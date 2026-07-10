@@ -36,7 +36,7 @@ namespace SpireChess.UI.Battle
 
         public void Render(BattleMinionRuntime minion)
         {
-            SetText("Name", minion.Name);
+            SetText("Name", minion.IsGolden ? $"金色{minion.Name}" : minion.Name);
             SetText("Stats", $"{minion.CurrentAttack}/{minion.CurrentHealth}");
             SetText("Tier", $"T{minion.Config.Tier}");
             SetText("Race", ToRaceName(minion.Config.Race));

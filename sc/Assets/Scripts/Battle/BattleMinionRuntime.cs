@@ -9,13 +9,25 @@ namespace SpireChess.Battle
     {
         private readonly HashSet<string> keywords;
 
-        public BattleMinionRuntime(MinionConfig config, bool isGolden = false)
+        public BattleMinionRuntime(
+            MinionConfig config,
+            bool isGolden = false,
+            int? initialAttack = null,
+            int? initialHealth = null,
+            string sourceInstanceId = null,
+            int permanentAttackBonus = 0,
+            int permanentHealthBonus = 0,
+            IEnumerable<string> permanentKeywords = null)
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             IsGolden = isGolden;
             keywords = new HashSet<string>(config.Keywords ?? Enumerable.Empty<string>());
-            CurrentAttack = BaseAttack;
-            CurrentHealth = BaseHealth;
+            keywords.UnionWith(permanentKeywords ?? Enumerable.Empty<string>());
+            SourceInstanceId = sourceInstanceId;
+            PermanentAttackBonus = permanentAttackBonus;
+            PermanentHealthBonus = permanentHealthBonus;
+            CurrentAttack = initialAttack ?? BaseAttack + permanentAttackBonus;
+            CurrentHealth = initialHealth ?? BaseHealth + permanentHealthBonus;
             HasShield = keywords.Contains("Shield");
         }
 
@@ -27,7 +39,8 @@ namespace SpireChess.Battle
             int permanentAttackBonus,
             int permanentHealthBonus,
             bool hasShield,
-            IEnumerable<string> keywords)
+            IEnumerable<string> keywords,
+            string sourceInstanceId)
         {
             Config = config;
             IsGolden = isGolden;
@@ -36,10 +49,12 @@ namespace SpireChess.Battle
             PermanentAttackBonus = permanentAttackBonus;
             PermanentHealthBonus = permanentHealthBonus;
             HasShield = hasShield;
+            SourceInstanceId = sourceInstanceId;
             this.keywords = new HashSet<string>(keywords ?? Enumerable.Empty<string>());
         }
 
         public MinionConfig Config { get; }
+        public string SourceInstanceId { get; }
         public string Id => Config.Id;
         public string Name => Config.Name;
         public int BaseAttack => IsGolden ? Config.GoldenAttack : Config.Attack;
@@ -65,7 +80,8 @@ namespace SpireChess.Battle
                 PermanentAttackBonus,
                 PermanentHealthBonus,
                 HasShield,
-                keywords);
+                keywords,
+                SourceInstanceId);
         }
 
         public bool TakeDamage(int damage, IList<string> log)
@@ -92,6 +108,18 @@ namespace SpireChess.Battle
 
             log.Add($"{Name} 死亡。");
             return true;
+        }
+
+        public void AddTemporaryStats(int attack, int health, IList<string> log)
+        {
+            if (!IsAlive || (attack == 0 && health == 0))
+            {
+                return;
+            }
+
+            CurrentAttack += attack;
+            CurrentHealth += health;
+            log.Add($"{Name} 获得 {FormatStatChange(attack, health)}，当前为 {CurrentAttack}/{CurrentHealth}。");
         }
 
         public string BuildKeywordText()
@@ -121,6 +149,23 @@ namespace SpireChess.Battle
                 default:
                     return keyword;
             }
+        }
+
+        private static string FormatStatChange(int attack, int health)
+        {
+            if (attack != 0 && health != 0)
+            {
+                return $"{FormatSigned(attack)}/{FormatSigned(health)}";
+            }
+
+            return attack != 0
+                ? $"{FormatSigned(attack)} 攻击"
+                : $"{FormatSigned(health)} 生命";
+        }
+
+        private static string FormatSigned(int value)
+        {
+            return value >= 0 ? $"+{value}" : value.ToString();
         }
     }
 }

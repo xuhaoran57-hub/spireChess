@@ -38,6 +38,9 @@ namespace SpireChess.Config
         [JsonProperty("cost")]
         public int Cost { get; set; }
 
+        [JsonProperty("shopEligible")]
+        public bool ShopEligible { get; set; } = true;
+
         [JsonProperty("artId")]
         public string ArtId { get; set; }
 

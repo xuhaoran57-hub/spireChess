@@ -22,8 +22,88 @@ namespace SpireChess.UI.Battle
         private static readonly Color SlotOutlineColor = new Color(1f, 1f, 1f, 0.18f);
         private static readonly Color AttackerOutlineColor = new Color(1f, 0.78f, 0.18f, 1f);
         private static readonly Color TargetOutlineColor = new Color(1f, 0.28f, 0.24f, 1f);
+        private static readonly Color SplashOutlineColor = new Color(0.95f, 0.48f, 0.12f, 1f);
+        private static readonly BattlePreset[] Presets =
+        {
+            new BattlePreset(
+                "基础阵容",
+                new[]
+                {
+                    "forge_soul_shield_squire",
+                    "hearth_core_spark",
+                    "young_deer_spirit",
+                    "stargazing_apprentice",
+                    "wandering_swordsman"
+                },
+                new[]
+                {
+                    "moss_mark_seedling",
+                    "copper_ring_apprentice",
+                    "glimmer_mage",
+                    "rending_cub",
+                    "forge_soul_shield_squire"
+                }),
+            new BattlePreset(
+                "随机目标",
+                new[] { "wandering_swordsman", null, null, null, null },
+                new[] { "moss_mark_seedling", null, "glimmer_mage", null, "rending_cub" }),
+            new BattlePreset(
+                "多个嘲讽",
+                new[] { "wandering_swordsman", null, null, null, null },
+                new[]
+                {
+                    "moss_mark_seedling",
+                    "forge_soul_shield_squire",
+                    "glimmer_mage",
+                    "shieldwall_furnace_keeper",
+                    "rending_cub"
+                }),
+            new BattlePreset(
+                "普通溅射",
+                new[] { "formation_breaker_mercenary", null, null, null, null },
+                new[]
+                {
+                    null,
+                    "moss_mark_seedling",
+                    "forge_soul_shield_squire",
+                    "glimmer_mage",
+                    null
+                }),
+            new BattlePreset(
+                "金色溅射",
+                new[] { "formation_breaker_mercenary", null, null, null, null },
+                new[]
+                {
+                    null,
+                    "hearth_core_spark",
+                    "shieldwall_furnace_keeper",
+                    "glimmer_mage",
+                    null
+                },
+                new[] { 0 }),
+            new BattlePreset(
+                "亡语召唤",
+                new[] { "young_deer_spirit", null, null, null, null },
+                new[] { "wandering_swordsman", null, null, null, null }),
+            new BattlePreset(
+                "迅捷幼灵",
+                new[] { "hundred_song_herd", null, null, null, null },
+                new[] { "oathbroken_blade_soul", null, null, null, null }),
+            new BattlePreset(
+                "召唤失败",
+                new[]
+                {
+                    "young_deer_spirit",
+                    "young_deer_spirit",
+                    "young_deer_spirit",
+                    "young_deer_spirit",
+                    "young_deer_spirit"
+                },
+                new[] { "oathbroken_blade_soul", null, null, null, null },
+                new[] { 0, 1, 2, 3, 4 })
+        };
 
-        private readonly BattleSimulator simulator = new BattleSimulator();
+        private BattleSimulator simulator;
         private readonly Dictionary<string, Transform> slotContentRoots = new Dictionary<string, Transform>();
         private readonly Dictionary<string, Outline> slotOutlines = new Dictionary<string, Outline>();
         private readonly List<string> displayedLog = new List<string>();
@@ -36,6 +116,7 @@ namespace SpireChess.UI.Battle
         private BattleStep activeStep;
         private bool battleRunning;
         private bool battleResolved;
+        private int presetIndex;
         private static Font uiFont;
 
         public bool IsBattleLocked => battleRunning || battleResolved;
@@ -76,12 +157,20 @@ namespace SpireChess.UI.Battle
                 return;
             }
 
-            setupState = BuildInitialState(GameApp.Instance.Configs);
+            var configs = GameApp.Instance.Configs;
+            simulator = new BattleSimulator(
+                new System.Random(),
+                id =>
+                {
+                    MinionConfig config;
+                    return configs.TryGetMinion(id, out config) ? config : null;
+                });
+            setupState = BuildInitialState(configs, Presets[presetIndex]);
             displayedState = setupState.Clone();
             BuildUi();
             RebuildCards();
             SetLog(new[] { "拖拽同一阵营的卡牌可以交换站位。点击开始战斗逐步播放结算。" });
-            SetStatus("准备阶段");
+            SetStatus(BuildReadyStatus());
         }
 
         public void MoveCard(BattleSide fromSide, int fromIndex, BattleSide toSide, int toIndex)
@@ -157,54 +246,84 @@ namespace SpireChess.UI.Battle
                 playbackCoroutine = null;
             }
 
-            setupState = BuildInitialState(GameApp.Instance.Configs);
+            setupState = BuildInitialState(GameApp.Instance.Configs, Presets[presetIndex]);
             displayedState = setupState.Clone();
             activeStep = null;
             displayedLog.Clear();
             battleRunning = false;
             battleResolved = false;
             RebuildCards();
-            SetLog(new[] { "已重置测试阵容。" });
-            SetStatus("准备阶段");
+            SetLog(new[] { $"已重置测试阵容：{Presets[presetIndex].Name}。" });
+            SetStatus(BuildReadyStatus());
         }
 
-        private static BattleBoardState BuildInitialState(ConfigService configs)
+        private void NextPreset()
+        {
+            if (battleRunning)
+            {
+                return;
+            }
+
+            presetIndex = (presetIndex + 1) % Presets.Length;
+            ResetBattle();
+            SetLog(new[] { $"已切换测试阵容：{Presets[presetIndex].Name}。" });
+        }
+
+        private void RunBatchSimulation()
+        {
+            if (battleRunning)
+            {
+                return;
+            }
+
+            const int simulationCount = 10;
+            var playerWins = 0;
+            var enemyWins = 0;
+            var draws = 0;
+            for (var i = 0; i < simulationCount; i++)
+            {
+                var result = simulator.Simulate(setupState);
+                if (!result.Winner.HasValue)
+                {
+                    draws++;
+                }
+                else if (result.Winner.Value == BattleSide.Player)
+                {
+                    playerWins++;
+                }
+                else
+                {
+                    enemyWins++;
+                }
+            }
+
+            SetLog(new[]
+            {
+                $"预设：{Presets[presetIndex].Name}",
+                $"连续模拟 {simulationCount} 场：玩家 {playerWins} 胜，敌方 {enemyWins} 胜，平局 {draws} 场。"
+            });
+            SetStatus($"批量模拟完成 · {Presets[presetIndex].Name}");
+        }
+
+        private static BattleBoardState BuildInitialState(ConfigService configs, BattlePreset preset)
         {
             var state = new BattleBoardState();
-
-            var playerIds = new[]
-            {
-                "forge_soul_shield_squire",
-                "hearth_core_spark",
-                "young_deer_spirit",
-                "stargazing_apprentice",
-                "wandering_swordsman"
-            };
-
-            var enemyIds = new[]
-            {
-                "moss_mark_seedling",
-                "copper_ring_apprentice",
-                "glimmer_mage",
-                "rending_cub",
-                "forge_soul_shield_squire"
-            };
-
-            FillRow(state.Player, configs, playerIds);
-            FillRow(state.Enemy, configs, enemyIds);
+            FillRow(state.Player, configs, preset.PlayerIds, preset.PlayerGoldenSlots);
+            FillRow(state.Enemy, configs, preset.EnemyIds, preset.EnemyGoldenSlots);
             return state;
         }
 
         private static void FillRow(
             IList<BattleMinionRuntime> row,
             ConfigService configs,
-            IReadOnlyList<string> ids)
+            IReadOnlyList<string> ids,
+            ISet<int> goldenSlots)
         {
             for (var i = 0; i < BattleBoardState.SlotCount; i++)
             {
-                if (configs.TryGetMinion(ids[i], out var config))
+                if (!string.IsNullOrEmpty(ids[i]) && configs.TryGetMinion(ids[i], out var config))
                 {
-                    row[i] = new BattleMinionRuntime(config);
+                    row[i] = new BattleMinionRuntime(config, goldenSlots.Contains(i));
                 }
             }
         }
@@ -228,7 +347,13 @@ namespace SpireChess.UI.Battle
             Anchor(statusText.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(280f, 0f), new Vector2(520f, 0f));
 
             var startButton = CreateButton("StartBattleButton", top, "开始战斗", StartBattle);
-            Anchor(startButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-360f, -25f), new Vector2(-220f, 25f));
+            Anchor(startButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-520f, -25f), new Vector2(-380f, 25f));
+
+            var batchButton = CreateButton("BatchButton", top, "模拟10场", RunBatchSimulation);
+            Anchor(batchButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-680f, -25f), new Vector2(-540f, 25f));
+
+            var presetButton = CreateButton("PresetButton", top, "切换预设", NextPreset);
+            Anchor(presetButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-360f, -25f), new Vector2(-220f, 25f));
 
             var resetButton = CreateButton("ResetButton", top, "重置", ResetBattle);
             Anchor(resetButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-200f, -25f), new Vector2(-80f, 25f));
@@ -550,6 +675,15 @@ namespace SpireChess.UI.Battle
                 activeStep.TargetIndex,
                 TargetOutlineColor,
                 new Vector2(4f, -4f));
+
+            foreach (var splashTargetIndex in activeStep.SplashTargetIndexes)
+            {
+                SetSlotHighlight(
+                    activeStep.TargetSide.Value,
+                    splashTargetIndex,
+                    SplashOutlineColor,
+                    new Vector2(4f, -4f));
+            }
         }
 
         private void SetSlotHighlight(BattleSide side, int index, Color color, Vector2 distance)
@@ -594,6 +728,34 @@ namespace SpireChess.UI.Battle
         private static string BuildSlotKey(BattleSide side, int index)
         {
             return side + ":" + index;
+        }
+
+        private string BuildReadyStatus()
+        {
+            return $"准备阶段 · {Presets[presetIndex].Name}";
+        }
+
+        private sealed class BattlePreset
+        {
+            public BattlePreset(
+                string name,
+                string[] playerIds,
+                string[] enemyIds,
+                IEnumerable<int> playerGoldenSlots = null,
+                IEnumerable<int> enemyGoldenSlots = null)
+            {
+                Name = name;
+                PlayerIds = playerIds;
+                EnemyIds = enemyIds;
+                PlayerGoldenSlots = new HashSet<int>(playerGoldenSlots ?? new int[0]);
+                EnemyGoldenSlots = new HashSet<int>(enemyGoldenSlots ?? new int[0]);
+            }
+
+            public string Name { get; }
+            public IReadOnlyList<string> PlayerIds { get; }
+            public IReadOnlyList<string> EnemyIds { get; }
+            public ISet<int> PlayerGoldenSlots { get; }
+            public ISet<int> EnemyGoldenSlots { get; }
         }
     }
 

@@ -7,7 +7,10 @@ namespace SpireChess.Config
     {
         private const int ExpectedMinionCount = 52;
         private const int ExpectedTokenCount = 2;
-        private const int ExpectedSpellCount = 15;
+        private const int ExpectedSpellCount = 16;
+        private const int ExpectedShopSpellCount = 15;
+        private const string TripleDiscoveryRewardSpellId =
+            "triple_discovery_reward";
 
         private static readonly HashSet<string> ValidRaces = new HashSet<string>
         {
@@ -39,9 +42,7 @@ namespace SpireChess.Config
 
         private static readonly HashSet<string> ValidUseTiming = new HashSet<string>
         {
-            "Shop",
-            "Prep",
-            "Combat"
+            "Shop"
         };
 
         public static ConfigValidationResult Validate(
@@ -146,6 +147,13 @@ namespace SpireChess.Config
                 result.AddError($"Spell count should be {ExpectedSpellCount}, got {spells.Count}.");
             }
 
+            var shopSpellCount = spells.Count(spell => spell.ShopEligible);
+            if (shopSpellCount != ExpectedShopSpellCount)
+            {
+                result.AddError(
+                    $"Shop spell count should be {ExpectedShopSpellCount}, got {shopSpellCount}.");
+            }
+
             foreach (var group in spells.GroupBy(spell => spell.Id))
             {
                 if (string.IsNullOrWhiteSpace(group.Key))
@@ -170,7 +178,49 @@ namespace SpireChess.Config
                     result.AddError($"Invalid spell type for spell {spell.Id}: {spell.SpellType}.");
                 }
 
+                if (spell.Cost != 1)
+                {
+                    result.AddError($"Spell {spell.Id} should cost 1, got {spell.Cost}.");
+                }
+
                 ValidateUseTiming(spell, result);
+            }
+
+            ValidateTripleDiscoveryReward(spells, result);
+        }
+
+        private static void ValidateTripleDiscoveryReward(
+            IReadOnlyList<SpellConfig> spells,
+            ConfigValidationResult result)
+        {
+            var reward = spells.FirstOrDefault(
+                spell => spell.Id == TripleDiscoveryRewardSpellId);
+            if (reward == null)
+            {
+                result.AddError("Triple discovery reward spell is missing.");
+                return;
+            }
+
+            if (reward.ShopEligible)
+            {
+                result.AddError("Triple discovery reward must not enter the shop pool.");
+            }
+
+            var effects = reward.Effects ?? new List<EffectConfig>();
+            var effect = effects.Count == 1 ? effects[0] : null;
+            var discover = effect?.Discover;
+            if (effect?.Trigger != "Manual" ||
+                effect.Action != "DiscoverMinion" ||
+                discover == null ||
+                discover.CardType != "Minion" ||
+                discover.TierMode != "ExactCurrentTavernTier" ||
+                discover.Count != 3 ||
+                discover.Pick != 1 ||
+                discover.IncludeToken ||
+                discover.IncludeDisabled ||
+                discover.RequireGolden)
+            {
+                result.AddError("Triple discovery reward configuration is invalid.");
             }
         }
 

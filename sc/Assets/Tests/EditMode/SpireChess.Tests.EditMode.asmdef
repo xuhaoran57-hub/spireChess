@@ -1,0 +1,21 @@
+{
+  "name": "SpireChess.Tests.EditMode",
+  "rootNamespace": "SpireChess.Tests",
+  "references": [
+    "SpireChess.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "noEngineReferences": false
+}

@@ -1,0 +1,418 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using SpireChess.Config;
+
+namespace SpireChess.Shop
+{
+    public enum ShopCardType
+    {
+        Minion,
+        Spell
+    }
+
+    public enum ShopOperationError
+    {
+        None,
+        ShopClosed,
+        ShopAlreadyOpen,
+        InvalidIndex,
+        EmptySlot,
+        InsufficientGold,
+        BenchFull,
+        InvalidCardType,
+        InvalidCardLocation,
+        OccupiedBattleSlot,
+        InvalidTarget,
+        NoBenefit,
+        UnsupportedEffect,
+        InvalidTiming,
+        DiscoveryPending,
+        NoDiscoveryPending,
+        AlreadyUpgradedThisRound,
+        MaximumTavernTier
+    }
+
+    public enum ShopEventType
+    {
+        OnShopPhaseStart,
+        OnShopPhaseEnd,
+        OnRefresh,
+        OnBuy,
+        OnSell,
+        OnPlay,
+        OnSpellUsed,
+        OnTripleFormed,
+        OnTripleRewardGranted,
+        OnDiscoverStarted,
+        OnDiscoverResolved,
+        OnDiscoverCancelled,
+        OnTavernUpgraded
+    }
+
+    public sealed class ShopOperationResult
+    {
+        private ShopOperationResult(bool success, ShopOperationError error, int benchIndex)
+        {
+            Success = success;
+            Error = error;
+            BenchIndex = benchIndex;
+        }
+
+        public bool Success { get; }
+        public ShopOperationError Error { get; }
+        public int BenchIndex { get; }
+
+        public static ShopOperationResult Succeed(int benchIndex = -1)
+        {
+            return new ShopOperationResult(true, ShopOperationError.None, benchIndex);
+        }
+
+        public static ShopOperationResult Fail(ShopOperationError error)
+        {
+            return new ShopOperationResult(false, error, -1);
+        }
+    }
+
+    public sealed class ShopCardInstance
+    {
+        private ShopCardInstance(
+            string instanceId,
+            ShopCardType cardType,
+            MinionConfig minion,
+            SpellConfig spell,
+            bool isGolden,
+            int permanentAttackBonus,
+            int permanentHealthBonus,
+            IEnumerable<string> permanentKeywords,
+            bool tripleDiscoveryPending)
+        {
+            InstanceId = instanceId;
+            CardType = cardType;
+            Minion = minion;
+            Spell = spell;
+            IsGolden = isGolden;
+            PermanentAttackBonus = permanentAttackBonus;
+            PermanentHealthBonus = permanentHealthBonus;
+            PermanentKeywords = new HashSet<string>(
+                permanentKeywords ?? Array.Empty<string>());
+            TripleDiscoveryPending = tripleDiscoveryPending;
+        }
+
+        public string InstanceId { get; }
+        public ShopCardType CardType { get; }
+        public MinionConfig Minion { get; }
+        public SpellConfig Spell { get; }
+        public string ConfigId => CardType == ShopCardType.Minion ? Minion.Id : Spell.Id;
+        public bool IsGolden { get; }
+        public int PermanentAttackBonus { get; private set; }
+        public int PermanentHealthBonus { get; private set; }
+        public IReadOnlyCollection<string> PermanentKeywords { get; }
+        public bool TripleDiscoveryPending { get; internal set; }
+        public int PoolCopiesHeld => IsGolden ? 3 : 1;
+        public int CurrentAttack => CardType == ShopCardType.Minion
+            ? (IsGolden ? Minion.GoldenAttack : Minion.Attack) + PermanentAttackBonus
+            : 0;
+        public int CurrentHealth => CardType == ShopCardType.Minion
+            ? (IsGolden ? Minion.GoldenHealth : Minion.Health) + PermanentHealthBonus
+            : 0;
+
+        public static ShopCardInstance CreateMinion(
+            string instanceId,
+            MinionConfig minion,
+            bool isGolden = false,
+            int permanentAttackBonus = 0,
+            int permanentHealthBonus = 0,
+            IEnumerable<string> permanentKeywords = null,
+            bool tripleDiscoveryPending = false)
+        {
+            return new ShopCardInstance(
+                instanceId,
+                ShopCardType.Minion,
+                minion ?? throw new ArgumentNullException(nameof(minion)),
+                null,
+                isGolden,
+                permanentAttackBonus,
+                permanentHealthBonus,
+                permanentKeywords,
+                tripleDiscoveryPending);
+        }
+
+        public static ShopCardInstance CreateSpell(string instanceId, SpellConfig spell)
+        {
+            return new ShopCardInstance(
+                instanceId,
+                ShopCardType.Spell,
+                null,
+                spell ?? throw new ArgumentNullException(nameof(spell)),
+                false,
+                0,
+                0,
+                null,
+                false);
+        }
+
+        internal void ApplyPermanentStats(int attack, int health)
+        {
+            if (CardType != ShopCardType.Minion)
+            {
+                throw new InvalidOperationException("Only minions can receive permanent stats.");
+            }
+
+            PermanentAttackBonus += attack;
+            PermanentHealthBonus += health;
+        }
+    }
+
+    public sealed class ShopEventData
+    {
+        public ShopEventData(
+            ShopEventType type,
+            ShopCardInstance card = null,
+            int cost = 0,
+            int refreshCount = 0,
+            int previousTavernTier = 0,
+            int tavernTier = 0,
+            ShopCardInstance targetCard = null)
+        {
+            Type = type;
+            Card = card;
+            Cost = cost;
+            RefreshCount = refreshCount;
+            PreviousTavernTier = previousTavernTier;
+            TavernTier = tavernTier;
+            TargetCard = targetCard;
+        }
+
+        public ShopEventType Type { get; }
+        public ShopCardInstance Card { get; }
+        public int Cost { get; }
+        public int RefreshCount { get; }
+        public int PreviousTavernTier { get; }
+        public int TavernTier { get; }
+        public ShopCardInstance TargetCard { get; }
+    }
+
+    public sealed class ShopDiscoverState
+    {
+        internal ShopDiscoverState(
+            ShopCardInstance sourceSpell,
+            int benchIndex,
+            IEnumerable<MinionConfig> candidates)
+        {
+            SourceSpell = sourceSpell ??
+                throw new ArgumentNullException(nameof(sourceSpell));
+            BenchIndex = benchIndex;
+            Candidates = new List<MinionConfig>(
+                candidates ?? throw new ArgumentNullException(nameof(candidates)))
+                .AsReadOnly();
+        }
+
+        public ShopCardInstance SourceSpell { get; }
+        public int BenchIndex { get; }
+        public IReadOnlyList<MinionConfig> Candidates { get; }
+    }
+
+    public sealed class PlayerCollection
+    {
+        private readonly ShopCardInstance[] bench =
+            new ShopCardInstance[ShopEconomyRules.BenchSlotCount];
+        private readonly ShopCardInstance[] battle =
+            new ShopCardInstance[ShopEconomyRules.BattleSlotCount];
+
+        public IReadOnlyList<ShopCardInstance> Bench => bench;
+        public IReadOnlyList<ShopCardInstance> Battle => battle;
+
+        public bool TryAddToBench(ShopCardInstance card, out int benchIndex)
+        {
+            if (card == null)
+            {
+                benchIndex = -1;
+                return false;
+            }
+
+            for (var i = 0; i < bench.Length; i++)
+            {
+                if (bench[i] != null)
+                {
+                    continue;
+                }
+
+                bench[i] = card;
+                benchIndex = i;
+                return true;
+            }
+
+            benchIndex = -1;
+            return false;
+        }
+
+        internal ShopCardInstance RemoveSellableMinionFromBattle(int index)
+        {
+            if (!IsValidIndex(index, battle.Length))
+            {
+                return null;
+            }
+
+            var card = battle[index];
+            if (!IsSellableMinion(card))
+            {
+                return null;
+            }
+
+            battle[index] = null;
+            return card;
+        }
+
+        internal bool PlaceBenchMinionInBattle(int benchIndex, int battleIndex)
+        {
+            if (!IsValidIndex(benchIndex, bench.Length) ||
+                !IsValidIndex(battleIndex, battle.Length))
+            {
+                return false;
+            }
+
+            var source = bench[benchIndex];
+            if (source == null || source.CardType != ShopCardType.Minion ||
+                battle[battleIndex] != null)
+            {
+                return false;
+            }
+
+            bench[benchIndex] = null;
+            battle[battleIndex] = source;
+            return true;
+        }
+
+        internal bool RepositionBattleMinion(int sourceIndex, int targetIndex)
+        {
+            if (!IsValidIndex(sourceIndex, battle.Length) ||
+                !IsValidIndex(targetIndex, battle.Length) ||
+                battle[sourceIndex] == null)
+            {
+                return false;
+            }
+
+            if (sourceIndex == targetIndex)
+            {
+                return true;
+            }
+
+            var target = battle[targetIndex];
+            battle[targetIndex] = battle[sourceIndex];
+            battle[sourceIndex] = target;
+            return true;
+        }
+
+        internal ShopCardInstance RemoveUsedSpellFromBench(int index)
+        {
+            if (!IsValidIndex(index, bench.Length) ||
+                bench[index] == null ||
+                bench[index].CardType != ShopCardType.Spell)
+            {
+                return null;
+            }
+
+            var spell = bench[index];
+            bench[index] = null;
+            return spell;
+        }
+
+        internal int EmptyBenchSlotCount()
+        {
+            var count = 0;
+            for (var i = 0; i < bench.Length; i++)
+            {
+                if (bench[i] == null)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        internal bool RemoveTripleMaterials(
+            IReadOnlyCollection<ShopCardInstance> materials)
+        {
+            if (materials == null || materials.Count != 3)
+            {
+                return false;
+            }
+
+            var unique = new HashSet<ShopCardInstance>(materials);
+            if (unique.Count != 3)
+            {
+                return false;
+            }
+
+            var owned = new HashSet<ShopCardInstance>();
+            for (var i = 0; i < bench.Length; i++)
+            {
+                if (bench[i] != null)
+                {
+                    owned.Add(bench[i]);
+                }
+            }
+
+            for (var i = 0; i < battle.Length; i++)
+            {
+                if (battle[i] != null)
+                {
+                    owned.Add(battle[i]);
+                }
+            }
+
+            if (unique.Any(card => !owned.Contains(card)))
+            {
+                return false;
+            }
+
+            for (var i = 0; i < bench.Length; i++)
+            {
+                if (bench[i] != null && unique.Contains(bench[i]))
+                {
+                    bench[i] = null;
+                }
+            }
+
+            for (var i = 0; i < battle.Length; i++)
+            {
+                if (battle[i] != null && unique.Contains(battle[i]))
+                {
+                    battle[i] = null;
+                }
+            }
+
+            return true;
+        }
+
+        internal bool ReplaceBenchCard(
+            int index,
+            ShopCardInstance expected,
+            ShopCardInstance replacement)
+        {
+            if (!IsValidIndex(index, bench.Length) ||
+                expected == null || replacement == null ||
+                !ReferenceEquals(bench[index], expected))
+            {
+                return false;
+            }
+
+            bench[index] = replacement;
+            return true;
+        }
+
+        private static bool IsValidIndex(int index, int count)
+        {
+            return index >= 0 && index < count;
+        }
+
+        private static bool IsSellableMinion(ShopCardInstance card)
+        {
+            return card != null &&
+                card.CardType == ShopCardType.Minion &&
+                !card.Minion.IsToken;
+        }
+    }
+}

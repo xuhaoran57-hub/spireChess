@@ -91,8 +91,40 @@
       "artId": "placeholder_card_young_deer_spirit",
       "iconId": "icon_wild_spirit",
       "audioId": "",
-      "effects": [],
-      "goldenEffects": [],
+      "effects": [
+        {
+          "id": "young_deer_spirit_deathrattle",
+          "trigger": "OnDeath",
+          "action": "SummonToken",
+          "value": { "attack": 0, "health": 0, "amount": 1, "duration": "Combat", "keyword": "", "resource": "token_young_spirit" },
+          "fallbackEffects": [
+            {
+              "id": "young_deer_spirit_summon_failed",
+              "trigger": "OnSummonFailed",
+              "action": "ModifyStats",
+              "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeToken": false, "maxTargets": 1, "selector": "Random" },
+              "value": { "attack": 1, "health": 1, "amount": 0, "duration": "Combat", "keyword": "", "resource": "" }
+            }
+          ]
+        }
+      ],
+      "goldenEffects": [
+        {
+          "id": "golden_young_deer_spirit_deathrattle",
+          "trigger": "OnDeath",
+          "action": "SummonToken",
+          "value": { "attack": 0, "health": 0, "amount": 2, "duration": "Combat", "keyword": "", "resource": "token_young_spirit" },
+          "fallbackEffects": [
+            {
+              "id": "golden_young_deer_spirit_summon_failed",
+              "trigger": "OnSummonFailed",
+              "action": "ModifyStats",
+              "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeToken": false, "maxTargets": 1, "selector": "Random" },
+              "value": { "attack": 1, "health": 1, "amount": 0, "duration": "Combat", "keyword": "", "resource": "" }
+            }
+          ]
+        }
+      ],
       "tags": ["summon"],
       "enabled": true,
       "devNote": ""
@@ -163,8 +195,22 @@
       "artId": "placeholder_card_stargazing_apprentice",
       "iconId": "icon_starbound",
       "audioId": "",
-      "effects": [],
-      "goldenEffects": [],
+      "effects": [
+        {
+          "id": "stargazing_apprentice_on_play",
+          "trigger": "OnPlay",
+          "action": "FreeRefresh",
+          "value": { "amount": 1 }
+        }
+      ],
+      "goldenEffects": [
+        {
+          "id": "stargazing_apprentice_on_play_golden",
+          "trigger": "OnPlay",
+          "action": "FreeRefresh",
+          "value": { "amount": 2 }
+        }
+      ],
       "tags": ["refresh"],
       "enabled": true,
       "devNote": ""
@@ -475,8 +521,22 @@
       "artId": "placeholder_card_black_market_vendor",
       "iconId": "icon_wayfarer",
       "audioId": "",
-      "effects": [],
-      "goldenEffects": [],
+      "effects": [
+        {
+          "id": "black_market_vendor_on_play",
+          "trigger": "OnPlay",
+          "action": "GainGold",
+          "value": { "amount": 1 }
+        }
+      ],
+      "goldenEffects": [
+        {
+          "id": "black_market_vendor_on_play_golden",
+          "trigger": "OnPlay",
+          "action": "GainGold",
+          "value": { "amount": 2 }
+        }
+      ],
       "tags": ["gold", "battlecry"],
       "enabled": true,
       "devNote": ""
@@ -835,8 +895,40 @@
       "artId": "placeholder_card_hundred_song_herd",
       "iconId": "icon_wild_spirit",
       "audioId": "",
-      "effects": [],
-      "goldenEffects": [],
+      "effects": [
+        {
+          "id": "hundred_song_herd_deathrattle",
+          "trigger": "OnDeath",
+          "action": "SummonToken",
+          "value": { "attack": 2, "health": 1, "amount": 2, "duration": "Combat", "keyword": "", "resource": "token_swift_young_spirit" },
+          "fallbackEffects": [
+            {
+              "id": "hundred_song_herd_summon_failed",
+              "trigger": "OnSummonFailed",
+              "action": "ModifyStats",
+              "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeToken": false, "maxTargets": 1, "selector": "Random" },
+              "value": { "attack": 2, "health": 0, "amount": 0, "duration": "Combat", "keyword": "", "resource": "" }
+            }
+          ]
+        }
+      ],
+      "goldenEffects": [
+        {
+          "id": "golden_hundred_song_herd_deathrattle",
+          "trigger": "OnDeath",
+          "action": "SummonToken",
+          "value": { "attack": 4, "health": 2, "amount": 2, "duration": "Combat", "keyword": "", "resource": "token_swift_young_spirit" },
+          "fallbackEffects": [
+            {
+              "id": "golden_hundred_song_herd_summon_failed",
+              "trigger": "OnSummonFailed",
+              "action": "ModifyStats",
+              "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeToken": false, "maxTargets": 1, "selector": "Random" },
+              "value": { "attack": 4, "health": 0, "amount": 0, "duration": "Combat", "keyword": "", "resource": "" }
+            }
+          ]
+        }
+      ],
       "tags": ["summon", "immediate_attack"],
       "enabled": true,
       "devNote": ""
@@ -1243,7 +1335,13 @@
       "artId": "placeholder_token_swift_young_spirit",
       "iconId": "icon_wild_spirit",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "swift_young_spirit_immediate_attack",
+          "trigger": "OnSummon",
+          "action": "ImmediateAttack"
+        }
+      ],
       "goldenEffects": [],
       "tags": ["token", "summon", "immediate_attack"],
       "enabled": true,

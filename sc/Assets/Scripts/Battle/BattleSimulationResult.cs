@@ -36,6 +36,7 @@ namespace SpireChess.Battle
             int attackerIndex = -1,
             BattleSide? targetSide = null,
             int targetIndex = -1,
+            IEnumerable<int> splashTargetIndexes = null,
             BattleSide? winner = null)
         {
             BoardState = boardState;
@@ -44,6 +45,7 @@ namespace SpireChess.Battle
             AttackerIndex = attackerIndex;
             TargetSide = targetSide;
             TargetIndex = targetIndex;
+            SplashTargetIndexes = new List<int>(splashTargetIndexes ?? new int[0]);
             Winner = winner;
         }
 
@@ -53,6 +55,7 @@ namespace SpireChess.Battle
         public int AttackerIndex { get; }
         public BattleSide? TargetSide { get; }
         public int TargetIndex { get; }
+        public IReadOnlyList<int> SplashTargetIndexes { get; }
         public BattleSide? Winner { get; }
         public bool HasAttack => AttackerSide.HasValue && TargetSide.HasValue;
     }

@@ -41,6 +41,12 @@ namespace SpireChess.Config
         [JsonProperty("scope")]
         public string Scope { get; set; }
 
+        [JsonProperty("zones")]
+        public List<string> Zones { get; set; } = new List<string> { "Battle" };
+
+        [JsonProperty("includeSelf")]
+        public bool IncludeSelf { get; set; }
+
         [JsonProperty("race")]
         public string Race { get; set; }
 
@@ -115,6 +121,9 @@ namespace SpireChess.Config
 
         [JsonProperty("race")]
         public string Race { get; set; }
+
+        [JsonProperty("tierMode")]
+        public string TierMode { get; set; } = "Range";
 
         [JsonProperty("minTier")]
         public int MinTier { get; set; }

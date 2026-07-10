@@ -51,10 +51,18 @@
 
 溅射规则：
 
-- 普通溅射：攻击时，对攻击目标左右两侧的随从造成本次攻击伤害 50% 的伤害。
+- 普通溅射：攻击时，将本次攻击伤害拆分给攻击目标左右两侧的随从，两侧伤害总和为 100%。
+- 攻击力为奇数时，一侧向下取整、另一侧向上取整，多出的 1 点等概率随机分配给左侧或右侧。
+- 左右伤害在检查相邻槽位前完成分配；一侧为空时，该侧伤害不会转移给另一侧。
 - 金色溅射：攻击时，对攻击目标左右两侧的随从造成本次攻击伤害 100% 的伤害。
 - 溅射只影响攻击目标相邻位置上的随从，不会继续扩散。
 - 溅射伤害可以被护盾抵挡。
+
+目标选择规则：
+
+- 没有嘲讽时，从所有存活敌人中等概率随机选择目标。
+- 存在嘲讽时，仅从所有存活嘲讽单位中等概率随机选择目标。
+- 目标选择不考虑对位、距离或左右顺序。
 
 ### 2.3 流派标签
 
@@ -148,7 +156,7 @@ Assets/Configs/Json/minions.json
 | effects | EffectConfig[] | 否 | 普通效果 |
 | goldenEffects | EffectConfig[] | 否 | 金色效果 |
 | tags | string[] | 否 | 调试和筛选标签 |
-| enabled | bool | 是 | 是否进入牌池 |
+| enabled | bool | 是 | 配置是否启用；启用的非 Token 随从进入有限随从牌池 |
 | devNote | string | 否 | 设计备注 |
 
 ## 4. Token JSON 字段
@@ -212,9 +220,10 @@ Assets/Configs/Json/spells.json
 
   "tier": 1,
   "spellType": "Growth",
-  "useTiming": ["Shop", "Prep"],
+  "useTiming": ["Shop"],
   "rarity": "Common",
-  "cost": 3,
+  "cost": 1,
+  "shopEligible": true,
 
   "artId": "placeholder_spell_growth_001",
   "iconId": "icon_spell_growth",
@@ -240,13 +249,16 @@ Assets/Configs/Json/spells.json
 | useTiming | string[] | 是 | 可使用时机 |
 | rarity | string | 否 | 稀有度 |
 | cost | int | 是 | 商店购买费用 |
+| shopEligible | bool | 是 | 是否可以出现在普通商店法术位；三连奖励法术设为 false |
 | artId | string | 否 | 美术资源 ID |
 | iconId | string | 否 | 图标资源 ID |
 | audioId | string | 否 | 音效资源 ID |
 | effects | EffectConfig[] | 是 | 效果配置 |
 | tags | string[] | 否 | 调试和筛选标签 |
-| enabled | bool | 是 | 是否进入牌池 |
+| enabled | bool | 是 | 配置是否启用；是否进入普通商店另由 `shopEligible` 控制 |
 | devNote | string | 否 | 设计备注 |
+
+法术配置总数为 16：15 张 `shopEligible: true` 的普通商店法术，以及 1 张 ID 为 `triple_discovery_reward`、`shopEligible: false` 的三连系统奖励法术。
 
 ### 5.4 法术类型
 
@@ -272,7 +284,7 @@ Assets/Configs/Json/spells.json
 ]
 ```
 
-MVP 默认不支持玩家在战斗中手动使用法术，因此 `Combat` 暂时不用。
+阶段 3 只使用 `Shop`，商店阶段同时承担阵容准备功能；`Prep` 和 `Combat` 保留给后续独立阶段，当前暂不使用。
 
 金色效果规则：
 
@@ -292,6 +304,8 @@ MVP 默认不支持玩家在战斗中手动使用法术，因此 `Combat` 暂时
   "target": {
     "side": "Ally",
     "scope": "Self",
+    "zones": ["Battle"],
+    "includeSelf": false,
     "race": "",
     "includeToken": false,
     "maxTargets": 1,
@@ -339,8 +353,9 @@ MVP 默认不支持玩家在战斗中手动使用法术，因此 `Combat` 暂时
 
 MVP 实现说明：
 
-- `fallbackEffects` 字段可以保留在 JSON 中，但运行时先忽略。
-- 需要备用逻辑的复杂牌，先通过代码特殊处理。
+- `SummonToken` 召唤失败时，运行时支持执行 `fallbackEffects` 中的单目标 `ModifyStats`；其他备用动作暂不实现。
+- 阶段 3B 已支持系统奖励法术使用 `DiscoverMinion`，并要求其 `tierMode` 为 `ExactCurrentTavernTier`。
+- 需要其他备用逻辑的复杂牌，先通过代码特殊处理。
 - 特殊处理统一使用 `effectId` 定位。
 
 ## 7. 触发时机
@@ -357,6 +372,7 @@ MVP 实现说明：
   "OnShieldGained",
   "OnShieldLost",
   "OnSummon",
+  "OnSummonFailed",
   "OnSummonedUnitDeath",
   "OnSpellUsed",
   "OnRefresh",
@@ -376,6 +392,7 @@ MVP 实现说明：
 - `OnShieldGained`：获得护盾。
 - `OnShieldLost`：失去护盾。
 - `OnSummon`：召唤成功。
+- `OnSummonFailed`：单次召唤因没有空位而失败，仅用于该次召唤的备用效果。
 - `OnSummonedUnitDeath`：召唤物死亡。
 - `OnSpellUsed`：使用法术。
 - `OnRefresh`：商店刷新。
@@ -433,6 +450,8 @@ MVP 实现说明：
 {
   "side": "Ally",
   "scope": "Self",
+  "zones": ["Battle"],
+  "includeSelf": false,
   "race": "",
   "includeToken": false,
   "maxTargets": 1,
@@ -446,7 +465,16 @@ MVP 实现说明：
 ["Ally", "Enemy", "Both"]
 ```
 
-### 9.3 scope
+### 9.3 zones
+
+```json
+["Battle"]
+```
+
+- 阶段 3 的战吼和法术只能选择操作完成后的最终战斗区，因此只支持 `Battle`。
+- `Bench` 作为后续扩展保留，阶段 3 不允许法术或战吼选择备战区随从。
+
+### 9.4 scope
 
 ```json
 [
@@ -466,7 +494,7 @@ MVP 实现说明：
 ]
 ```
 
-### 9.4 selector
+### 9.5 selector
 
 ```json
 ["None", "PlayerChoice", "Random", "LowestAttack", "LowestHealth", "MostCommonRace"]
@@ -474,6 +502,8 @@ MVP 实现说明：
 
 说明：
 
+- `includeSelf` 默认 false，“友方随从”不包含战吼来源自身；`scope: Self` 时忽略该字段并选择来源自身。
+- 法术没有随从来源，`includeSelf` 对法术不生效。
 - 永久强化默认 `includeToken: false`。
 - 临时强化可以允许 `includeToken: true`。
 - `MostCommonRace` 只统计主种族，不统计旅团。
@@ -582,6 +612,7 @@ MVP 实现说明：
   "discover": {
     "cardType": "Minion",
     "race": "Starbound",
+    "tierMode": "ExactCurrentTavernTier",
     "minTier": 1,
     "maxTierMode": "CurrentTavernTier",
     "maxTierOffset": 0,
@@ -600,6 +631,7 @@ MVP 实现说明：
 | --- | --- | --- |
 | cardType | string | `Minion` 或 `Spell` |
 | race | string | 限定种族，空字符串表示不限 |
+| tierMode | string | 等级范围模式；`Range` 使用最低/最高等级字段，`ExactCurrentTavernTier` 只允许使用时的当前酒馆等级 |
 | minTier | int | 最低等级 |
 | maxTierMode | string | 最高等级计算方式 |
 | maxTierOffset | int | 最高等级偏移 |
@@ -611,11 +643,24 @@ MVP 实现说明：
 
 说明：
 
-- 发现池不支持权重。
-- 候选从满足条件的配置中随机抽取。
+- 发现池不支持额外配置自定义权重。
+- 普通无限池发现从满足条件的配置中等概率抽取。
+- 有限随从牌池发现时，每个剩余实体副本等概率参与抽取；已成为本次候选的配置不再重复展示。
 - 若可用候选少于 `count`，则展示全部可用候选。
 
-### 13.3 maxTierMode
+### 13.3 tierMode
+
+```json
+[
+  "Range",
+  "ExactCurrentTavernTier"
+]
+```
+
+- `Range`：使用 `minTier`、`maxTierMode` 和 `maxTierOffset` 计算范围。
+- `ExactCurrentTavernTier`：最低和最高等级都等于法术实际使用时的当前酒馆等级，并忽略其他等级范围字段。
+
+### 13.4 maxTierMode
 
 ```json
 [
@@ -737,9 +782,10 @@ MVP 实现说明：
   "description": "使一个随从永久获得 +1/+1。",
   "tier": 1,
   "spellType": "Growth",
-  "useTiming": ["Shop", "Prep"],
+  "useTiming": ["Shop"],
   "rarity": "Common",
-  "cost": 3,
+  "cost": 1,
+  "shopEligible": true,
   "artId": "placeholder_spell_growth_001",
   "iconId": "icon_spell_growth",
   "audioId": "",
@@ -795,9 +841,10 @@ MVP 实现说明：
   "description": "下个商店阶段开始时，获得 2 金币。",
   "tier": 1,
   "spellType": "Economy",
-  "useTiming": ["Shop", "Prep"],
+  "useTiming": ["Shop"],
   "rarity": "Common",
-  "cost": 3,
+  "cost": 1,
+  "shopEligible": true,
   "artId": "placeholder_spell_economy_001",
   "iconId": "icon_spell_economy",
   "audioId": "",
@@ -855,6 +902,7 @@ MVP 实现说明：
   "instanceId": "run_minion_0001",
   "configId": "forge_soul_shield_squire",
   "isGolden": false,
+  "tripleDiscoveryPending": false,
   "permanentAttackBonus": 0,
   "permanentHealthBonus": 0,
   "permanentKeywords": [],
@@ -871,16 +919,34 @@ MVP 实现说明：
 }
 ```
 
+阻塞式发现状态建议存档：
+
+```json
+{
+  "spellInstanceId": "run_spell_0001",
+  "candidateConfigIds": ["minion_a", "minion_b", "minion_c"],
+  "reservedCopies": ["minion_a", "minion_b", "minion_c"]
+}
+```
+
+- 存在阻塞式发现状态时，选择或取消前不能执行其他商店操作，也不能结束商店。
+- 取消时返还全部暂时保留的实体副本，发现法术继续保留在原备战位。
+
 ## 17. 已确认规则
 
 - 战吼最终绑定 `OnPlay`。
 - `OnPlay` 指随从放入阵容时触发。
-- `OnPlay` 允许同一个随从多次进出阵容重复触发。
+- 战斗区随从不能手动回收到备战区；若三连或明确卡牌效果使其返回，则再次上场可以重新触发 `OnPlay`。
+- 阶段 3 的战吼和法术只选择最终战斗区；“友方随从”默认不包含战吼来源自身。
 - `Battlecry` 与 `OnPlay` 在 UI 文案中完全等价。
-- 战吼类效果在合成金色时重新触发。
-- 溅射对攻击目标左右两侧随从造成伤害：普通为 50%，金色为 100%。
+- 合成金色只生成金色随从并放入备战区，不触发战吼；金色随从之后实际上场时执行 `goldenEffects` 中的 `OnPlay`。
+- 三连生成的金色随从将 `tripleDiscoveryPending` 设为 `true`；首次成功打出并生成发现法术后设为 `false`，重复上场不再次奖励。
+- 金色随从继承三个材料的永久攻击、永久生命和永久关键词；不继承护盾消耗状态、下一战增益和触发计数。
+- 三连奖励法术使用 `shopEligible: false`，不能进入普通商店法术位。
+- 普通溅射将本次攻击伤害拆分给攻击目标左右两侧，奇数伤害随机决定哪侧多 1；金色溅射对两侧各造成 100% 伤害。
+- 无嘲讽时随机选择存活敌人；存在嘲讽时随机选择存活嘲讽单位。
 - 发现池完全用效果字段描述。
-- 发现池无需支持权重。
+- 发现池无需支持配置自定义权重；有限随从牌池的发现按剩余实体副本等概率抽取。
 - 发现候选不足时不重复候选，展示全部可用候选。
 - `DiscoverConfig` 作为 `EffectConfig.discover` 字段。
 - 金色效果全部写入 `goldenEffects`。
