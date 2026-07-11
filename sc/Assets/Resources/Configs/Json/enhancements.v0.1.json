@@ -1,0 +1,11 @@
+{
+  "version": "0.1",
+  "recipes": [
+    { "id": "balanced_forging", "name": "均衡锻造", "action": "ModifyStats", "attack": 2, "health": 2, "keyword": "", "enabled": true },
+    { "id": "heavy_armor_inscription", "name": "重甲铭刻", "action": "GrantKeyword", "attack": 0, "health": 0, "keyword": "Shield", "enabled": true },
+    { "id": "guardian_inscription", "name": "守卫铭刻", "action": "GrantKeyword", "attack": 0, "health": 0, "keyword": "Taunt", "enabled": true }
+  ],
+  "nodes": [
+    { "id": "f1_enhance_basic", "recipeIds": ["balanced_forging", "heavy_armor_inscription", "guardian_inscription"], "allowSkip": true }
+  ]
+}

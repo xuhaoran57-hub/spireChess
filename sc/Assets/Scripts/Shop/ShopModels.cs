@@ -94,8 +94,9 @@ namespace SpireChess.Shop
             IsGolden = isGolden;
             PermanentAttackBonus = permanentAttackBonus;
             PermanentHealthBonus = permanentHealthBonus;
-            PermanentKeywords = new HashSet<string>(
+            permanentKeywordsSet = new HashSet<string>(
                 permanentKeywords ?? Array.Empty<string>());
+            PermanentKeywords = permanentKeywordsSet;
             TripleDiscoveryPending = tripleDiscoveryPending;
         }
 
@@ -107,6 +108,7 @@ namespace SpireChess.Shop
         public bool IsGolden { get; }
         public int PermanentAttackBonus { get; private set; }
         public int PermanentHealthBonus { get; private set; }
+        private readonly HashSet<string> permanentKeywordsSet;
         public IReadOnlyCollection<string> PermanentKeywords { get; }
         public bool TripleDiscoveryPending { get; internal set; }
         public int PoolCopiesHeld => IsGolden ? 3 : 1;
@@ -161,6 +163,26 @@ namespace SpireChess.Shop
 
             PermanentAttackBonus += attack;
             PermanentHealthBonus += health;
+        }
+
+        internal bool HasEffectiveKeyword(string keyword)
+        {
+            return !string.IsNullOrWhiteSpace(keyword) &&
+                   ((Minion?.Keywords?.Contains(keyword) ?? false) ||
+                    PermanentKeywords.Contains(keyword));
+        }
+
+        internal bool TryGrantPermanentKeyword(string keyword)
+        {
+            if (CardType != ShopCardType.Minion ||
+                string.IsNullOrWhiteSpace(keyword) ||
+                HasEffectiveKeyword(keyword))
+            {
+                return false;
+            }
+
+            permanentKeywordsSet.Add(keyword);
+            return true;
         }
     }
 

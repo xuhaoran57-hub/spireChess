@@ -1,7 +1,7 @@
 # 阶段 3 构筑系统设计 v0.1
 
 版本：0.1
-状态：已确认开发基线；阶段 3A/3B 纯领域逻辑已实现，待 Unity 交互验收
+状态：已确认开发基线；阶段 3A/3B 领域逻辑和最小 Unity 交互已实现，自动化测试通过，待 Unity 手动交互验收
 关联文档：`game-design.md`、`minion-design-v0.1.md`、`spell-design-v0.1.md`、`shop-economy-design-v0.1.md`
 
 ## 1. 阶段目标

@@ -7,7 +7,7 @@ namespace SpireChess.Battle
 {
     public sealed class BattleSimulator
     {
-        private const int MaxRounds = 30;
+        public const int MaxRounds = 30;
         private readonly Random random;
         private readonly Func<string, MinionConfig> resolveMinionConfig;
 
@@ -126,7 +126,17 @@ namespace SpireChess.Battle
                     winner: winner);
             }
 
-            return new BattleSimulationResult(state, winner, log, steps ?? new List<BattleStep>());
+            var outcomeReason = !battleOver
+                ? BattleOutcomeReason.RoundLimit
+                : winner.HasValue
+                    ? BattleOutcomeReason.Victory
+                    : BattleOutcomeReason.MutualElimination;
+            return new BattleSimulationResult(
+                state,
+                winner,
+                outcomeReason,
+                log,
+                steps ?? new List<BattleStep>());
         }
 
         private void ResolveAttackStep(

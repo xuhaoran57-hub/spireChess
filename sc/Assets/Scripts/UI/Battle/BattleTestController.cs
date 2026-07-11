@@ -4,6 +4,7 @@ using System.Linq;
 using SpireChess.App;
 using SpireChess.Battle;
 using SpireChess.Config;
+using SpireChess.Run;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -108,18 +109,28 @@ namespace SpireChess.UI.Battle
         private readonly Dictionary<string, Outline> slotOutlines = new Dictionary<string, Outline>();
         private readonly List<string> displayedLog = new List<string>();
         private BattleBoardState setupState;
+        private BattleBoardState initialSetupState;
         private BattleBoardState displayedState;
         private Canvas canvas;
         private Text logText;
         private Text statusText;
+        private Button startButton;
+        private Button returnButton;
         private Coroutine playbackCoroutine;
         private BattleStep activeStep;
+        private BattleSimulationResult lastResult;
         private bool battleRunning;
         private bool battleResolved;
+        private bool runBattle;
+        private string encounterName;
+        private string returnSceneName;
         private int presetIndex;
         private static Font uiFont;
 
         public bool IsBattleLocked => battleRunning || battleResolved;
+        public bool IsRunBattle => runBattle;
+        public BattleBoardState SetupState => setupState;
+        public BattleSimulationResult LastResult => lastResult;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RegisterSceneHook()
@@ -165,12 +176,53 @@ namespace SpireChess.UI.Battle
                     MinionConfig config;
                     return configs.TryGetMinion(id, out config) ? config : null;
                 });
-            setupState = BuildInitialState(configs, Presets[presetIndex]);
+
+            var activeRun = GameApp.Instance.Run;
+            var context = activeRun?.PendingBattle;
+            BattleSimulationResult restoredResult = null;
+            if (context == null &&
+                activeRun?.LastBattleContext != null &&
+                !string.IsNullOrWhiteSpace(activeRun.LastBattleContext.NodeAttemptId) &&
+                (activeRun.State.Phase == RunPhase.BattleResult ||
+                 activeRun.State.Phase == RunPhase.RunWon ||
+                 activeRun.State.Phase == RunPhase.RunLost))
+            {
+                context = activeRun.LastBattleContext;
+                restoredResult = activeRun.LastBattleResult;
+            }
+
+            if (context != null)
+            {
+                runBattle = true;
+                encounterName = context.EncounterName;
+                setupState = context.BoardState.Clone();
+            }
+            else
+            {
+                setupState = BuildInitialState(configs, Presets[presetIndex]);
+            }
+
+            initialSetupState = setupState.Clone();
             displayedState = setupState.Clone();
             BuildUi();
-            RebuildCards();
-            SetLog(new[] { "拖拽同一阵营的卡牌可以交换站位。点击开始战斗逐步播放结算。" });
-            SetStatus(BuildReadyStatus());
+            if (restoredResult != null)
+            {
+                lastResult = restoredResult;
+                displayedState = restoredResult.FinalState;
+                battleResolved = true;
+                returnSceneName = context.ReturnSceneName;
+                startButton.interactable = false;
+                returnButton.gameObject.SetActive(true);
+                RebuildCards();
+                SetLog(restoredResult.Log);
+                SetStatus(BuildResultStatus(restoredResult));
+            }
+            else
+            {
+                RebuildCards();
+                SetLog(new[] { "拖拽同一阵营的卡牌可以交换站位。点击开始战斗逐步播放结算。" });
+                SetStatus(BuildReadyStatus());
+            }
         }
 
         public void MoveCard(BattleSide fromSide, int fromIndex, BattleSide toSide, int toIndex)
@@ -190,7 +242,7 @@ namespace SpireChess.UI.Battle
             SetStatus("已调整站位");
         }
 
-        private void StartBattle()
+        public void StartBattle()
         {
             if (battleRunning)
             {
@@ -236,6 +288,28 @@ namespace SpireChess.UI.Battle
             RebuildCards();
             SetLog(displayedLog);
             SetStatus(BuildResultStatus(result));
+            FinalizeBattle(result);
+        }
+
+        public BattleSimulationResult ResolveImmediately()
+        {
+            if (simulator == null || battleRunning)
+            {
+                return null;
+            }
+
+            var result = simulator.Simulate(setupState);
+            displayedLog.Clear();
+            displayedLog.AddRange(result.Log);
+            displayedState = result.FinalState;
+            activeStep = null;
+            battleRunning = false;
+            battleResolved = true;
+            RebuildCards();
+            SetLog(displayedLog);
+            SetStatus(BuildResultStatus(result));
+            FinalizeBattle(result);
+            return result;
         }
 
         private void ResetBattle()
@@ -246,20 +320,37 @@ namespace SpireChess.UI.Battle
                 playbackCoroutine = null;
             }
 
-            setupState = BuildInitialState(GameApp.Instance.Configs, Presets[presetIndex]);
+            setupState = runBattle
+                ? initialSetupState.Clone()
+                : BuildInitialState(GameApp.Instance.Configs, Presets[presetIndex]);
             displayedState = setupState.Clone();
             activeStep = null;
             displayedLog.Clear();
             battleRunning = false;
             battleResolved = false;
+            lastResult = null;
+            returnSceneName = null;
+            if (startButton != null)
+            {
+                startButton.interactable = true;
+            }
+            if (returnButton != null)
+            {
+                returnButton.gameObject.SetActive(false);
+            }
             RebuildCards();
-            SetLog(new[] { $"已重置测试阵容：{Presets[presetIndex].Name}。" });
+            SetLog(new[]
+            {
+                runBattle
+                    ? $"已重置遭遇：{encounterName}。"
+                    : $"已重置测试阵容：{Presets[presetIndex].Name}。"
+            });
             SetStatus(BuildReadyStatus());
         }
 
         private void NextPreset()
         {
-            if (battleRunning)
+            if (battleRunning || runBattle)
             {
                 return;
             }
@@ -346,17 +437,28 @@ namespace SpireChess.UI.Battle
             statusText = CreateText("Status", top, string.Empty, 22, TextAnchor.MiddleLeft);
             Anchor(statusText.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(280f, 0f), new Vector2(520f, 0f));
 
-            var startButton = CreateButton("StartBattleButton", top, "开始战斗", StartBattle);
+            startButton = CreateButton("StartBattleButton", top, "开始战斗", StartBattle);
             Anchor(startButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-520f, -25f), new Vector2(-380f, 25f));
 
             var batchButton = CreateButton("BatchButton", top, "模拟10场", RunBatchSimulation);
             Anchor(batchButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-680f, -25f), new Vector2(-540f, 25f));
+            batchButton.gameObject.SetActive(!runBattle);
 
             var presetButton = CreateButton("PresetButton", top, "切换预设", NextPreset);
             Anchor(presetButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-360f, -25f), new Vector2(-220f, 25f));
+            presetButton.gameObject.SetActive(!runBattle);
 
             var resetButton = CreateButton("ResetButton", top, "重置", ResetBattle);
             Anchor(resetButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-200f, -25f), new Vector2(-80f, 25f));
+            resetButton.gameObject.SetActive(!runBattle);
+
+            returnButton = CreateButton(
+                "ReturnButton",
+                top,
+                runBattle ? "查看结算" : "返回商店",
+                ReturnToFlow);
+            Anchor(returnButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-360f, -25f), new Vector2(-220f, 25f));
+            returnButton.gameObject.SetActive(false);
 
             var board = CreatePanel("Board", root, new Color(0f, 0f, 0f, 0f));
             Anchor(board, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(24f, 24f), new Vector2(-430f, -100f));
@@ -596,7 +698,7 @@ namespace SpireChess.UI.Battle
                 18);
             if (uiFont == null)
             {
-                uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                uiFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
 
             return uiFont;
@@ -712,7 +814,9 @@ namespace SpireChess.UI.Battle
         {
             if (!result.Winner.HasValue)
             {
-                return "战斗结束：平局";
+                return result.OutcomeReason == BattleOutcomeReason.RoundLimit
+                    ? "战斗结束：达到回合上限，平局"
+                    : "战斗结束：双方同时倒下，平局";
             }
 
             return result.Winner.Value == BattleSide.Player
@@ -732,7 +836,38 @@ namespace SpireChess.UI.Battle
 
         private string BuildReadyStatus()
         {
-            return $"准备阶段 · {Presets[presetIndex].Name}";
+            return runBattle
+                ? $"等待战斗 · {encounterName}"
+                : $"准备阶段 · {Presets[presetIndex].Name}";
+        }
+
+        private void FinalizeBattle(BattleSimulationResult result)
+        {
+            lastResult = result;
+            if (startButton != null)
+            {
+                startButton.interactable = false;
+            }
+            if (!runBattle || GameApp.Instance?.Run == null)
+            {
+                return;
+            }
+
+            if (GameApp.Instance.Run.TryCompleteBattle(result, out returnSceneName) &&
+                returnButton != null)
+            {
+                returnButton.gameObject.SetActive(true);
+            }
+        }
+
+        public void ReturnToFlow()
+        {
+            if (!battleResolved || string.IsNullOrEmpty(returnSceneName))
+            {
+                return;
+            }
+
+            SceneManager.LoadScene(returnSceneName);
         }
 
         private sealed class BattlePreset

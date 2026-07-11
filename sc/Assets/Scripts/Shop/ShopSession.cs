@@ -17,6 +17,7 @@ namespace SpireChess.Shop
         private readonly List<MinionConfig> minionOffers = new List<MinionConfig>();
         private int cardInstanceSequence;
         private int roundsWithoutUpgradeAtCurrentTier;
+        private int pendingUpgradeDiscount;
 
         public ShopSession(
             IEnumerable<MinionConfig> minions,
@@ -41,6 +42,7 @@ namespace SpireChess.Shop
         public event Action<ShopEventData> EventRaised;
 
         public int Round { get; private set; }
+        public int LastEconomyTurn => Round;
         public int Gold { get; private set; }
         public int TavernTier { get; private set; }
         public int RefreshCount { get; private set; }
@@ -66,18 +68,39 @@ namespace SpireChess.Shop
                 return Math.Max(
                     1,
                     ShopEconomyRules.GetUpgradeBaseCost(TavernTier) -
-                    roundsWithoutUpgradeAtCurrentTier);
+                    roundsWithoutUpgradeAtCurrentTier -
+                    pendingUpgradeDiscount);
             }
         }
 
         public ShopOperationResult StartNextRound()
         {
+            return StartRound(Round + 1);
+        }
+
+        public ShopOperationResult StartRound(int runTurn)
+        {
+            if (runTurn < 1)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
+            }
+
+            if (runTurn == Round && IsShopOpen)
+            {
+                return ShopOperationResult.Succeed();
+            }
+
             if (IsShopOpen)
             {
                 return ShopOperationResult.Fail(ShopOperationError.ShopAlreadyOpen);
             }
 
-            Round++;
+            if (runTurn <= Round || runTurn != Round + 1)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
+            }
+
+            Round = runTurn;
             Gold = ShopEconomyRules.GetRoundBudget(Round);
             RefreshCount = 0;
             FreeRefreshes = 0;
@@ -92,6 +115,32 @@ namespace SpireChess.Shop
                 ShopEventType.OnShopPhaseStart,
                 tavernTier: TavernTier));
             RaiseTripleEvents(triples);
+            return ShopOperationResult.Succeed();
+        }
+
+        public ShopOperationResult AdvanceSkippedRound(int runTurn)
+        {
+            if (IsShopOpen || runTurn < 1)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
+            }
+
+            if (runTurn == Round)
+            {
+                return ShopOperationResult.Succeed();
+            }
+
+            if (runTurn != Round + 1)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
+            }
+
+            Round = runTurn;
+            if (TavernTier < ShopEconomyRules.MaximumTavernTier)
+            {
+                roundsWithoutUpgradeAtCurrentTier++;
+            }
+
             return ShopOperationResult.Succeed();
         }
 
@@ -649,6 +698,7 @@ namespace SpireChess.Shop
             Gold -= cost;
             TavernTier++;
             roundsWithoutUpgradeAtCurrentTier = 0;
+            pendingUpgradeDiscount = 0;
             UpgradedThisRound = true;
             EnsureMinionOfferCapacity();
             RaiseEvent(new ShopEventData(
@@ -689,6 +739,104 @@ namespace SpireChess.Shop
             {
                 FreeRefreshes += amount;
             }
+        }
+
+        public void GrantUpgradeDiscount(int amount)
+        {
+            if (amount > 0)
+            {
+                pendingUpgradeDiscount += amount;
+            }
+        }
+
+        public ShopOperationResult ClaimRewardMinion(MinionConfig config)
+        {
+            if (!IsShopOpen)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
+            }
+
+            if (config == null || config.IsToken || !config.Enabled)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidCardType);
+            }
+
+            if (Collection.EmptyBenchSlotCount() <= 0)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.BenchFull);
+            }
+
+            var card = ShopCardInstance.CreateMinion(NextCardInstanceId(), config);
+            Collection.TryAddToBench(card, out var benchIndex);
+            var triples = ResolveAllTriples();
+            RaiseTripleEvents(triples);
+            return ShopOperationResult.Succeed(benchIndex);
+        }
+
+        public ShopOperationResult ClaimRewardSpell(SpellConfig config)
+        {
+            if (!IsShopOpen)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
+            }
+
+            if (config == null || !config.Enabled)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidCardType);
+            }
+
+            if (Collection.EmptyBenchSlotCount() <= 0)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.BenchFull);
+            }
+
+            var card = ShopCardInstance.CreateSpell(NextCardInstanceId(), config);
+            Collection.TryAddToBench(card, out var benchIndex);
+            return ShopOperationResult.Succeed(benchIndex);
+        }
+
+        public ShopOperationResult ModifyOwnedBattleMinion(
+            string instanceId,
+            int attack,
+            int health,
+            string keyword = null)
+        {
+            if (string.IsNullOrWhiteSpace(instanceId))
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidTarget);
+            }
+
+            var target = Collection.Battle.FirstOrDefault(
+                card => card != null && card.InstanceId == instanceId);
+            if (target == null || target.CardType != ShopCardType.Minion)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidTarget);
+            }
+
+            if (attack == 0 && health == 0 && string.IsNullOrWhiteSpace(keyword))
+            {
+                return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
+            }
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                if (keyword != "Shield" && keyword != "Taunt")
+                {
+                    return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+                }
+
+                if (!target.TryGrantPermanentKeyword(keyword))
+                {
+                    return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
+                }
+            }
+
+            if (attack != 0 || health != 0)
+            {
+                target.ApplyPermanentStats(attack, health);
+            }
+
+            return ShopOperationResult.Succeed();
         }
 
         private void ResolveMinionSale(ShopCardInstance card)

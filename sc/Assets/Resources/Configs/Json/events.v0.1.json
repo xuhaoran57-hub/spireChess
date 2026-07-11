@@ -1,0 +1,52 @@
+{
+  "version": "0.1",
+  "eventPools": [
+    {
+      "id": "f1_event_pool",
+      "entries": [
+        { "eventId": "blood_contract", "weight": 1 },
+        { "eventId": "old_tavern_ledger", "weight": 1 },
+        { "eventId": "lost_supply_cart", "weight": 1 },
+        { "eventId": "star_spring", "weight": 1 },
+        { "eventId": "dangerous_recruit", "weight": 1 }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "blood_contract", "name": "鲜血契约", "description": "以生命换取下一次商店的爆发经济。",
+      "options": [
+        { "id": "accept", "label": "失去 3 点生命；下个商店 +4 金币", "effects": [{ "type": "LoseHealth", "amount": 3 }, { "type": "NextShopGold", "amount": 4 }] },
+        { "id": "leave", "label": "离开", "effects": [] }
+      ]
+    },
+    {
+      "id": "old_tavern_ledger", "name": "旧酒馆账本", "description": "选择升级效率或刷新机会。",
+      "options": [
+        { "id": "discount", "label": "下次酒馆升级费用 -2", "effects": [{ "type": "UpgradeDiscount", "amount": 2 }] },
+        { "id": "refresh", "label": "下个商店获得 1 次免费刷新", "effects": [{ "type": "FreeRefresh", "amount": 1 }] }
+      ]
+    },
+    {
+      "id": "lost_supply_cart", "name": "遗失的补给车", "description": "在刷新资源和法术之间选择。",
+      "options": [
+        { "id": "refresh", "label": "下个商店获得 2 次免费刷新", "effects": [{ "type": "FreeRefresh", "amount": 2 }] },
+        { "id": "spell", "label": "获得一张当前可用的随机普通法术", "effects": [{ "type": "QueueRandomSpell", "amount": 1 }] }
+      ]
+    },
+    {
+      "id": "star_spring", "name": "星泉", "description": "恢复生命或储备下一轮经济。",
+      "options": [
+        { "id": "heal", "label": "恢复 4 点生命", "effects": [{ "type": "HealHealth", "amount": 4 }] },
+        { "id": "gold", "label": "下个商店 +2 金币", "effects": [{ "type": "NextShopGold", "amount": 2 }] }
+      ]
+    },
+    {
+      "id": "dangerous_recruit", "name": "危险招募", "description": "以生命为代价挑选当前等级随从。",
+      "options": [
+        { "id": "recruit", "label": "失去 2 点生命；当前酒馆等级随从三选一", "effects": [{ "type": "LoseHealth", "amount": 2 }], "followupRewardTableId": "dangerous_recruit_reward" },
+        { "id": "leave", "label": "离开", "effects": [] }
+      ]
+    }
+  ]
+}

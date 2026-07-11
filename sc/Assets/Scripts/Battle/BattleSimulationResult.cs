@@ -2,10 +2,24 @@ using System.Collections.Generic;
 
 namespace SpireChess.Battle
 {
+    public enum BattleOutcomeReason
+    {
+        Victory,
+        MutualElimination,
+        RoundLimit
+    }
+
     public sealed class BattleSimulationResult
     {
         public BattleSimulationResult(BattleBoardState finalState, BattleSide? winner, List<string> log)
-            : this(finalState, winner, log, new List<BattleStep>())
+            : this(
+                finalState,
+                winner,
+                winner.HasValue
+                    ? BattleOutcomeReason.Victory
+                    : BattleOutcomeReason.MutualElimination,
+                log,
+                new List<BattleStep>())
         {
         }
 
@@ -14,15 +28,34 @@ namespace SpireChess.Battle
             BattleSide? winner,
             List<string> log,
             List<BattleStep> steps)
+            : this(
+                finalState,
+                winner,
+                winner.HasValue
+                    ? BattleOutcomeReason.Victory
+                    : BattleOutcomeReason.MutualElimination,
+                log,
+                steps)
+        {
+        }
+
+        public BattleSimulationResult(
+            BattleBoardState finalState,
+            BattleSide? winner,
+            BattleOutcomeReason outcomeReason,
+            List<string> log,
+            List<BattleStep> steps)
         {
             FinalState = finalState;
             Winner = winner;
+            OutcomeReason = outcomeReason;
             Log = log;
             Steps = steps;
         }
 
         public BattleBoardState FinalState { get; }
         public BattleSide? Winner { get; }
+        public BattleOutcomeReason OutcomeReason { get; }
         public IReadOnlyList<string> Log { get; }
         public IReadOnlyList<BattleStep> Steps { get; }
     }

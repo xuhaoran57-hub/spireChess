@@ -1,0 +1,13 @@
+{
+  "version": "0.1",
+  "nodes": [
+    {
+      "id": "f1_rest_basic",
+      "options": [
+        { "id": "heal_6", "label": "休息：恢复 6 点生命", "heal": 6, "maxHealth": 0 },
+        { "id": "max_health_2_heal_2", "label": "深度休整：最大生命 +2 并恢复 2", "heal": 2, "maxHealth": 2 },
+        { "id": "leave", "label": "离开", "heal": 0, "maxHealth": 0 }
+      ]
+    }
+  ]
+}

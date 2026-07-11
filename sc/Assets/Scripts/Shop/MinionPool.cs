@@ -85,6 +85,19 @@ namespace SpireChess.Shop
             return ReturnCopies(minionId, 1) == 1;
         }
 
+        public bool TryReserveCopies(string minionId, int copies)
+        {
+            if (copies <= 0 || string.IsNullOrWhiteSpace(minionId) ||
+                !remainingCopies.TryGetValue(minionId, out var remaining) ||
+                remaining < copies)
+            {
+                return false;
+            }
+
+            remainingCopies[minionId] = remaining - copies;
+            return true;
+        }
+
         public IReadOnlyList<MinionConfig> ReserveDistinctAtTier(
             int tier,
             int count,

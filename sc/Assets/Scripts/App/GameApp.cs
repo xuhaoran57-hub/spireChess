@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using SpireChess.Config;
+using SpireChess.Run;
 using SpireChess.Save;
 using SpireChess.Utils;
 using UnityEngine;
@@ -9,13 +11,14 @@ namespace SpireChess.App
 {
     public sealed class GameApp : MonoBehaviour
     {
-        private const string TestSaveKey = "save_slot_0.json";
-        private const string BattleTestSceneName = "BattleTest";
+        private const string TestSaveKey = "save_smoke_test.json";
+        private const string RunTestSceneName = "RunTest";
         private static GameApp instance;
 
         public static GameApp Instance => instance;
         public ConfigService Configs { get; private set; }
         public SaveService Saves { get; private set; }
+        public RunSession Run { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -63,6 +66,8 @@ namespace SpireChess.App
             LogValidation(validation);
             validation.ThrowIfInvalid();
 
+            StartNewRun();
+
             RunSaveSmokeTest();
 
             Debug.Log(
@@ -70,18 +75,26 @@ namespace SpireChess.App
                 $"({Configs.Minions.Count(minion => minion.IsToken)} tokens) and {Configs.Spells.Count} spells.");
         }
 
+        public void StartNewRun(int? randomSeed = null)
+        {
+            Run?.ReleaseOutstandingRewards();
+            Run = new RunSession(
+                Configs,
+                randomSeed ?? Environment.TickCount);
+        }
+
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (!ShouldAutoOpenBattleTest(scene.name))
+            if (!ShouldAutoOpenRunTest(scene.name))
             {
                 return;
             }
 
-            Debug.Log($"[GameApp] Auto loading {BattleTestSceneName} from {scene.name}.");
-            SceneManager.LoadScene(BattleTestSceneName);
+            Debug.Log($"[GameApp] Auto loading {RunTestSceneName} from {scene.name}.");
+            SceneManager.LoadScene(RunTestSceneName);
         }
 
-        private static bool ShouldAutoOpenBattleTest(string sceneName)
+        private static bool ShouldAutoOpenRunTest(string sceneName)
         {
             return sceneName == "Boot" || sceneName == "SampleScene" || sceneName == "MainMenu";
         }
