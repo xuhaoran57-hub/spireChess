@@ -29,6 +29,7 @@ namespace SpireChess.Shop
         InvalidTiming,
         DiscoveryPending,
         NoDiscoveryPending,
+        DiscoveryCannotBeCancelled,
         AlreadyUpgradedThisRound,
         MaximumTavernTier
     }
@@ -118,6 +119,9 @@ namespace SpireChess.Shop
             new List<PendingCombatModifier>();
         public IReadOnlyList<PendingCombatModifier> PendingCombatModifiers =>
             pendingCombatModifiers;
+        public bool HasPermanentShield => HasEffectiveKeyword("Shield");
+        public bool HasPendingCombatShield => pendingCombatModifiers.Any(modifier =>
+            modifier.AddShield || modifier.Keyword == "Shield");
         public int PoolCopiesHeld => IsGolden ? 3 : 1;
         public int CurrentAttack => CardType == ShopCardType.Minion
             ? (IsGolden ? Minion.GoldenAttack : Minion.Attack) + PermanentAttackBonus
@@ -249,7 +253,8 @@ namespace SpireChess.Shop
         internal ShopDiscoverState(
             ShopCardInstance sourceSpell,
             int benchIndex,
-            IEnumerable<MinionConfig> candidates)
+            IEnumerable<MinionConfig> candidates,
+            bool canCancel)
         {
             SourceSpell = sourceSpell ??
                 throw new ArgumentNullException(nameof(sourceSpell));
@@ -257,11 +262,13 @@ namespace SpireChess.Shop
             Candidates = new List<MinionConfig>(
                 candidates ?? throw new ArgumentNullException(nameof(candidates)))
                 .AsReadOnly();
+            CanCancel = canCancel;
         }
 
         public ShopCardInstance SourceSpell { get; }
         public int BenchIndex { get; }
         public IReadOnlyList<MinionConfig> Candidates { get; }
+        public bool CanCancel { get; }
     }
 
     public sealed class PlayerCollection

@@ -102,6 +102,13 @@ namespace SpireChess.Tests
             Assert.That(controller.UseBenchSpell(rewardIndex).Success, Is.True);
             Assert.That(session.PendingDiscover, Is.Not.Null);
             Assert.That(controller.DiscoverModalVisible, Is.True);
+            Assert.That(controller.DiscoverCancelInteractable, Is.False);
+
+            var cancel = controller.CancelDiscover();
+            Assert.That(cancel.Success, Is.False);
+            Assert.That(cancel.Error, Is.EqualTo(
+                ShopOperationError.DiscoveryCannotBeCancelled));
+            Assert.That(session.PendingDiscover, Is.Not.Null);
 
             var blockedRefresh = controller.RefreshShop();
             Assert.That(blockedRefresh.Success, Is.False);
@@ -152,6 +159,45 @@ namespace SpireChess.Tests
             Assert.That(shopSpells.Count, Is.EqualTo(15));
             Assert.That(shopSpells.All(spell => spell.Effects != null && spell.Effects.Count > 0),
                 Is.True);
+        }
+
+        [UnityTest]
+        public IEnumerator ShopMinionCards_ShowRacePermanentShieldAndNextCombatShield()
+        {
+            yield return EnsureGameApp();
+            var configs = GameApp.Instance.Configs;
+            var session = new ShopSession(
+                configs.Minions,
+                configs.Spells,
+                new System.Random(71));
+            Assert.That(session.StartRound(1).Success, Is.True);
+
+            Assert.That(session.ClaimRewardMinion(
+                configs.MinionsById["hearth_core_spark"]).Success, Is.True);
+            Assert.That(session.PlayMinion(0, 0).Success, Is.True);
+            Assert.That(session.ClaimRewardMinion(
+                configs.MinionsById["stargazing_apprentice"]).Success, Is.True);
+            Assert.That(session.PlayMinion(0, 1).Success, Is.True);
+            Assert.That(session.ClaimRewardSpell(
+                configs.SpellsById["temporary_ward"]).Success, Is.True);
+            Assert.That(session.UseSpell(0, 1).Success, Is.True);
+
+            var controllerObject = new GameObject("ShopCardStateControllerUnderTest");
+            var controller = controllerObject.AddComponent<ShopTestController>();
+            controller.InitializeForTests(session);
+            yield return null;
+
+            var subtitles = Object.FindObjectsOfType<UnityEngine.UI.Text>()
+                .Where(text => text.name == "Subtitle")
+                .Select(text => text.text)
+                .ToList();
+            Assert.That(subtitles.Any(text =>
+                text.Contains("铸魂") && text.Contains("[护盾]")), Is.True);
+            Assert.That(subtitles.Any(text =>
+                text.Contains("星契") && text.Contains("[下一战护盾]")), Is.True);
+
+            Object.Destroy(controllerObject);
+            yield return null;
         }
 
         [UnityTest]

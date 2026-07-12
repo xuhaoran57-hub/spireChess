@@ -38,6 +38,7 @@ namespace SpireChess.UI.Shop
         private Button endButton;
         private GameObject discoverOverlay;
         private RectTransform discoverCandidatesRoot;
+        private Button discoverCancelButton;
         private GameObject rewardOverlay;
         private Text rewardText;
         private int selectedBenchIndex = -1;
@@ -50,6 +51,8 @@ namespace SpireChess.UI.Shop
         public ShopSession Session => session;
         public bool IsInitialized => initialized;
         public bool DiscoverModalVisible => discoverOverlay != null && discoverOverlay.activeSelf;
+        public bool DiscoverCancelInteractable =>
+            discoverCancelButton != null && discoverCancelButton.interactable;
         public bool RewardModalVisible => rewardOverlay != null && rewardOverlay.activeSelf;
         public int EventLogCount => eventLog.Count;
         public int SelectedBenchIndex => selectedBenchIndex;
@@ -628,8 +631,14 @@ namespace SpireChess.UI.Shop
             Anchor(title.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(20f, -70f), new Vector2(-20f, -16f));
             discoverCandidatesRoot = CreateRect("Candidates", panel);
             Anchor(discoverCandidatesRoot, new Vector2(0f, 0.18f), new Vector2(1f, 0.82f), new Vector2(24f, 0f), new Vector2(-24f, 0f));
-            var cancel = CreateButton("Cancel", panel, "取消发现", () => CancelDiscover());
-            Anchor(cancel.GetComponent<RectTransform>(), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-80f, 18f), new Vector2(80f, 64f));
+            discoverCancelButton = CreateButton(
+                "Cancel",
+                panel,
+                "取消选择",
+                () => CancelDiscover());
+            Anchor(discoverCancelButton.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(-90f, 18f), new Vector2(90f, 64f));
             discoverOverlay.SetActive(false);
         }
 
@@ -770,7 +779,14 @@ namespace SpireChess.UI.Shop
             if (minion != null)
             {
                 CreateCard(parent, zone, index, minion.Name,
-                    $"{minion.Attack}/{minion.Health} · T{minion.Tier} · 3金",
+                    BuildMinionSubtitle(
+                        minion.Attack,
+                        minion.Health,
+                        minion.Tier,
+                        minion.Race,
+                        minion.Keywords?.Contains("Shield") == true,
+                        false,
+                        true),
                     minion.GetPrototypeDescription(false), false, MinionCardColor);
             }
             else
@@ -795,7 +811,14 @@ namespace SpireChess.UI.Shop
             {
                 CreateCard(parent, zone, index,
                     card.IsGolden ? "金色" + card.Minion.Name : card.Minion.Name,
-                    $"{card.CurrentAttack}/{card.CurrentHealth} · T{card.Minion.Tier}",
+                    BuildMinionSubtitle(
+                        card.CurrentAttack,
+                        card.CurrentHealth,
+                        card.Minion.Tier,
+                        card.Minion.Race,
+                        card.HasPermanentShield,
+                        card.HasPendingCombatShield,
+                        false),
                     card.Minion.GetPrototypeDescription(card.IsGolden),
                     true, selected ? SelectedColor : MinionCardColor);
             }
@@ -844,6 +867,12 @@ namespace SpireChess.UI.Shop
                 return;
             }
 
+            var canCancel = state == null || state.CanCancel;
+            discoverCancelButton.interactable = canCancel;
+            discoverCancelButton.GetComponentInChildren<Text>().text = canCancel
+                ? "取消选择"
+                : "三连发现必须选择";
+
             DestroyChildren(discoverCandidatesRoot);
             var count = state != null
                 ? state.Candidates.Count
@@ -855,14 +884,17 @@ namespace SpireChess.UI.Shop
                 if (state != null)
                 {
                     var candidate = state.Candidates[i];
-                    label = $"{candidate.Name}\n{candidate.Attack}/{candidate.Health} · T{candidate.Tier}\n{candidate.Description}";
+                    label = $"{candidate.Name}\n{candidate.Attack}/{candidate.Health} · T{candidate.Tier} · " +
+                            $"{ToRaceName(candidate.Race)}\n{candidate.Description}";
                 }
                 else
                 {
                     var candidate = effectState.Candidates[i];
                     if (candidate.Minion != null)
                     {
-                        label = $"{candidate.Minion.Name}\n{candidate.Minion.Attack}/{candidate.Minion.Health} · T{candidate.Minion.Tier}\n{candidate.Minion.Description}";
+                        label = $"{candidate.Minion.Name}\n{candidate.Minion.Attack}/{candidate.Minion.Health} · " +
+                                $"T{candidate.Minion.Tier} · {ToRaceName(candidate.Minion.Race)}\n" +
+                                candidate.Minion.Description;
                     }
                     else if (candidate.Spell != null)
                     {
@@ -870,7 +902,9 @@ namespace SpireChess.UI.Shop
                     }
                     else if (candidate.Target != null)
                     {
-                        label = $"{candidate.Target.Minion.Name}\n复制为基础 {candidate.Target.Minion.Attack}/{candidate.Target.Minion.Health}";
+                        label = $"{candidate.Target.Minion.Name}\n" +
+                                $"{ToRaceName(candidate.Target.Minion.Race)} · " +
+                                $"复制为基础 {candidate.Target.Minion.Attack}/{candidate.Target.Minion.Health}";
                     }
                     else
                     {
@@ -887,6 +921,49 @@ namespace SpireChess.UI.Shop
                 Anchor(button.GetComponent<RectTransform>(),
                     new Vector2(left, 0f), new Vector2(right, 1f),
                     new Vector2(8f, 4f), new Vector2(-8f, -4f));
+            }
+        }
+
+        private static string BuildMinionSubtitle(
+            int attack,
+            int health,
+            int tier,
+            string race,
+            bool hasPermanentShield,
+            bool hasPendingCombatShield,
+            bool includePrice)
+        {
+            var summary = $"{attack}/{health} · T{tier} · {ToRaceName(race)}";
+            if (includePrice)
+            {
+                summary += " · 3金";
+            }
+
+            var states = new List<string>();
+            if (hasPermanentShield)
+            {
+                states.Add("护盾");
+            }
+
+            if (hasPendingCombatShield)
+            {
+                states.Add("下一战护盾");
+            }
+
+            return states.Count == 0
+                ? summary
+                : summary + "\n[" + string.Join(" / ", states) + "]";
+        }
+
+        private static string ToRaceName(string race)
+        {
+            switch (race)
+            {
+                case "ForgeSoul": return "铸魂";
+                case "WildSpirit": return "荒灵";
+                case "Starbound": return "星契";
+                case "Wayfarer": return "旅团";
+                default: return string.IsNullOrWhiteSpace(race) ? "无种族" : race;
             }
         }
 
@@ -973,7 +1050,8 @@ namespace SpireChess.UI.Shop
                 case ShopOperationError.OccupiedBattleSlot: return "目标战斗位已有随从";
                 case ShopOperationError.InvalidTarget: return "目标不合法，请选择有效战斗区随从";
                 case ShopOperationError.NoBenefit: return "该操作当前没有收益，法术未消耗";
-                case ShopOperationError.DiscoveryPending: return "请先完成或取消当前发现";
+                case ShopOperationError.DiscoveryPending: return "请先完成当前选择";
+                case ShopOperationError.DiscoveryCannotBeCancelled: return "三连发现必须选择一个候选";
                 case ShopOperationError.AlreadyUpgradedThisRound: return "本回合已经升级过酒馆";
                 case ShopOperationError.MaximumTavernTier: return "酒馆已经满级";
                 case ShopOperationError.InvalidCardLocation: return "该位置的卡牌不能执行此操作";

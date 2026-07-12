@@ -720,6 +720,12 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.NoDiscoveryPending);
             }
 
+            if (!PendingDiscover.CanCancel)
+            {
+                return ShopOperationResult.Fail(
+                    ShopOperationError.DiscoveryCannotBeCancelled);
+            }
+
             var state = PendingDiscover;
             foreach (var candidate in state.Candidates)
             {
@@ -1160,7 +1166,8 @@ namespace SpireChess.Shop
             PendingDiscover = new ShopDiscoverState(
                 spell,
                 benchIndex,
-                candidates);
+                candidates,
+                canCancel: false);
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnDiscoverStarted,
                 spell,

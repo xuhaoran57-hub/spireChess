@@ -60,6 +60,8 @@ namespace SpireChess.Tests.EditMode
             Assert.That(shop.ClaimRewardSpell(configs.SpellsById["temporary_ward"]).Success, Is.True);
             Assert.That(shop.UseSpell(FindBench(shop, "temporary_ward"), 0).Success, Is.True);
 
+            Assert.That(shop.Collection.Battle[0].HasPermanentShield, Is.False);
+            Assert.That(shop.Collection.Battle[0].HasPendingCombatShield, Is.True);
             Assert.That(shop.CreateBattleSnapshot().Player[0].HasShield, Is.True);
             Assert.That(shop.CreateBattleSnapshot().Player[0].HasShield, Is.False);
         }

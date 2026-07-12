@@ -135,7 +135,7 @@ namespace SpireChess.Tests
         }
 
         [Test]
-        public void Discover_BlocksAllOtherOperationsAndCancelReturnsReservations()
+        public void TripleDiscover_BlocksAllOtherOperationsAndCannotBeCancelled()
         {
             var minions = new[]
             {
@@ -177,14 +177,20 @@ namespace SpireChess.Tests
 
             var cancel = session.CancelDiscover();
 
-            Assert.That(cancel.Success, Is.True);
-            Assert.That(session.PendingDiscover, Is.Null);
+            Assert.That(cancel.Success, Is.False);
+            Assert.That(cancel.Error, Is.EqualTo(
+                ShopOperationError.DiscoveryCannotBeCancelled));
+            Assert.That(session.PendingDiscover, Is.Not.Null);
             Assert.That(session.Collection.Bench[rewardIndex], Is.SameAs(reward));
-            foreach (var minion in minions)
+            foreach (var candidate in session.PendingDiscover.Candidates)
             {
-                Assert.That(session.MinionPool.GetRemainingCopies(minion.Id),
-                    Is.EqualTo(before[minion.Id]));
+                Assert.That(session.MinionPool.GetRemainingCopies(candidate.Id),
+                    Is.EqualTo(before[candidate.Id] - 1));
             }
+
+            AssertBlocked(session.Refresh());
+            Assert.That(session.SelectDiscover(0).Success, Is.True);
+            Assert.That(session.PendingDiscover, Is.Null);
             Assert.That(session.Refresh().Success, Is.True);
         }
 
