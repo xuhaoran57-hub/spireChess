@@ -1,0 +1,48 @@
+{
+  "contentVersion": "5.0.1",
+  "minimumRulesVersion": "5A.1",
+  "minionIds": [
+    "forge_soul_shield_squire", "hearth_core_spark", "copper_ring_apprentice",
+    "young_deer_spirit", "rending_cub", "moss_mark_seedling",
+    "stargazing_apprentice", "glimmer_mage", "stardust_attendant",
+    "wandering_swordsman", "shieldwall_furnace_keeper", "shieldbreaker_blade_blank",
+    "tempering_mender", "two_tailed_fox_spirit", "swiftwing_forest_hawk",
+    "root_devourer", "moon_phase_scribe", "astrolabe_calibrator",
+    "rune_ward_reader", "black_market_vendor", "oathblade_armor",
+    "resonance_bell_guard", "molten_core_standard", "many_branch_invoker",
+    "tuskherd_pathrunner", "ancient_moss_hatchling", "echo_starchanter",
+    "star_map_broker", "fate_track_recorder", "old_tower_guide",
+    "hearth_core_aegis_officer", "cracked_armor_avenger", "ringing_iron_bastion",
+    "vinecrown_priest", "hundred_song_herd", "mountain_belly_soul_eater",
+    "stargate_lecturer", "moonwheel_dispatcher", "falling_light_arbiter",
+    "formation_breaker_mercenary", "undying_furnace_king", "oathbroken_blade_soul",
+    "thousand_ring_tomb_guardian", "ancient_mountain_spirit", "ten_thousand_hoof_surge",
+    "world_eating_final_bloom", "falling_star_prophet", "fate_shuffler",
+    "sky_covenant_bearer", "royal_bounty_hunter", "token_young_spirit",
+    "token_swift_young_spirit"
+  ],
+  "spellIds": [
+    "minor_tempering", "delayed_supply", "temporary_ward", "precise_training",
+    "thickhide_potion", "free_refresh", "warband_forging", "starlight_rebate",
+    "prototype_copy", "bloodline_awakening", "prebattle_benediction",
+    "advanced_discovery", "fate_reforging", "army_ascension",
+    "legendary_recruitment", "triple_discovery_reward"
+  ],
+  "encounterIds": [
+    "f1_opening_encounter", "f1_safe_normal_encounter", "f1_elite_wall_encounter",
+    "f1_boss_encounter", "f2_normal_encounter", "f2_elite_encounter",
+    "f2_boss_encounter", "f3_normal_encounter", "f3_elite_encounter",
+    "f3_boss_encounter", "stage5b_f1_mechanic_encounter",
+    "stage5b_f2_mechanic_encounter", "stage5b_f3_mechanic_encounter"
+  ],
+  "eventIds": [
+    "blood_contract", "old_tavern_ledger", "lost_supply_cart", "star_spring",
+    "dangerous_recruit", "forge_bargain", "tranquil_grove", "merchant_cache",
+    "risky_map", "starlit_wager"
+  ],
+  "rewardTableIds": [
+    "f1_opening_reward", "f1_safe_reward", "f1_elite_reward",
+    "dangerous_recruit_reward", "f2_normal_reward", "f3_normal_reward",
+    "f1_boss_reward", "f2_boss_reward"
+  ]
+}

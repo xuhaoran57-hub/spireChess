@@ -15,9 +15,17 @@ namespace SpireChess.Shop
         private readonly List<SpellConfig> spells;
         private readonly SpellConfig tripleDiscoveryRewardSpell;
         private readonly List<MinionConfig> minionOffers = new List<MinionConfig>();
+        private readonly List<ActiveShopEffect> activeShopEffects =
+            new List<ActiveShopEffect>();
+        private readonly Dictionary<string, int> perShopEffectUsage =
+            new Dictionary<string, int>();
+        private readonly Dictionary<string, ValueConfig> pendingPostCombatBuffs =
+            new Dictionary<string, ValueConfig>();
+        private readonly ShopEffectEngine effectEngine;
         private int cardInstanceSequence;
         private int roundsWithoutUpgradeAtCurrentTier;
         private int pendingUpgradeDiscount;
+        private int scheduledGold;
 
         public ShopSession(
             IEnumerable<MinionConfig> minions,
@@ -27,7 +35,8 @@ namespace SpireChess.Shop
             this.random = random ?? throw new ArgumentNullException(nameof(random));
             MinionPool = new MinionPool(minions);
             var enabledSpells = (spells ?? throw new ArgumentNullException(nameof(spells)))
-                .Where(spell => spell != null && spell.Enabled)
+                .Where(spell => spell != null && spell.Enabled &&
+                    spell.ImplementationStatus == "Playable")
                 .ToList();
             this.spells = enabledSpells
                 .Where(spell => spell.ShopEligible)
@@ -35,6 +44,14 @@ namespace SpireChess.Shop
             tripleDiscoveryRewardSpell = enabledSpells.FirstOrDefault(
                 spell => spell.Id == TripleDiscoveryRewardSpellId);
             Collection = new PlayerCollection();
+            PhaseStats = new ShopPhaseStats();
+            effectEngine = new ShopEffectEngine(
+                Collection,
+                random,
+                PhaseStats,
+                GrantGold,
+                GrantFreeRefreshes,
+                amount => scheduledGold += Math.Max(0, amount));
             TavernTier = 1;
             EnsureMinionOfferCapacity();
         }
@@ -55,6 +72,9 @@ namespace SpireChess.Shop
         public MinionPool MinionPool { get; }
         public PlayerCollection Collection { get; }
         public ShopDiscoverState PendingDiscover { get; private set; }
+        public PendingEffectChoice PendingChoice { get; private set; }
+        public ShopPhaseStats PhaseStats { get; }
+        public int ScheduledGold => scheduledGold;
 
         public int CurrentUpgradeCost
         {
@@ -101,8 +121,12 @@ namespace SpireChess.Shop
             }
 
             Round = runTurn;
-            Gold = ShopEconomyRules.GetRoundBudget(Round);
+            Gold = ShopEconomyRules.GetRoundBudget(Round) + scheduledGold;
+            scheduledGold = 0;
             RefreshCount = 0;
+            PhaseStats.Reset();
+            activeShopEffects.Clear();
+            perShopEffectUsage.Clear();
             FreeRefreshes = 0;
             UpgradedThisRound = false;
             IsShopOpen = true;
@@ -114,6 +138,7 @@ namespace SpireChess.Shop
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnShopPhaseStart,
                 tavernTier: TavernTier));
+            ResolveShopTrigger("OnShopPhaseStart");
             RaiseTripleEvents(triples);
             return ShopOperationResult.Succeed();
         }
@@ -151,7 +176,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -167,6 +192,10 @@ namespace SpireChess.Shop
                 SpellOffer = null;
             }
 
+            ResolveShopTrigger("OnShopPhaseEnd");
+            Collection.RemoveTemporarySpells();
+            activeShopEffects.Clear();
+            perShopEffectUsage.Clear();
             Gold = 0;
             FreeRefreshes = 0;
             IsShopOpen = false;
@@ -184,7 +213,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -209,11 +238,13 @@ namespace SpireChess.Shop
             FillEmptyOffers();
             IsFrozen = false;
             RefreshCount++;
+            PhaseStats.RefreshCount = RefreshCount;
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnRefresh,
                 cost: cost,
                 refreshCount: RefreshCount,
                 tavernTier: TavernTier));
+            ResolveShopTrigger("OnRefresh");
             return ShopOperationResult.Succeed();
         }
 
@@ -224,7 +255,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -253,6 +284,7 @@ namespace SpireChess.Shop
             var card = ShopCardInstance.CreateMinion(NextCardInstanceId(), config);
             Collection.TryAddToBench(card, out var benchIndex);
             Gold -= ShopEconomyRules.MinionPurchaseCost;
+            PhaseStats.MinionBoughtCount++;
             minionOffers[offerIndex] = null;
             var triples = ResolveAllTriples();
             RaiseEvent(new ShopEventData(
@@ -272,7 +304,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -295,6 +327,7 @@ namespace SpireChess.Shop
             var card = ShopCardInstance.CreateSpell(NextCardInstanceId(), SpellOffer);
             Collection.TryAddToBench(card, out var benchIndex);
             Gold -= ShopEconomyRules.SpellPurchaseCost;
+            PhaseStats.SpellBoughtCount++;
             SpellOffer = null;
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnBuy,
@@ -312,7 +345,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -338,7 +371,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -374,7 +407,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -408,8 +441,14 @@ namespace SpireChess.Shop
             }
 
             var effects = GetTriggeredEffects(card, "OnPlay");
-            if (!TryBuildEffectPlan(
-                    effects,
+            var blockingEffect = effects.FirstOrDefault(RequiresBlockingChoice);
+            if (blockingEffect != null && effects.Count(effect => RequiresBlockingChoice(effect)) > 1)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+            }
+            var immediateEffects = effects.Where(effect => !RequiresBlockingChoice(effect)).ToList();
+            if (!effectEngine.TryBuildPlan(
+                    immediateEffects,
                     card,
                     battleIndex,
                     effectTargetBattleIndex,
@@ -420,8 +459,20 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(error);
             }
 
+            if (blockingEffect != null)
+            {
+                var choiceResult = BeginEffectChoice(
+                    -1,
+                    card,
+                    blockingEffect,
+                    false);
+                if (!choiceResult.Success)
+                {
+                    return choiceResult;
+                }
+            }
             Collection.PlaceBenchMinionInBattle(benchIndex, battleIndex);
-            ApplyEffectPlan(plan);
+            effectEngine.ApplyPlan(plan);
             ShopCardInstance rewardCard = null;
             if (grantsTripleReward)
             {
@@ -443,6 +494,7 @@ namespace SpireChess.Shop
                 card,
                 tavernTier: TavernTier,
                 targetCard: GetFirstTarget(plan)));
+            ResolveShopTrigger("OnPlay", card);
             if (rewardCard != null)
             {
                 RaiseEvent(new ShopEventData(
@@ -463,7 +515,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -490,7 +542,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -525,7 +577,9 @@ namespace SpireChess.Shop
             var discoverEffects = effects
                 .Where(effect => effect.Action == "DiscoverMinion")
                 .ToList();
-            if (discoverEffects.Count > 0)
+            if (card.ConfigId == TripleDiscoveryRewardSpellId &&
+                discoverEffects.Count > 0 &&
+                discoverEffects.All(IsSupportedTripleDiscoverEffect))
             {
                 if (discoverEffects.Count != 1 || effects.Count != 1)
                 {
@@ -535,8 +589,22 @@ namespace SpireChess.Shop
                 return BeginDiscover(benchIndex, card, discoverEffects[0]);
             }
 
-            if (!TryBuildEffectPlan(
-                    effects,
+            var choiceEffect = effects.FirstOrDefault(RequiresBlockingChoice);
+            if (choiceEffect != null)
+            {
+                if (effects.Count != 1)
+                {
+                    return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+                }
+
+                return BeginEffectChoice(benchIndex, card, choiceEffect);
+            }
+
+            var executableEffects = effects
+                .Where(effect => effect.Action != "SetPostCombatSurvivorBuff")
+                .ToList();
+            if (!effectEngine.TryBuildPlan(
+                    executableEffects,
                     null,
                     -1,
                     targetBattleIndex,
@@ -548,13 +616,36 @@ namespace SpireChess.Shop
             }
 
             Collection.RemoveUsedSpellFromBench(benchIndex);
-            ApplyEffectPlan(plan);
+            effectEngine.ApplyPlan(plan);
+            foreach (var postCombatEffect in effects.Where(
+                         effect => effect.Action == "SetPostCombatSurvivorBuff"))
+            {
+                foreach (var target in Collection.Battle.Where(card =>
+                             card != null && card.CardType == ShopCardType.Minion &&
+                             (string.IsNullOrWhiteSpace(postCombatEffect.Target?.Race) ||
+                              card.Minion.Race == postCombatEffect.Target.Race)))
+                {
+                    pendingPostCombatBuffs.TryGetValue(target.InstanceId, out var existing);
+                    pendingPostCombatBuffs[target.InstanceId] = new ValueConfig
+                    {
+                        Attack = (existing?.Attack ?? 0) +
+                                 (postCombatEffect.Value?.Attack ?? 0),
+                        Health = (existing?.Health ?? 0) +
+                                 (postCombatEffect.Value?.Health ?? 0),
+                        Keyword = postCombatEffect.Value?.Keyword ?? existing?.Keyword,
+                        Duration = "Permanent"
+                    };
+                }
+            }
+            ActivateSpellListeners(card);
+            PhaseStats.SpellUsedCount++;
             var triples = ResolveAllTriples();
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnSpellUsed,
                 card,
                 tavernTier: TavernTier,
                 targetCard: GetFirstTarget(plan)));
+            ResolveShopTrigger("OnSpellUsed", card);
             RaiseTripleEvents(triples);
             return ShopOperationResult.Succeed();
         }
@@ -600,6 +691,7 @@ namespace SpireChess.Shop
             }
 
             PendingDiscover = null;
+            PhaseStats.SpellUsedCount++;
             var triples = ResolveAllTriples();
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnSpellUsed,
@@ -611,6 +703,7 @@ namespace SpireChess.Shop
                 state.SourceSpell,
                 tavernTier: TavernTier,
                 targetCard: selectedCard));
+            ResolveShopTrigger("OnSpellUsed", state.SourceSpell);
             RaiseTripleEvents(triples);
             return ShopOperationResult.Succeed(state.BenchIndex);
         }
@@ -641,6 +734,157 @@ namespace SpireChess.Shop
             return ShopOperationResult.Succeed(state.BenchIndex);
         }
 
+        public ShopOperationResult SelectEffectChoice(int candidateIndex)
+        {
+            if (!IsShopOpen)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
+            }
+
+            if (PendingChoice == null)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.NoDiscoveryPending);
+            }
+
+            if (candidateIndex < 0 || candidateIndex >= PendingChoice.Candidates.Count)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidIndex);
+            }
+
+            var state = PendingChoice;
+            var candidate = state.Candidates[candidateIndex];
+            ShopCardInstance grantedCard = null;
+            switch (state.ChoiceType)
+            {
+                case EffectChoiceType.MinionCard:
+                    grantedCard = ShopCardInstance.CreateMinion(
+                        NextCardInstanceId(),
+                        candidate.Minion);
+                    if (state.ReplaceSourceCard
+                        ? !Collection.ReplaceBenchCard(
+                            state.BenchIndex, state.SourceCard, grantedCard)
+                        : !Collection.TryAddToBench(grantedCard, out _))
+                    {
+                        return ShopOperationResult.Fail(ShopOperationError.InvalidCardLocation);
+                    }
+
+                    foreach (var option in state.Candidates)
+                    {
+                        if (!ReferenceEquals(option, candidate) && option.Minion != null)
+                        {
+                            MinionPool.Return(option.Minion.Id);
+                        }
+                    }
+                    break;
+                case EffectChoiceType.SpellCard:
+                    grantedCard = ShopCardInstance.CreateSpell(
+                        NextCardInstanceId(),
+                        candidate.Spell,
+                        state.Effect.Value?.Temporary ?? false);
+                    if (state.ReplaceSourceCard
+                        ? !Collection.ReplaceBenchCard(
+                            state.BenchIndex, state.SourceCard, grantedCard)
+                        : !Collection.TryAddToBench(grantedCard, out _))
+                    {
+                        return ShopOperationResult.Fail(ShopOperationError.InvalidCardLocation);
+                    }
+                    break;
+                case EffectChoiceType.BattleTarget:
+                    if (state.Effect.Action != "CopyMinion" || candidate.Target == null ||
+                        !MinionPool.TryReserveCopies(candidate.Target.ConfigId, 1))
+                    {
+                        return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
+                    }
+
+                    grantedCard = ShopCardInstance.CreateMinion(
+                        NextCardInstanceId(),
+                        candidate.Target.Minion);
+                    if (!Collection.ReplaceBenchCard(
+                            state.BenchIndex,
+                            state.SourceCard,
+                            grantedCard))
+                    {
+                        MinionPool.Return(candidate.Target.ConfigId);
+                        return ShopOperationResult.Fail(ShopOperationError.InvalidCardLocation);
+                    }
+                    break;
+                case EffectChoiceType.Race:
+                    var targets = Collection.Battle
+                        .Where(card => card != null && card.Minion.Race == candidate.Id)
+                        .ToList();
+                    if (targets.Count == 0)
+                    {
+                        return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
+                    }
+
+                    Collection.RemoveUsedSpellFromBench(state.BenchIndex);
+                    foreach (var target in targets)
+                    {
+                        target.ApplyPermanentStats(
+                            state.Effect.Value?.Attack ?? 0,
+                            state.Effect.Value?.Health ?? 0);
+                    }
+                    break;
+                default:
+                    return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+            }
+
+            PendingChoice = null;
+            if (state.SourceCard.CardType == ShopCardType.Spell)
+            {
+                PhaseStats.SpellUsedCount++;
+            }
+            var triples = ResolveAllTriples();
+            RaiseEvent(new ShopEventData(
+                ShopEventType.OnSpellUsed,
+                state.SourceCard,
+                tavernTier: TavernTier,
+                targetCard: grantedCard ?? candidate.Target));
+            RaiseEvent(new ShopEventData(
+                ShopEventType.OnDiscoverResolved,
+                state.SourceCard,
+                tavernTier: TavernTier,
+                targetCard: grantedCard ?? candidate.Target));
+            if (state.SourceCard.CardType == ShopCardType.Spell)
+            {
+                ResolveShopTrigger("OnSpellUsed", state.SourceCard);
+            }
+            RaiseTripleEvents(triples);
+            return ShopOperationResult.Succeed(state.BenchIndex);
+        }
+
+        public ShopOperationResult CancelEffectChoice()
+        {
+            if (!IsShopOpen)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
+            }
+
+            if (PendingChoice == null)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.NoDiscoveryPending);
+            }
+
+            var state = PendingChoice;
+            if (state.ChoiceType == EffectChoiceType.MinionCard)
+            {
+                foreach (var candidate in state.Candidates)
+                {
+                    if (candidate.Minion != null)
+                    {
+                        MinionPool.Return(candidate.Minion.Id);
+                    }
+                }
+            }
+
+            PendingChoice = null;
+            RaiseEvent(new ShopEventData(
+                ShopEventType.OnDiscoverCancelled,
+                state.SourceCard,
+                tavernTier: TavernTier));
+            return ShopOperationResult.Succeed(state.BenchIndex);
+        }
+
         public BattleBoardState CreateBattleSnapshot()
         {
             var state = new BattleBoardState();
@@ -652,18 +896,56 @@ namespace SpireChess.Shop
                     continue;
                 }
 
+                var modifiers = card.ConsumePendingCombatModifiers();
+                var modifierAttack = modifiers.Sum(value => value.Attack);
+                var modifierHealth = modifiers.Sum(value => value.Health);
+                var modifierKeywords = card.PermanentKeywords
+                    .Concat(modifiers
+                        .Where(value => !string.IsNullOrWhiteSpace(value.Keyword))
+                        .Select(value => value.Keyword))
+                    .Concat(modifiers.Where(value => value.AddShield).Select(value => "Shield"))
+                    .Distinct()
+                    .ToList();
                 state.Player[i] = new BattleMinionRuntime(
                     card.Minion,
                     card.IsGolden,
-                    card.CurrentAttack,
-                    card.CurrentHealth,
+                    card.CurrentAttack + modifierAttack,
+                    card.CurrentHealth + modifierHealth,
                     card.InstanceId,
                     card.PermanentAttackBonus,
                     card.PermanentHealthBonus,
-                    card.PermanentKeywords);
+                    modifierKeywords);
             }
 
             return state;
+        }
+
+        public void ApplyPostCombatSurvivorBuffs(BattleSimulationResult result)
+        {
+            if (result == null || pendingPostCombatBuffs.Count == 0)
+            {
+                return;
+            }
+
+            var survivors = new HashSet<string>(result.FinalState.Player
+                .Where(runtime => runtime != null && runtime.IsAlive &&
+                    !string.IsNullOrWhiteSpace(runtime.SourceInstanceId))
+                .Select(runtime => runtime.SourceInstanceId));
+            foreach (var entry in pendingPostCombatBuffs)
+            {
+                if (!survivors.Contains(entry.Key))
+                {
+                    continue;
+                }
+
+                ModifyOwnedBattleMinion(
+                    entry.Key,
+                    entry.Value?.Attack ?? 0,
+                    entry.Value?.Health ?? 0,
+                    entry.Value?.Keyword);
+            }
+
+            pendingPostCombatBuffs.Clear();
         }
 
         public ShopOperationResult UpgradeTavern()
@@ -673,7 +955,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -716,7 +998,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (PendingDiscover != null)
+            if (PendingDiscover != null || PendingChoice != null)
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
@@ -756,7 +1038,8 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (config == null || config.IsToken || !config.Enabled)
+            if (config == null || config.IsToken || !config.Enabled ||
+                config.ImplementationStatus != "Playable")
             {
                 return ShopOperationResult.Fail(ShopOperationError.InvalidCardType);
             }
@@ -781,6 +1064,7 @@ namespace SpireChess.Shop
             }
 
             if (config == null || !config.Enabled ||
+                config.ImplementationStatus != "Playable" ||
                 config.Effects == null || config.Effects.Count == 0)
             {
                 return ShopOperationResult.Fail(ShopOperationError.InvalidCardType);
@@ -850,6 +1134,8 @@ namespace SpireChess.Shop
                 cost: -ShopEconomyRules.MinionSellValue,
                 refreshCount: RefreshCount,
                 tavernTier: TavernTier));
+            ResolveCardTrigger(card, "OnSell", -1);
+            ResolveShopTrigger("OnSell", card);
         }
 
         private ShopOperationResult BeginDiscover(
@@ -880,6 +1166,158 @@ namespace SpireChess.Shop
                 spell,
                 tavernTier: TavernTier));
             return ShopOperationResult.Succeed(benchIndex);
+        }
+
+        private ShopOperationResult BeginEffectChoice(
+            int benchIndex,
+            ShopCardInstance sourceCard,
+            EffectConfig effect,
+            bool replaceSourceCard = true)
+        {
+            var candidates = new List<EffectChoiceCandidate>();
+            EffectChoiceType choiceType;
+            switch (effect.Action)
+            {
+                case "DiscoverMinion":
+                {
+                    var discover = effect.Discover;
+                    if (discover == null)
+                    {
+                        return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+                    }
+
+                    var minimumTier = discover.MinTier > 0 ? discover.MinTier : 1;
+                    var maximumTier = TavernTier;
+                    if (discover.TierMode == "ExactCurrentTavernTier")
+                    {
+                        minimumTier = TavernTier;
+                    }
+                    else if (discover.TierMode == "Exact")
+                    {
+                        maximumTier = Math.Max(1, discover.MinTier);
+                        minimumTier = maximumTier;
+                    }
+                    else if (discover.MaxTierMode == "CurrentTavernTierPlusOffset")
+                    {
+                        maximumTier = Math.Min(
+                            ShopEconomyRules.MaximumTavernTier,
+                            TavernTier + discover.MaxTierOffset);
+                    }
+
+                    if (sourceCard.ConfigId == "advanced_discovery" && RefreshCount >= 3)
+                    {
+                        maximumTier = Math.Min(
+                            ShopEconomyRules.MaximumTavernTier,
+                            maximumTier + 1);
+                    }
+
+                    var count = Math.Max(1, discover.Count);
+                    if (sourceCard.ConfigId == "legendary_recruitment" &&
+                        Collection.Battle.Any(card => card != null && card.IsGolden))
+                    {
+                        count++;
+                    }
+
+                    var discoverRace = sourceCard.ConfigId == "fate_shuffler" &&
+                                       RefreshCount >= 3
+                        ? "Starbound"
+                        : ResolveDiscoverRace(discover.Race);
+                    var reserved = MinionPool.ReserveDistinct(
+                        minimumTier,
+                        maximumTier,
+                        discoverRace,
+                        count,
+                        random);
+                    candidates.AddRange(reserved.Select(minion =>
+                        new EffectChoiceCandidate(minion.Id, minion.Name, minion: minion)));
+                    choiceType = EffectChoiceType.MinionCard;
+                    break;
+                }
+                case "DiscoverSpell":
+                {
+                    var discover = effect.Discover;
+                    var maximumTier = discover?.MaxTierMode == "CurrentTavernTier"
+                        ? TavernTier
+                        : Math.Max(1, discover?.MinTier ?? TavernTier);
+                    var count = Math.Max(1, discover?.Count ?? 3);
+                    var eligible = spells
+                        .Where(spell => spell.Tier <= maximumTier && spell.ShopEligible)
+                        .OrderBy(_ => random.Next())
+                        .Take(count)
+                        .ToList();
+                    candidates.AddRange(eligible.Select(spell =>
+                        new EffectChoiceCandidate(spell.Id, spell.Name, spell: spell)));
+                    choiceType = EffectChoiceType.SpellCard;
+                    break;
+                }
+                case "CopyMinion":
+                    candidates.AddRange(Collection.Battle
+                        .Where(card => card != null && card.CardType == ShopCardType.Minion &&
+                            !card.Minion.IsToken && card.Minion.Tier >= 1 &&
+                            card.Minion.Tier <= 2 &&
+                            MinionPool.GetRemainingCopies(card.ConfigId) > 0)
+                        .Select(card => new EffectChoiceCandidate(
+                            card.InstanceId,
+                            card.Minion.Name,
+                            target: card)));
+                    choiceType = EffectChoiceType.BattleTarget;
+                    break;
+                case "ModifyStats" when effect.Target?.Selector == "PlayerChoiceRace":
+                    var races = new[] { "ForgeSoul", "WildSpirit", "Starbound", "Wayfarer" };
+                    candidates.AddRange(races
+                        .Where(race => Collection.Battle.Any(
+                            card => card != null && card.Minion.Race == race))
+                        .Select(race => new EffectChoiceCandidate(race, race)));
+                    choiceType = EffectChoiceType.Race;
+                    break;
+                default:
+                    return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+            }
+
+            if (candidates.Count == 0)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
+            }
+
+            PendingChoice = new PendingEffectChoice(
+                choiceType,
+                sourceCard,
+                benchIndex,
+                effect,
+                candidates,
+                replaceSourceCard);
+            RaiseEvent(new ShopEventData(
+                ShopEventType.OnDiscoverStarted,
+                sourceCard,
+                tavernTier: TavernTier));
+            return ShopOperationResult.Succeed(benchIndex);
+        }
+
+        private static bool RequiresBlockingChoice(EffectConfig effect)
+        {
+            return effect != null &&
+                (effect.Action == "DiscoverSpell" ||
+                 effect.Action == "CopyMinion" ||
+                 effect.Action == "DiscoverMinion" ||
+                 effect.Target?.Selector == "PlayerChoiceRace");
+        }
+
+        private string ResolveDiscoverRace(string configuredRace)
+        {
+            if (configuredRace != "MostCommonMainRace")
+            {
+                return configuredRace;
+            }
+
+            var priority = new[] { "ForgeSoul", "WildSpirit", "Starbound" };
+            var counts = priority.ToDictionary(
+                race => race,
+                race => Collection.Battle.Count(card =>
+                    card != null && card.Minion.Race == race));
+            var maximum = counts.Values.DefaultIfEmpty(0).Max();
+            return maximum <= 0
+                ? "Wayfarer"
+                : priority.First(race => counts[race] == maximum);
         }
 
         private bool IsValidTripleDiscoveryRewardSpell()
@@ -1064,6 +1502,205 @@ namespace SpireChess.Shop
             EventRaised?.Invoke(eventData);
         }
 
+        private void ActivateSpellListeners(ShopCardInstance spell)
+        {
+            foreach (var effect in GetTriggeredEffectsExcept(spell, "Manual"))
+            {
+                activeShopEffects.Add(new ActiveShopEffect(
+                    spell.InstanceId,
+                    spell.ConfigId,
+                    effect,
+                    RefreshCount));
+            }
+        }
+
+        private void ResolveShopTrigger(string trigger, ShopCardInstance subject = null)
+        {
+            var board = Collection.Battle.ToArray();
+            for (var i = 0; i < board.Length; i++)
+            {
+                var source = board[i];
+                if (source == null || (trigger == "OnPlay" && ReferenceEquals(source, subject)))
+                {
+                    continue;
+                }
+
+                ResolveCardTrigger(source, trigger, i);
+            }
+
+            foreach (var active in activeShopEffects.ToArray())
+            {
+                var effect = active.Effect;
+                if (effect.Trigger != trigger || !CanUseEffect(
+                        active.SourceInstanceId,
+                        effect,
+                        active.TriggerCount))
+                {
+                    continue;
+                }
+
+                if (effect.Condition?.PhaseStat == "RefreshesSinceActivation")
+                {
+                    var threshold = Math.Max(1, effect.Condition.Threshold);
+                    var refreshes = RefreshCount - active.ActivationRefreshCount;
+                    if (refreshes < (active.TriggerCount + 1) * threshold)
+                    {
+                        continue;
+                    }
+                }
+
+                if (!effectEngine.TryBuildPlan(
+                        new[] { effect },
+                        null,
+                        -1,
+                        -1,
+                        false,
+                        out var plan,
+                        out _))
+                {
+                    continue;
+                }
+
+                effectEngine.ApplyPlan(plan);
+                active.TriggerCount++;
+                RecordEffectUse(active.SourceInstanceId, effect);
+            }
+        }
+
+        private void ResolveCardTrigger(
+            ShopCardInstance source,
+            string trigger,
+            int sourceBattleIndex)
+        {
+            foreach (var effect in GetTriggeredEffects(source, trigger))
+            {
+                if (!CanUseEffect(source.InstanceId, effect))
+                {
+                    continue;
+                }
+
+                if (effect.Action == "GrantRandomSpell")
+                {
+                    if (MeetsShopCondition(effect.Condition) &&
+                        TryGrantRandomSpell(effect))
+                    {
+                        RecordEffectUse(source.InstanceId, effect);
+                    }
+                    continue;
+                }
+
+                if (!effectEngine.TryBuildPlan(
+                        new[] { effect },
+                        source,
+                        sourceBattleIndex,
+                        -1,
+                        false,
+                        out var plan,
+                        out _))
+                {
+                    continue;
+                }
+
+                effectEngine.ApplyPlan(plan);
+                RecordEffectUse(source.InstanceId, effect);
+            }
+        }
+
+        private bool MeetsShopCondition(ConditionConfig condition)
+        {
+            if (condition == null || string.IsNullOrWhiteSpace(condition.Type) ||
+                condition.Type == "None")
+            {
+                return true;
+            }
+
+            if (condition.Type != "PhaseStatAtLeast")
+            {
+                return false;
+            }
+
+            int value;
+            switch (condition.PhaseStat)
+            {
+                case "RefreshCount": value = PhaseStats.RefreshCount; break;
+                case "SpellUsedCount": value = PhaseStats.SpellUsedCount; break;
+                case "SpellBoughtCount": value = PhaseStats.SpellBoughtCount; break;
+                case "MinionBoughtCount": value = PhaseStats.MinionBoughtCount; break;
+                default: return false;
+            }
+
+            return value >= condition.Threshold;
+        }
+
+        private bool TryGrantRandomSpell(EffectConfig effect)
+        {
+            if (Collection.EmptyBenchSlotCount() <= 0)
+            {
+                return false;
+            }
+
+            var minimumTier = Math.Max(1, effect.Discover?.MinTier ?? 1);
+            var maximumTier = effect.Discover?.TierMode == "Exact"
+                ? minimumTier
+                : TavernTier;
+            var eligible = spells.Where(spell =>
+                spell.Tier >= minimumTier && spell.Tier <= maximumTier).ToList();
+            if (eligible.Count == 0)
+            {
+                return false;
+            }
+
+            var selected = eligible[random.Next(eligible.Count)];
+            var card = ShopCardInstance.CreateSpell(
+                NextCardInstanceId(),
+                selected,
+                effect.Value?.Temporary ?? true);
+            return Collection.TryAddToBench(card, out _);
+        }
+
+        private bool CanUseEffect(
+            string sourceInstanceId,
+            EffectConfig effect,
+            int knownUsage = -1)
+        {
+            var limit = effect?.Limit?.PerShop ?? 0;
+            if (limit <= 0)
+            {
+                return true;
+            }
+
+            var usage = knownUsage >= 0
+                ? knownUsage
+                : GetEffectUseCount(sourceInstanceId, effect.Id);
+            return usage < limit;
+        }
+
+        private int GetEffectUseCount(string sourceInstanceId, string effectId)
+        {
+            perShopEffectUsage.TryGetValue(
+                $"{sourceInstanceId}:{effectId}",
+                out var usage);
+            return usage;
+        }
+
+        private void RecordEffectUse(string sourceInstanceId, EffectConfig effect)
+        {
+            var key = $"{sourceInstanceId}:{effect.Id}";
+            perShopEffectUsage[key] = GetEffectUseCount(sourceInstanceId, effect.Id) + 1;
+        }
+
+        private static IReadOnlyList<EffectConfig> GetTriggeredEffectsExcept(
+            ShopCardInstance card,
+            string excludedTrigger)
+        {
+            IEnumerable<EffectConfig> effects = card.CardType == ShopCardType.Spell
+                ? card.Spell.Effects
+                : card.IsGolden ? card.Minion.GoldenEffects : card.Minion.Effects;
+            return (effects ?? Enumerable.Empty<EffectConfig>())
+                .Where(effect => effect != null && effect.Trigger != excludedTrigger)
+                .ToList();
+        }
+
         private IReadOnlyList<EffectConfig> GetTriggeredEffects(
             ShopCardInstance card,
             string trigger)
@@ -1085,259 +1722,10 @@ namespace SpireChess.Shop
                 .ToList();
         }
 
-        private bool TryBuildEffectPlan(
-            IReadOnlyList<EffectConfig> effects,
-            ShopCardInstance source,
-            int sourceBattleIndex,
-            int playerTargetIndex,
-            bool requireEveryEffect,
-            out List<ResolvedShopEffect> plan,
-            out ShopOperationError error)
-        {
-            plan = new List<ResolvedShopEffect>();
-            error = ShopOperationError.None;
-
-            foreach (var effect in effects)
-            {
-                if (effect.Condition != null &&
-                    !string.IsNullOrWhiteSpace(effect.Condition.Type) &&
-                    effect.Condition.Type != "None")
-                {
-                    error = ShopOperationError.UnsupportedEffect;
-                    return false;
-                }
-
-                var value = effect.Value;
-                switch (effect.Action)
-                {
-                    case "ModifyStats":
-                    {
-                        if (value == null ||
-                            (value.Attack == 0 && value.Health == 0) ||
-                            (!string.IsNullOrWhiteSpace(value.Duration) &&
-                             value.Duration != "Permanent"))
-                        {
-                            error = requireEveryEffect
-                                ? ShopOperationError.NoBenefit
-                                : ShopOperationError.UnsupportedEffect;
-                            return false;
-                        }
-
-                        if (!TryResolveTargets(
-                                effect.Target,
-                                source,
-                                sourceBattleIndex,
-                                playerTargetIndex,
-                                out var targets,
-                                out error))
-                        {
-                            return false;
-                        }
-
-                        if (targets.Count == 0)
-                        {
-                            if (requireEveryEffect)
-                            {
-                                error = ShopOperationError.NoBenefit;
-                                return false;
-                            }
-
-                            continue;
-                        }
-
-                        plan.Add(new ResolvedShopEffect(effect, targets));
-                        break;
-                    }
-                    case "GainGold":
-                    case "FreeRefresh":
-                        if (value == null || value.Amount <= 0)
-                        {
-                            error = requireEveryEffect
-                                ? ShopOperationError.NoBenefit
-                                : ShopOperationError.UnsupportedEffect;
-                            return false;
-                        }
-
-                        plan.Add(new ResolvedShopEffect(
-                            effect,
-                            Array.Empty<ShopCardInstance>()));
-                        break;
-                    default:
-                        error = ShopOperationError.UnsupportedEffect;
-                        return false;
-                }
-            }
-
-            if (requireEveryEffect && plan.Count == 0)
-            {
-                error = ShopOperationError.NoBenefit;
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool TryResolveTargets(
-            TargetConfig target,
-            ShopCardInstance source,
-            int sourceBattleIndex,
-            int playerTargetIndex,
-            out IReadOnlyList<ShopCardInstance> targets,
-            out ShopOperationError error)
-        {
-            targets = Array.Empty<ShopCardInstance>();
-            error = ShopOperationError.None;
-            if (target == null ||
-                (!string.IsNullOrWhiteSpace(target.Side) && target.Side != "Ally") ||
-                (target.Zones != null && target.Zones.Count > 0 &&
-                 !target.Zones.Contains("Battle")))
-            {
-                error = ShopOperationError.UnsupportedEffect;
-                return false;
-            }
-
-            if (target.Scope == "Self")
-            {
-                if (source != null)
-                {
-                    targets = new[] { source };
-                }
-
-                return true;
-            }
-
-            var candidates = new List<KeyValuePair<int, ShopCardInstance>>();
-            for (var i = 0; i < Collection.Battle.Count; i++)
-            {
-                var card = i == sourceBattleIndex
-                    ? source
-                    : Collection.Battle[i];
-                if (!IsEligibleTarget(card, source, target))
-                {
-                    continue;
-                }
-
-                candidates.Add(new KeyValuePair<int, ShopCardInstance>(i, card));
-            }
-
-            if (target.Scope == "All")
-            {
-                targets = candidates.Select(candidate => candidate.Value).ToList();
-                return true;
-            }
-
-            if (target.Scope != "Single")
-            {
-                error = ShopOperationError.UnsupportedEffect;
-                return false;
-            }
-
-            if (candidates.Count == 0)
-            {
-                return true;
-            }
-
-            switch (target.Selector)
-            {
-                case "Random":
-                    targets = new[] { candidates[random.Next(candidates.Count)].Value };
-                    return true;
-                case "LowestAttack":
-                    targets = new[] { candidates
-                        .OrderBy(candidate => candidate.Value.CurrentAttack)
-                        .ThenBy(candidate => candidate.Key)
-                        .First().Value };
-                    return true;
-                case "LowestHealth":
-                    targets = new[] { candidates
-                        .OrderBy(candidate => candidate.Value.CurrentHealth)
-                        .ThenBy(candidate => candidate.Key)
-                        .First().Value };
-                    return true;
-                case "PlayerChoice":
-                case "None":
-                    var selected = candidates.FirstOrDefault(
-                        candidate => candidate.Key == playerTargetIndex);
-                    if (selected.Value == null)
-                    {
-                        error = ShopOperationError.InvalidTarget;
-                        return false;
-                    }
-
-                    targets = new[] { selected.Value };
-                    return true;
-                default:
-                    error = ShopOperationError.UnsupportedEffect;
-                    return false;
-            }
-        }
-
-        private static bool IsEligibleTarget(
-            ShopCardInstance card,
-            ShopCardInstance source,
-            TargetConfig target)
-        {
-            if (card == null || card.CardType != ShopCardType.Minion)
-            {
-                return false;
-            }
-
-            if (!target.IncludeSelf && source != null && ReferenceEquals(card, source))
-            {
-                return false;
-            }
-
-            if (!target.IncludeToken && card.Minion.IsToken)
-            {
-                return false;
-            }
-
-            return string.IsNullOrWhiteSpace(target.Race) ||
-                target.Race == card.Minion.Race;
-        }
-
-        private void ApplyEffectPlan(IEnumerable<ResolvedShopEffect> plan)
-        {
-            foreach (var resolved in plan)
-            {
-                switch (resolved.Effect.Action)
-                {
-                    case "ModifyStats":
-                        foreach (var target in resolved.Targets)
-                        {
-                            target.ApplyPermanentStats(
-                                resolved.Effect.Value.Attack,
-                                resolved.Effect.Value.Health);
-                        }
-                        break;
-                    case "GainGold":
-                        Gold += resolved.Effect.Value.Amount;
-                        break;
-                    case "FreeRefresh":
-                        FreeRefreshes += resolved.Effect.Value.Amount;
-                        break;
-                }
-            }
-        }
-
         private static ShopCardInstance GetFirstTarget(
-            IEnumerable<ResolvedShopEffect> plan)
+            IEnumerable<global::SpireChess.Shop.ResolvedShopEffect> plan)
         {
             return plan.SelectMany(resolved => resolved.Targets).FirstOrDefault();
-        }
-
-        private sealed class ResolvedShopEffect
-        {
-            public ResolvedShopEffect(
-                EffectConfig effect,
-                IReadOnlyList<ShopCardInstance> targets)
-            {
-                Effect = effect;
-                Targets = targets;
-            }
-
-            public EffectConfig Effect { get; }
-            public IReadOnlyList<ShopCardInstance> Targets { get; }
         }
     }
 }

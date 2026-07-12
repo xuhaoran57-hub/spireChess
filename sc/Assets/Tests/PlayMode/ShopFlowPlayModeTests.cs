@@ -149,7 +149,7 @@ namespace SpireChess.Tests
                 .Where(spell => spell.Enabled && spell.ShopEligible)
                 .ToList();
 
-            Assert.That(shopSpells.Count, Is.EqualTo(4));
+            Assert.That(shopSpells.Count, Is.EqualTo(15));
             Assert.That(shopSpells.All(spell => spell.Effects != null && spell.Effects.Count > 0),
                 Is.True);
         }

@@ -59,6 +59,9 @@ namespace SpireChess.Config
         [JsonProperty("enabled")]
         public bool Enabled { get; set; }
 
+        [JsonProperty("implementationStatus")]
+        public string ImplementationStatus { get; set; } = "Playable";
+
         [JsonProperty("devNote")]
         public string DevNote { get; set; }
     }

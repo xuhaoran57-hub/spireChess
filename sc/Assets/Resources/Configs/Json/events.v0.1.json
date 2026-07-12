@@ -8,7 +8,12 @@
         { "eventId": "old_tavern_ledger", "weight": 1 },
         { "eventId": "lost_supply_cart", "weight": 1 },
         { "eventId": "star_spring", "weight": 1 },
-        { "eventId": "dangerous_recruit", "weight": 1 }
+        { "eventId": "dangerous_recruit", "weight": 1 },
+        { "eventId": "forge_bargain", "weight": 1 },
+        { "eventId": "tranquil_grove", "weight": 1 },
+        { "eventId": "merchant_cache", "weight": 1 },
+        { "eventId": "risky_map", "weight": 1 },
+        { "eventId": "starlit_wager", "weight": 1 }
       ]
     }
   ],
@@ -46,6 +51,41 @@
       "options": [
         { "id": "recruit", "label": "失去 2 点生命；当前酒馆等级随从三选一", "effects": [{ "type": "LoseHealth", "amount": 2 }], "followupRewardTableId": "dangerous_recruit_reward" },
         { "id": "leave", "label": "离开", "effects": [] }
+      ]
+    },
+    {
+      "id": "forge_bargain", "name": "炉边交易", "description": "工匠愿意用一份危险契约换取升级材料。",
+      "options": [
+        { "id": "accept", "label": "失去 2 点生命；下次酒馆升级费用 -3", "effects": [{ "type": "LoseHealth", "amount": 2 }, { "type": "UpgradeDiscount", "amount": 3 }] },
+        { "id": "small", "label": "下个商店获得 1 次免费刷新", "effects": [{ "type": "FreeRefresh", "amount": 1 }] }
+      ]
+    },
+    {
+      "id": "tranquil_grove", "name": "静谧林地", "description": "短暂休整，或为下一次招募保留灵感。",
+      "options": [
+        { "id": "heal", "label": "恢复 2 点生命", "effects": [{ "type": "HealHealth", "amount": 2 }] },
+        { "id": "refresh", "label": "下个商店获得 1 次免费刷新", "effects": [{ "type": "FreeRefresh", "amount": 1 }] }
+      ]
+    },
+    {
+      "id": "merchant_cache", "name": "行商秘藏", "description": "在现金与未知法术中选择。",
+      "options": [
+        { "id": "gold", "label": "下个商店 +3 金币", "effects": [{ "type": "NextShopGold", "amount": 3 }] },
+        { "id": "spell", "label": "获得一张随机普通法术", "effects": [{ "type": "QueueRandomSpell", "amount": 1 }] }
+      ]
+    },
+    {
+      "id": "risky_map", "name": "残缺星图", "description": "沿危险捷径前进可换来更多刷新机会。",
+      "options": [
+        { "id": "risk", "label": "失去 1 点生命；下个商店获得 3 次免费刷新", "effects": [{ "type": "LoseHealth", "amount": 1 }, { "type": "FreeRefresh", "amount": 3 }] },
+        { "id": "safe", "label": "下个商店 +1 金币", "effects": [{ "type": "NextShopGold", "amount": 1 }] }
+      ]
+    },
+    {
+      "id": "starlit_wager", "name": "星辉赌局", "description": "把生命押在下一次商店的爆发上。",
+      "options": [
+        { "id": "wager", "label": "失去 4 点生命；下个商店 +5 金币", "effects": [{ "type": "LoseHealth", "amount": 4 }, { "type": "NextShopGold", "amount": 5 }] },
+        { "id": "decline", "label": "恢复 1 点生命", "effects": [{ "type": "HealHealth", "amount": 1 }] }
       ]
     }
   ]

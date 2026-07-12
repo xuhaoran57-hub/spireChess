@@ -31,6 +31,12 @@ namespace SpireChess.Config
 
         [JsonProperty("fallbackEffects")]
         public List<EffectConfig> FallbackEffects { get; set; } = new List<EffectConfig>();
+
+        [JsonProperty("tokenId")]
+        public string TokenId { get; set; }
+
+        [JsonProperty("repeat")]
+        public int Repeat { get; set; } = 1;
     }
 
     public sealed class TargetConfig
@@ -79,6 +85,15 @@ namespace SpireChess.Config
 
         [JsonProperty("resource")]
         public string Resource { get; set; }
+
+        [JsonProperty("cardId")]
+        public string CardId { get; set; }
+
+        [JsonProperty("count")]
+        public int Count { get; set; }
+
+        [JsonProperty("temporary")]
+        public bool Temporary { get; set; }
     }
 
     public sealed class ConditionConfig

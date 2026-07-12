@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpireChess.Battle
 {
@@ -19,7 +20,8 @@ namespace SpireChess.Battle
                     ? BattleOutcomeReason.Victory
                     : BattleOutcomeReason.MutualElimination,
                 log,
-                new List<BattleStep>())
+                new List<BattleStep>(),
+                null)
         {
         }
 
@@ -35,7 +37,8 @@ namespace SpireChess.Battle
                     ? BattleOutcomeReason.Victory
                     : BattleOutcomeReason.MutualElimination,
                 log,
-                steps)
+                steps,
+                null)
         {
         }
 
@@ -44,13 +47,16 @@ namespace SpireChess.Battle
             BattleSide? winner,
             BattleOutcomeReason outcomeReason,
             List<string> log,
-            List<BattleStep> steps)
+            List<BattleStep> steps,
+            IEnumerable<BattlePermanentDelta> permanentDeltas = null)
         {
             FinalState = finalState;
             Winner = winner;
             OutcomeReason = outcomeReason;
             Log = log;
             Steps = steps;
+            PermanentDeltas = (permanentDeltas ?? Enumerable.Empty<BattlePermanentDelta>())
+                .ToList().AsReadOnly();
         }
 
         public BattleBoardState FinalState { get; }
@@ -58,6 +64,7 @@ namespace SpireChess.Battle
         public BattleOutcomeReason OutcomeReason { get; }
         public IReadOnlyList<string> Log { get; }
         public IReadOnlyList<BattleStep> Steps { get; }
+        public IReadOnlyList<BattlePermanentDelta> PermanentDeltas { get; }
     }
 
     public sealed class BattleStep

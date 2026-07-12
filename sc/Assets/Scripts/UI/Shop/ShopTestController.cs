@@ -211,22 +211,32 @@ namespace SpireChess.UI.Shop
         {
             return ApplyOperation(
                 session.UseSpell(benchIndex, targetBattleIndex),
-                session.PendingDiscover == null ? "法术已使用" : "请选择一项发现结果",
+                !HasPendingChoice ? "法术已使用" : "请选择一个效果结果",
                 true);
         }
 
         public ShopOperationResult SelectDiscoverCandidate(int candidateIndex)
         {
             return ApplyOperation(
-                session.SelectDiscover(candidateIndex),
-                "发现选择已加入备战区",
+                session.PendingChoice != null
+                    ? session.SelectEffectChoice(candidateIndex)
+                    : session.SelectDiscover(candidateIndex),
+                "选择已完成",
                 true);
         }
 
         public ShopOperationResult CancelDiscover()
         {
-            return ApplyOperation(session.CancelDiscover(), "已取消发现", true);
+            return ApplyOperation(
+                session.PendingChoice != null
+                    ? session.CancelEffectChoice()
+                    : session.CancelDiscover(),
+                "已取消选择",
+                true);
         }
+
+        private bool HasPendingChoice =>
+            session.PendingDiscover != null || session.PendingChoice != null;
 
         public ShopOperationResult EndShopAndEnterBattle()
         {
@@ -280,7 +290,7 @@ namespace SpireChess.UI.Shop
 
         public bool CanDrag(ShopCardZone zone, int index)
         {
-            if (!initialized || !session.IsShopOpen || session.PendingDiscover != null)
+            if (!initialized || !session.IsShopOpen || HasPendingChoice)
             {
                 return false;
             }
@@ -296,7 +306,7 @@ namespace SpireChess.UI.Shop
 
         public void HandleCardClick(ShopCardZone zone, int index)
         {
-            if (!initialized || session.PendingDiscover != null)
+            if (!initialized || HasPendingChoice)
             {
                 return;
             }
@@ -374,7 +384,7 @@ namespace SpireChess.UI.Shop
                 {
                     ApplyOperation(
                         result,
-                        session.PendingDiscover == null ? "法术已使用" : "请选择一项发现结果",
+                        !HasPendingChoice ? "法术已使用" : "请选择一个效果结果",
                         true);
                     return;
                 }
@@ -669,7 +679,7 @@ namespace SpireChess.UI.Shop
 
             var hasPendingReward = runSession != null &&
                                    runSession.State.PendingCardRewards.Count > 0;
-            var unlocked = session.IsShopOpen && session.PendingDiscover == null &&
+            var unlocked = session.IsShopOpen && !HasPendingChoice &&
                            !hasPendingReward;
             refreshButton.interactable = unlocked;
             upgradeButton.interactable = unlocked && session.TavernTier < ShopEconomyRules.MaximumTavernTier;
@@ -827,22 +837,50 @@ namespace SpireChess.UI.Shop
         private void RefreshDiscover()
         {
             var state = session.PendingDiscover;
-            discoverOverlay.SetActive(state != null);
-            if (state == null)
+            var effectState = session.PendingChoice;
+            discoverOverlay.SetActive(state != null || effectState != null);
+            if (state == null && effectState == null)
             {
                 return;
             }
 
             DestroyChildren(discoverCandidatesRoot);
-            var count = state.Candidates.Count;
+            var count = state != null
+                ? state.Candidates.Count
+                : effectState.Candidates.Count;
             for (var i = 0; i < count; i++)
             {
                 var candidateIndex = i;
-                var candidate = state.Candidates[i];
+                string label;
+                if (state != null)
+                {
+                    var candidate = state.Candidates[i];
+                    label = $"{candidate.Name}\n{candidate.Attack}/{candidate.Health} · T{candidate.Tier}\n{candidate.Description}";
+                }
+                else
+                {
+                    var candidate = effectState.Candidates[i];
+                    if (candidate.Minion != null)
+                    {
+                        label = $"{candidate.Minion.Name}\n{candidate.Minion.Attack}/{candidate.Minion.Health} · T{candidate.Minion.Tier}\n{candidate.Minion.Description}";
+                    }
+                    else if (candidate.Spell != null)
+                    {
+                        label = $"{candidate.Spell.Name}\n法术 · T{candidate.Spell.Tier}\n{candidate.Spell.Description}";
+                    }
+                    else if (candidate.Target != null)
+                    {
+                        label = $"{candidate.Target.Minion.Name}\n复制为基础 {candidate.Target.Minion.Attack}/{candidate.Target.Minion.Health}";
+                    }
+                    else
+                    {
+                        label = candidate.DisplayName;
+                    }
+                }
                 var button = CreateButton(
                     "Candidate" + i,
                     discoverCandidatesRoot,
-                    $"{candidate.Name}\n{candidate.Attack}/{candidate.Health} · T{candidate.Tier}\n{candidate.Description}",
+                    label,
                     () => SelectDiscoverCandidate(candidateIndex));
                 var left = count == 0 ? 0f : (float)i / count;
                 var right = count == 0 ? 1f : (float)(i + 1) / count;

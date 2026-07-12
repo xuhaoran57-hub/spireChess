@@ -122,6 +122,48 @@ namespace SpireChess.Battle
             log.Add($"{Name} 获得 {FormatStatChange(attack, health)}，当前为 {CurrentAttack}/{CurrentHealth}。");
         }
 
+        public bool TryAddShield(IList<string> log)
+        {
+            if (!IsAlive || HasShield)
+            {
+                return false;
+            }
+
+            HasShield = true;
+            keywords.Add("Shield");
+            log?.Add($"{Name} 获得护盾。");
+            return true;
+        }
+
+        public bool TryRemoveShield(IList<string> log)
+        {
+            if (!IsAlive || !HasShield)
+            {
+                return false;
+            }
+
+            HasShield = false;
+            log?.Add($"{Name} 失去护盾。");
+            return true;
+        }
+
+        public bool TryAddKeyword(string keyword, IList<string> log)
+        {
+            if (!IsAlive || string.IsNullOrWhiteSpace(keyword) || keywords.Contains(keyword))
+            {
+                return false;
+            }
+
+            if (keyword == "Shield")
+            {
+                return TryAddShield(log);
+            }
+
+            keywords.Add(keyword);
+            log?.Add($"{Name} 获得 {ToDisplayKeyword(keyword)}。");
+            return true;
+        }
+
         public string BuildKeywordText()
         {
             if (keywords.Count == 0)

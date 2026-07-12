@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using SpireChess.Effects;
 
 namespace SpireChess.Config
 {
@@ -8,7 +9,7 @@ namespace SpireChess.Config
         private const int ExpectedMinionCount = 52;
         private const int ExpectedTokenCount = 2;
         private const int ExpectedSpellCount = 16;
-        private const int ExpectedShopSpellCount = 4;
+        private const int ExpectedShopSpellCount = 15;
         private const string TripleDiscoveryRewardSpellId =
             "triple_discovery_reward";
 
@@ -101,6 +102,23 @@ namespace SpireChess.Config
                 }
 
                 ValidateKeywords(minion, result);
+                ValidateImplementationStatus(minion.Id, minion.ImplementationStatus, result);
+                if (!minion.IsToken && minion.Enabled &&
+                    minion.ImplementationStatus == "Playable")
+                {
+                    if (minion.Effects == null || minion.Effects.Count == 0)
+                    {
+                        result.AddError($"Playable minion {minion.Id} has no normal effects.");
+                    }
+
+                    if (minion.GoldenEffects == null || minion.GoldenEffects.Count == 0)
+                    {
+                        result.AddError($"Playable minion {minion.Id} has no golden effects.");
+                    }
+                }
+
+                ValidateEffects(minion.Id, minion.Effects, result);
+                ValidateEffects(minion.Id + " (golden)", minion.GoldenEffects, result);
             }
         }
 
@@ -184,6 +202,8 @@ namespace SpireChess.Config
                 }
 
                 ValidateUseTiming(spell, result);
+                ValidateImplementationStatus(spell.Id, spell.ImplementationStatus, result);
+                ValidateEffects(spell.Id, spell.Effects, result);
 
                 if (spell.Enabled && spell.ShopEligible &&
                     (spell.Effects == null || spell.Effects.Count == 0))
@@ -247,6 +267,70 @@ namespace SpireChess.Config
                 {
                     result.AddError($"Invalid use timing for spell {spell.Id}: {timing}.");
                 }
+            }
+        }
+
+        private static void ValidateImplementationStatus(
+            string id,
+            string status,
+            ConfigValidationResult result)
+        {
+            if (!EffectDefinitionCatalog.ImplementationStatuses.Contains(status ?? string.Empty))
+            {
+                result.AddError($"Invalid implementation status for {id}: {status}.");
+            }
+        }
+
+        private static void ValidateEffects(
+            string ownerId,
+            IEnumerable<EffectConfig> effects,
+            ConfigValidationResult result)
+        {
+            var ids = new HashSet<string>();
+            foreach (var effect in effects ?? Enumerable.Empty<EffectConfig>())
+            {
+                if (effect == null)
+                {
+                    result.AddError($"{ownerId} contains a null effect.");
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(effect.Id) || !ids.Add(effect.Id))
+                {
+                    result.AddError($"{ownerId} has an empty or duplicate effect id: {effect.Id}.");
+                }
+
+                if (!EffectDefinitionCatalog.Triggers.Contains(effect.Trigger ?? string.Empty))
+                {
+                    result.AddError($"Unsupported trigger on {ownerId}/{effect.Id}: {effect.Trigger}.");
+                }
+
+                if (!EffectDefinitionCatalog.Actions.Contains(effect.Action ?? string.Empty))
+                {
+                    result.AddError($"Unsupported action on {ownerId}/{effect.Id}: {effect.Action}.");
+                }
+
+                if (effect.Condition != null &&
+                    !string.IsNullOrWhiteSpace(effect.Condition.Type) &&
+                    !EffectDefinitionCatalog.Conditions.Contains(effect.Condition.Type))
+                {
+                    result.AddError($"Unsupported condition on {ownerId}/{effect.Id}: {effect.Condition.Type}.");
+                }
+
+                if (effect.Value != null && !string.IsNullOrWhiteSpace(effect.Value.Duration) &&
+                    !EffectDefinitionCatalog.Durations.Contains(effect.Value.Duration))
+                {
+                    result.AddError($"Unsupported duration on {ownerId}/{effect.Id}: {effect.Value.Duration}.");
+                }
+
+                if ((effect.Limit?.PerShop ?? 0) < 0 ||
+                    (effect.Limit?.PerCombat ?? 0) < 0 ||
+                    (effect.Limit?.PerRun ?? 0) < 0)
+                {
+                    result.AddError($"Negative effect limit on {ownerId}/{effect.Id}.");
+                }
+
+                ValidateEffects(ownerId + "/" + effect.Id + " fallback", effect.FallbackEffects, result);
             }
         }
     }

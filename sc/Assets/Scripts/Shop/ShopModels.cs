@@ -85,7 +85,8 @@ namespace SpireChess.Shop
             int permanentAttackBonus,
             int permanentHealthBonus,
             IEnumerable<string> permanentKeywords,
-            bool tripleDiscoveryPending)
+            bool tripleDiscoveryPending,
+            bool expiresAtShopEnd)
         {
             InstanceId = instanceId;
             CardType = cardType;
@@ -98,6 +99,7 @@ namespace SpireChess.Shop
                 permanentKeywords ?? Array.Empty<string>());
             PermanentKeywords = permanentKeywordsSet;
             TripleDiscoveryPending = tripleDiscoveryPending;
+            ExpiresAtShopEnd = expiresAtShopEnd;
         }
 
         public string InstanceId { get; }
@@ -111,6 +113,11 @@ namespace SpireChess.Shop
         private readonly HashSet<string> permanentKeywordsSet;
         public IReadOnlyCollection<string> PermanentKeywords { get; }
         public bool TripleDiscoveryPending { get; internal set; }
+        public bool ExpiresAtShopEnd { get; }
+        private readonly List<PendingCombatModifier> pendingCombatModifiers =
+            new List<PendingCombatModifier>();
+        public IReadOnlyList<PendingCombatModifier> PendingCombatModifiers =>
+            pendingCombatModifiers;
         public int PoolCopiesHeld => IsGolden ? 3 : 1;
         public int CurrentAttack => CardType == ShopCardType.Minion
             ? (IsGolden ? Minion.GoldenAttack : Minion.Attack) + PermanentAttackBonus
@@ -137,10 +144,14 @@ namespace SpireChess.Shop
                 permanentAttackBonus,
                 permanentHealthBonus,
                 permanentKeywords,
-                tripleDiscoveryPending);
+                tripleDiscoveryPending,
+                false);
         }
 
-        public static ShopCardInstance CreateSpell(string instanceId, SpellConfig spell)
+        public static ShopCardInstance CreateSpell(
+            string instanceId,
+            SpellConfig spell,
+            bool expiresAtShopEnd = false)
         {
             return new ShopCardInstance(
                 instanceId,
@@ -151,7 +162,8 @@ namespace SpireChess.Shop
                 0,
                 0,
                 null,
-                false);
+                false,
+                expiresAtShopEnd);
         }
 
         internal void ApplyPermanentStats(int attack, int health)
@@ -183,6 +195,23 @@ namespace SpireChess.Shop
 
             permanentKeywordsSet.Add(keyword);
             return true;
+        }
+
+        internal void AddPendingCombatModifier(PendingCombatModifier modifier)
+        {
+            if (CardType != ShopCardType.Minion || modifier == null)
+            {
+                return;
+            }
+
+            pendingCombatModifiers.Add(modifier);
+        }
+
+        internal IReadOnlyList<PendingCombatModifier> ConsumePendingCombatModifiers()
+        {
+            var consumed = pendingCombatModifiers.ToArray();
+            pendingCombatModifiers.Clear();
+            return consumed;
         }
     }
 
@@ -338,6 +367,25 @@ namespace SpireChess.Shop
             var spell = bench[index];
             bench[index] = null;
             return spell;
+        }
+
+        internal IReadOnlyList<ShopCardInstance> RemoveTemporarySpells()
+        {
+            var removed = new List<ShopCardInstance>();
+            for (var i = 0; i < bench.Length; i++)
+            {
+                var card = bench[i];
+                if (card == null || card.CardType != ShopCardType.Spell ||
+                    !card.ExpiresAtShopEnd)
+                {
+                    continue;
+                }
+
+                removed.Add(card);
+                bench[i] = null;
+            }
+
+            return removed;
         }
 
         internal int EmptyBenchSlotCount()

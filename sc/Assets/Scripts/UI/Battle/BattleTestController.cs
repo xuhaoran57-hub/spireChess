@@ -5,6 +5,7 @@ using SpireChess.App;
 using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Run;
+using SpireChess.Simulation;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -367,31 +368,17 @@ namespace SpireChess.UI.Battle
                 return;
             }
 
-            const int simulationCount = 10;
-            var playerWins = 0;
-            var enemyWins = 0;
-            var draws = 0;
-            for (var i = 0; i < simulationCount; i++)
-            {
-                var result = simulator.Simulate(setupState);
-                if (!result.Winner.HasValue)
-                {
-                    draws++;
-                }
-                else if (result.Winner.Value == BattleSide.Player)
-                {
-                    playerWins++;
-                }
-                else
-                {
-                    enemyWins++;
-                }
-            }
+            const int simulationCount = 100;
+            var runner = new BattleBatchRunner(id =>
+                GameApp.Instance.Configs.TryGetMinion(id, out var minion)
+                    ? minion
+                    : null);
+            var result = runner.Run(setupState, 1000, simulationCount);
 
             SetLog(new[]
             {
                 $"预设：{Presets[presetIndex].Name}",
-                $"连续模拟 {simulationCount} 场：玩家 {playerWins} 胜，敌方 {enemyWins} 胜，平局 {draws} 场。"
+                $"固定种子 1000-1099：玩家 {result.PlayerWins} 胜，敌方 {result.EnemyWins} 胜，平局 {result.Draws} 场。"
             });
             SetStatus($"批量模拟完成 · {Presets[presetIndex].Name}");
         }
@@ -440,7 +427,7 @@ namespace SpireChess.UI.Battle
             startButton = CreateButton("StartBattleButton", top, "开始战斗", StartBattle);
             Anchor(startButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-520f, -25f), new Vector2(-380f, 25f));
 
-            var batchButton = CreateButton("BatchButton", top, "模拟10场", RunBatchSimulation);
+            var batchButton = CreateButton("BatchButton", top, "模拟100场", RunBatchSimulation);
             Anchor(batchButton.GetComponent<RectTransform>(), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-680f, -25f), new Vector2(-540f, 25f));
             batchButton.gameObject.SetActive(!runBattle);
 

@@ -19,7 +19,8 @@ namespace SpireChess.Shop
 
             foreach (var config in configs)
             {
-                if (config == null || !config.Enabled || config.IsToken ||
+                if (config == null || !config.Enabled ||
+                    config.ImplementationStatus != "Playable" || config.IsToken ||
                     config.Tier < 1 || config.Tier > ShopEconomyRules.MaximumTavernTier)
                 {
                     continue;
@@ -103,6 +104,16 @@ namespace SpireChess.Shop
             int count,
             Random random)
         {
+            return ReserveDistinct(tier, tier, null, count, random);
+        }
+
+        public IReadOnlyList<MinionConfig> ReserveDistinct(
+            int minimumTier,
+            int maximumTier,
+            string race,
+            int count,
+            Random random)
+        {
             if (random == null)
             {
                 throw new ArgumentNullException(nameof(random));
@@ -117,7 +128,9 @@ namespace SpireChess.Shop
             var eligible = new List<MinionConfig>();
             foreach (var minion in minions)
             {
-                if (minion.Tier == tier && remainingCopies[minion.Id] > 0)
+                if (minion.Tier >= minimumTier && minion.Tier <= maximumTier &&
+                    (string.IsNullOrWhiteSpace(race) || minion.Race == race) &&
+                    remainingCopies[minion.Id] > 0)
                 {
                     eligible.Add(minion);
                 }

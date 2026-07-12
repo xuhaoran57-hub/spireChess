@@ -49,6 +49,7 @@ namespace SpireChess.Config
             enhancementRecipesById;
         public IReadOnlyDictionary<string, EnhanceNodeConfig> EnhanceNodesById => enhanceNodesById;
         public IReadOnlyDictionary<string, RestNodeConfig> RestNodesById => restNodesById;
+        public ContentReleaseConfig ContentRelease { get; private set; }
 
         public ConfigValidationResult LoadFromResources(
             string minionResourcePath = "Configs/Json/minions.v0.1",
@@ -58,7 +59,8 @@ namespace SpireChess.Config
             string rewardResourcePath = "Configs/Json/rewards.v0.1",
             string eventResourcePath = "Configs/Json/events.v0.1",
             string enhancementResourcePath = "Configs/Json/enhancements.v0.1",
-            string restResourcePath = "Configs/Json/rests.v0.1")
+            string restResourcePath = "Configs/Json/rests.v0.1",
+            string contentReleaseResourcePath = "Configs/Json/content-release.v0.1")
         {
             var minionAsset = Resources.Load<TextAsset>(minionResourcePath);
             var spellAsset = Resources.Load<TextAsset>(spellResourcePath);
@@ -68,6 +70,7 @@ namespace SpireChess.Config
             var eventAsset = Resources.Load<TextAsset>(eventResourcePath);
             var enhancementAsset = Resources.Load<TextAsset>(enhancementResourcePath);
             var restAsset = Resources.Load<TextAsset>(restResourcePath);
+            var contentReleaseAsset = Resources.Load<TextAsset>(contentReleaseResourcePath);
 
             if (minionAsset == null)
             {
@@ -86,7 +89,7 @@ namespace SpireChess.Config
                     "Missing stage-four run content config resource.");
             }
 
-            return LoadFromJson(
+            var result = LoadFromJson(
                 minionAsset.text,
                 spellAsset.text,
                 mapAsset.text,
@@ -95,6 +98,15 @@ namespace SpireChess.Config
                 eventAsset.text,
                 enhancementAsset.text,
                 restAsset.text);
+            if (contentReleaseAsset == null)
+            {
+                result.AddError($"Missing content release config resource: {contentReleaseResourcePath}.");
+                return result;
+            }
+
+            ContentRelease = serializer.FromJson<ContentReleaseConfig>(contentReleaseAsset.text);
+            ValidateAndApplyContentRelease(result);
+            return result;
         }
 
         public ConfigValidationResult LoadFromJson(string minionsJson, string spellsJson)
@@ -144,6 +156,7 @@ namespace SpireChess.Config
             }
 
             Version = minionFile.Version;
+            ContentRelease = null;
             Minions = minionFile.Minions ?? new List<MinionConfig>();
             Spells = spellFile.Spells ?? new List<SpellConfig>();
 
@@ -297,6 +310,90 @@ namespace SpireChess.Config
             foreach (var warning in source.Warnings)
             {
                 target.AddWarning(warning);
+            }
+        }
+
+        private void ValidateAndApplyContentRelease(ConfigValidationResult result)
+        {
+            if (ContentRelease == null)
+            {
+                result.AddError("Content release JSON could not be parsed.");
+                return;
+            }
+
+            var releasedMinions = new HashSet<string>(ContentRelease.MinionIds ??
+                new List<string>());
+            var releasedSpells = new HashSet<string>(ContentRelease.SpellIds ??
+                new List<string>());
+            foreach (var id in releasedMinions.Where(id => !minionsById.ContainsKey(id)))
+            {
+                result.AddError($"Content release references missing minion: {id}.");
+            }
+
+            foreach (var id in releasedSpells.Where(id => !spellsById.ContainsKey(id)))
+            {
+                result.AddError($"Content release references missing spell: {id}.");
+            }
+
+            foreach (var id in (ContentRelease.EncounterIds ?? new List<string>())
+                         .Where(id => !encountersById.ContainsKey(id)))
+            {
+                result.AddError($"Content release references missing encounter: {id}.");
+            }
+
+            foreach (var id in (ContentRelease.EventIds ?? new List<string>())
+                         .Where(id => !eventsById.ContainsKey(id)))
+            {
+                result.AddError($"Content release references missing event: {id}.");
+            }
+
+            foreach (var id in (ContentRelease.RewardTableIds ?? new List<string>())
+                         .Where(id => !rewardTablesById.ContainsKey(id)))
+            {
+                result.AddError($"Content release references missing reward table: {id}.");
+            }
+
+            foreach (var minion in Minions)
+            {
+                if (!releasedMinions.Contains(minion.Id))
+                {
+                    minion.ImplementationStatus = "Disabled";
+                }
+            }
+
+            foreach (var spell in Spells)
+            {
+                if (!releasedSpells.Contains(spell.Id))
+                {
+                    spell.ImplementationStatus = "Disabled";
+                }
+            }
+
+            if (releasedMinions.Count != 52)
+            {
+                result.AddError($"Content release should contain 52 minions, got {releasedMinions.Count}.");
+            }
+
+            if (releasedSpells.Count != 16)
+            {
+                result.AddError($"Content release should contain 16 spells, got {releasedSpells.Count}.");
+            }
+
+            if ((ContentRelease.EventIds?.Distinct().Count() ?? 0) < 10)
+            {
+                result.AddError("Content release should contain at least 10 events.");
+            }
+
+            var releasedEncounterIds = new HashSet<string>(
+                ContentRelease.EncounterIds ?? new List<string>());
+            var releasedEncounters = Encounters.Where(value =>
+                releasedEncounterIds.Contains(value.Id)).ToList();
+            if (releasedEncounters.Count(value => value.Category == "Normal") < 6 ||
+                releasedEncounters.Count(value => value.Category == "Elite") != 3 ||
+                releasedEncounters.Count(value => value.Category == "Boss") != 3)
+            {
+                result.AddError(
+                    "Content release must contain at least 6 normal encounters, 3 elites and 3 bosses.");
             }
         }
     }

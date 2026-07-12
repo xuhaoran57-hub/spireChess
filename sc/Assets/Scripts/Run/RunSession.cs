@@ -57,7 +57,14 @@ namespace SpireChess.Run
         public BattleContext PendingBattle { get; private set; }
         public BattleContext LastBattleContext { get; private set; }
         public BattleSimulationResult LastBattleResult { get; private set; }
+        public RunTelemetry Telemetry { get; private set; }
         public bool HasStageFourMap => State.CurrentMap != null;
+
+        public void EnableTelemetry(RunTelemetry telemetry)
+        {
+            Telemetry = telemetry;
+            Telemetry?.Record("RunStarted", new { seed = State.Seed, floor = State.Floor });
+        }
 
         public RunOperationResult EnterNode(string nodeId)
         {
@@ -94,6 +101,12 @@ namespace SpireChess.Run
             State.CurrentNodeId = nodeId;
             State.Phase = RunPhase.EnteringNode;
             CreateAttempt(node, node.PayloadId);
+            Telemetry?.Record("NodeEntered", new
+            {
+                nodeId = node.Id,
+                nodeType = node.Type.ToString(),
+                contentId = node.PayloadId
+            });
 
             switch (node.Type)
             {
@@ -483,6 +496,15 @@ namespace SpireChess.Run
             LastBattleContext = PendingBattle;
             LastBattleResult = result;
             PendingBattle = null;
+            Shop.ApplyPostCombatSurvivorBuffs(result);
+            ApplyBattlePermanentDeltas(result);
+            Telemetry?.Record("BattleCompleted", new
+            {
+                encounterId = LastBattleContext.EncounterId,
+                winner = result.Winner?.ToString() ?? "Draw",
+                reason = result.OutcomeReason.ToString(),
+                permanentDeltaCount = result.PermanentDeltas.Count
+            });
             returnSceneName = LastBattleContext.ReturnSceneName;
             if (!string.IsNullOrWhiteSpace(LastBattleContext.NodeAttemptId))
             {
@@ -490,6 +512,26 @@ namespace SpireChess.Run
             }
 
             return true;
+        }
+
+        private void ApplyBattlePermanentDeltas(BattleSimulationResult result)
+        {
+            foreach (var delta in result.PermanentDeltas ??
+                     Array.Empty<BattlePermanentDelta>())
+            {
+                Shop.ModifyOwnedBattleMinion(
+                    delta.SourceInstanceId,
+                    delta.Attack,
+                    delta.Health);
+                foreach (var keyword in delta.Keywords)
+                {
+                    Shop.ModifyOwnedBattleMinion(
+                        delta.SourceInstanceId,
+                        0,
+                        0,
+                        keyword);
+                }
+            }
         }
 
         public void ReleaseOutstandingRewards()
@@ -994,7 +1036,9 @@ namespace SpireChess.Run
                         : CreateCardCandidate(entry.Category, "Minion", minion.Id, 1);
                 case "Spell":
                     var spells = configs.Spells
-                        .Where(value => value.Enabled && value.ShopEligible && value.Tier <= Shop.TavernTier)
+                        .Where(value => value.Enabled && value.ShopEligible &&
+                            value.ImplementationStatus == "Playable" &&
+                            value.Tier <= Shop.TavernTier)
                         .ToList();
                     var spellId = entry.CardId;
                     if (string.IsNullOrWhiteSpace(spellId) && spells.Count > 0)
@@ -1126,6 +1170,18 @@ namespace SpireChess.Run
             {
                 State.Statistics.TriplesFormed++;
             }
+
+            if (eventData != null)
+            {
+                Telemetry?.Record("ShopEvent", new
+                {
+                    type = eventData.Type.ToString(),
+                    cardId = eventData.Card?.ConfigId,
+                    eventData.Cost,
+                    eventData.RefreshCount,
+                    eventData.TavernTier
+                });
+            }
         }
 
         private void ResolveCurrentNodeToMap()
@@ -1208,7 +1264,9 @@ namespace SpireChess.Run
             if (string.IsNullOrWhiteSpace(spellId))
             {
                 var candidates = configs.Spells
-                    .Where(spell => spell.Enabled && spell.ShopEligible && spell.Tier <= Shop.TavernTier)
+                    .Where(spell => spell.Enabled && spell.ShopEligible &&
+                        spell.ImplementationStatus == "Playable" &&
+                        spell.Tier <= Shop.TavernTier)
                     .ToList();
                 if (candidates.Count == 0)
                 {
