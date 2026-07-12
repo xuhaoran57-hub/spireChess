@@ -25,6 +25,12 @@ namespace SpireChess.UI.Battle
         private static readonly Color AttackerOutlineColor = new Color(1f, 0.78f, 0.18f, 1f);
         private static readonly Color TargetOutlineColor = new Color(1f, 0.28f, 0.24f, 1f);
         private static readonly Color SplashOutlineColor = new Color(0.95f, 0.48f, 0.12f, 1f);
+        private static readonly Color ImpactColor = new Color(1f, 0.32f, 0.26f, 1f);
+        private const float AttackWindupDuration = 0.10f;
+        private const float AttackLungeDuration = 0.16f;
+        private const float AttackImpactDuration = 0.18f;
+        private const float AttackReturnDuration = 0.16f;
+        private const float AttackLungeDistance = 82f;
         private static readonly BattlePreset[] Presets =
         {
             new BattlePreset(
@@ -122,6 +128,7 @@ namespace SpireChess.UI.Battle
         private BattleSimulationResult lastResult;
         private bool battleRunning;
         private bool battleResolved;
+        private bool attackAnimationPlaying;
         private bool runBattle;
         private string encounterName;
         private string returnSceneName;
@@ -132,6 +139,7 @@ namespace SpireChess.UI.Battle
         public bool IsRunBattle => runBattle;
         public BattleBoardState SetupState => setupState;
         public BattleSimulationResult LastResult => lastResult;
+        public bool IsAttackAnimationPlaying => attackAnimationPlaying;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RegisterSceneHook()
@@ -273,15 +281,23 @@ namespace SpireChess.UI.Battle
             foreach (var step in result.Steps)
             {
                 activeStep = step;
+                if (step.HasAttack)
+                {
+                    UpdateSlotHighlights();
+                    SetStatus(BuildStepStatus(step));
+                    yield return PlayAttackAnimation(step);
+                }
+
                 displayedState = step.BoardState;
                 displayedLog.AddRange(step.Messages);
                 RebuildCards();
                 SetLog(displayedLog);
                 SetStatus(BuildStepStatus(step));
-                yield return new WaitForSeconds(step.HasAttack ? 0.65f : 0.32f);
+                yield return new WaitForSeconds(step.HasAttack ? 0.22f : 0.32f);
             }
 
             activeStep = null;
+            attackAnimationPlaying = false;
             displayedState = result.FinalState;
             battleResolved = true;
             battleRunning = false;
@@ -304,6 +320,7 @@ namespace SpireChess.UI.Battle
             displayedLog.AddRange(result.Log);
             displayedState = result.FinalState;
             activeStep = null;
+            attackAnimationPlaying = false;
             battleRunning = false;
             battleResolved = true;
             RebuildCards();
@@ -326,6 +343,7 @@ namespace SpireChess.UI.Battle
                 : BuildInitialState(GameApp.Instance.Configs, Presets[presetIndex]);
             displayedState = setupState.Clone();
             activeStep = null;
+            attackAnimationPlaying = false;
             displayedLog.Clear();
             battleRunning = false;
             battleResolved = false;
@@ -775,6 +793,175 @@ namespace SpireChess.UI.Battle
             }
         }
 
+        private IEnumerator PlayAttackAnimation(BattleStep step)
+        {
+            var attacker = FindCardRect(step.AttackerSide.Value, step.AttackerIndex);
+            var target = FindCardRect(step.TargetSide.Value, step.TargetIndex);
+            if (attacker == null || target == null)
+            {
+                yield return new WaitForSeconds(0.35f);
+                yield break;
+            }
+
+            attackAnimationPlaying = true;
+            var attackerPosition = attacker.anchoredPosition;
+            var targetPosition = target.anchoredPosition;
+            var attackerScale = attacker.localScale;
+            var targetScale = target.localScale;
+            var targetImage = target.GetComponent<Image>();
+            var targetOutline = target.GetComponent<Outline>();
+            var targetColor = targetImage == null ? CardColor : targetImage.color;
+            var targetOutlineColor = targetOutline == null
+                ? TargetOutlineColor
+                : targetOutline.effectColor;
+            var targetOutlineDistance = targetOutline == null
+                ? Vector2.zero
+                : targetOutline.effectDistance;
+
+            var worldDirection = (target.position - attacker.position).normalized;
+            var localDirection = attacker.parent.InverseTransformVector(worldDirection);
+            var direction = new Vector2(localDirection.x, localDirection.y).normalized;
+            if (direction.sqrMagnitude < 0.01f)
+            {
+                direction = step.AttackerSide == BattleSide.Player
+                    ? Vector2.up
+                    : Vector2.down;
+            }
+
+            var lungePosition = attackerPosition + direction * AttackLungeDistance;
+            attacker.SetAsLastSibling();
+
+            yield return AnimatePhase(AttackWindupDuration, progress =>
+            {
+                if (attacker != null)
+                {
+                    attacker.localScale = Vector3.Lerp(
+                        attackerScale,
+                        attackerScale * 1.08f,
+                        Smooth(progress));
+                }
+            });
+
+            yield return AnimatePhase(AttackLungeDuration, progress =>
+            {
+                if (attacker != null)
+                {
+                    attacker.anchoredPosition = Vector2.Lerp(
+                        attackerPosition,
+                        lungePosition,
+                        Smooth(progress));
+                }
+            });
+
+            if (targetOutline != null)
+            {
+                targetOutline.effectColor = ImpactColor;
+                targetOutline.effectDistance = new Vector2(7f, -7f);
+            }
+
+            yield return AnimatePhase(AttackImpactDuration, progress =>
+            {
+                if (target == null)
+                {
+                    return;
+                }
+
+                var fade = Smooth(progress);
+                var shake = Mathf.Sin(progress * Mathf.PI * 6f) *
+                            (1f - progress) * 9f;
+                target.anchoredPosition = targetPosition + Vector2.right * shake;
+                target.localScale = Vector3.Lerp(
+                    targetScale * 0.92f,
+                    targetScale,
+                    fade);
+                if (targetImage != null)
+                {
+                    targetImage.color = Color.Lerp(ImpactColor, targetColor, fade);
+                }
+            });
+
+            yield return AnimatePhase(AttackReturnDuration, progress =>
+            {
+                if (attacker != null)
+                {
+                    attacker.anchoredPosition = Vector2.Lerp(
+                        lungePosition,
+                        attackerPosition,
+                        Smooth(progress));
+                    attacker.localScale = Vector3.Lerp(
+                        attackerScale * 1.08f,
+                        attackerScale,
+                        Smooth(progress));
+                }
+            });
+
+            if (attacker != null)
+            {
+                attacker.anchoredPosition = attackerPosition;
+                attacker.localScale = attackerScale;
+            }
+
+            if (target != null)
+            {
+                target.anchoredPosition = targetPosition;
+                target.localScale = targetScale;
+            }
+
+            if (targetImage != null)
+            {
+                targetImage.color = targetColor;
+            }
+
+            if (targetOutline != null)
+            {
+                targetOutline.effectColor = targetOutlineColor;
+                targetOutline.effectDistance = targetOutlineDistance;
+            }
+
+            attackAnimationPlaying = false;
+        }
+
+        private static IEnumerator AnimatePhase(
+            float duration,
+            System.Action<float> update)
+        {
+            var elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                update(Mathf.Clamp01(elapsed / duration));
+                yield return null;
+            }
+
+            update(1f);
+        }
+
+        private RectTransform FindCardRect(BattleSide side, int index)
+        {
+            if (!slotContentRoots.TryGetValue(
+                    BuildSlotKey(side, index),
+                    out var root))
+            {
+                return null;
+            }
+
+            for (var i = root.childCount - 1; i >= 0; i--)
+            {
+                var child = root.GetChild(i) as RectTransform;
+                if (child != null && child.name == "Card")
+                {
+                    return child;
+                }
+            }
+
+            return null;
+        }
+
+        private static float Smooth(float value)
+        {
+            return value * value * (3f - 2f * value);
+        }
+
         private void SetSlotHighlight(BattleSide side, int index, Color color, Vector2 distance)
         {
             Outline outline;
@@ -791,7 +978,8 @@ namespace SpireChess.UI.Battle
         {
             if (step.HasAttack)
             {
-                return $"{BuildSideName(step.AttackerSide.Value)} {step.AttackerIndex + 1} 号位攻击";
+                return $"{BuildSideName(step.AttackerSide.Value)} {step.AttackerIndex + 1} 号位 → " +
+                       $"{BuildSideName(step.TargetSide.Value)} {step.TargetIndex + 1} 号位";
             }
 
             return step.Messages.Count > 0 ? step.Messages[0] : "战斗播放中";
