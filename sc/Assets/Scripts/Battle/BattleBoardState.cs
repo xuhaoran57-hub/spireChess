@@ -1,8 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
+using SpireChess.Config;
 
 namespace SpireChess.Battle
 {
+    public sealed class BattleStartEffectState
+    {
+        public BattleStartEffectState(BattleSide side, EffectConfig effect)
+        {
+            Side = side;
+            Effect = effect;
+        }
+
+        public BattleSide Side { get; }
+        public EffectConfig Effect { get; }
+    }
+
     public sealed class BattleBoardState
     {
         public const int SlotCount = 5;
@@ -11,10 +24,12 @@ namespace SpireChess.Battle
         {
             Player = new List<BattleMinionRuntime>(new BattleMinionRuntime[SlotCount]);
             Enemy = new List<BattleMinionRuntime>(new BattleMinionRuntime[SlotCount]);
+            BattleStartEffects = new List<BattleStartEffectState>();
         }
 
         public List<BattleMinionRuntime> Player { get; }
         public List<BattleMinionRuntime> Enemy { get; }
+        public List<BattleStartEffectState> BattleStartEffects { get; }
 
         public List<BattleMinionRuntime> GetRow(BattleSide side)
         {
@@ -36,6 +51,7 @@ namespace SpireChess.Battle
             var clone = new BattleBoardState();
             CopyRow(Player, clone.Player);
             CopyRow(Enemy, clone.Enemy);
+            clone.BattleStartEffects.AddRange(BattleStartEffects);
             return clone;
         }
 

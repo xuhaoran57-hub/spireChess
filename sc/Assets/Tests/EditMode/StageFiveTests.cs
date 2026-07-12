@@ -67,6 +67,45 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void PrebattleBenediction_UsesFinalBattleLineupAtBattleStart()
+        {
+            var shop = CreateShop();
+            Assert.That(shop.StartRound(1).Success, Is.True);
+            var original = configs.MinionsById["stargazing_apprentice"];
+            Assert.That(shop.ClaimRewardMinion(original).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, original.Id), 0).Success, Is.True);
+            Assert.That(shop.ClaimRewardSpell(
+                configs.SpellsById["prebattle_benediction"]).Success, Is.True);
+
+            Assert.That(shop.UseSpell(
+                FindBench(shop, "prebattle_benediction")).Success, Is.True);
+            Assert.That(shop.Collection.Battle[0].HasPendingCombatShield, Is.False);
+            Assert.That(shop.SellBattleMinion(0).Success, Is.True);
+
+            var replacement = configs.MinionsById["young_deer_spirit"];
+            Assert.That(shop.ClaimRewardMinion(replacement).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, replacement.Id), 0).Success, Is.True);
+            var replacementCard = shop.Collection.Battle[0];
+            var attackBeforeCombat = replacementCard.CurrentAttack;
+            var healthBeforeCombat = replacementCard.CurrentHealth;
+
+            var snapshot = shop.CreateBattleSnapshot();
+            Assert.That(snapshot.Player[0].HasShield, Is.False);
+            Assert.That(snapshot.BattleStartEffects, Has.Count.EqualTo(1));
+
+            var result = new BattleSimulator(new Random(17), ResolveMinion)
+                .SimulatePlayback(snapshot);
+            Assert.That(result.FinalState.Player[0].HasShield, Is.True);
+            Assert.That(result.Steps.Any(step =>
+                step.BoardState.Player[0]?.HasShield == true &&
+                step.Messages.Any(message => message.Contains("获得护盾"))), Is.True);
+
+            shop.ApplyPostCombatSurvivorBuffs(result);
+            Assert.That(replacementCard.CurrentAttack, Is.EqualTo(attackBeforeCombat + 1));
+            Assert.That(replacementCard.CurrentHealth, Is.EqualTo(healthBeforeCombat + 1));
+        }
+
+        [Test]
         public void PrototypeCopy_CanCancelOrCreateBaseCopyAndConsumePool()
         {
             var shop = CreateShop();

@@ -21,6 +21,8 @@ namespace SpireChess.Shop
             new Dictionary<string, int>();
         private readonly Dictionary<string, ValueConfig> pendingPostCombatBuffs =
             new Dictionary<string, ValueConfig>();
+        private readonly List<EffectConfig> pendingBattleStartEffects =
+            new List<EffectConfig>();
         private readonly ShopEffectEngine effectEngine;
         private int cardInstanceSequence;
         private int roundsWithoutUpgradeAtCurrentTier;
@@ -568,10 +570,18 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
             }
 
-            var effects = GetTriggeredEffects(card, "Manual");
+            var manualEffects = GetTriggeredEffects(card, "Manual");
+            var battleStartEffects = GetTriggeredEffects(card, "OnBattleStart");
+            var effects = manualEffects.Concat(battleStartEffects).ToList();
             if (effects.Count == 0)
             {
                 return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
+            }
+
+            if (battleStartEffects.Any(effect =>
+                    !IsSupportedScheduledBattleStartEffect(effect)))
+            {
+                return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
             }
 
             var discoverEffects = effects
@@ -600,7 +610,7 @@ namespace SpireChess.Shop
                 return BeginEffectChoice(benchIndex, card, choiceEffect);
             }
 
-            var executableEffects = effects
+            var executableEffects = manualEffects
                 .Where(effect => effect.Action != "SetPostCombatSurvivorBuff")
                 .ToList();
             if (!effectEngine.TryBuildPlan(
@@ -608,7 +618,7 @@ namespace SpireChess.Shop
                     null,
                     -1,
                     targetBattleIndex,
-                    true,
+                    manualEffects.Count > 0,
                     out var plan,
                     out var error))
             {
@@ -617,25 +627,11 @@ namespace SpireChess.Shop
 
             Collection.RemoveUsedSpellFromBench(benchIndex);
             effectEngine.ApplyPlan(plan);
-            foreach (var postCombatEffect in effects.Where(
+            pendingBattleStartEffects.AddRange(battleStartEffects);
+            foreach (var postCombatEffect in manualEffects.Where(
                          effect => effect.Action == "SetPostCombatSurvivorBuff"))
             {
-                foreach (var target in Collection.Battle.Where(card =>
-                             card != null && card.CardType == ShopCardType.Minion &&
-                             (string.IsNullOrWhiteSpace(postCombatEffect.Target?.Race) ||
-                              card.Minion.Race == postCombatEffect.Target.Race)))
-                {
-                    pendingPostCombatBuffs.TryGetValue(target.InstanceId, out var existing);
-                    pendingPostCombatBuffs[target.InstanceId] = new ValueConfig
-                    {
-                        Attack = (existing?.Attack ?? 0) +
-                                 (postCombatEffect.Value?.Attack ?? 0),
-                        Health = (existing?.Health ?? 0) +
-                                 (postCombatEffect.Value?.Health ?? 0),
-                        Keyword = postCombatEffect.Value?.Keyword ?? existing?.Keyword,
-                        Duration = "Permanent"
-                    };
-                }
+                RegisterPostCombatSurvivorBuff(postCombatEffect);
             }
             ActivateSpellListeners(card);
             PhaseStats.SpellUsedCount++;
@@ -922,6 +918,21 @@ namespace SpireChess.Shop
                     card.PermanentHealthBonus,
                     modifierKeywords);
             }
+
+            foreach (var effect in pendingBattleStartEffects)
+            {
+                if (effect.Action == "SetPostCombatSurvivorBuff")
+                {
+                    RegisterPostCombatSurvivorBuff(effect);
+                    continue;
+                }
+
+                state.BattleStartEffects.Add(new BattleStartEffectState(
+                    BattleSide.Player,
+                    effect));
+            }
+
+            pendingBattleStartEffects.Clear();
 
             return state;
         }
@@ -1511,7 +1522,10 @@ namespace SpireChess.Shop
 
         private void ActivateSpellListeners(ShopCardInstance spell)
         {
-            foreach (var effect in GetTriggeredEffectsExcept(spell, "Manual"))
+            foreach (var effect in GetTriggeredEffectsExcept(
+                         spell,
+                         "Manual",
+                         "OnBattleStart"))
             {
                 activeShopEffects.Add(new ActiveShopEffect(
                     spell.InstanceId,
@@ -1698,14 +1712,52 @@ namespace SpireChess.Shop
 
         private static IReadOnlyList<EffectConfig> GetTriggeredEffectsExcept(
             ShopCardInstance card,
-            string excludedTrigger)
+            params string[] excludedTriggers)
         {
             IEnumerable<EffectConfig> effects = card.CardType == ShopCardType.Spell
                 ? card.Spell.Effects
                 : card.IsGolden ? card.Minion.GoldenEffects : card.Minion.Effects;
             return (effects ?? Enumerable.Empty<EffectConfig>())
-                .Where(effect => effect != null && effect.Trigger != excludedTrigger)
+                .Where(effect => effect != null &&
+                    !(excludedTriggers ?? Array.Empty<string>()).Contains(effect.Trigger))
                 .ToList();
+        }
+
+        private static bool IsSupportedScheduledBattleStartEffect(EffectConfig effect)
+        {
+            if (effect == null || effect.Value == null)
+            {
+                return false;
+            }
+
+            switch (effect.Action)
+            {
+                case "ModifyStats":
+                case "AddShield":
+                case "AddKeyword":
+                case "SetPostCombatSurvivorBuff":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void RegisterPostCombatSurvivorBuff(EffectConfig effect)
+        {
+            foreach (var target in Collection.Battle.Where(card =>
+                         card != null && card.CardType == ShopCardType.Minion &&
+                         (string.IsNullOrWhiteSpace(effect.Target?.Race) ||
+                          card.Minion.Race == effect.Target.Race)))
+            {
+                pendingPostCombatBuffs.TryGetValue(target.InstanceId, out var existing);
+                pendingPostCombatBuffs[target.InstanceId] = new ValueConfig
+                {
+                    Attack = (existing?.Attack ?? 0) + (effect.Value?.Attack ?? 0),
+                    Health = (existing?.Health ?? 0) + (effect.Value?.Health ?? 0),
+                    Keyword = effect.Value?.Keyword ?? existing?.Keyword,
+                    Duration = "Permanent"
+                };
+            }
         }
 
         private IReadOnlyList<EffectConfig> GetTriggeredEffects(

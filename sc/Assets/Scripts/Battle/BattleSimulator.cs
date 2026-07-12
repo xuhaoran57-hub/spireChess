@@ -61,7 +61,9 @@ namespace SpireChess.Battle
 
             var startAttacks = new List<PendingAttack>();
             EnqueueBattleStartEffects(state);
-            DrainEffectQueue(state, log, startAttacks);
+            var battleStartLog = new List<string>();
+            DrainEffectQueue(state, battleStartLog, startAttacks);
+            AddStep(state, steps, log, battleStartLog);
             foreach (var pendingAttack in startAttacks)
             {
                 ResolveAttackStep(
@@ -478,6 +480,32 @@ namespace SpireChess.Battle
 
         private void EnqueueBattleStartEffects(BattleBoardState state)
         {
+            foreach (var scheduled in state.BattleStartEffects)
+            {
+                if (scheduled?.Effect == null)
+                {
+                    continue;
+                }
+
+                var row = state.GetRow(scheduled.Side);
+                var sourceIndex = row.FindIndex(minion => minion != null && minion.IsAlive);
+                if (sourceIndex < 0)
+                {
+                    continue;
+                }
+
+                var source = row[sourceIndex];
+                effectQueue.Enqueue(new PendingBattleEffect(
+                    source,
+                    scheduled.Side,
+                    sourceIndex,
+                    source,
+                    null,
+                    scheduled.Effect,
+                    null,
+                    null));
+            }
+
             for (var i = 0; i < BattleBoardState.SlotCount; i++)
             {
                 var player = state.Player[i];

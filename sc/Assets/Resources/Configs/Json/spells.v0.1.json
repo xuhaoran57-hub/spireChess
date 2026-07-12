@@ -320,14 +320,14 @@
       "effects": [
         {
           "id": "prebattle_benediction_manual",
-          "trigger": "Manual",
+          "trigger": "OnBattleStart",
           "action": "AddShield",
           "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 5, "selector": "None" },
           "value": { "duration": "NextCombat", "keyword": "Shield" }
         },
         {
           "id": "prebattle_benediction_survivor",
-          "trigger": "Manual",
+          "trigger": "OnBattleStart",
           "action": "SetPostCombatSurvivorBuff",
           "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 5, "selector": "None" },
           "value": { "attack": 1, "health": 1, "duration": "Permanent" }
