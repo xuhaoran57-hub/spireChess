@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SpireChess.App;
 using SpireChess.Config;
 using SpireChess.Run;
@@ -247,12 +248,15 @@ namespace SpireChess.UI.Run
             }
 
             nodeButtons.Clear();
+            var maximumColumn = Math.Max(
+                1,
+                run.State.CurrentMap.Nodes.Max(node => node.Column));
             foreach (var node in run.State.CurrentMap.Nodes)
             {
                 var capturedId = node.Id;
                 var button = CreateButton(node.Id, mapRoot, BuildNodeLabel(node), () => EnterNode(capturedId));
                 var rect = button.GetComponent<RectTransform>();
-                var center = GetNodeCenter(node);
+                var center = GetNodeCenter(node, maximumColumn);
                 rect.anchorMin = center;
                 rect.anchorMax = center;
                 rect.sizeDelta = new Vector2(220f, 88f);
@@ -293,7 +297,12 @@ namespace SpireChess.UI.Run
             var state = run.State;
             if (state.Phase == RunPhase.MapSelection)
             {
-                var text = CreateText("Hint", resultRoot, "选择高亮节点；每条路线固定经过 4 个节点。", 20, TextAnchor.MiddleCenter);
+                var text = CreateText(
+                    "Hint",
+                    resultRoot,
+                    "选择高亮节点；第 2、3 层包含额外战斗，可用于验证后期阵容。",
+                    20,
+                    TextAnchor.MiddleCenter);
                 Stretch(text.rectTransform);
                 return;
             }
@@ -446,9 +455,10 @@ namespace SpireChess.UI.Run
             return $"{type}\n{node.Id}";
         }
 
-        private static Vector2 GetNodeCenter(MapNodeDefinition node)
+        private static Vector2 GetNodeCenter(MapNodeDefinition node, int maximumColumn)
         {
-            var x = 0.12f + 0.255f * node.Column;
+            var progress = Mathf.Clamp01((float)node.Column / Math.Max(1, maximumColumn));
+            var x = Mathf.Lerp(0.12f, 0.88f, progress);
             var y = node.Row < 0 ? 0.68f : node.Row > 0 ? 0.28f : 0.48f;
             return new Vector2(x, y);
         }

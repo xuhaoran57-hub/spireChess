@@ -223,7 +223,7 @@ namespace SpireChess.Tests
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.FloorComplete));
             Assert.That(map.ContinueToNextFloor().Success, Is.True);
             Assert.That(run.State.Floor, Is.EqualTo(2));
-            Assert.That(map.NodeButtonCount, Is.EqualTo(6));
+            Assert.That(map.NodeButtonCount, Is.EqualTo(8));
             Assert.That(run.State.MapProgress.GetStatus("f2_normal"), Is.EqualTo(RunNodeStatus.Reachable));
         }
 
@@ -236,17 +236,31 @@ namespace SpireChess.Tests
             CompleteSafeFloorToBossVictory(run, "f1_opening_normal", "f1_safe_normal", "f1_rest", "f1_boss");
             Assert.That(run.SkipRewardChoice().Success, Is.True);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
-            CompleteSafeFloorToBossVictory(run, null, "f2_normal", "f2_rest", "f2_boss");
+            CompleteSafeFloorToBossVictory(
+                run,
+                null,
+                "f2_normal",
+                "f2_rest",
+                "f2_boss",
+                "f2_mid_normal",
+                "f2_late_normal");
             Assert.That(run.SkipRewardChoice().Success, Is.True);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
-            CompleteSafeFloorToBossVictory(run, null, "f3_normal", "f3_rest", "f3_boss");
+            CompleteSafeFloorToBossVictory(
+                run,
+                null,
+                "f3_normal",
+                "f3_rest",
+                "f3_boss",
+                "f3_mid_normal",
+                "f3_late_normal");
 
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RunWon));
             SceneManager.LoadScene("RunTest");
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
             Assert.That(map, Is.Not.Null);
-            Assert.That(map.NodeButtonCount, Is.EqualTo(6));
+            Assert.That(map.NodeButtonCount, Is.EqualTo(8));
             Assert.That(run.State.Statistics.BossesDefeated, Is.EqualTo(3));
             Assert.That(run.State.Statistics.CompletedAtUtc, Is.Not.Null);
         }
@@ -256,13 +270,16 @@ namespace SpireChess.Tests
             string openingNode,
             string normalNode,
             string restNode,
-            string bossNode)
+            string bossNode,
+            params string[] additionalCombatNodes)
         {
             if (!string.IsNullOrWhiteSpace(openingNode))
                 CompleteCombatAndContinue(run, openingNode);
             CompleteCombatAndContinue(run, normalNode);
             Assert.That(run.EnterNode(restNode).Success, Is.True);
             Assert.That(run.SelectRestOption("leave").Success, Is.True);
+            foreach (var nodeId in additionalCombatNodes)
+                CompleteCombatAndContinue(run, nodeId);
             Assert.That(run.EnterNode(bossNode).Success, Is.True);
             ClaimAllRewards(run);
             Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
@@ -281,7 +298,14 @@ namespace SpireChess.Tests
         private static void ClaimAllRewards(RunSession run)
         {
             while (run.State.PendingCardRewards.Count > 0)
-                Assert.That(run.ClaimNextCardReward().Success, Is.True);
+            {
+                var claim = run.ClaimNextCardReward();
+                if (claim.Success)
+                    continue;
+
+                Assert.That(claim.Error, Is.EqualTo(RunOperationError.BenchFull));
+                Assert.That(run.SkipNextCardReward().Success, Is.True);
+            }
         }
 
         private static void CompleteCombatNodeAsWin(RunSession run, string nodeId)

@@ -148,7 +148,7 @@
 - [ ] 在目标机器拉取最新提交，使用 `sc/ProjectSettings/ProjectVersion.txt` 指定的 Unity 版本打开 `sc` 项目。
 - [ ] 等待首次资源导入和脚本编译完成，确认所有 `.meta` 与 `.asmdef` 正常识别。
 - [ ] 确认 `Unity.Newtonsoft.Json` 和 Unity Test Framework 依赖可用，Console 达到 0 个编译错误。
-- [x] 在 Unity Test Runner 运行全部 EditMode 测试，当前自动化 80 / 80 通过。
+- [x] 在 Unity Test Runner 运行全部 EditMode 测试，当前自动化 81 / 81 通过。
 - [x] 验证配置加载：52 个随从、16 张法术；阶段 5 开放 15 张普通商店法术并保留 1 张三连发现系统法术。
 - [ ] 手动复核阶段 1 战斗表现：
   - 无嘲讽和多个嘲讽时的随机目标。
@@ -240,7 +240,7 @@
 - [x] 扩充到 7 套普通遭遇、3 个精英、3 个 Boss 和 10 个事件。
 - [x] 完善普通、精英、Boss 和事件奖励池。
 - [x] 建立本地 NDJSON 遥测、种子摘要和固定构筑 100 场批量模拟工具；完整命令重放延后到阶段 6。
-- [x] 阶段 5 自动化回归：EditMode 80 / 80、PlayMode 14 / 14 通过。
+- [x] 阶段 5 自动化回归：EditMode 81 / 81、PlayMode 14 / 14 通过。
 - [ ] 完成至少两轮数值调整与阶段 5C Unity 人工验收。
 
 ## 暂缓

@@ -21,8 +21,12 @@ namespace SpireChess.Tests
 
             Assert.That(configs.RunMaps.Count, Is.EqualTo(3));
             Assert.That(first.Nodes.Count, Is.EqualTo(7));
-            Assert.That(second.Nodes.Count, Is.EqualTo(6));
-            Assert.That(third.Nodes.Count, Is.EqualTo(6));
+            Assert.That(second.Nodes.Count, Is.EqualTo(8));
+            Assert.That(third.Nodes.Count, Is.EqualTo(8));
+            Assert.That(second.Nodes.Count(node => node.Type == RunNodeType.Normal),
+                Is.EqualTo(3));
+            Assert.That(third.Nodes.Count(node => node.Type == RunNodeType.Normal),
+                Is.EqualTo(3));
             Assert.That(first.StartNodeIds, Is.EqualTo(new[] { "f1_opening_normal" }));
             Assert.That(second.StartNodeIds, Is.EquivalentTo(new[] { "f2_elite", "f2_normal" }));
             Assert.That(third.StartNodeIds, Is.EquivalentTo(new[] { "f3_elite", "f3_normal" }));
@@ -85,17 +89,21 @@ namespace SpireChess.Tests
 
             CompleteCombat(run, "f2_normal");
             CompleteRest(run, "f2_rest");
+            CompleteCombat(run, "f2_mid_normal");
+            CompleteCombat(run, "f2_late_normal");
             CompleteBossAndAdvance(run, "f2_boss");
 
             CompleteCombat(run, "f3_normal");
             CompleteRest(run, "f3_rest");
+            CompleteCombat(run, "f3_mid_normal");
+            CompleteCombat(run, "f3_late_normal");
             EnterCombatAndClaimRewards(run, "f3_boss");
             ResolveWin(run);
 
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RunWon));
             Assert.That(run.State.Floor, Is.EqualTo(3));
-            Assert.That(run.State.RunTurn, Is.EqualTo(10));
-            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(7));
+            Assert.That(run.State.RunTurn, Is.EqualTo(14));
+            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(11));
             Assert.That(run.State.Statistics.BattlesNotWon, Is.Zero);
             Assert.That(run.State.Statistics.BossesDefeated, Is.EqualTo(3));
             Assert.That(run.State.Statistics.CompletedAtUtc, Is.Not.Null);
@@ -134,7 +142,12 @@ namespace SpireChess.Tests
             Assert.That(run.EnterNode(nodeId).Success, Is.True);
             while (run.State.PendingCardRewards.Count > 0)
             {
-                Assert.That(run.ClaimNextCardReward().Success, Is.True);
+                var claim = run.ClaimNextCardReward();
+                if (claim.Success)
+                    continue;
+
+                Assert.That(claim.Error, Is.EqualTo(RunOperationError.BenchFull));
+                Assert.That(run.SkipNextCardReward().Success, Is.True);
             }
         }
 

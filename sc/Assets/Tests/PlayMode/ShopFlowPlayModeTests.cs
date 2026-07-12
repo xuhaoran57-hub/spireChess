@@ -55,6 +55,9 @@ namespace SpireChess.Tests
 
             var battleResult = battleController.ResolveImmediately();
             Assert.That(battleResult, Is.Not.Null);
+            Assert.That(battleController.IsLogScrollable, Is.True);
+            Assert.That(battleController.LogContents,
+                Is.EqualTo(string.Join("\n", battleResult.Log)));
             Assert.That(run.LastBattleResult, Is.SameAs(battleResult));
             Assert.That(run.Shop.Collection.Battle[0].InstanceId, Is.EqualTo(sourceInstanceId));
 

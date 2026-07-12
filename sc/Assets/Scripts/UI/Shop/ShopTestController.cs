@@ -5,6 +5,7 @@ using SpireChess.App;
 using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.Shop;
+using SpireChess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -19,8 +20,6 @@ namespace SpireChess.UI.Shop
         private static readonly Color OfferSlotColor = new Color(0.24f, 0.19f, 0.15f, 1f);
         private static readonly Color BattleSlotColor = new Color(0.17f, 0.25f, 0.28f, 1f);
         private static readonly Color BenchSlotColor = new Color(0.19f, 0.20f, 0.24f, 1f);
-        private static readonly Color MinionCardColor = new Color(0.86f, 0.80f, 0.68f, 1f);
-        private static readonly Color SpellCardColor = new Color(0.62f, 0.73f, 0.90f, 1f);
         private static readonly Color SelectedColor = new Color(0.35f, 0.95f, 0.58f, 1f);
 
         private readonly Dictionary<string, Transform> slotRoots = new Dictionary<string, Transform>();
@@ -787,13 +786,15 @@ namespace SpireChess.UI.Shop
                         minion.Keywords?.Contains("Shield") == true,
                         false,
                         true),
-                    minion.GetPrototypeDescription(false), false, MinionCardColor);
+                    minion.GetPrototypeDescription(false), false,
+                    CardTierPalette.GetBackground(minion.Tier));
             }
             else
             {
                 CreateCard(parent, zone, index, spell.Name,
                     $"法术 · T{spell.Tier} · 1金",
-                    spell.Description, false, SpellCardColor);
+                    spell.Description, false,
+                    CardTierPalette.GetBackground(spell.Tier));
             }
         }
 
@@ -820,13 +821,17 @@ namespace SpireChess.UI.Shop
                         card.HasPendingCombatShield,
                         false),
                     card.Minion.GetPrototypeDescription(card.IsGolden),
-                    true, selected ? SelectedColor : MinionCardColor);
+                    true, selected
+                        ? SelectedColor
+                        : CardTierPalette.GetBackground(card.Minion.Tier));
             }
             else
             {
                 CreateCard(parent, zone, index, card.Spell.Name,
-                    "法术", card.Spell.Description,
-                    false, selected ? SelectedColor : SpellCardColor);
+                    $"法术 · T{card.Spell.Tier}", card.Spell.Description,
+                    false, selected
+                        ? SelectedColor
+                        : CardTierPalette.GetBackground(card.Spell.Tier));
             }
         }
 

@@ -6,6 +6,7 @@ using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.Simulation;
+using SpireChess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -19,8 +20,6 @@ namespace SpireChess.UI.Battle
         private static readonly Color PanelColor = new Color(0.14f, 0.15f, 0.17f, 0.94f);
         private static readonly Color PlayerSlotColor = new Color(0.17f, 0.25f, 0.28f, 1f);
         private static readonly Color EnemySlotColor = new Color(0.28f, 0.18f, 0.20f, 1f);
-        private static readonly Color CardColor = new Color(0.88f, 0.83f, 0.72f, 1f);
-        private static readonly Color CardHeaderColor = new Color(0.18f, 0.16f, 0.13f, 1f);
         private static readonly Color SlotOutlineColor = new Color(1f, 1f, 1f, 0.18f);
         private static readonly Color AttackerOutlineColor = new Color(1f, 0.78f, 0.18f, 1f);
         private static readonly Color TargetOutlineColor = new Color(1f, 0.28f, 0.24f, 1f);
@@ -120,6 +119,7 @@ namespace SpireChess.UI.Battle
         private BattleBoardState displayedState;
         private Canvas canvas;
         private Text logText;
+        private ScrollRect logScrollRect;
         private Text statusText;
         private Button startButton;
         private Button returnButton;
@@ -140,6 +140,8 @@ namespace SpireChess.UI.Battle
         public BattleBoardState SetupState => setupState;
         public BattleSimulationResult LastResult => lastResult;
         public bool IsAttackAnimationPlaying => attackAnimationPlaying;
+        public bool IsLogScrollable => logScrollRect != null && logScrollRect.vertical;
+        public string LogContents => logText == null ? string.Empty : logText.text;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RegisterSceneHook()
@@ -474,10 +476,36 @@ namespace SpireChess.UI.Battle
             var logTitle = CreateText("LogTitle", logPanel, "战斗日志", 24, TextAnchor.MiddleLeft);
             Anchor(logTitle.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(18f, -52f), new Vector2(-18f, -12f));
 
-            logText = CreateText("LogText", logPanel, string.Empty, 17, TextAnchor.UpperLeft);
+            var logScroll = CreateRect("LogScroll", logPanel);
+            Anchor(logScroll, new Vector2(0f, 0f), new Vector2(1f, 1f),
+                new Vector2(18f, 18f), new Vector2(-18f, -64f));
+            logScrollRect = logScroll.gameObject.AddComponent<ScrollRect>();
+            logScrollRect.horizontal = false;
+            logScrollRect.vertical = true;
+            logScrollRect.movementType = ScrollRect.MovementType.Clamped;
+            logScrollRect.scrollSensitivity = 28f;
+
+            var viewport = CreatePanel(
+                "Viewport",
+                logScroll,
+                new Color(0f, 0f, 0f, 0.01f));
+            Stretch(viewport);
+            var mask = viewport.gameObject.AddComponent<Mask>();
+            mask.showMaskGraphic = false;
+            logScrollRect.viewport = viewport;
+
+            logText = CreateText("LogText", viewport, string.Empty, 17, TextAnchor.UpperLeft);
             logText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            logText.verticalOverflow = VerticalWrapMode.Truncate;
-            Anchor(logText.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(18f, 18f), new Vector2(-18f, -64f));
+            logText.verticalOverflow = VerticalWrapMode.Overflow;
+            logText.rectTransform.anchorMin = new Vector2(0f, 1f);
+            logText.rectTransform.anchorMax = new Vector2(1f, 1f);
+            logText.rectTransform.pivot = new Vector2(0.5f, 1f);
+            logText.rectTransform.anchoredPosition = Vector2.zero;
+            logText.rectTransform.sizeDelta = Vector2.zero;
+            var fitter = logText.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            logScrollRect.content = logText.rectTransform;
 
             CreateRow(board, BattleSide.Enemy, "敌方", EnemySlotColor, 0.70f);
             CreateRow(board, BattleSide.Player, "玩家", PlayerSlotColor, 0.16f);
@@ -569,7 +597,10 @@ namespace SpireChess.UI.Battle
 
         private BattleCardView CreateCard(Transform parent, BattleSide side, int index, BattleMinionRuntime minion)
         {
-            var cardRect = CreatePanel("Card", parent, CardColor);
+            var cardRect = CreatePanel(
+                "Card",
+                parent,
+                CardTierPalette.GetBackground(minion.Config.Tier));
             cardRect.anchorMin = new Vector2(0.5f, 0.5f);
             cardRect.anchorMax = new Vector2(0.5f, 0.5f);
             cardRect.pivot = new Vector2(0.5f, 0.5f);
@@ -582,7 +613,10 @@ namespace SpireChess.UI.Battle
                 : new Color(0.2f, 0.16f, 0.1f, 1f);
             outline.effectDistance = new Vector2(2f, -2f);
 
-            var header = CreatePanel("Header", cardRect, CardHeaderColor);
+            var header = CreatePanel(
+                "Header",
+                cardRect,
+                CardTierPalette.GetHeader(minion.Config.Tier));
             Anchor(header, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -42f), Vector2.zero);
 
             var name = CreateText("Name", cardRect, string.Empty, 18, TextAnchor.MiddleCenter);
@@ -751,7 +785,12 @@ namespace SpireChess.UI.Battle
 
         private void SetLog(IEnumerable<string> lines)
         {
-            logText.text = string.Join("\n", lines.TakeLastSafe(32));
+            logText.text = string.Join("\n", lines ?? Enumerable.Empty<string>());
+            Canvas.ForceUpdateCanvases();
+            if (logScrollRect != null)
+            {
+                logScrollRect.verticalNormalizedPosition = 0f;
+            }
         }
 
         private void SetStatus(string status)
@@ -810,7 +849,9 @@ namespace SpireChess.UI.Battle
             var targetScale = target.localScale;
             var targetImage = target.GetComponent<Image>();
             var targetOutline = target.GetComponent<Outline>();
-            var targetColor = targetImage == null ? CardColor : targetImage.color;
+            var targetColor = targetImage == null
+                ? CardTierPalette.GetBackground(1)
+                : targetImage.color;
             var targetOutlineColor = targetOutline == null
                 ? TargetOutlineColor
                 : targetOutline.effectColor;
@@ -1069,13 +1110,4 @@ namespace SpireChess.UI.Battle
         }
     }
 
-    internal static class BattleLogExtensions
-    {
-        public static IEnumerable<T> TakeLastSafe<T>(this IEnumerable<T> source, int count)
-        {
-            var list = source as IList<T> ?? source.ToList();
-            var skip = Mathf.Max(0, list.Count - count);
-            return list.Skip(skip);
-        }
-    }
 }

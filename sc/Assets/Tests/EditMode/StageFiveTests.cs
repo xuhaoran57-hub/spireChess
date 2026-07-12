@@ -5,6 +5,7 @@ using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Shop;
 using SpireChess.Simulation;
+using SpireChess.UI;
 using SpireChess.Utils;
 
 namespace SpireChess.Tests.EditMode
@@ -33,6 +34,18 @@ namespace SpireChess.Tests.EditMode
             Assert.That(configs.Minions.Where(value => !value.IsToken),
                 Has.All.Matches<MinionConfig>(value =>
                     value.Effects.Count > 0 && value.GoldenEffects.Count > 0));
+        }
+
+        [Test]
+        public void CardTierPalette_UsesFiveDistinctReadableBackgrounds()
+        {
+            var colors = Enumerable.Range(1, 5)
+                .Select(CardTierPalette.GetBackground)
+                .ToList();
+
+            Assert.That(colors.Distinct().Count(), Is.EqualTo(5));
+            Assert.That(colors, Has.All.Matches<UnityEngine.Color>(color =>
+                color.a == 1f && color.r >= 0.5f && color.g >= 0.5f));
         }
 
         [Test]

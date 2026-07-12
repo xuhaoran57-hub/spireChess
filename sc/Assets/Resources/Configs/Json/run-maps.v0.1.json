@@ -18,10 +18,12 @@
       "nodes": [
         { "id": "f2_elite", "type": "Elite", "column": 0, "row": -1, "payloadId": "f2_elite_encounter", "nextNodeIds": ["f2_enhance"] },
         { "id": "f2_normal", "type": "Normal", "column": 0, "row": 1, "payloadId": "f2_normal_encounter", "nextNodeIds": ["f2_event", "f2_rest"] },
-        { "id": "f2_enhance", "type": "Enhance", "column": 1, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f2_boss"] },
-        { "id": "f2_event", "type": "Event", "column": 1, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f2_boss"] },
-        { "id": "f2_rest", "type": "Rest", "column": 1, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f2_boss"] },
-        { "id": "f2_boss", "type": "Boss", "column": 2, "row": 0, "payloadId": "f2_boss_encounter", "nextNodeIds": [] }
+        { "id": "f2_enhance", "type": "Enhance", "column": 1, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f2_mid_normal"] },
+        { "id": "f2_event", "type": "Event", "column": 1, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f2_mid_normal"] },
+        { "id": "f2_rest", "type": "Rest", "column": 1, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f2_mid_normal"] },
+        { "id": "f2_mid_normal", "type": "Normal", "column": 2, "row": 0, "payloadId": "stage5b_f2_mechanic_encounter", "nextNodeIds": ["f2_late_normal"] },
+        { "id": "f2_late_normal", "type": "Normal", "column": 3, "row": 0, "payloadId": "f2_normal_encounter", "nextNodeIds": ["f2_boss"] },
+        { "id": "f2_boss", "type": "Boss", "column": 4, "row": 0, "payloadId": "f2_boss_encounter", "nextNodeIds": [] }
       ]
     },
     {
@@ -29,10 +31,12 @@
       "nodes": [
         { "id": "f3_elite", "type": "Elite", "column": 0, "row": -1, "payloadId": "f3_elite_encounter", "nextNodeIds": ["f3_enhance"] },
         { "id": "f3_normal", "type": "Normal", "column": 0, "row": 1, "payloadId": "f3_normal_encounter", "nextNodeIds": ["f3_event", "f3_rest"] },
-        { "id": "f3_enhance", "type": "Enhance", "column": 1, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f3_boss"] },
-        { "id": "f3_event", "type": "Event", "column": 1, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f3_boss"] },
-        { "id": "f3_rest", "type": "Rest", "column": 1, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f3_boss"] },
-        { "id": "f3_boss", "type": "Boss", "column": 2, "row": 0, "payloadId": "f3_boss_encounter", "nextNodeIds": [] }
+        { "id": "f3_enhance", "type": "Enhance", "column": 1, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f3_mid_normal"] },
+        { "id": "f3_event", "type": "Event", "column": 1, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f3_mid_normal"] },
+        { "id": "f3_rest", "type": "Rest", "column": 1, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f3_mid_normal"] },
+        { "id": "f3_mid_normal", "type": "Normal", "column": 2, "row": 0, "payloadId": "stage5b_f3_mechanic_encounter", "nextNodeIds": ["f3_late_normal"] },
+        { "id": "f3_late_normal", "type": "Normal", "column": 3, "row": 0, "payloadId": "f3_normal_encounter", "nextNodeIds": ["f3_boss"] },
+        { "id": "f3_boss", "type": "Boss", "column": 4, "row": 0, "payloadId": "f3_boss_encounter", "nextNodeIds": [] }
       ]
     }
   ]
