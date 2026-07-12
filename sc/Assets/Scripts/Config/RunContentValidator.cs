@@ -242,11 +242,18 @@ namespace SpireChess.Config
                 }
 
                 if (string.Equals(entry.Type, "Spell", StringComparison.OrdinalIgnoreCase) &&
-                    !string.IsNullOrWhiteSpace(entry.CardId) &&
-                    (spells == null || !spells.ContainsKey(entry.CardId)))
+                    !string.IsNullOrWhiteSpace(entry.CardId))
                 {
-                    result.AddError(
-                        $"Reward table {table.Id} references missing spell {entry.CardId}.");
+                    if (spells == null || !spells.TryGetValue(entry.CardId, out var spell))
+                    {
+                        result.AddError(
+                            $"Reward table {table.Id} references missing spell {entry.CardId}.");
+                    }
+                    else if (!spell.Enabled || spell.Effects == null || spell.Effects.Count == 0)
+                    {
+                        result.AddError(
+                            $"Reward table {table.Id} references unavailable spell {entry.CardId}.");
+                    }
                 }
 
                 if (string.Equals(entry.Type, "PermanentStats", StringComparison.OrdinalIgnoreCase) &&

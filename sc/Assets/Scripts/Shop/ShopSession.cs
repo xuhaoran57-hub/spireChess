@@ -780,7 +780,8 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
             }
 
-            if (config == null || !config.Enabled)
+            if (config == null || !config.Enabled ||
+                config.Effects == null || config.Effects.Count == 0)
             {
                 return ShopOperationResult.Fail(ShopOperationError.InvalidCardType);
             }

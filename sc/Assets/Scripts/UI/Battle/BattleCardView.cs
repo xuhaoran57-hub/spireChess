@@ -41,9 +41,7 @@ namespace SpireChess.UI.Battle
             SetText("Tier", $"T{minion.Config.Tier}");
             SetText("Race", ToRaceName(minion.Config.Race));
             SetText("Keywords", minion.BuildKeywordText());
-            SetText("Description", minion.IsGolden
-                ? minion.Config.GoldenDescription
-                : minion.Config.Description);
+            SetText("Description", minion.Config.GetPrototypeDescription(minion.IsGolden));
 
             var shield = transform.Find("Shield");
             if (shield != null)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace SpireChess.Config
@@ -79,5 +80,16 @@ namespace SpireChess.Config
 
         [JsonProperty("devNote")]
         public string DevNote { get; set; }
+
+        public string GetPrototypeDescription(bool isGolden)
+        {
+            var effects = isGolden ? GoldenEffects : Effects;
+            if (effects == null || !effects.Any(effect => effect != null))
+            {
+                return "原型阶段：当前仅基础属性和已支持关键词生效。";
+            }
+
+            return isGolden ? GoldenDescription : Description;
+        }
     }
 }

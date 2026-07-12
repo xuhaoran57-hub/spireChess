@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using NUnit.Framework;
 using SpireChess.App;
+using SpireChess.Config;
 using SpireChess.Shop;
 using SpireChess.UI.Battle;
 using SpireChess.UI.Shop;
@@ -137,6 +138,54 @@ namespace SpireChess.Tests
             var reloadedEventCount = controllers[0].EventLogCount;
             Assert.That(controllers[0].RefreshShop().Success, Is.True);
             Assert.That(controllers[0].EventLogCount, Is.EqualTo(reloadedEventCount + 1));
+        }
+
+        [UnityTest]
+        public IEnumerator ConfiguredShopSpells_AllHaveExecutableEffects()
+        {
+            yield return EnsureGameApp();
+
+            var shopSpells = GameApp.Instance.Configs.Spells
+                .Where(spell => spell.Enabled && spell.ShopEligible)
+                .ToList();
+
+            Assert.That(shopSpells.Count, Is.EqualTo(4));
+            Assert.That(shopSpells.All(spell => spell.Effects != null && spell.Effects.Count > 0),
+                Is.True);
+        }
+
+        [UnityTest]
+        public IEnumerator TargetedSpell_SecondClickCancelsSelectionAndFreeRefreshesAreVisible()
+        {
+            yield return EnsureGameApp();
+            var spell = GameApp.Instance.Configs.Spells.Single(
+                config => config.Id == "minor_tempering");
+            var session = new ShopSession(
+                System.Array.Empty<MinionConfig>(),
+                new[] { spell },
+                new System.Random(7));
+            var controllerObject = new GameObject("ShopSelectionControllerUnderTest");
+            var controller = controllerObject.AddComponent<ShopTestController>();
+            controller.InitializeForTests(session);
+            yield return null;
+
+            var purchase = controller.BuySpellOffer();
+            Assert.That(purchase.Success, Is.True);
+
+            controller.HandleCardClick(ShopCardZone.Bench, purchase.BenchIndex);
+            Assert.That(controller.SelectedBenchIndex, Is.EqualTo(purchase.BenchIndex));
+            Assert.That(controller.LastOperationResult.Error, Is.EqualTo(ShopOperationError.NoBenefit));
+
+            controller.HandleCardClick(ShopCardZone.Bench, purchase.BenchIndex);
+            Assert.That(controller.SelectedBenchIndex, Is.EqualTo(-1));
+            Assert.That(controller.StatusMessage, Is.EqualTo("已取消选择"));
+
+            session.GrantFreeRefreshes(2);
+            controller.ToggleFreeze();
+            Assert.That(controller.ResourceSummary, Does.Contain("免费刷新 2"));
+
+            Object.Destroy(controllerObject);
+            yield return null;
         }
 
         private static IEnumerator EnsureGameApp()

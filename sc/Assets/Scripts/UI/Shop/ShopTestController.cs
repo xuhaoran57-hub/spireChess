@@ -52,6 +52,8 @@ namespace SpireChess.UI.Shop
         public bool DiscoverModalVisible => discoverOverlay != null && discoverOverlay.activeSelf;
         public bool RewardModalVisible => rewardOverlay != null && rewardOverlay.activeSelf;
         public int EventLogCount => eventLog.Count;
+        public int SelectedBenchIndex => selectedBenchIndex;
+        public string ResourceSummary => resourceText == null ? string.Empty : resourceText.text;
         public ShopOperationResult LastOperationResult { get; private set; }
         public string StatusMessage { get; private set; }
 
@@ -353,6 +355,14 @@ namespace SpireChess.UI.Shop
                 return;
             }
 
+            if (selectedBenchIndex == index)
+            {
+                ClearSelection();
+                SetStatus("已取消选择");
+                RefreshAll();
+                return;
+            }
+
             var card = session.Collection.Bench[index];
             selectedBenchIndex = index;
             selectedBattleIndex = -1;
@@ -646,7 +656,8 @@ namespace SpireChess.UI.Shop
             }
 
             resourceText.text = $"回合 {session.Round}   金币 {session.Gold}   酒馆 T{session.TavernTier}   " +
-                                $"升级 {session.CurrentUpgradeCost}   刷新 {session.RefreshCount}";
+                                $"升级 {session.CurrentUpgradeCost}   刷新 {session.RefreshCount}   " +
+                                $"免费刷新 {session.FreeRefreshes}";
             statusText.text = StatusMessage ?? string.Empty;
             logText.text = eventLog.Count == 0 ? "等待商店操作" : string.Join("   |   ", eventLog);
 
@@ -750,7 +761,7 @@ namespace SpireChess.UI.Shop
             {
                 CreateCard(parent, zone, index, minion.Name,
                     $"{minion.Attack}/{minion.Health} · T{minion.Tier} · 3金",
-                    minion.Description, false, MinionCardColor);
+                    minion.GetPrototypeDescription(false), false, MinionCardColor);
             }
             else
             {
@@ -775,7 +786,7 @@ namespace SpireChess.UI.Shop
                 CreateCard(parent, zone, index,
                     card.IsGolden ? "金色" + card.Minion.Name : card.Minion.Name,
                     $"{card.CurrentAttack}/{card.CurrentHealth} · T{card.Minion.Tier}",
-                    card.IsGolden ? card.Minion.GoldenDescription : card.Minion.Description,
+                    card.Minion.GetPrototypeDescription(card.IsGolden),
                     true, selected ? SelectedColor : MinionCardColor);
             }
             else

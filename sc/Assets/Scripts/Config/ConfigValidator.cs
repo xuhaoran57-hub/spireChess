@@ -8,7 +8,7 @@ namespace SpireChess.Config
         private const int ExpectedMinionCount = 52;
         private const int ExpectedTokenCount = 2;
         private const int ExpectedSpellCount = 16;
-        private const int ExpectedShopSpellCount = 15;
+        private const int ExpectedShopSpellCount = 4;
         private const string TripleDiscoveryRewardSpellId =
             "triple_discovery_reward";
 
@@ -147,7 +147,7 @@ namespace SpireChess.Config
                 result.AddError($"Spell count should be {ExpectedSpellCount}, got {spells.Count}.");
             }
 
-            var shopSpellCount = spells.Count(spell => spell.ShopEligible);
+            var shopSpellCount = spells.Count(spell => spell.Enabled && spell.ShopEligible);
             if (shopSpellCount != ExpectedShopSpellCount)
             {
                 result.AddError(
@@ -184,6 +184,13 @@ namespace SpireChess.Config
                 }
 
                 ValidateUseTiming(spell, result);
+
+                if (spell.Enabled && spell.ShopEligible &&
+                    (spell.Effects == null || spell.Effects.Count == 0))
+                {
+                    result.AddError(
+                        $"Shop spell {spell.Id} has no executable effects.");
+                }
             }
 
             ValidateTripleDiscoveryReward(spells, result);

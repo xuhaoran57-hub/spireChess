@@ -258,7 +258,7 @@ Assets/Configs/Json/spells.json
 | enabled | bool | 是 | 配置是否启用；是否进入普通商店另由 `shopEligible` 控制 |
 | devNote | string | 否 | 设计备注 |
 
-法术配置总数为 16：15 张 `shopEligible: true` 的普通商店法术，以及 1 张 ID 为 `triple_discovery_reward`、`shopEligible: false` 的三连系统奖励法术。
+法术配置总数为 16。完整内容目标包含 15 张普通法术；阶段 2-4 原型仅将 4 张已实现法术设为 `shopEligible: true`，其余 11 张保留配置但暂不进入商店或奖励池。ID 为 `triple_discovery_reward` 的第 16 张法术始终为 `shopEligible: false`，只作为三连系统奖励。
 
 ### 5.4 法术类型
 
