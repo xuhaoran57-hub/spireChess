@@ -56,6 +56,9 @@ namespace SpireChess.Config
         [JsonProperty("race")]
         public string Race { get; set; }
 
+        [JsonProperty("excludeRace")]
+        public string ExcludeRace { get; set; }
+
         [JsonProperty("includeToken")]
         public bool IncludeToken { get; set; }
 
@@ -94,6 +97,15 @@ namespace SpireChess.Config
 
         [JsonProperty("temporary")]
         public bool Temporary { get; set; }
+
+        [JsonProperty("summonEffectMultiplier")]
+        public int SummonEffectMultiplier { get; set; } = 1;
+
+        [JsonProperty("permanentAttack")]
+        public int PermanentAttack { get; set; }
+
+        [JsonProperty("permanentHealth")]
+        public int PermanentHealth { get; set; }
     }
 
     public sealed class ConditionConfig

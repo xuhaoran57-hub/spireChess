@@ -1,7 +1,7 @@
 # 阶段 5C 完整内容池与平衡技术方案 v0.1
 
 版本：0.1  
-状态：技术方案已完成，待实施  
+状态：阶段 5C 代码与内容已完成，随从池 v0.2 功能联合人工验收已通过；原全面人工验收和两轮调数仍暂缓
 前置条件：阶段 5A、5B 完成  
 关联文档：`development-plan.md`、`phase-5a-effect-system-technical-design-v0.1.md`、`phase-5b-archetype-content-technical-design-v0.1.md`
 

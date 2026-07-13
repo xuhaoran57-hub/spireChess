@@ -1,5 +1,5 @@
 {
-  "contentVersion": "5.0.1",
+  "contentVersion": "5.1.0",
   "minimumRulesVersion": "5A.1",
   "minionIds": [
     "forge_soul_shield_squire", "hearth_core_spark", "copper_ring_apprentice",
@@ -19,7 +19,12 @@
     "thousand_ring_tomb_guardian", "ancient_mountain_spirit", "ten_thousand_hoof_surge",
     "world_eating_final_bloom", "falling_star_prophet", "fate_shuffler",
     "sky_covenant_bearer", "royal_bounty_hunter", "token_young_spirit",
-    "token_swift_young_spirit"
+    "token_swift_young_spirit", "ember_engraver", "counterflow_smith",
+    "cinder_armor_arbiter", "rotleaf_heir", "rootbound_soul_guide",
+    "fox_den_matriarch", "star_etched_timekeeper", "secret_page_refractor",
+    "star_ring_treasurer", "traveling_physician", "mercenary_shieldbearer",
+    "many_arts_apprentice", "pack_hunt_inspector", "mirrorsteel_duelist",
+    "token_two_tailed_fox_shadow"
   ],
   "spellIds": [
     "minor_tempering", "delayed_supply", "temporary_ward", "precise_training",

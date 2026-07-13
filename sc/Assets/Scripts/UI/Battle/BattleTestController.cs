@@ -107,7 +107,76 @@ namespace SpireChess.UI.Battle
                     "young_deer_spirit"
                 },
                 new[] { "oathbroken_blade_soul", null, null, null, null },
-                new[] { 0, 1, 2, 3, 4 })
+                new[] { 0, 1, 2, 3, 4 }),
+            new BattlePreset(
+                "v0.2狐群召唤",
+                new[]
+                {
+                    "fox_den_matriarch",
+                    "ten_thousand_hoof_surge",
+                    "rending_cub",
+                    "many_branch_invoker",
+                    "moss_mark_seedling"
+                },
+                new[] { "mirrorsteel_duelist", null, null, null, null }),
+            new BattlePreset(
+                "v0.2金色狐群",
+                new[]
+                {
+                    "fox_den_matriarch",
+                    "ten_thousand_hoof_surge",
+                    "vinecrown_priest",
+                    null,
+                    null
+                },
+                new[] { "mirrorsteel_duelist", null, null, null, null },
+                new[] { 0 }),
+            new BattlePreset(
+                "v0.2格位复用",
+                new[]
+                {
+                    "fox_den_matriarch",
+                    "thousand_ring_tomb_guardian",
+                    "moss_mark_seedling",
+                    "root_devourer",
+                    "many_branch_invoker"
+                },
+                new[] { "mirrorsteel_duelist", null, null, null, null }),
+            new BattlePreset(
+                "v0.2关键词复制",
+                new[]
+                {
+                    "forge_soul_shield_squire",
+                    "many_arts_apprentice",
+                    "formation_breaker_mercenary",
+                    null,
+                    null
+                },
+                new[] { "mirrorsteel_duelist", null, null, null, null },
+                new[] { 1 }),
+            new BattlePreset(
+                "v0.2金色盾链",
+                new[]
+                {
+                    "undying_furnace_king",
+                    "forge_soul_shield_squire",
+                    "oathbroken_blade_soul",
+                    "cinder_armor_arbiter",
+                    "ember_engraver"
+                },
+                new[] { "mirrorsteel_duelist", "mercenary_shieldbearer", null, null, null },
+                new[] { 0 }),
+            new BattlePreset(
+                "v0.2召唤反制",
+                new[] { "pack_hunt_inspector", "mirrorsteel_duelist", null, null, null },
+                new[]
+                {
+                    "hundred_song_herd",
+                    "fox_den_matriarch",
+                    "many_branch_invoker",
+                    null,
+                    null
+                })
         };
 
         private BattleSimulator simulator;

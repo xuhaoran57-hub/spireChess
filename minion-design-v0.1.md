@@ -3,11 +3,11 @@
 版本：0.1（当前实现基线）
 关联文档：`game-design.md`、`development-plan.md`、`unity-project-prep-tech-plan.md`  
 关联设计更新：`minion-pool-expansion-rebalance-design-v0.2.md`
-状态：当前运行配置仍为 50 个非 Token 随从和 2 个 Token；v0.2 已完成扩池及铸魂、荒灵原卡再平衡设计，代码与运行时配置待实现。
+状态：本文件保留阶段 5 的 50 个非 Token 基线说明；当前运行配置已按 v0.2 扩充为 64 个非 Token 和 3 个 Token，新增与再平衡内容以 `minion-pool-expansion-rebalance-design-v0.2.md` 为准。
 
 ## 1. 设计目标
 
-本章节记录当前已经落地的 MVP 第一批随从池，共 50 个非 Token 随从。
+本章节记录阶段 5 MVP 第一批 50 个非 Token 随从；v0.2 的 14 张新增随从、双尾狐影和原卡改造见关联设计更新。
 
 结构：
 

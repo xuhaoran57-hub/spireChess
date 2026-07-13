@@ -1,0 +1,314 @@
+using System;
+using System.IO;
+using System.Linq;
+using NUnit.Framework;
+using SpireChess.Battle;
+using SpireChess.Config;
+using SpireChess.Shop;
+using SpireChess.Utils;
+using Application = UnityEngine.Application;
+
+namespace SpireChess.Tests.EditMode
+{
+    public sealed class MinionPoolV02Tests
+    {
+        private ConfigService configs;
+
+        [SetUp]
+        public void SetUp()
+        {
+            configs = new ConfigService(new NewtonsoftJsonSerializer());
+            var validation = configs.LoadFromResources();
+            Assert.That(validation.IsValid, Is.True, string.Join("\n", validation.Errors));
+        }
+
+        [Test]
+        public void ReleasedPool_HasV02CountsDistributionAndNoNewArchetypeMetadata()
+        {
+            Assert.That(configs.Minions, Has.Count.EqualTo(67));
+            Assert.That(configs.Minions.Count(value => value.IsToken), Is.EqualTo(3));
+            Assert.That(configs.Minions.Count(value => !value.IsToken), Is.EqualTo(64));
+
+            var expectedMainRaceCounts = new[] { 3, 4, 4, 4, 3 };
+            foreach (var race in new[] { "ForgeSoul", "WildSpirit", "Starbound" })
+            {
+                for (var tier = 1; tier <= 5; tier++)
+                {
+                    Assert.That(configs.Minions.Count(value => !value.IsToken &&
+                        value.Race == race && value.Tier == tier),
+                        Is.EqualTo(expectedMainRaceCounts[tier - 1]),
+                        $"{race} tier {tier}");
+                }
+            }
+
+            for (var tier = 1; tier <= 5; tier++)
+            {
+                Assert.That(configs.Minions.Count(value => !value.IsToken &&
+                    value.Race == "Wayfarer" && value.Tier == tier), Is.EqualTo(2));
+            }
+
+            var newIds = new[]
+            {
+                "ember_engraver", "counterflow_smith", "cinder_armor_arbiter",
+                "rotleaf_heir", "rootbound_soul_guide", "fox_den_matriarch",
+                "star_etched_timekeeper", "secret_page_refractor", "star_ring_treasurer",
+                "traveling_physician", "mercenary_shieldbearer", "many_arts_apprentice",
+                "pack_hunt_inspector", "mirrorsteel_duelist"
+            };
+            Assert.That(newIds.Select(id => configs.MinionsById[id]),
+                Has.All.Matches<MinionConfig>(value => value.Archetypes.Count == 0));
+            Assert.That(configs.ContentRelease.MinionIds, Is.EquivalentTo(
+                configs.Minions.Select(value => value.Id)));
+        }
+
+        [Test]
+        public void RootAndResourcesMinionConfigs_AreExactMirrors()
+        {
+            var resourcesPath = Path.Combine(
+                Application.dataPath,
+                "Resources",
+                "Configs",
+                "Json",
+                "minions.v0.1.json");
+            var rootPath = Path.GetFullPath(Path.Combine(
+                Application.dataPath,
+                "..",
+                "..",
+                "minions.v0.1.json"));
+
+            Assert.That(File.Exists(rootPath), Is.True);
+            Assert.That(File.ReadAllText(rootPath), Is.EqualTo(File.ReadAllText(resourcesPath)));
+        }
+
+        [Test]
+        public void EncountersAndRewards_ReferenceV02Content()
+        {
+            var encounterIds = configs.Encounters
+                .SelectMany(value => value.EnemySlots)
+                .Select(value => value.MinionId)
+                .ToList();
+            Assert.That(encounterIds, Does.Contain("counterflow_smith"));
+            Assert.That(encounterIds, Does.Contain("cinder_armor_arbiter"));
+            Assert.That(encounterIds, Does.Contain("fox_den_matriarch"));
+            Assert.That(encounterIds, Does.Contain("pack_hunt_inspector"));
+
+            var rewardCardIds = configs.RewardTables
+                .SelectMany(value => value.Entries)
+                .Select(value => value.CardId)
+                .ToList();
+            Assert.That(rewardCardIds, Does.Contain("traveling_physician"));
+            Assert.That(rewardCardIds, Does.Contain("ember_engraver"));
+            Assert.That(rewardCardIds, Does.Contain("fox_den_matriarch"));
+        }
+
+        [Test]
+        public void FurnaceKingAndGrowthFinishers_HaveV02Caps()
+        {
+            var furnace = configs.MinionsById["undying_furnace_king"];
+            var normalTransfer = furnace.Effects.Single(value =>
+                value.Id == "undying_furnace_king_transfer");
+            var goldenTransfer = furnace.GoldenEffects.Single(value =>
+                value.Id == "golden_undying_furnace_king_transfer");
+            Assert.That(normalTransfer.Limit.PerCombat, Is.EqualTo(3));
+            Assert.That(goldenTransfer.Limit.PerCombat, Is.EqualTo(6));
+            Assert.That(normalTransfer.Condition.Type, Is.EqualTo("HasUnshieldedRaceTarget"));
+            Assert.That(goldenTransfer.Condition.Type, Is.EqualTo("HasUnshieldedRaceTarget"));
+
+            var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
+            Assert.That(oathbroken.Effects.Single(value =>
+                value.Id == "oathbroken_blade_soul_lost_permanent").Limit.PerCombat,
+                Is.EqualTo(2));
+            Assert.That(oathbroken.GoldenEffects.Single(value =>
+                value.Id == "golden_oathbroken_blade_soul_lost_permanent").Limit.PerCombat,
+                Is.EqualTo(4));
+
+            var finalBloom = configs.MinionsById["world_eating_final_bloom"];
+            Assert.That(finalBloom.GoldenEffects.Single(value =>
+                value.Id == "golden_world_eating_final_bloom_death").Value.Duration,
+                Is.EqualTo("Combat"));
+            Assert.That(finalBloom.GoldenEffects.Single(value =>
+                value.Id == "golden_world_eating_final_bloom_death_permanent")
+                .Limit.PerCombat, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void NewStarboundMinions_ExecuteRefreshAndNextCombatEffects()
+        {
+            var shop = new ShopSession(configs.Minions, configs.Spells, new Random(11));
+            Assert.That(shop.StartRound(1).Success, Is.True);
+
+            Assert.That(shop.ClaimRewardMinion(
+                configs.MinionsById["star_etched_timekeeper"]).Success, Is.True);
+            Assert.That(shop.PlayMinion(
+                FindBench(shop, "star_etched_timekeeper"), 0).Success, Is.True);
+            Assert.That(shop.ClaimRewardMinion(
+                configs.MinionsById["secret_page_refractor"]).Success, Is.True);
+            Assert.That(shop.PlayMinion(
+                FindBench(shop, "secret_page_refractor"), 1).Success, Is.True);
+
+            Assert.That(shop.Refresh().Success, Is.True);
+            Assert.That(shop.FreeRefreshes, Is.EqualTo(0));
+            Assert.That(shop.Refresh().Success, Is.True);
+            Assert.That(shop.FreeRefreshes, Is.EqualTo(1));
+
+            Assert.That(shop.ClaimRewardSpell(
+                configs.SpellsById["delayed_supply"]).Success, Is.True);
+            Assert.That(shop.UseSpell(FindBench(shop, "delayed_supply")).Success, Is.True);
+            var timekeeper = shop.Collection.Battle[0];
+            Assert.That(timekeeper.PendingCombatModifiers, Has.Count.EqualTo(1));
+            Assert.That(timekeeper.PendingCombatModifiers[0].Attack, Is.EqualTo(1));
+            Assert.That(timekeeper.PendingCombatModifiers[0].Health, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void SameSummonEvent_DeduplicatesImmediateAttackAcrossMultipleSources()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(configs.MinionsById["hundred_song_herd"]);
+            state.Player[1] = new BattleMinionRuntime(configs.MinionsById["ten_thousand_hoof_surge"]);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["mirrorsteel_duelist"],
+                initialAttack: 100,
+                initialHealth: 200);
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var immediateAttackCount = result.Log.Count(message =>
+                message.Contains("迅捷幼灵") && message.Contains("立即攻击"));
+
+            Assert.That(immediateAttackCount, Is.EqualTo(2),
+                "Each of the two summon events should enqueue one immediate attack.");
+        }
+
+        [Test]
+        public void GoldenFoxMatriarch_UsesNestedTokenChainAndKeepsTokensOutOfWriteback()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["fox_den_matriarch"],
+                true,
+                sourceInstanceId: "matriarch");
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["moss_mark_seedling"],
+                sourceInstanceId: "seedling");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["mirrorsteel_duelist"],
+                initialAttack: 100,
+                initialHealth: 300);
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var foxStep = result.Steps.First(step => step.BoardState.Player.Any(value =>
+                value?.Id == "token_two_tailed_fox_shadow"));
+            var fox = foxStep.BoardState.Player.First(value =>
+                value?.Id == "token_two_tailed_fox_shadow");
+            Assert.That(fox.CurrentAttack, Is.EqualTo(4));
+            Assert.That(fox.CurrentHealth, Is.EqualTo(4));
+            Assert.That(fox.SourceInstanceId, Is.Null);
+
+            var youngSpiritStep = result.Steps.First(step => step.BoardState.Player.Any(value =>
+                value?.Id == "token_young_spirit"));
+            var youngSpirit = youngSpiritStep.BoardState.Player.First(value =>
+                value?.Id == "token_young_spirit");
+            Assert.That(youngSpirit.CurrentAttack, Is.EqualTo(2));
+            Assert.That(youngSpirit.CurrentHealth, Is.EqualTo(2));
+            Assert.That(youngSpirit.SourceInstanceId, Is.Null);
+
+            var seedlingDelta = result.PermanentDeltas.Single(value =>
+                value.SourceInstanceId == "seedling");
+            Assert.That(seedlingDelta.Health, Is.EqualTo(1),
+                "Only the non-token matriarch death may grant permanent growth.");
+            Assert.That(result.PermanentDeltas.Any(value =>
+                value.SourceInstanceId == null), Is.False);
+        }
+
+        [Test]
+        public void FoxShadow_SingleOpenSlotReusesSlotThenFailsSecondYoungSpirit()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(configs.MinionsById["fox_den_matriarch"]);
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["thousand_ring_tomb_guardian"]);
+            state.Player[2] = new BattleMinionRuntime(configs.MinionsById["moss_mark_seedling"]);
+            state.Player[3] = new BattleMinionRuntime(configs.MinionsById["root_devourer"]);
+            state.Player[4] = new BattleMinionRuntime(configs.MinionsById["many_branch_invoker"]);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["mirrorsteel_duelist"],
+                initialAttack: 6,
+                initialHealth: 300);
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var youngSpiritSummons = result.Log.Count(message =>
+                message.Contains("召唤了 幼灵"));
+            Assert.That(youngSpiritSummons, Is.EqualTo(1));
+            Assert.That(result.Log.Any(message => message.Contains("没有空位")), Is.True);
+        }
+
+        [Test]
+        public void ManyArtsApprentice_CopiesOnlyAdjacentCombatKeywords()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["formation_breaker_mercenary"],
+                permanentKeywords: new[] { "Taunt", "Cleave", "Shield" });
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["many_arts_apprentice"],
+                sourceInstanceId: "apprentice");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["mirrorsteel_duelist"],
+                initialAttack: 0,
+                initialHealth: 200);
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var copied = result.Steps.Select(step => step.BoardState.Player[1])
+                .First(value => value != null && value.HasTaunt && value.HasShield && value.HasCleave);
+            Assert.That(copied.Keywords, Does.Contain("Taunt"));
+            Assert.That(copied.Keywords, Does.Contain("Shield"));
+            Assert.That(copied.Keywords, Does.Contain("Cleave"));
+            Assert.That(result.PermanentDeltas.Any(value =>
+                value.SourceInstanceId == "apprentice"), Is.False);
+        }
+
+        [Test]
+        public void EnemyTokenObserverAndMirrorsteelDifference_ApplyConfiguredCaps()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(configs.MinionsById["pack_hunt_inspector"]);
+            state.Enemy[0] = new BattleMinionRuntime(configs.MinionsById["hundred_song_herd"]);
+            var result = CreateSimulator().SimulatePlayback(state);
+            Assert.That(result.Steps.Any(step => step.BoardState.Player[0] != null &&
+                step.BoardState.Player[0].CurrentAttack >= 7 &&
+                step.BoardState.Player[0].HasCleave), Is.True);
+
+            var differenceState = new BattleBoardState();
+            differenceState.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["mirrorsteel_duelist"], true);
+            differenceState.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["formation_breaker_mercenary"],
+                initialAttack: 40,
+                initialHealth: 200);
+            var differenceResult = CreateSimulator().SimulatePlayback(differenceState);
+            Assert.That(differenceResult.Steps.Any(step =>
+                step.BoardState.Player[0]?.CurrentAttack == 30 &&
+                step.BoardState.Player[0].HasCleave), Is.True);
+        }
+
+        private BattleSimulator CreateSimulator()
+        {
+            return new BattleSimulator(
+                new Random(7),
+                id => configs.MinionsById.TryGetValue(id, out var value) ? value : null);
+        }
+
+        private static int FindBench(ShopSession shop, string configId)
+        {
+            for (var i = 0; i < shop.Collection.Bench.Count; i++)
+            {
+                if (shop.Collection.Bench[i]?.ConfigId == configId)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+    }
+}

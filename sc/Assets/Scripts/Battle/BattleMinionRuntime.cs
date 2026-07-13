@@ -17,7 +17,8 @@ namespace SpireChess.Battle
             string sourceInstanceId = null,
             int permanentAttackBonus = 0,
             int permanentHealthBonus = 0,
-            IEnumerable<string> permanentKeywords = null)
+            IEnumerable<string> permanentKeywords = null,
+            int summonEffectMultiplier = 1)
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             IsGolden = isGolden;
@@ -29,6 +30,7 @@ namespace SpireChess.Battle
             CurrentAttack = initialAttack ?? BaseAttack + permanentAttackBonus;
             CurrentHealth = initialHealth ?? BaseHealth + permanentHealthBonus;
             HasShield = keywords.Contains("Shield");
+            SummonEffectMultiplier = Math.Max(1, summonEffectMultiplier);
         }
 
         private BattleMinionRuntime(
@@ -40,7 +42,8 @@ namespace SpireChess.Battle
             int permanentHealthBonus,
             bool hasShield,
             IEnumerable<string> keywords,
-            string sourceInstanceId)
+            string sourceInstanceId,
+            int summonEffectMultiplier)
         {
             Config = config;
             IsGolden = isGolden;
@@ -51,6 +54,7 @@ namespace SpireChess.Battle
             HasShield = hasShield;
             SourceInstanceId = sourceInstanceId;
             this.keywords = new HashSet<string>(keywords ?? Enumerable.Empty<string>());
+            SummonEffectMultiplier = summonEffectMultiplier;
         }
 
         public MinionConfig Config { get; }
@@ -65,6 +69,7 @@ namespace SpireChess.Battle
         public int PermanentHealthBonus { get; private set; }
         public bool HasShield { get; private set; }
         public bool IsGolden { get; }
+        public int SummonEffectMultiplier { get; }
         public bool IsAlive => CurrentHealth > 0;
         public bool HasTaunt => keywords.Contains("Taunt");
         public bool HasCleave => keywords.Contains("Cleave");
@@ -81,7 +86,8 @@ namespace SpireChess.Battle
                 PermanentHealthBonus,
                 HasShield,
                 keywords,
-                SourceInstanceId);
+                SourceInstanceId,
+                SummonEffectMultiplier);
         }
 
         public bool TakeDamage(int damage, IList<string> log)

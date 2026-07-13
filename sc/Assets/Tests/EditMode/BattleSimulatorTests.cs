@@ -125,10 +125,13 @@ namespace SpireChess.Tests
             state.Player[4] = CreateMinion("ally", 0, 100);
             state.Enemy[0] = CreateMinion("enemy", 2, 100);
 
-            var step = FirstAttack(CreateSimulator(tokenConfig).SimulatePlayback(state));
+            var result = CreateSimulator(tokenConfig).SimulatePlayback(state);
+            var completedSummonStep = result.Steps.First(step =>
+                step.BoardState.Player[1]?.Id == "token" &&
+                step.BoardState.Player[2]?.Id == "token");
 
-            Assert.That(step.BoardState.Player[1]?.Id, Is.EqualTo("token"));
-            Assert.That(step.BoardState.Player[2]?.Id, Is.EqualTo("token"));
+            Assert.That(completedSummonStep.BoardState.Player[1]?.Id, Is.EqualTo("token"));
+            Assert.That(completedSummonStep.BoardState.Player[2]?.Id, Is.EqualTo("token"));
         }
 
         [Test]
@@ -142,10 +145,13 @@ namespace SpireChess.Tests
             state.Player[4] = CreateMinion("ally", 0, 100);
             state.Enemy[0] = CreateMinion("enemy", 2, 100);
 
-            var step = FirstAttack(CreateSimulator(tokenConfig).SimulatePlayback(state));
+            var result = CreateSimulator(tokenConfig).SimulatePlayback(state);
+            var completedSummonStep = result.Steps.First(step =>
+                step.BoardState.Player[3]?.Id == "token" &&
+                step.BoardState.Player[2]?.Id == "token");
 
-            Assert.That(step.BoardState.Player[3]?.Id, Is.EqualTo("token"));
-            Assert.That(step.BoardState.Player[2]?.Id, Is.EqualTo("token"));
+            Assert.That(completedSummonStep.BoardState.Player[3]?.Id, Is.EqualTo("token"));
+            Assert.That(completedSummonStep.BoardState.Player[2]?.Id, Is.EqualTo("token"));
         }
 
         [Test]
@@ -178,13 +184,15 @@ namespace SpireChess.Tests
 
             state.Enemy[0] = CreateMinion("enemy", 2, 100);
 
-            var step = FirstAttack(CreateSimulator(tokenConfig).SimulatePlayback(state));
-            var allyAttack = step.BoardState.Player
+            var result = CreateSimulator(tokenConfig).SimulatePlayback(state);
+            var fallbackStep = result.Steps.First(step =>
+                step.Messages.Any(message => message.Contains("没有空位")));
+            var allyAttack = fallbackStep.BoardState.Player
                 .Where(minion => minion != null && !minion.Config.IsToken)
                 .Sum(minion => minion.CurrentAttack);
 
             Assert.That(allyAttack, Is.EqualTo(5));
-            Assert.That(step.Messages.Any(message => message.Contains("没有空位")), Is.True);
+            Assert.That(fallbackStep.Messages.Any(message => message.Contains("没有空位")), Is.True);
         }
 
         [Test]

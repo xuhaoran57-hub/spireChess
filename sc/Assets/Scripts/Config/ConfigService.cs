@@ -369,9 +369,9 @@ namespace SpireChess.Config
                 }
             }
 
-            if (releasedMinions.Count != 52)
+            if (releasedMinions.Count != 67)
             {
-                result.AddError($"Content release should contain 52 minions, got {releasedMinions.Count}.");
+                result.AddError($"Content release should contain 67 minions, got {releasedMinions.Count}.");
             }
 
             if (releasedSpells.Count != 16)

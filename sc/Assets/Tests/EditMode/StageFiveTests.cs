@@ -26,7 +26,7 @@ namespace SpireChess.Tests.EditMode
         public void ReleasedContent_IsCompleteAndPlayable()
         {
             Assert.That(configs.ContentRelease, Is.Not.Null);
-            Assert.That(configs.ContentRelease.MinionIds, Has.Count.EqualTo(52));
+            Assert.That(configs.ContentRelease.MinionIds, Has.Count.EqualTo(67));
             Assert.That(configs.ContentRelease.SpellIds, Has.Count.EqualTo(16));
             Assert.That(configs.EventsById, Has.Count.EqualTo(10));
             Assert.That(configs.Encounters.Count(value => value.Category == "Normal"),
@@ -169,19 +169,19 @@ namespace SpireChess.Tests.EditMode
                 effect => effect.Id == "oathbroken_blade_soul_lost_permanent");
             Assert.That(oathbrokenGrowth.Value.Attack, Is.EqualTo(1));
             Assert.That(oathbrokenGrowth.Value.Duration, Is.EqualTo("Permanent"));
-            Assert.That(oathbrokenGrowth.Limit.PerCombat, Is.EqualTo(1));
+            Assert.That(oathbrokenGrowth.Limit.PerCombat, Is.EqualTo(2));
 
             var tombGuardian = configs.MinionsById["thousand_ring_tomb_guardian"];
             var tombGrowth = tombGuardian.Effects.Single(
                 effect => effect.Id == "thousand_ring_tomb_guardian_death_permanent");
             Assert.That(tombGrowth.Value.Attack, Is.EqualTo(1));
             Assert.That(tombGrowth.Value.Health, Is.EqualTo(1));
-            Assert.That(tombGrowth.Target.MaxTargets, Is.EqualTo(1));
+            Assert.That(tombGrowth.Target.MaxTargets, Is.EqualTo(2));
 
             var vinecrown = configs.MinionsById["vinecrown_priest"];
             var vinecrownGrowth = vinecrown.Effects.Single(
-                effect => effect.Id == "vinecrown_priest_win");
-            Assert.That(vinecrownGrowth.Condition.Type, Is.EqualTo("CombatWon"));
+                effect => effect.Id == "vinecrown_priest_token_death_permanent");
+            Assert.That(vinecrownGrowth.Trigger, Is.EqualTo("OnSummonedUnitDeath"));
             Assert.That(vinecrownGrowth.Value.Attack, Is.EqualTo(1));
             Assert.That(vinecrownGrowth.Value.Health, Is.EqualTo(1));
 

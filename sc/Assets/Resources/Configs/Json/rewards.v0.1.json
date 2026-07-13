@@ -17,6 +17,7 @@
       "id": "f1_elite_reward", "mode": "ChooseOne", "candidateCount": 3, "preferDistinctCategories": true, "allowSkip": true,
       "entries": [
         { "type": "Minion", "category": "Minion", "amount": 1, "cardId": "", "weight": 1 },
+        { "type": "Minion", "category": "Minion", "amount": 1, "cardId": "traveling_physician", "weight": 1 },
         { "type": "Spell", "category": "Spell", "amount": 1, "cardId": "", "weight": 1 },
         { "type": "FreeRefresh", "category": "Refresh", "amount": 2, "cardId": "", "weight": 1 },
         { "type": "NextShopGold", "category": "Gold", "amount": 3, "cardId": "", "weight": 1 },
@@ -41,6 +42,7 @@
       "id": "f1_boss_reward", "mode": "ChooseOne", "candidateCount": 3, "preferDistinctCategories": true, "allowSkip": true,
       "entries": [
         { "type": "Minion", "category": "Minion", "amount": 1, "cardId": "", "maximumTierOffset": 1, "weight": 1 },
+        { "type": "Minion", "category": "Minion", "amount": 1, "cardId": "ember_engraver", "weight": 1 },
         { "type": "Spell", "category": "Spell", "amount": 1, "cardId": "free_refresh", "weight": 1 },
         { "type": "UpgradeDiscount", "category": "Upgrade", "amount": 3, "cardId": "", "weight": 1 },
         { "type": "NextShopGold", "category": "Gold", "amount": 5, "cardId": "", "weight": 1 },
@@ -51,6 +53,7 @@
       "id": "f2_boss_reward", "mode": "ChooseOne", "candidateCount": 3, "preferDistinctCategories": true, "allowSkip": true,
       "entries": [
         { "type": "Minion", "category": "Minion", "amount": 1, "cardId": "", "maximumTierOffset": 1, "weight": 1 },
+        { "type": "Minion", "category": "Minion", "amount": 1, "cardId": "fox_den_matriarch", "weight": 1 },
         { "type": "Spell", "category": "Spell", "amount": 1, "cardId": "thickhide_potion", "weight": 1 },
         { "type": "UpgradeDiscount", "category": "Upgrade", "amount": 3, "cardId": "", "weight": 1 },
         { "type": "NextShopGold", "category": "Gold", "amount": 5, "cardId": "", "weight": 1 },

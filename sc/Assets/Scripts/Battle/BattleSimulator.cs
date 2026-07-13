@@ -16,7 +16,10 @@ namespace SpireChess.Battle
             new Dictionary<string, int>();
         private readonly Dictionary<string, BattlePermanentDelta> permanentDeltas =
             new Dictionary<string, BattlePermanentDelta>();
+        private readonly Dictionary<string, int> triggerCounts =
+            new Dictionary<string, int>();
         private int processedEffectCount;
+        private long nextSummonEventId;
         private bool isDrainingEffects;
         private const int MaxEffectEvents = 2048;
 
@@ -54,7 +57,9 @@ namespace SpireChess.Battle
             effectQueue.Clear();
             effectUsage.Clear();
             permanentDeltas.Clear();
+            triggerCounts.Clear();
             processedEffectCount = 0;
+            nextSummonEventId = 0;
             isDrainingEffects = false;
 
             AddStep(state, steps, log, new[] { "战斗开始。" });
@@ -518,7 +523,9 @@ namespace SpireChess.Battle
                     null,
                     scheduled.Effect,
                     null,
-                    null));
+                    null,
+                    0,
+                    true));
             }
 
             for (var i = 0; i < BattleBoardState.SlotCount; i++)
@@ -581,7 +588,8 @@ namespace SpireChess.Battle
             string trigger,
             BattleMinionRuntime subject,
             BattleMinionRuntime related,
-            BattleMinionRuntime excludedSource = null)
+            BattleMinionRuntime excludedSource = null,
+            long summonEventId = 0)
         {
             var row = state.GetRow(side);
             for (var i = 0; i < row.Count; i++)
@@ -592,7 +600,14 @@ namespace SpireChess.Battle
                     continue;
                 }
 
-                EnqueueSourceEffects(source, side, trigger, subject, related, i);
+                EnqueueSourceEffects(
+                    source,
+                    side,
+                    trigger,
+                    subject,
+                    related,
+                    i,
+                    summonEventId: summonEventId);
             }
         }
 
@@ -604,8 +619,11 @@ namespace SpireChess.Battle
             BattleMinionRuntime related,
             int sourceIndex,
             DeathRecord death = null,
-            BattleSide? winner = null)
+            BattleSide? winner = null,
+            long summonEventId = 0)
         {
+            var triggerKey = BuildTriggerCountKey(source, trigger);
+            triggerCounts[triggerKey] = GetTriggerCount(source, trigger) + 1;
             var effects = source.IsGolden
                 ? source.Config.GoldenEffects
                 : source.Config.Effects;
@@ -624,7 +642,8 @@ namespace SpireChess.Battle
                     related,
                     effect,
                     death,
-                    winner));
+                    winner,
+                    summonEventId));
             }
         }
 
@@ -709,6 +728,34 @@ namespace SpireChess.Battle
                         Math.Abs(subjectIndex - pending.SourceIndex) == 1;
                 case "AttackBelowHealth":
                     return pending.Source.CurrentAttack < pending.Source.CurrentHealth;
+                case "SubjectIsSelf":
+                    return ReferenceEquals(pending.Source, pending.Subject);
+                case "HasAdjacentNonRace":
+                    var sourceRow = state.GetRow(pending.Side);
+                    return sourceRow.Select((value, index) => new { value, index })
+                        .Any(entry => Math.Abs(entry.index - pending.SourceIndex) == 1 &&
+                            entry.value != null && entry.value.IsAlive &&
+                            entry.value.Config.Race != condition.Race);
+                case "TriggerCountAtLeast":
+                    return GetTriggerCount(pending.Source, pending.Effect.Trigger) >=
+                        condition.Threshold;
+                case "TriggerCountEquals":
+                    return GetTriggerCount(pending.Source, pending.Effect.Trigger) ==
+                        condition.Threshold;
+                case "EnemyAttackDifferenceAtLeast":
+                    var opposingRow = state.GetRow(GetOpposingSide(pending.Side));
+                    var highestAttack = opposingRow
+                        .Where(value => value != null && value.IsAlive)
+                        .Select(value => value.CurrentAttack)
+                        .DefaultIfEmpty(0)
+                        .Max();
+                    return highestAttack - pending.Source.CurrentAttack >= condition.Threshold;
+                case "HasUnshieldedRaceTarget":
+                    return state.GetRow(pending.Side).Any(value =>
+                        value != null && value.IsAlive &&
+                        !ReferenceEquals(value, pending.Source) &&
+                        !value.HasShield &&
+                        value.Config.Race == condition.Race);
                 default:
                     return false;
             }
@@ -736,7 +783,69 @@ namespace SpireChess.Battle
                 var actor = pending.Subject ?? pending.Source;
                 if (actor != null && actor.IsAlive)
                 {
-                    pendingActions.Attacks.Enqueue(new PendingAttack(pending.Side, actor));
+                    var requestKey = pending.SummonEventId > 0
+                        ? $"{pending.SummonEventId}:{actor.GetHashCode()}"
+                        : null;
+                    if (requestKey == null ||
+                        pendingActions.ImmediateAttackRequests.Add(requestKey))
+                    {
+                        pendingActions.Attacks.Enqueue(new PendingAttack(pending.Side, actor));
+                    }
+                }
+                return;
+            }
+
+            if (effect.Action == "CopyCombatKeywords")
+            {
+                CopyCombatKeywords(state, pending, log);
+                return;
+            }
+
+            if (effect.Action == "GainAttackDifference")
+            {
+                var enemyAttack = state.GetRow(GetOpposingSide(pending.Side))
+                    .Where(value => value != null && value.IsAlive)
+                    .Select(value => value.CurrentAttack)
+                    .DefaultIfEmpty(0)
+                    .Max();
+                var difference = Math.Max(0, enemyAttack - pending.Source.CurrentAttack);
+                var cap = Math.Max(0, effect.Value?.Amount ?? 0);
+                var gainedAttack = Math.Min(difference, cap);
+                pending.Source.AddTemporaryStats(gainedAttack, 0, log);
+                if (gainedAttack >= Math.Max(1, effect.Value?.Count ?? int.MaxValue))
+                {
+                    pending.Source.TryAddKeyword(effect.Value?.Keyword, log);
+                }
+                return;
+            }
+
+            if (effect.Action == "ModifySelectedPermanentAndOthersCombat")
+            {
+                var selected = ResolveBattleTargets(state, pending).ToList();
+                foreach (var target in selected)
+                {
+                    target.AddTemporaryStats(
+                        effect.Value?.PermanentAttack ?? 0,
+                        effect.Value?.PermanentHealth ?? 0,
+                        log);
+                    AddPermanentDelta(
+                        pending.Side,
+                        target,
+                        effect.Value?.PermanentAttack ?? 0,
+                        effect.Value?.PermanentHealth ?? 0,
+                        null);
+                }
+
+                var targetConfig = effect.Target;
+                var selectedSet = new HashSet<BattleMinionRuntime>(selected);
+                foreach (var target in state.GetRow(pending.Side).Where(value =>
+                             IsValidEffectTarget(value, targetConfig) &&
+                             !selectedSet.Contains(value)))
+                {
+                    target.AddTemporaryStats(
+                        effect.Value?.Attack ?? 0,
+                        effect.Value?.Health ?? 0,
+                        log);
                 }
                 return;
             }
@@ -891,10 +1000,13 @@ namespace SpireChess.Battle
             }
             var indexed = row
                 .Select((value, index) => new { value, index })
-                .Where(entry => IsValidEffectTarget(entry.value, target) ||
+                .Where(entry =>
+                    (pending.SourceIsSynthetic || target.IncludeSelf ||
+                     !ReferenceEquals(entry.value, pending.Source)) &&
+                    (IsValidEffectTarget(entry.value, target) ||
                     (resolvedSpecialRace != null && entry.value != null &&
                      entry.value.IsAlive && entry.value.Config.Race == resolvedSpecialRace &&
-                     (target.IncludeToken || !entry.value.Config.IsToken)))
+                     (target.IncludeToken || !entry.value.Config.IsToken))))
                 .ToList();
             if (target.Selector == "NoShieldRandom")
             {
@@ -918,6 +1030,7 @@ namespace SpireChess.Battle
                         (target.Scope == "Right" && entry.index == pending.SourceIndex + 1) ||
                         (target.Scope == "Adjacent" &&
                          Math.Abs(entry.index - pending.SourceIndex) == 1))
+                    .Take(target.MaxTargets > 0 ? target.MaxTargets : int.MaxValue)
                     .Select(entry => entry.value).ToList();
             }
 
@@ -1094,32 +1207,45 @@ namespace SpireChess.Battle
             else
             {
                 var attackOverride = effect.Value != null && effect.Value.Attack > 0
-                    ? (int?)effect.Value.Attack
+                    ? (int?)(effect.Value.Attack * death.Minion.SummonEffectMultiplier)
                     : null;
                 var healthOverride = effect.Value != null && effect.Value.Health > 0
-                    ? (int?)effect.Value.Health
+                    ? (int?)(effect.Value.Health * death.Minion.SummonEffectMultiplier)
                     : null;
                 var token = new BattleMinionRuntime(
                     tokenConfig,
                     false,
                     attackOverride,
-                    healthOverride);
+                    healthOverride,
+                    summonEffectMultiplier: Math.Max(
+                        1,
+                        effect.Value?.SummonEffectMultiplier ?? 1));
                 row[slotIndex] = token;
                 log.Add($"{death.Minion.Name} 在 {slotIndex + 1} 号位召唤了 {token.Name}。");
+                var summonEventId = ++nextSummonEventId;
                 EnqueueSourceEffects(
                     token,
                     death.Side,
                     "OnSummon",
                     token,
                     death.Minion,
-                    slotIndex);
+                    slotIndex,
+                    summonEventId: summonEventId);
                 EnqueueObservedEffects(
                     state,
                     death.Side,
                     "OnSummon",
                     token,
                     death.Minion,
-                    token);
+                    token,
+                    summonEventId);
+                EnqueueObservedEffects(
+                    state,
+                    GetOpposingSide(death.Side),
+                    "OnEnemySummon",
+                    token,
+                    death.Minion,
+                    summonEventId: summonEventId);
             }
 
             if (pending.Remaining > 1)
@@ -1182,7 +1308,53 @@ namespace SpireChess.Battle
                 return false;
             }
 
+            if (!string.IsNullOrWhiteSpace(target.ExcludeRace) &&
+                minion.Config.Race == target.ExcludeRace)
+            {
+                return false;
+            }
+
             return string.IsNullOrWhiteSpace(target.Race) || minion.Config.Race == target.Race;
+        }
+
+        private void CopyCombatKeywords(
+            BattleBoardState state,
+            PendingBattleEffect pending,
+            IList<string> log)
+        {
+            var adjacent = state.GetRow(pending.Side)
+                .Select((value, index) => new { value, index })
+                .Where(entry => entry.value != null && entry.value.IsAlive &&
+                    Math.Abs(entry.index - pending.SourceIndex) == 1);
+            if (pending.Effect.Value?.Resource == "Left")
+            {
+                adjacent = adjacent.Where(entry => entry.index < pending.SourceIndex);
+            }
+
+            var allowed = new HashSet<string> { "Taunt", "Shield", "Cleave" };
+            foreach (var keyword in adjacent
+                         .SelectMany(entry => entry.value.Keywords)
+                         .Where(allowed.Contains)
+                         .Distinct())
+            {
+                pending.Source.TryAddKeyword(keyword, log);
+            }
+        }
+
+        private static string BuildTriggerCountKey(
+            BattleMinionRuntime source,
+            string trigger)
+        {
+            return $"{source.GetHashCode()}:{trigger}";
+        }
+
+        private int GetTriggerCount(BattleMinionRuntime source, string trigger)
+        {
+            return triggerCounts.TryGetValue(
+                BuildTriggerCountKey(source, trigger),
+                out var count)
+                ? count
+                : 0;
         }
 
         private static bool HasImmediateAttackOnSummon(BattleMinionRuntime minion)
@@ -1393,6 +1565,7 @@ namespace SpireChess.Battle
         {
             public Queue<PendingAttack> Attacks { get; } = new Queue<PendingAttack>();
             public Queue<PendingSummon> Summons { get; } = new Queue<PendingSummon>();
+            public HashSet<string> ImmediateAttackRequests { get; } = new HashSet<string>();
         }
 
         private sealed class PendingBattleEffect
@@ -1405,7 +1578,9 @@ namespace SpireChess.Battle
                 BattleMinionRuntime related,
                 EffectConfig effect,
                 DeathRecord death,
-                BattleSide? winner)
+                BattleSide? winner,
+                long summonEventId,
+                bool sourceIsSynthetic = false)
             {
                 Source = source;
                 Side = side;
@@ -1415,6 +1590,8 @@ namespace SpireChess.Battle
                 Effect = effect;
                 Death = death;
                 Winner = winner;
+                SummonEventId = summonEventId;
+                SourceIsSynthetic = sourceIsSynthetic;
             }
 
             public BattleMinionRuntime Source { get; }
@@ -1425,6 +1602,8 @@ namespace SpireChess.Battle
             public EffectConfig Effect { get; }
             public DeathRecord Death { get; }
             public BattleSide? Winner { get; }
+            public long SummonEventId { get; }
+            public bool SourceIsSynthetic { get; }
         }
     }
 }

@@ -398,8 +398,10 @@ namespace SpireChess.Shop
                         .Select(value => value.Value).ToList();
                     return true;
                 case "LowestHealth":
-                    targets = new[] { candidates.OrderBy(value => value.Value.CurrentHealth)
-                        .ThenBy(value => value.Key).First().Value };
+                    targets = candidates.OrderBy(value => value.Value.CurrentHealth)
+                        .ThenBy(value => value.Key)
+                        .Take(target.MaxTargets > 0 ? target.MaxTargets : 1)
+                        .Select(value => value.Value).ToList();
                     return true;
                 case "Leftmost":
                     targets = new[] { candidates.OrderBy(value => value.Key).First().Value };

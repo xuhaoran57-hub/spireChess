@@ -1582,6 +1582,11 @@ namespace SpireChess.Shop
                     continue;
                 }
 
+                if (plan.Count == 0)
+                {
+                    continue;
+                }
+
                 effectEngine.ApplyPlan(plan);
                 active.TriggerCount++;
                 RecordEffectUse(active.SourceInstanceId, effect);
@@ -1618,6 +1623,11 @@ namespace SpireChess.Shop
                         false,
                         out var plan,
                         out _))
+                {
+                    continue;
+                }
+
+                if (plan.Count == 0)
                 {
                     continue;
                 }

@@ -6,8 +6,8 @@ namespace SpireChess.Config
 {
     public static class ConfigValidator
     {
-        private const int ExpectedMinionCount = 52;
-        private const int ExpectedTokenCount = 2;
+        private const int ExpectedMinionCount = 67;
+        private const int ExpectedTokenCount = 3;
         private const int ExpectedSpellCount = 16;
         private const int ExpectedShopSpellCount = 15;
         private const string TripleDiscoveryRewardSpellId =
@@ -75,6 +75,33 @@ namespace SpireChess.Config
             if (tokenCount != ExpectedTokenCount)
             {
                 result.AddError($"Token count should be {ExpectedTokenCount}, got {tokenCount}.");
+            }
+
+            var mainRaceTierCounts = new[] { 3, 4, 4, 4, 3 };
+            foreach (var race in new[] { "ForgeSoul", "WildSpirit", "Starbound" })
+            {
+                for (var tier = 1; tier <= 5; tier++)
+                {
+                    var actual = minions.Count(minion => !minion.IsToken &&
+                        minion.Race == race && minion.Tier == tier);
+                    var expected = mainRaceTierCounts[tier - 1];
+                    if (actual != expected)
+                    {
+                        result.AddError(
+                            $"{race} tier {tier} should contain {expected} minions, got {actual}.");
+                    }
+                }
+            }
+
+            for (var tier = 1; tier <= 5; tier++)
+            {
+                var actual = minions.Count(minion => !minion.IsToken &&
+                    minion.Race == "Wayfarer" && minion.Tier == tier);
+                if (actual != 2)
+                {
+                    result.AddError(
+                        $"Wayfarer tier {tier} should contain 2 minions, got {actual}.");
+                }
             }
 
             foreach (var group in minions.GroupBy(minion => minion.Id))
