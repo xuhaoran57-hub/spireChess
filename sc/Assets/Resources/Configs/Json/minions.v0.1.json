@@ -989,7 +989,7 @@
       "id": "vinecrown_priest",
       "name": "藤冠祭司",
       "title": "",
-      "description": "你的召唤物死亡时，使一个友方荒灵获得 +2/+2。",
+      "description": "你的召唤物死亡时，使一个友方荒灵获得 +2/+2。战斗胜利后，使一个友方荒灵永久获得 +1/+1。",
       "goldenDescription": "你的召唤物死亡时，使一个友方荒灵获得 +4/+4。战斗胜利后，使一个友方荒灵永久获得 +2/+2。",
       "tier": 4,
       "race": "WildSpirit",
@@ -1004,7 +1004,8 @@
       "iconId": "icon_wild_spirit",
       "audioId": "",
       "effects": [
-        { "id": "vinecrown_priest_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 2, "health": 2, "duration": "Combat" } }
+        { "id": "vinecrown_priest_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 2, "health": 2, "duration": "Combat" } },
+        { "id": "vinecrown_priest_win", "trigger": "OnCombatEnd", "action": "ModifyStats", "condition": { "type": "CombatWon" }, "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
       ],
       "goldenEffects": [
         { "id": "golden_vinecrown_priest_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 4, "health": 4, "duration": "Combat" } },
@@ -1074,7 +1075,7 @@
       "id": "mountain_belly_soul_eater",
       "name": "山腹吞灵者",
       "title": "",
-      "description": "每当一个非召唤物友方荒灵死亡，获得 +2 生命；攻击力低于生命时获得 +1 攻击。",
+      "description": "每当一个非召唤物友方荒灵死亡，获得 +2 生命；攻击力低于生命时获得 +1 攻击。战斗胜利后，永久获得 +1 生命。",
       "goldenDescription": "每当一个非召唤物友方荒灵死亡，获得 +4 生命；攻击力低于生命时获得 +2 攻击。战斗胜利后，永久获得 +2 生命。",
       "tier": 4,
       "race": "WildSpirit",
@@ -1090,7 +1091,8 @@
       "audioId": "",
       "effects": [
         { "id": "mountain_belly_soul_eater_health", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 0, "health": 2, "duration": "Combat" } },
-        { "id": "mountain_belly_soul_eater_attack", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "AttackBelowHealth" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Combat" } }
+        { "id": "mountain_belly_soul_eater_attack", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "AttackBelowHealth" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Combat" } },
+        { "id": "mountain_belly_soul_eater_win", "trigger": "OnCombatEnd", "action": "ModifyStats", "condition": { "type": "CombatWon" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 0, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
       ],
       "goldenEffects": [
         { "id": "golden_mountain_belly_soul_eater_health", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 0, "health": 4, "duration": "Combat" } },
@@ -1252,7 +1254,7 @@
       "id": "oathbroken_blade_soul",
       "name": "断誓刃魂",
       "title": "",
-      "description": "每当友方随从失去护盾，获得 +2 攻击；每当本随从击杀敌人，重新获得护盾。",
+      "description": "每当友方随从失去护盾，获得 +2 攻击；每场战斗首次触发时，永久获得 +1 攻击。每当本随从击杀敌人，重新获得护盾。",
       "goldenDescription": "每当友方随从失去护盾，永久获得 +1 攻击，并在本场战斗额外获得 +3 攻击；每当本随从击杀敌人，重新获得护盾。",
       "tier": 5,
       "race": "ForgeSoul",
@@ -1268,6 +1270,7 @@
       "audioId": "",
       "effects": [
         { "id": "oathbroken_blade_soul_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 0, "duration": "Combat" } },
+        { "id": "oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 1 } },
         { "id": "oathbroken_blade_soul_kill", "trigger": "OnKill", "action": "AddShield", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "duration": "Combat", "keyword": "Shield" } }
       ],
       "goldenEffects": [
@@ -1283,7 +1286,7 @@
       "id": "thousand_ring_tomb_guardian",
       "name": "千环守墓者",
       "title": "",
-      "description": "亡语：使所有友方随从获得 +2/+2。",
+      "description": "亡语：使所有友方随从获得 +2/+2，并使一个存活友方随从永久获得 +1/+1。",
       "goldenDescription": "亡语：使所有友方随从永久获得 +2/+2。",
       "tier": 5,
       "race": "ForgeSoul",
@@ -1298,7 +1301,8 @@
       "iconId": "icon_forge_soul",
       "audioId": "",
       "effects": [
-        { "id": "thousand_ring_tomb_guardian_death", "trigger": "OnDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "All", "includeSelf": false, "includeToken": true }, "value": { "attack": 2, "health": 2, "duration": "Combat" } }
+        { "id": "thousand_ring_tomb_guardian_death", "trigger": "OnDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "All", "includeSelf": false, "includeToken": true }, "value": { "attack": 2, "health": 2, "duration": "Combat" } },
+        { "id": "thousand_ring_tomb_guardian_death_permanent", "trigger": "OnDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
       ],
       "goldenEffects": [
         { "id": "golden_thousand_ring_tomb_guardian_death", "trigger": "OnDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "All", "includeSelf": false, "includeToken": false }, "value": { "attack": 2, "health": 2, "duration": "Permanent" } }

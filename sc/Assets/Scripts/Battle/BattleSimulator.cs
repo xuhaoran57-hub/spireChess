@@ -59,21 +59,12 @@ namespace SpireChess.Battle
 
             AddStep(state, steps, log, new[] { "战斗开始。" });
 
-            var startAttacks = new List<PendingAttack>();
+            var startActions = new PendingBattleActions();
             EnqueueBattleStartEffects(state);
             var battleStartLog = new List<string>();
-            DrainEffectQueue(state, battleStartLog, startAttacks);
+            DrainEffectQueue(state, battleStartLog, startActions);
             AddStep(state, steps, log, battleStartLog);
-            foreach (var pendingAttack in startAttacks)
-            {
-                ResolveAttackStep(
-                    state,
-                    pendingAttack.Side,
-                    pendingAttack.Minion,
-                    log,
-                    steps,
-                    true);
-            }
+            ResolvePendingActions(state, startActions, log, steps);
 
             BattleSide? winner;
             var battleOver = TryGetBattleResult(state, out winner);
@@ -162,7 +153,11 @@ namespace SpireChess.Battle
                     ? BattleOutcomeReason.Victory
                     : BattleOutcomeReason.MutualElimination;
             EnqueueCombatEndEffects(state, winner);
-            DrainEffectQueue(state, log, new List<PendingAttack>());
+            var combatEndActions = new PendingBattleActions();
+            var combatEndLog = new List<string>();
+            DrainEffectQueue(state, combatEndLog, combatEndActions);
+            AddStep(state, steps, log, combatEndLog);
+            ResolvePendingActions(state, combatEndActions, log, steps);
             return new BattleSimulationResult(
                 state,
                 winner,
@@ -192,7 +187,7 @@ namespace SpireChess.Battle
             }
 
             var attackLog = new List<string>();
-            var pendingAttacks = new List<PendingAttack>();
+            var pendingActions = new PendingBattleActions();
             int targetIndex;
             List<int> splashTargetIndexes;
             if (!ResolveAttack(
@@ -202,7 +197,7 @@ namespace SpireChess.Battle
                     attackLog,
                     out targetIndex,
                     out splashTargetIndexes,
-                    pendingAttacks,
+                    pendingActions,
                     isImmediateAttack))
             {
                 return;
@@ -219,15 +214,35 @@ namespace SpireChess.Battle
                 targetIndex,
                 splashTargetIndexes);
 
-            foreach (var pendingAttack in pendingAttacks)
+            ResolvePendingActions(state, pendingActions, log, steps);
+        }
+
+        private void ResolvePendingActions(
+            BattleBoardState state,
+            PendingBattleActions pendingActions,
+            List<string> log,
+            List<BattleStep> steps)
+        {
+            while (pendingActions.Attacks.Count > 0 || pendingActions.Summons.Count > 0)
             {
-                ResolveAttackStep(
-                    state,
-                    pendingAttack.Side,
-                    pendingAttack.Minion,
-                    log,
-                    steps,
-                    true);
+                if (pendingActions.Attacks.Count > 0)
+                {
+                    var pendingAttack = pendingActions.Attacks.Dequeue();
+                    ResolveAttackStep(
+                        state,
+                        pendingAttack.Side,
+                        pendingAttack.Minion,
+                        log,
+                        steps,
+                        true);
+                    continue;
+                }
+
+                var pendingSummon = pendingActions.Summons.Dequeue();
+                var summonLog = new List<string>();
+                ResolveNextSummonToken(state, pendingSummon, summonLog, pendingActions);
+                DrainEffectQueue(state, summonLog, pendingActions);
+                AddStep(state, steps, log, summonLog);
             }
         }
 
@@ -238,7 +253,7 @@ namespace SpireChess.Battle
             IList<string> log,
             out int targetIndex,
             out List<int> splashTargetIndexes,
-            ICollection<PendingAttack> pendingAttacks,
+            PendingBattleActions pendingActions,
             bool isImmediateAttack)
         {
             targetIndex = -1;
@@ -269,7 +284,7 @@ namespace SpireChess.Battle
                 attacker,
                 target,
                 attackerIndex);
-            DrainEffectQueue(state, log, pendingAttacks);
+            DrainEffectQueue(state, log, pendingActions);
             if (!attacker.IsAlive || !target.IsAlive)
             {
                 return true;
@@ -312,7 +327,7 @@ namespace SpireChess.Battle
                 GetOpposingSide(attackerSide),
                 log);
             deaths.AddRange(RemoveDead(attackers, attackerSide, log));
-            ResolveDeathEffects(state, deaths, log, pendingAttacks);
+            ResolveDeathEffects(state, deaths, log, pendingActions);
             if (deaths.Any(value => ReferenceEquals(value.Minion, target)) && attacker.IsAlive)
             {
                 EnqueueSourceEffects(
@@ -324,7 +339,7 @@ namespace SpireChess.Battle
                     attackerIndex);
             }
 
-            DrainEffectQueue(state, log, pendingAttacks);
+            DrainEffectQueue(state, log, pendingActions);
             return true;
         }
 
@@ -445,7 +460,7 @@ namespace SpireChess.Battle
             BattleBoardState state,
             IEnumerable<DeathRecord> deaths,
             IList<string> log,
-            ICollection<PendingAttack> pendingAttacks)
+            PendingBattleActions pendingActions)
         {
             var materialized = deaths.ToList();
             foreach (var death in materialized)
@@ -475,7 +490,7 @@ namespace SpireChess.Battle
                 }
             }
 
-            DrainEffectQueue(state, log, pendingAttacks);
+            DrainEffectQueue(state, log, pendingActions);
         }
 
         private void EnqueueBattleStartEffects(BattleBoardState state)
@@ -616,7 +631,7 @@ namespace SpireChess.Battle
         private void DrainEffectQueue(
             BattleBoardState state,
             IList<string> log,
-            ICollection<PendingAttack> pendingAttacks)
+            PendingBattleActions pendingActions)
         {
             if (isDrainingEffects)
             {
@@ -641,7 +656,7 @@ namespace SpireChess.Battle
                         continue;
                     }
 
-                    ExecuteEffect(state, pending, log, pendingAttacks);
+                    ExecuteEffect(state, pending, log, pendingActions);
                     RecordEffectUse(pending);
                 }
             }
@@ -703,7 +718,7 @@ namespace SpireChess.Battle
             BattleBoardState state,
             PendingBattleEffect pending,
             IList<string> log,
-            ICollection<PendingAttack> pendingAttacks)
+            PendingBattleActions pendingActions)
         {
             var effect = pending.Effect;
             if (effect.Action == "SummonToken")
@@ -712,7 +727,7 @@ namespace SpireChess.Battle
                     pending.Side,
                     pending.SourceIndex,
                     pending.Source);
-                ResolveSummonToken(state, death, effect, log, pendingAttacks);
+                ResolveSummonToken(state, death, effect, log, pendingActions);
                 return;
             }
 
@@ -721,7 +736,7 @@ namespace SpireChess.Battle
                 var actor = pending.Subject ?? pending.Source;
                 if (actor != null && actor.IsAlive)
                 {
-                    pendingAttacks.Add(new PendingAttack(pending.Side, actor));
+                    pendingActions.Attacks.Enqueue(new PendingAttack(pending.Side, actor));
                 }
                 return;
             }
@@ -793,7 +808,7 @@ namespace SpireChess.Battle
                             target,
                             Math.Max(0, effect.Value?.Amount ?? 0),
                             log,
-                            pendingAttacks);
+                            pendingActions);
                         break;
                 }
             }
@@ -951,7 +966,7 @@ namespace SpireChess.Battle
             BattleMinionRuntime target,
             int amount,
             IList<string> log,
-            ICollection<PendingAttack> pendingAttacks)
+            PendingBattleActions pendingActions)
         {
             if (target == null || amount <= 0 || !target.IsAlive)
             {
@@ -974,7 +989,7 @@ namespace SpireChess.Battle
             var deaths = RemoveDead(state.GetRow(targetSide), targetSide, log);
             if (deaths.Count > 0)
             {
-                ResolveDeathEffects(state, deaths, log, pendingAttacks);
+                ResolveDeathEffects(state, deaths, log, pendingActions);
             }
         }
 
@@ -1040,7 +1055,7 @@ namespace SpireChess.Battle
             DeathRecord death,
             EffectConfig effect,
             IList<string> log,
-            ICollection<PendingAttack> pendingAttacks)
+            PendingBattleActions pendingActions)
         {
             var resourceId = effect.Value?.Resource;
             var tokenConfig = string.IsNullOrWhiteSpace(resourceId)
@@ -1053,17 +1068,31 @@ namespace SpireChess.Battle
             }
 
             var amount = Math.Max(1, effect.Value?.Amount ?? 1);
-            var row = state.GetRow(death.Side);
-            for (var summonIndex = 0; summonIndex < amount; summonIndex++)
-            {
-                var slotIndex = FindSummonSlot(row, death.OriginalIndex);
-                if (slotIndex < 0)
-                {
-                    log.Add($"{death.Minion.Name} 召唤 {tokenConfig.Name} 失败：没有空位。");
-                    ResolveFallbackEffects(row, effect.FallbackEffects, log);
-                    continue;
-                }
+            ResolveNextSummonToken(
+                state,
+                new PendingSummon(death, effect, tokenConfig, amount),
+                log,
+                pendingActions);
+        }
 
+        private void ResolveNextSummonToken(
+            BattleBoardState state,
+            PendingSummon pending,
+            IList<string> log,
+            PendingBattleActions pendingActions)
+        {
+            var death = pending.Death;
+            var effect = pending.Effect;
+            var tokenConfig = pending.TokenConfig;
+            var row = state.GetRow(death.Side);
+            var slotIndex = FindSummonSlot(row, death.OriginalIndex);
+            if (slotIndex < 0)
+            {
+                log.Add($"{death.Minion.Name} 召唤 {tokenConfig.Name} 失败：没有空位。");
+                ResolveFallbackEffects(row, effect.FallbackEffects, log);
+            }
+            else
+            {
                 var attackOverride = effect.Value != null && effect.Value.Attack > 0
                     ? (int?)effect.Value.Attack
                     : null;
@@ -1091,6 +1120,15 @@ namespace SpireChess.Battle
                     token,
                     death.Minion,
                     token);
+            }
+
+            if (pending.Remaining > 1)
+            {
+                pendingActions.Summons.Enqueue(new PendingSummon(
+                    death,
+                    effect,
+                    tokenConfig,
+                    pending.Remaining - 1));
             }
         }
 
@@ -1329,6 +1367,32 @@ namespace SpireChess.Battle
 
             public BattleSide Side { get; }
             public BattleMinionRuntime Minion { get; }
+        }
+
+        private sealed class PendingSummon
+        {
+            public PendingSummon(
+                DeathRecord death,
+                EffectConfig effect,
+                MinionConfig tokenConfig,
+                int remaining)
+            {
+                Death = death;
+                Effect = effect;
+                TokenConfig = tokenConfig;
+                Remaining = remaining;
+            }
+
+            public DeathRecord Death { get; }
+            public EffectConfig Effect { get; }
+            public MinionConfig TokenConfig { get; }
+            public int Remaining { get; }
+        }
+
+        private sealed class PendingBattleActions
+        {
+            public Queue<PendingAttack> Attacks { get; } = new Queue<PendingAttack>();
+            public Queue<PendingSummon> Summons { get; } = new Queue<PendingSummon>();
         }
 
         private sealed class PendingBattleEffect

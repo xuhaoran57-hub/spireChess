@@ -212,6 +212,47 @@ namespace SpireChess.Tests
         }
 
         [Test]
+        public void MultiSummon_ImmediateAttackCanFreeSlotForNextToken()
+        {
+            var tokenConfig = CreateConfig("swift_token", 2, 1, true);
+            tokenConfig.Effects.Add(new EffectConfig
+            {
+                Id = "immediate",
+                Trigger = "OnSummon",
+                Action = "ImmediateAttack"
+            });
+            var summonerConfig = CreateConfig("summoner", 0, 1);
+            summonerConfig.Effects.Add(CreateSummonEffect("swift_token", 2));
+            var state = CreateState();
+            state.Player[0] = new BattleMinionRuntime(summonerConfig);
+            for (var i = 1; i < BattleBoardState.SlotCount; i++)
+            {
+                state.Player[i] = CreateMinion($"ally_{i}", 0, 100);
+            }
+
+            state.Enemy[0] = CreateMinion("enemy", 2, 100, "Taunt");
+
+            var result = CreateSimulator(tokenConfig).SimulatePlayback(state);
+            var summonIndexes = result.Log
+                .Select((message, index) => new { message, index })
+                .Where(entry => entry.message.Contains("召唤了 swift_token"))
+                .Select(entry => entry.index)
+                .ToList();
+            var immediateIndexes = result.Log
+                .Select((message, index) => new { message, index })
+                .Where(entry => entry.message.Contains("swift_token 立即攻击"))
+                .Select(entry => entry.index)
+                .ToList();
+
+            Assert.That(summonIndexes.Count, Is.EqualTo(2));
+            Assert.That(immediateIndexes.Count, Is.EqualTo(2));
+            Assert.That(summonIndexes[0], Is.LessThan(immediateIndexes[0]));
+            Assert.That(immediateIndexes[0], Is.LessThan(summonIndexes[1]));
+            Assert.That(summonIndexes[1], Is.LessThan(immediateIndexes[1]));
+            Assert.That(result.Log.Any(message => message.Contains("没有空位")), Is.False);
+        }
+
+        [Test]
         public void SummonedToken_GetsNormalAttackInCurrentRound()
         {
             var tokenConfig = CreateConfig("token", 2, 100, true);

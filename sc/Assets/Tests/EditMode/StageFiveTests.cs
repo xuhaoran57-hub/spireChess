@@ -162,6 +162,38 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void NormalForgeAndWildFinishers_HaveLimitedPermanentGrowth()
+        {
+            var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
+            var oathbrokenGrowth = oathbroken.Effects.Single(
+                effect => effect.Id == "oathbroken_blade_soul_lost_permanent");
+            Assert.That(oathbrokenGrowth.Value.Attack, Is.EqualTo(1));
+            Assert.That(oathbrokenGrowth.Value.Duration, Is.EqualTo("Permanent"));
+            Assert.That(oathbrokenGrowth.Limit.PerCombat, Is.EqualTo(1));
+
+            var tombGuardian = configs.MinionsById["thousand_ring_tomb_guardian"];
+            var tombGrowth = tombGuardian.Effects.Single(
+                effect => effect.Id == "thousand_ring_tomb_guardian_death_permanent");
+            Assert.That(tombGrowth.Value.Attack, Is.EqualTo(1));
+            Assert.That(tombGrowth.Value.Health, Is.EqualTo(1));
+            Assert.That(tombGrowth.Target.MaxTargets, Is.EqualTo(1));
+
+            var vinecrown = configs.MinionsById["vinecrown_priest"];
+            var vinecrownGrowth = vinecrown.Effects.Single(
+                effect => effect.Id == "vinecrown_priest_win");
+            Assert.That(vinecrownGrowth.Condition.Type, Is.EqualTo("CombatWon"));
+            Assert.That(vinecrownGrowth.Value.Attack, Is.EqualTo(1));
+            Assert.That(vinecrownGrowth.Value.Health, Is.EqualTo(1));
+
+            var soulEater = configs.MinionsById["mountain_belly_soul_eater"];
+            var soulEaterGrowth = soulEater.Effects.Single(
+                effect => effect.Id == "mountain_belly_soul_eater_win");
+            Assert.That(soulEaterGrowth.Condition.Type, Is.EqualTo("CombatWon"));
+            Assert.That(soulEaterGrowth.Value.Health, Is.EqualTo(1));
+            Assert.That(soulEaterGrowth.Limit.PerCombat, Is.EqualTo(1));
+        }
+
+        [Test]
         public void BattleBatchRunner_IsDeterministicForSameSeedRange()
         {
             var state = BuildFixture.Create(
