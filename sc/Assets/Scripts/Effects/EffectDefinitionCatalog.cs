@@ -20,7 +20,7 @@ namespace SpireChess.Effects
             "DiscoverSpell", "GrantRandomSpell", "CopyMinion", "SummonToken",
             "ImmediateAttack", "ActivateCardListeners", "SetPendingCombatBuff",
             "SetPostCombatSurvivorBuff", "CopyCombatKeywords", "GainAttackDifference",
-            "ModifySelectedPermanentAndOthersCombat"
+            "ModifySelectedPermanentAndOthersCombat", "GainFlourish"
         };
 
         public static readonly HashSet<string> Conditions = new HashSet<string>

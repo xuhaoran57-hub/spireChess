@@ -24,9 +24,12 @@ namespace SpireChess.Run
         private readonly Random rewardRandom;
         private readonly Random eventRandom;
         private readonly IMapProvider mapProvider;
+        private readonly CoreActivationEvidence coreEvidence = new CoreActivationEvidence();
         private int attemptSequence;
         private int rewardSequence;
         private int choiceSequence;
+        private bool turnTenSnapshotRecorded;
+        private bool runEndedRecorded;
 
         public RunSession(ConfigService configs, Random random)
             : this(
@@ -63,7 +66,13 @@ namespace SpireChess.Run
         public void EnableTelemetry(RunTelemetry telemetry)
         {
             Telemetry = telemetry;
-            Telemetry?.Record("RunStarted", new { seed = State.Seed, floor = State.Floor });
+            Telemetry?.Record("RunStarted", new
+            {
+                seed = State.Seed,
+                floor = State.Floor,
+                runTurn = State.RunTurn,
+                coreClassifierVersion = CoreBuildClassifier.Version
+            });
         }
 
         public RunOperationResult EnterNode(string nodeId)
@@ -105,7 +114,9 @@ namespace SpireChess.Run
             {
                 nodeId = node.Id,
                 nodeType = node.Type.ToString(),
-                contentId = node.PayloadId
+                contentId = node.PayloadId,
+                floor = State.Floor,
+                runTurn = State.RunTurn
             });
 
             switch (node.Type)
@@ -222,7 +233,21 @@ namespace SpireChess.Run
             State.CurrentAttempt.ChoiceCommitted = true;
             State.CurrentAttempt.EffectApplied = true;
             State.LastRewardSummary = candidate.DisplayText;
+            Telemetry?.Record("RewardChoiceResolved", new
+            {
+                choiceId = choice.ChoiceId,
+                selectedCandidateId = candidate.CandidateId,
+                selectedCardId = candidate.CardId,
+                skipped = false,
+                candidates = choice.Candidates.Select(value => new
+                {
+                    value.CandidateId,
+                    cardId = value.CardId,
+                    cardType = value.Type
+                }).ToArray()
+            });
             CompleteRewardChoice(choice.CompletionMode);
+            UpdateCoreProgress();
             return RunOperationResult.Succeed(candidate.DisplayText);
         }
 
@@ -248,6 +273,19 @@ namespace SpireChess.Run
             State.CurrentAttempt.ChoiceCommitted = true;
             State.CurrentAttempt.EffectApplied = true;
             State.LastRewardSummary = "已跳过奖励";
+            Telemetry?.Record("RewardChoiceResolved", new
+            {
+                choiceId = choice.ChoiceId,
+                selectedCandidateId = (string)null,
+                selectedCardId = (string)null,
+                skipped = true,
+                candidates = choice.Candidates.Select(value => new
+                {
+                    value.CandidateId,
+                    cardId = value.CardId,
+                    cardType = value.Type
+                }).ToArray()
+            });
             CompleteRewardChoice(choice.CompletionMode);
             return RunOperationResult.Succeed("已跳过奖励");
         }
@@ -293,6 +331,13 @@ namespace SpireChess.Run
             }
 
             ApplyEventEffects(option.Effects);
+            Telemetry?.Record("EventChoiceResolved", new
+            {
+                eventId,
+                optionId,
+                option.Label,
+                followupRewardTableId = option.FollowupRewardTableId
+            });
             State.PendingEventChoice = null;
             State.CurrentAttempt.ChoiceCommitted = true;
             State.CurrentAttempt.EffectApplied = true;
@@ -450,6 +495,15 @@ namespace SpireChess.Run
             }
 
             State.DequeueCardReward();
+            Telemetry?.Record("RewardChoiceResolved", new
+            {
+                choiceId = reward.RewardInstanceId,
+                selectedCandidateId = reward.ConfigId,
+                selectedCardId = reward.ConfigId,
+                skipped = false,
+                candidates = new[] { reward.ConfigId }
+            });
+            UpdateCoreProgress();
             return RunOperationResult.Succeed($"已领取 {reward.ConfigId}");
         }
 
@@ -467,6 +521,14 @@ namespace SpireChess.Run
             }
 
             ReleaseRewardReservation(reward);
+            Telemetry?.Record("RewardChoiceResolved", new
+            {
+                choiceId = reward.RewardInstanceId,
+                selectedCandidateId = (string)null,
+                selectedCardId = (string)null,
+                skipped = true,
+                candidates = new[] { reward.ConfigId }
+            });
             return RunOperationResult.Succeed($"已跳过 {reward.ConfigId}");
         }
 
@@ -498,12 +560,32 @@ namespace SpireChess.Run
             PendingBattle = null;
             Shop.ApplyPostCombatSurvivorBuffs(result);
             ApplyBattlePermanentDeltas(result);
+            AccumulateBattleCoreEvidence(result.Diagnostics);
+            UpdateCoreProgress();
             Telemetry?.Record("BattleCompleted", new
             {
                 encounterId = LastBattleContext.EncounterId,
+                floor = State.Floor,
+                runTurn = State.RunTurn,
                 winner = result.Winner?.ToString() ?? "Draw",
                 reason = result.OutcomeReason.ToString(),
-                permanentDeltaCount = result.PermanentDeltas.Count
+                playerStartInstanceIds = LastBattleContext.BoardState.Player
+                    .Where(value => value != null)
+                    .Select(value => value.SourceInstanceId)
+                    .Where(value => !string.IsNullOrWhiteSpace(value)).ToArray(),
+                playerSurvivorInstanceIds = result.FinalState.Player
+                    .Where(value => value != null && value.IsAlive)
+                    .Select(value => value.SourceInstanceId)
+                    .Where(value => !string.IsNullOrWhiteSpace(value)).ToArray(),
+                permanentDeltas = result.PermanentDeltas.Select(value => new
+                {
+                    value.SourceInstanceId,
+                    value.Attack,
+                    value.Health,
+                    value.Flourish,
+                    keywords = value.Keywords.ToArray()
+                }).ToArray(),
+                diagnostics = result.Diagnostics
             });
             returnSceneName = LastBattleContext.ReturnSceneName;
             if (!string.IsNullOrWhiteSpace(LastBattleContext.NodeAttemptId))
@@ -522,7 +604,8 @@ namespace SpireChess.Run
                 Shop.ModifyOwnedBattleMinion(
                     delta.SourceInstanceId,
                     delta.Attack,
-                    delta.Health);
+                    delta.Health,
+                    flourish: delta.Flourish);
                 foreach (var keyword in delta.Keywords)
                 {
                     Shop.ModifyOwnedBattleMinion(
@@ -586,6 +669,14 @@ namespace SpireChess.Run
             State.LastRewardSummary = string.Empty;
             LastBattleContext = null;
             LastBattleResult = null;
+            if (node.Type == RunNodeType.Elite)
+            {
+                State.Statistics.ElitesAttempted++;
+            }
+            else if (node.Type == RunNodeType.Boss)
+            {
+                State.Statistics.BossAttempts++;
+            }
         }
 
         private RunOperationResult StartAttemptShop()
@@ -859,7 +950,7 @@ namespace SpireChess.Run
             if (State.Health <= 0)
             {
                 State.Phase = RunPhase.RunLost;
-                State.Statistics.Complete();
+                CompleteRun("Lost");
                 ReleaseOutstandingRewards();
                 return;
             }
@@ -877,7 +968,7 @@ namespace SpireChess.Run
                     : RunPhase.BattleResult;
                 if (State.Phase == RunPhase.RunWon)
                 {
-                    State.Statistics.Complete();
+                    CompleteRun("Won");
                     ReleaseOutstandingRewards();
                 }
 
@@ -1166,22 +1257,259 @@ namespace SpireChess.Run
 
         private void OnShopEvent(ShopEventData eventData)
         {
-            if (eventData != null && eventData.Type == ShopEventType.OnTripleFormed)
+            if (eventData == null)
             {
-                State.Statistics.TriplesFormed++;
+                return;
             }
 
-            if (eventData != null)
+            switch (eventData.Type)
             {
-                Telemetry?.Record("ShopEvent", new
+                case ShopEventType.OnRefresh:
+                    if (eventData.Cost > 0) State.Statistics.RefreshesPaid++;
+                    else State.Statistics.RefreshesFree++;
+                    coreEvidence.Refreshes = Math.Max(
+                        coreEvidence.Refreshes,
+                        Shop.PhaseStats.RefreshCount);
+                    break;
+                case ShopEventType.OnBuy:
+                    if (eventData.Card?.CardType == ShopCardType.Minion)
+                        State.Statistics.MinionsBought++;
+                    break;
+                case ShopEventType.OnSell:
+                    State.Statistics.MinionsSold++;
+                    break;
+                case ShopEventType.OnSpellUsed:
+                    State.Statistics.SpellsUsed++;
+                    coreEvidence.SpellsUsed = Math.Max(
+                        coreEvidence.SpellsUsed,
+                        Shop.PhaseStats.SpellUsedCount);
+                    break;
+                case ShopEventType.OnTavernUpgraded:
+                    State.Statistics.TavernUpgrades++;
+                    break;
+                case ShopEventType.OnTripleFormed:
+                    State.Statistics.TriplesFormed++;
+                    break;
+                case ShopEventType.OnDiscoverResolved:
+                    State.Statistics.TargetedDiscoversUsed++;
+                    break;
+                case ShopEventType.OnShopPhaseEnd:
+                    State.Statistics.GoldWasted += Math.Max(0, eventData.Gold);
+                    break;
+            }
+
+            Telemetry?.Record("ShopEvent", new
+            {
+                type = eventData.Type.ToString(),
+                cardId = eventData.Card?.ConfigId,
+                cardType = eventData.Card?.CardType.ToString(),
+                targetCardId = eventData.TargetCard?.ConfigId,
+                eventData.Cost,
+                eventData.RefreshCount,
+                eventData.TavernTier,
+                gold = eventData.Type == ShopEventType.OnShopPhaseEnd
+                    ? eventData.Gold
+                    : Shop.Gold,
+                freeRefreshes = Shop.FreeRefreshes,
+                discoverCandidateIds = GetPendingDiscoverCandidateIds(),
+                runTurn = State.RunTurn
+            });
+
+            if (eventData.Type == ShopEventType.OnShopPhaseStart ||
+                eventData.Type == ShopEventType.OnRefresh ||
+                eventData.Type == ShopEventType.OnShopPhaseEnd)
+            {
+                RecordShopSnapshot(eventData.Type.ToString(), eventData);
+            }
+
+            UpdateCoreProgress();
+        }
+
+        private void RecordShopSnapshot(string trigger, ShopEventData eventData)
+        {
+            var gold = eventData.Type == ShopEventType.OnShopPhaseEnd
+                ? eventData.Gold
+                : Shop.Gold;
+            var payload = new
+            {
+                trigger,
+                floor = State.Floor,
+                runTurn = State.RunTurn,
+                gold,
+                tavernTier = Shop.TavernTier,
+                refreshCount = Shop.RefreshCount,
+                freeRefreshes = Shop.FreeRefreshes,
+                minionOfferIds = Shop.MinionOffers
+                    .Select(value => value?.Id).ToArray(),
+                spellOfferId = Shop.SpellOffer?.Id,
+                battle = BuildCardSnapshots(Shop.Collection.Battle),
+                bench = BuildCardSnapshots(Shop.Collection.Bench),
+                firstCoreTurn = State.Statistics.FirstCoreTurn,
+                secondCoreTurn = State.Statistics.SecondCoreTurn
+            };
+            Telemetry?.Record("ShopSnapshot", payload);
+            if (eventData.Type == ShopEventType.OnShopPhaseEnd)
+            {
+                RecordTurnTenSnapshotIfNeeded("ShopPhaseEnd");
+            }
+        }
+
+        private void RecordTurnTenSnapshotIfNeeded(string trigger)
+        {
+            if (turnTenSnapshotRecorded || State.RunTurn != 10)
+            {
+                return;
+            }
+
+            turnTenSnapshotRecorded = true;
+            Telemetry?.Record("Turn10Snapshot", new
+            {
+                trigger,
+                floor = State.Floor,
+                runTurn = State.RunTurn,
+                health = State.Health,
+                tavernTier = Shop.TavernTier,
+                battle = BuildCardSnapshots(Shop.Collection.Battle),
+                bench = BuildCardSnapshots(Shop.Collection.Bench),
+                firstCoreTurn = State.Statistics.FirstCoreTurn,
+                secondCoreTurn = State.Statistics.SecondCoreTurn
+            });
+        }
+
+        private string[] GetPendingDiscoverCandidateIds()
+        {
+            if (Shop.PendingDiscover != null)
+            {
+                return Shop.PendingDiscover.Candidates.Select(value => value.Id).ToArray();
+            }
+            if (Shop.PendingChoice != null)
+            {
+                return Shop.PendingChoice.Candidates
+                    .Select(value => value.Minion?.Id ?? value.Spell?.Id ?? value.Target?.ConfigId)
+                    .Where(value => !string.IsNullOrWhiteSpace(value)).ToArray();
+            }
+            return Array.Empty<string>();
+        }
+
+        private static object[] BuildCardSnapshots(
+            IReadOnlyList<ShopCardInstance> cards)
+        {
+            return cards.Select((card, slot) => card == null
+                    ? null
+                    : (object)new
+                    {
+                        slot,
+                        instanceId = card.InstanceId,
+                        cardId = card.ConfigId,
+                        cardType = card.CardType.ToString(),
+                        card.IsGolden,
+                        attack = card.CurrentAttack,
+                        health = card.CurrentHealth,
+                        permanentAttack = card.PermanentAttackBonus,
+                        permanentHealth = card.PermanentHealthBonus,
+                        flourishStacks = card.FlourishStacks,
+                        permanentKeywords = card.PermanentKeywords.OrderBy(value => value).ToArray(),
+                        pendingCombatModifiers = card.PendingCombatModifiers.Select(value => new
+                        {
+                            value.EffectId,
+                            value.Attack,
+                            value.Health,
+                            value.Keyword,
+                            value.AddShield
+                        }).ToArray()
+                    })
+                .ToArray();
+        }
+
+        private void UpdateCoreProgress()
+        {
+            var owned = Shop.Collection.Battle.Concat(Shop.Collection.Bench).ToList();
+            var firstChanged = false;
+            var secondChanged = false;
+            if (!State.Statistics.FirstCoreTurn.HasValue &&
+                CoreBuildClassifier.ContainsAnyCore(owned))
+            {
+                State.Statistics.FirstCoreTurn = State.RunTurn;
+                firstChanged = true;
+            }
+
+            if (!State.Statistics.SecondCoreTurn.HasValue &&
+                CoreBuildClassifier.MatchActivatedBuilds(
+                    Shop.Collection.Battle,
+                    coreEvidence).Count > 0)
+            {
+                State.Statistics.SecondCoreTurn = State.RunTurn;
+                secondChanged = true;
+            }
+
+            if (firstChanged || secondChanged)
+            {
+                Telemetry?.Record("CoreProgress", new
                 {
-                    type = eventData.Type.ToString(),
-                    cardId = eventData.Card?.ConfigId,
-                    eventData.Cost,
-                    eventData.RefreshCount,
-                    eventData.TavernTier
+                    runTurn = State.RunTurn,
+                    firstCoreTurn = State.Statistics.FirstCoreTurn,
+                    secondCoreTurn = State.Statistics.SecondCoreTurn,
+                    activatedBuilds = CoreBuildClassifier.MatchActivatedBuilds(
+                        Shop.Collection.Battle,
+                        coreEvidence).ToArray()
                 });
             }
+        }
+
+        private void AccumulateBattleCoreEvidence(BattleDiagnostics diagnostics)
+        {
+            if (diagnostics == null)
+            {
+                return;
+            }
+
+            var player = diagnostics.Player;
+            coreEvidence.ShieldEvents += player.ShieldsGranted + player.ShieldsLost;
+            coreEvidence.ShieldBenefitEvents += player.ShieldBenefitTriggers;
+            coreEvidence.SummonSuccesses += player.SummonSuccesses;
+            coreEvidence.NonTokenDeathBenefitEvents +=
+                player.NonTokenDeathBenefitTriggers;
+        }
+
+        private void CompleteRun(string result)
+        {
+            State.Statistics.Complete();
+            if (runEndedRecorded)
+            {
+                return;
+            }
+
+            runEndedRecorded = true;
+            var statistics = State.Statistics;
+            Telemetry?.Record("RunEnded", new
+            {
+                result,
+                floorReached = State.Floor,
+                runTurn = State.RunTurn,
+                elapsedMinutes = statistics.Elapsed.TotalMinutes,
+                healthRemaining = State.Health,
+                statistics.BattlesWon,
+                statistics.BattlesNotWon,
+                statistics.ElitesAttempted,
+                statistics.ElitesDefeated,
+                statistics.BossAttempts,
+                statistics.BossesDefeated,
+                statistics.RefreshesPaid,
+                statistics.RefreshesFree,
+                statistics.MinionsBought,
+                statistics.MinionsSold,
+                statistics.SpellsUsed,
+                statistics.TavernUpgrades,
+                statistics.GoldWasted,
+                statistics.TriplesFormed,
+                statistics.TargetedDiscoversUsed,
+                statistics.FirstCoreTurn,
+                statistics.SecondCoreTurn,
+                finalBuildId = CoreBuildClassifier.ClassifyFinalBuild(
+                    Shop.Collection.Battle,
+                    coreEvidence),
+                finalBoard = BuildCardSnapshots(Shop.Collection.Battle)
+            });
         }
 
         private void ResolveCurrentNodeToMap()
@@ -1207,6 +1535,7 @@ namespace SpireChess.Run
 
             State.MapProgress.Resolve(node.Id);
             attempt.NodeResolved = true;
+            RecordTurnTenSnapshotIfNeeded("NodeResolved");
         }
 
         private RewardEntryConfig DrawRewardEntry(IReadOnlyList<RewardEntryConfig> entries)

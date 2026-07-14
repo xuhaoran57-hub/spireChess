@@ -1,0 +1,23 @@
+{
+  "balanceSchemaVersion": "0.2.0",
+  "candidateId": "R1-combined-dotnet",
+  "tuningRound": "R1",
+  "runtime": ".NET 8.0.20",
+  "unityVersion": null,
+  "contentVersion": "5.1.0",
+  "configHash": "162050b7ac1db4936466d4719d41107e6fe7ffd141ece704dc0a8d1431ffae84",
+  "gitCommit": "af0a7f8+dirty",
+  "fixtureVersion": "0.2.0",
+  "coreClassifierVersion": "0.2.0",
+  "s1Battles": 84000,
+  "s0ReplayBattles": 8400,
+  "totalSimulations": 92400,
+  "determinismFailureCount": 0,
+  "totalExceptions": 0,
+  "effectLimitHits": 0,
+  "roundLimits": 0,
+  "outputDummyRoundLimits": 2722,
+  "elapsedSeconds": 30.1553348,
+  "sampleFile": "balance_battle_samples.csv.gz",
+  "sampleFileSha256": "241e78d7da95dc7cb45fc212f1e784100bee6144d6fb014d77c2059a8f0806fe"
+}

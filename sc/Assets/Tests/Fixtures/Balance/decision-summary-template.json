@@ -1,0 +1,17 @@
+{
+  "tuningRound": "R0",
+  "candidateId": "R0-baseline",
+  "seed": 2000,
+  "tester": "",
+  "intendedBuildId": "B01_SHIELD",
+  "failureReason": "",
+  "boringMoment": "",
+  "unfairMoment": "",
+  "decisions": [
+    {
+      "runTurn": 1,
+      "nodeId": "",
+      "summary": ""
+    }
+  ]
+}

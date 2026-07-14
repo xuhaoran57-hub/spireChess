@@ -385,9 +385,21 @@ namespace SpireChess.Run
         public DateTime? CompletedAtUtc { get; internal set; }
         public int BattlesWon { get; internal set; }
         public int BattlesNotWon { get; internal set; }
+        public int ElitesAttempted { get; internal set; }
         public int ElitesDefeated { get; internal set; }
+        public int BossAttempts { get; internal set; }
         public int BossesDefeated { get; internal set; }
         public int TriplesFormed { get; internal set; }
+        public int RefreshesPaid { get; internal set; }
+        public int RefreshesFree { get; internal set; }
+        public int MinionsBought { get; internal set; }
+        public int MinionsSold { get; internal set; }
+        public int SpellsUsed { get; internal set; }
+        public int TavernUpgrades { get; internal set; }
+        public int GoldWasted { get; internal set; }
+        public int TargetedDiscoversUsed { get; internal set; }
+        public int? FirstCoreTurn { get; internal set; }
+        public int? SecondCoreTurn { get; internal set; }
         public TimeSpan Elapsed => (CompletedAtUtc ?? DateTime.UtcNow) - StartedAtUtc;
 
         internal void Complete()

@@ -1,0 +1,9 @@
+changeId,tuningRound,candidateId,targetType,targetId,jsonPath,oldValue,newValue,evidenceMetric,evidenceValue,rootCause,expectedEffect,affectedFixtures,affectedTests,result
+R1-001,R1,R1-combined-dotnet,fixture,D01_MECHANIC_PRESSURE,attack,12/24,8/16,finalSurvivors,0->0,压力板过强,增加机制存活窗口,D01_N|D01_H,StageSixInfrastructureTests,inconclusive
+R1-002,R1,R1-combined-dotnet,scenario,D00_OUTPUT_DUMMY,countsForCompetitiveSafety,true,false,competitiveRoundLimits,2722->0,测量场景污染安全口径,分离测量与竞技告警,D00,StageSixInfrastructureTests,kept
+R1-003,R1,R1-combined-dotnet,minion,fox_den_matriarch,health/goldenHealth,5/10,7/14,B03ScoreRateN/H,0.35%/1.60%->0.40%/2.35%,召唤核心过早死亡,提高核心存活,B03_N|B03_H,fixture-validation,kept
+R1-004,R1,R1-combined-dotnet,minion,ten_thousand_hoof_surge,health/goldenHealth,6/12,8/16,B03ScoreRateN/H,0.35%/1.60%->0.40%/2.35%,召唤核心过早死亡,提高核心存活,B03_N|B03_H,fixture-validation,kept
+R1-005,R1,R1-combined-dotnet,minion,undying_furnace_king,transfer.limit.perCombat,3/6,2/4,B01ScoreRateN/H,91.15%/97.90%->86.20%/96.90%,护盾循环系统性偏强,降低额外承伤次数,B01|B02,MinionPoolV02Tests,kept
+R1-006,R1,R1-combined-dotnet,minion,oathbroken_blade_soul,permanent.limit.perCombat,2/4,1/3,staticScoreRate,no-change,永久成长不应由静态面板验证,降低完整单局滚雪球,B02,StageFiveTests|MinionPoolV02Tests,pending-run-telemetry
+R1-007,R1,R1-combined-dotnet,fixture,B05_SPELL,overlay.attack,2,1,B05ScoreRateN/H,59.10%/49.00%->56.95%/46.60%,法术标准覆盖输出偏高,降低首轮输出,B05_N|B05_H,fixture-validation,kept-threshold-still-fails
+R1-008,R1,R1-combined-dotnet,minion+fixture,star_ring_treasurer,maxTargets/normalShields,1/2,2/3,B06NScoreRate,21.35%->28.10%,普通刷新构筑过弱,增加下一战防御,B06_N,MinionPoolV02Tests,kept

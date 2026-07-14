@@ -139,7 +139,9 @@ namespace SpireChess.Shop
             var triples = ResolveAllTriples();
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnShopPhaseStart,
-                tavernTier: TavernTier));
+                tavernTier: TavernTier,
+                gold: Gold,
+                freeRefreshes: FreeRefreshes));
             ResolveShopTrigger("OnShopPhaseStart");
             RaiseTripleEvents(triples);
             return ShopOperationResult.Succeed();
@@ -195,6 +197,7 @@ namespace SpireChess.Shop
             }
 
             ResolveShopTrigger("OnShopPhaseEnd");
+            var goldWasted = Gold;
             Collection.RemoveTemporarySpells();
             activeShopEffects.Clear();
             perShopEffectUsage.Clear();
@@ -204,7 +207,8 @@ namespace SpireChess.Shop
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnShopPhaseEnd,
                 refreshCount: RefreshCount,
-                tavernTier: TavernTier));
+                tavernTier: TavernTier,
+                gold: goldWasted));
             return ShopOperationResult.Succeed();
         }
 
@@ -245,7 +249,9 @@ namespace SpireChess.Shop
                 ShopEventType.OnRefresh,
                 cost: cost,
                 refreshCount: RefreshCount,
-                tavernTier: TavernTier));
+                tavernTier: TavernTier,
+                gold: Gold,
+                freeRefreshes: FreeRefreshes));
             ResolveShopTrigger("OnRefresh");
             return ShopOperationResult.Succeed();
         }
@@ -916,7 +922,8 @@ namespace SpireChess.Shop
                     card.InstanceId,
                     card.PermanentAttackBonus,
                     card.PermanentHealthBonus,
-                    modifierKeywords);
+                    modifierKeywords,
+                    flourishStacks: card.FlourishStacks);
             }
 
             foreach (var effect in pendingBattleStartEffects)
@@ -1101,7 +1108,8 @@ namespace SpireChess.Shop
             string instanceId,
             int attack,
             int health,
-            string keyword = null)
+            string keyword = null,
+            int flourish = 0)
         {
             if (string.IsNullOrWhiteSpace(instanceId))
             {
@@ -1115,7 +1123,8 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.InvalidTarget);
             }
 
-            if (attack == 0 && health == 0 && string.IsNullOrWhiteSpace(keyword))
+            if (attack == 0 && health == 0 && flourish <= 0 &&
+                string.IsNullOrWhiteSpace(keyword))
             {
                 return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
             }
@@ -1137,6 +1146,8 @@ namespace SpireChess.Shop
             {
                 target.ApplyPermanentStats(attack, health);
             }
+
+            target.ApplyFlourish(flourish);
 
             return ShopOperationResult.Succeed();
         }
@@ -1424,7 +1435,9 @@ namespace SpireChess.Shop
                     permanentHealthBonus: materials.Sum(
                         card => card.PermanentHealthBonus),
                     permanentKeywords: permanentKeywords,
-                    tripleDiscoveryPending: true);
+                    tripleDiscoveryPending: true,
+                    flourishStacks: Math.Min(8, materials.Sum(
+                        card => card.FlourishStacks)));
 
                 if (!Collection.RemoveTripleMaterials(materials) ||
                     !Collection.TryAddToBench(golden, out _))

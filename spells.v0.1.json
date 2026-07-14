@@ -44,11 +44,18 @@
       "useTiming": ["Shop"],
       "rarity": "Common",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_delayed_supply",
       "iconId": "icon_spell_economy",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "delayed_supply_manual",
+          "trigger": "Manual",
+          "action": "ScheduleGold",
+          "value": { "amount": 2, "duration": "ShopPhase" }
+        }
+      ],
       "tags": ["economy", "delayed"],
       "enabled": true,
       "devNote": ""
@@ -62,11 +69,27 @@
       "useTiming": ["Shop"],
       "rarity": "Common",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_temporary_ward",
       "iconId": "icon_spell_defense",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "temporary_ward_manual",
+          "trigger": "Manual",
+          "action": "AddShield",
+          "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "PlayerChoice" },
+          "value": { "duration": "NextCombat", "keyword": "Shield" },
+          "fallbackEffects": [
+            {
+              "id": "temporary_ward_existing_shield",
+              "trigger": "Manual",
+              "action": "ModifyStats",
+              "value": { "attack": 0, "health": 1, "duration": "Permanent" }
+            }
+          ]
+        }
+      ],
       "tags": ["shield", "next_combat"],
       "enabled": true,
       "devNote": ""
@@ -173,11 +196,19 @@
       "useTiming": ["Shop"],
       "rarity": "Uncommon",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_warband_forging",
       "iconId": "icon_spell_growth",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "warband_forging_manual",
+          "trigger": "Manual",
+          "action": "ModifyStats",
+          "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 5, "selector": "PlayerChoiceRace" },
+          "value": { "attack": 1, "health": 1, "duration": "Permanent" }
+        }
+      ],
       "tags": ["permanent_growth", "race"],
       "enabled": true,
       "devNote": ""
@@ -191,11 +222,25 @@
       "useTiming": ["Shop"],
       "rarity": "Uncommon",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_starlight_rebate",
       "iconId": "icon_spell_economy",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "starlight_rebate_activate",
+          "trigger": "Manual",
+          "action": "ActivateCardListeners"
+        },
+        {
+          "id": "starlight_rebate_refresh",
+          "trigger": "OnRefresh",
+          "action": "GainGold",
+          "condition": { "type": "PhaseStatAtLeast", "threshold": 2, "phaseStat": "RefreshesSinceActivation" },
+          "value": { "amount": 1, "duration": "ShopPhase" },
+          "limit": { "perShop": 3 }
+        }
+      ],
       "tags": ["refresh", "economy"],
       "enabled": true,
       "devNote": ""
@@ -209,11 +254,18 @@
       "useTiming": ["Shop"],
       "rarity": "Uncommon",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_prototype_copy",
       "iconId": "icon_spell_copy",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "prototype_copy_manual",
+          "trigger": "Manual",
+          "action": "CopyMinion",
+          "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "PlayerChoice" }
+        }
+      ],
       "tags": ["copy", "triple_helper"],
       "enabled": true,
       "devNote": ""
@@ -227,11 +279,27 @@
       "useTiming": ["Shop"],
       "rarity": "Rare",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_bloodline_awakening",
       "iconId": "icon_spell_growth",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "bloodline_awakening_base",
+          "trigger": "Manual",
+          "action": "ModifyStats",
+          "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "PlayerChoice" },
+          "value": { "attack": 4, "health": 4, "duration": "Permanent" }
+        },
+        {
+          "id": "bloodline_awakening_race_bonus",
+          "trigger": "Manual",
+          "action": "ModifyStats",
+          "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "PlayerChoice" },
+          "condition": { "type": "IsMostCommonMainRace" },
+          "value": { "attack": 2, "health": 2, "duration": "Permanent" }
+        }
+      ],
       "tags": ["permanent_growth", "race"],
       "enabled": true,
       "devNote": ""
@@ -245,11 +313,26 @@
       "useTiming": ["Shop"],
       "rarity": "Rare",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_prebattle_benediction",
       "iconId": "icon_spell_defense",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "prebattle_benediction_manual",
+          "trigger": "OnBattleStart",
+          "action": "AddShield",
+          "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 5, "selector": "None" },
+          "value": { "duration": "NextCombat", "keyword": "Shield" }
+        },
+        {
+          "id": "prebattle_benediction_survivor",
+          "trigger": "OnBattleStart",
+          "action": "SetPostCombatSurvivorBuff",
+          "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 5, "selector": "None" },
+          "value": { "attack": 1, "health": 1, "duration": "Permanent" }
+        }
+      ],
       "tags": ["shield", "next_combat", "permanent_growth"],
       "enabled": true,
       "devNote": ""
@@ -263,11 +346,18 @@
       "useTiming": ["Shop"],
       "rarity": "Rare",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_advanced_discovery",
       "iconId": "icon_spell_discover",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "advanced_discovery_manual",
+          "trigger": "Manual",
+          "action": "DiscoverMinion",
+          "discover": { "cardType": "Minion", "tierMode": "Range", "minTier": 1, "maxTierMode": "CurrentTavernTierPlusOffset", "maxTierOffset": 0, "count": 3, "pick": 1, "includeToken": false, "includeDisabled": false, "requireGolden": false }
+        }
+      ],
       "tags": ["discover_minion", "refresh"],
       "enabled": true,
       "devNote": ""
@@ -281,11 +371,27 @@
       "useTiming": ["Shop"],
       "rarity": "Epic",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_fate_reforging",
       "iconId": "icon_spell_growth",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "fate_reforging_base",
+          "trigger": "Manual",
+          "action": "ModifyStats",
+          "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "PlayerChoice" },
+          "value": { "attack": 8, "health": 8, "duration": "Permanent" }
+        },
+        {
+          "id": "fate_reforging_golden_bonus",
+          "trigger": "Manual",
+          "action": "ModifyStats",
+          "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "PlayerChoice" },
+          "condition": { "type": "IsGolden" },
+          "value": { "attack": 4, "health": 4, "duration": "Permanent" }
+        }
+      ],
       "tags": ["permanent_growth", "golden_bonus"],
       "enabled": true,
       "devNote": ""
@@ -299,11 +405,19 @@
       "useTiming": ["Shop"],
       "rarity": "Epic",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_army_ascension",
       "iconId": "icon_spell_growth",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "army_ascension_manual",
+          "trigger": "Manual",
+          "action": "ModifyStats",
+          "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "includeSelf": false, "includeToken": false, "maxTargets": 5, "selector": "PlayerChoiceRace" },
+          "value": { "attack": 3, "health": 3, "duration": "Permanent" }
+        }
+      ],
       "tags": ["permanent_growth", "race"],
       "enabled": true,
       "devNote": ""
@@ -311,17 +425,24 @@
     {
       "id": "legendary_recruitment",
       "name": "传说招募",
-      "description": "发现一个 5 级随从；若你已有金色随从，发现两个，选择一个获得。",
+      "description": "展示 3 个 5 级随从并选择一个；若你已有金色随从，额外展示一个候选。",
       "tier": 5,
       "spellType": "Discover",
       "useTiming": ["Shop"],
       "rarity": "Epic",
       "cost": 1,
-      "shopEligible": false,
+      "shopEligible": true,
       "artId": "placeholder_spell_legendary_recruitment",
       "iconId": "icon_spell_discover",
       "audioId": "",
-      "effects": [],
+      "effects": [
+        {
+          "id": "legendary_recruitment_manual",
+          "trigger": "Manual",
+          "action": "DiscoverMinion",
+          "discover": { "cardType": "Minion", "tierMode": "Exact", "minTier": 5, "count": 3, "pick": 1, "includeToken": false, "includeDisabled": false, "requireGolden": false }
+        }
+      ],
       "tags": ["discover_minion", "late_game"],
       "enabled": true,
       "devNote": ""

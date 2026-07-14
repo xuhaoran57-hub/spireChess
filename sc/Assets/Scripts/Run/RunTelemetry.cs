@@ -7,6 +7,7 @@ namespace SpireChess.Run
 {
     public sealed class RunTelemetry
     {
+        public const string SchemaVersion = "1";
         private readonly string outputPath;
         private readonly string contentVersion;
         private readonly int seed;
@@ -28,7 +29,7 @@ namespace SpireChess.Run
 
             var entry = new Dictionary<string, object>
             {
-                ["schemaVersion"] = "1",
+                ["schemaVersion"] = SchemaVersion,
                 ["contentVersion"] = contentVersion,
                 ["seed"] = seed,
                 ["timestampUtc"] = DateTime.UtcNow.ToString("O"),

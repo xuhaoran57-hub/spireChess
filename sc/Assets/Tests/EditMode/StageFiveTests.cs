@@ -169,7 +169,7 @@ namespace SpireChess.Tests.EditMode
                 effect => effect.Id == "oathbroken_blade_soul_lost_permanent");
             Assert.That(oathbrokenGrowth.Value.Attack, Is.EqualTo(1));
             Assert.That(oathbrokenGrowth.Value.Duration, Is.EqualTo("Permanent"));
-            Assert.That(oathbrokenGrowth.Limit.PerCombat, Is.EqualTo(2));
+            Assert.That(oathbrokenGrowth.Limit.PerCombat, Is.EqualTo(1));
 
             var tombGuardian = configs.MinionsById["thousand_ring_tomb_guardian"];
             var tombGrowth = tombGuardian.Effects.Single(
@@ -180,10 +180,21 @@ namespace SpireChess.Tests.EditMode
 
             var vinecrown = configs.MinionsById["vinecrown_priest"];
             var vinecrownGrowth = vinecrown.Effects.Single(
-                effect => effect.Id == "vinecrown_priest_token_death_permanent");
-            Assert.That(vinecrownGrowth.Trigger, Is.EqualTo("OnSummonedUnitDeath"));
-            Assert.That(vinecrownGrowth.Value.Attack, Is.EqualTo(1));
-            Assert.That(vinecrownGrowth.Value.Health, Is.EqualTo(1));
+                effect => effect.Id == "vinecrown_priest_flourish");
+            Assert.That(vinecrownGrowth.Trigger, Is.EqualTo("OnFriendlyDeath"));
+            Assert.That(vinecrownGrowth.Action, Is.EqualTo("GainFlourish"));
+            Assert.That(vinecrownGrowth.Condition.Type, Is.EqualTo("TriggerCountAtLeast"));
+            Assert.That(vinecrownGrowth.Condition.Threshold, Is.EqualTo(2));
+            Assert.That(vinecrownGrowth.Value.Count, Is.EqualTo(4));
+            Assert.That(vinecrownGrowth.Limit.PerCombat, Is.EqualTo(1));
+            var goldenVinecrownGrowth = vinecrown.GoldenEffects.Single(
+                effect => effect.Id == "golden_vinecrown_priest_flourish");
+            Assert.That(goldenVinecrownGrowth.Value.Count, Is.EqualTo(8));
+            Assert.That(goldenVinecrownGrowth.Limit.PerCombat, Is.EqualTo(1));
+            Assert.That(new BattleMinionRuntime(
+                vinecrown, flourishStacks: 99).FlourishStacks, Is.EqualTo(4));
+            Assert.That(new BattleMinionRuntime(
+                vinecrown, true, flourishStacks: 99).FlourishStacks, Is.EqualTo(8));
 
             var soulEater = configs.MinionsById["mountain_belly_soul_eater"];
             var soulEaterGrowth = soulEater.Effects.Single(
@@ -191,6 +202,130 @@ namespace SpireChess.Tests.EditMode
             Assert.That(soulEaterGrowth.Condition.Type, Is.EqualTo("CombatWon"));
             Assert.That(soulEaterGrowth.Value.Health, Is.EqualTo(1));
             Assert.That(soulEaterGrowth.Limit.PerCombat, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void SummonBuffs_IncludeTokensAndGoldenHoofCleaveTargetsToken()
+        {
+            var branch = configs.MinionsById["many_branch_invoker"];
+            Assert.That(branch.Effects.Single(value =>
+                value.Id == "many_branch_invoker_summon").Target.IncludeToken, Is.True);
+            Assert.That(branch.GoldenEffects.Single(value =>
+                value.Id == "golden_many_branch_invoker_summon").Target.IncludeToken, Is.True);
+
+            var hoof = configs.MinionsById["ten_thousand_hoof_surge"];
+            Assert.That(hoof.Effects.Single(value =>
+                value.Id == "ten_thousand_hoof_surge_buff").Target.IncludeToken, Is.True);
+            Assert.That(hoof.GoldenEffects.Single(value =>
+                value.Id == "golden_ten_thousand_hoof_surge_buff").Target.IncludeToken, Is.True);
+            Assert.That(hoof.GoldenEffects.Single(value =>
+                value.Id == "golden_ten_thousand_hoof_surge_cleave").Target.IncludeToken, Is.True);
+        }
+
+        [Test]
+        public void SummonedToken_ReceivesBranchHoofAndFlourishBeforeOneImmediateAttack()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+            state.Player[1] = new BattleMinionRuntime(configs.MinionsById["many_branch_invoker"]);
+            state.Player[2] = new BattleMinionRuntime(configs.MinionsById["ten_thousand_hoof_surge"]);
+            state.Player[3] = new BattleMinionRuntime(
+                configs.MinionsById["vinecrown_priest"], flourishStacks: 3);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 0,
+                initialHealth: 100);
+
+            var result = new BattleSimulator(new Random(23), ResolveMinion).Simulate(state);
+            var token = result.FinalState.Player.Single(value => value?.Config.IsToken == true);
+
+            Assert.That(token.CurrentAttack, Is.EqualTo(7));
+            Assert.That(token.CurrentHealth, Is.EqualTo(2));
+            Assert.That(result.Diagnostics.Player.ImmediateAttacks, Is.EqualTo(1));
+            Assert.That(result.Diagnostics.Player.TemporaryAttackGained,
+                Is.GreaterThanOrEqualTo(6));
+        }
+
+        [Test]
+        public void GoldenHoof_GrantsSummonedTokenCleaveAndAttacksOnce()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["ten_thousand_hoof_surge"], true);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 0,
+                initialHealth: 100);
+
+            var result = new BattleSimulator(new Random(29), ResolveMinion).Simulate(state);
+            var token = result.FinalState.Player.Single(value => value?.Config.IsToken == true);
+
+            Assert.That(token.CurrentAttack, Is.EqualTo(5));
+            Assert.That(token.HasCleave, Is.True);
+            Assert.That(result.Diagnostics.Player.ImmediateAttacks, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Vinecrown_GainsOneFlourishAfterTwoDeathsAndBuffsTokensWithNewStack()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+            state.Player[2] = new BattleMinionRuntime(
+                configs.MinionsById["vinecrown_priest"],
+                initialHealth: 100,
+                sourceInstanceId: "vinecrown",
+                flourishStacks: 3);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 0,
+                initialHealth: 100);
+
+            var result = new BattleSimulator(new Random(31), ResolveMinion).Simulate(state);
+            var vinecrown = result.FinalState.Player.Single(value =>
+                value?.SourceInstanceId == "vinecrown");
+            var delta = result.PermanentDeltas.Single(value =>
+                value.SourceInstanceId == "vinecrown");
+            var tokens = result.FinalState.Player.Where(value =>
+                value?.Config.IsToken == true).ToList();
+
+            Assert.That(vinecrown.FlourishStacks, Is.EqualTo(4));
+            Assert.That(delta.Flourish, Is.EqualTo(1));
+            Assert.That(delta.Attack, Is.Zero);
+            Assert.That(delta.Health, Is.Zero);
+            Assert.That(result.Diagnostics.Player.FlourishGained, Is.EqualTo(1));
+            Assert.That(tokens, Has.Count.EqualTo(2));
+            Assert.That(tokens, Has.All.Matches<BattleMinionRuntime>(value =>
+                value.CurrentAttack == 5));
+        }
+
+        [Test]
+        public void VinecrownTriple_SumsFlourishAndCapsGoldenAtEight()
+        {
+            var shop = CreateShop();
+            Assert.That(shop.StartRound(1).Success, Is.True);
+            var vinecrown = configs.MinionsById["vinecrown_priest"];
+
+            Assert.That(shop.ClaimRewardMinion(vinecrown).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, vinecrown.Id), 0).Success, Is.True);
+            Assert.That(shop.ModifyOwnedBattleMinion(
+                shop.Collection.Battle[0].InstanceId, 0, 0, flourish: 4).Success, Is.True);
+
+            Assert.That(shop.ClaimRewardMinion(vinecrown).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, vinecrown.Id), 1).Success, Is.True);
+            Assert.That(shop.ModifyOwnedBattleMinion(
+                shop.Collection.Battle[1].InstanceId, 0, 0, flourish: 4).Success, Is.True);
+
+            Assert.That(shop.ClaimRewardMinion(vinecrown).Success, Is.True);
+            var golden = shop.Collection.Bench.Single(value =>
+                value?.ConfigId == vinecrown.Id);
+            Assert.That(golden.IsGolden, Is.True);
+            Assert.That(golden.FlourishStacks, Is.EqualTo(8));
         }
 
         [Test]

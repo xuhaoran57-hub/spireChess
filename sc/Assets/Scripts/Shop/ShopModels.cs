@@ -87,7 +87,8 @@ namespace SpireChess.Shop
             int permanentHealthBonus,
             IEnumerable<string> permanentKeywords,
             bool tripleDiscoveryPending,
-            bool expiresAtShopEnd)
+            bool expiresAtShopEnd,
+            int flourishStacks)
         {
             InstanceId = instanceId;
             CardType = cardType;
@@ -101,6 +102,7 @@ namespace SpireChess.Shop
             PermanentKeywords = permanentKeywordsSet;
             TripleDiscoveryPending = tripleDiscoveryPending;
             ExpiresAtShopEnd = expiresAtShopEnd;
+            FlourishStacks = Math.Max(0, Math.Min(isGolden ? 8 : 4, flourishStacks));
         }
 
         public string InstanceId { get; }
@@ -111,6 +113,7 @@ namespace SpireChess.Shop
         public bool IsGolden { get; }
         public int PermanentAttackBonus { get; private set; }
         public int PermanentHealthBonus { get; private set; }
+        public int FlourishStacks { get; private set; }
         private readonly HashSet<string> permanentKeywordsSet;
         public IReadOnlyCollection<string> PermanentKeywords { get; }
         public bool TripleDiscoveryPending { get; internal set; }
@@ -137,7 +140,8 @@ namespace SpireChess.Shop
             int permanentAttackBonus = 0,
             int permanentHealthBonus = 0,
             IEnumerable<string> permanentKeywords = null,
-            bool tripleDiscoveryPending = false)
+            bool tripleDiscoveryPending = false,
+            int flourishStacks = 0)
         {
             return new ShopCardInstance(
                 instanceId,
@@ -149,7 +153,8 @@ namespace SpireChess.Shop
                 permanentHealthBonus,
                 permanentKeywords,
                 tripleDiscoveryPending,
-                false);
+                false,
+                flourishStacks);
         }
 
         public static ShopCardInstance CreateSpell(
@@ -167,7 +172,8 @@ namespace SpireChess.Shop
                 0,
                 null,
                 false,
-                expiresAtShopEnd);
+                expiresAtShopEnd,
+                0);
         }
 
         internal void ApplyPermanentStats(int attack, int health)
@@ -179,6 +185,16 @@ namespace SpireChess.Shop
 
             PermanentAttackBonus += attack;
             PermanentHealthBonus += health;
+        }
+
+        internal void ApplyFlourish(int amount)
+        {
+            if (CardType != ShopCardType.Minion || amount <= 0)
+            {
+                return;
+            }
+
+            FlourishStacks = Math.Min(IsGolden ? 8 : 4, FlourishStacks + amount);
         }
 
         internal bool HasEffectiveKeyword(string keyword)
@@ -228,7 +244,9 @@ namespace SpireChess.Shop
             int refreshCount = 0,
             int previousTavernTier = 0,
             int tavernTier = 0,
-            ShopCardInstance targetCard = null)
+            ShopCardInstance targetCard = null,
+            int gold = 0,
+            int freeRefreshes = 0)
         {
             Type = type;
             Card = card;
@@ -237,6 +255,8 @@ namespace SpireChess.Shop
             PreviousTavernTier = previousTavernTier;
             TavernTier = tavernTier;
             TargetCard = targetCard;
+            Gold = gold;
+            FreeRefreshes = freeRefreshes;
         }
 
         public ShopEventType Type { get; }
@@ -246,6 +266,8 @@ namespace SpireChess.Shop
         public int PreviousTavernTier { get; }
         public int TavernTier { get; }
         public ShopCardInstance TargetCard { get; }
+        public int Gold { get; }
+        public int FreeRefreshes { get; }
     }
 
     public sealed class ShopDiscoverState

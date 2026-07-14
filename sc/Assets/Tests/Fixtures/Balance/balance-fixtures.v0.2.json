@@ -1,0 +1,92 @@
+{
+  "fixtureVersion": "0.2.0",
+  "coreClassifierVersion": "0.2.1",
+  "builds": [
+    {
+      "buildId": "B01_SHIELD",
+      "slots": [
+        { "slot": 0, "minionId": "shieldwall_furnace_keeper", "permanentAttackBonus": 2, "permanentHealthBonus": 5, "expectedNormalAttack": 3, "expectedNormalHealth": 9, "expectedHighAttack": 6, "expectedHighHealth": 18 },
+        { "slot": 1, "minionId": "resonance_bell_guard", "permanentAttackBonus": 4, "permanentHealthBonus": 5, "expectedNormalAttack": 6, "expectedNormalHealth": 10, "expectedHighAttack": 12, "expectedHighHealth": 20 },
+        { "slot": 2, "minionId": "molten_core_standard", "permanentAttackBonus": 8, "permanentHealthBonus": 3, "expectedNormalAttack": 11, "expectedNormalHealth": 7, "expectedHighAttack": 22, "expectedHighHealth": 14 },
+        { "slot": 3, "minionId": "hearth_core_aegis_officer", "permanentAttackBonus": 4, "permanentHealthBonus": 5, "expectedNormalAttack": 8, "expectedNormalHealth": 11, "expectedHighAttack": 16, "expectedHighHealth": 22 },
+        { "slot": 4, "minionId": "undying_furnace_king", "permanentAttackBonus": 6, "permanentHealthBonus": 5, "expectedNormalAttack": 12, "expectedNormalHealth": 13, "expectedHighAttack": 24, "expectedHighHealth": 26 }
+      ]
+    },
+    {
+      "buildId": "B02_BREAK",
+      "slots": [
+        { "slot": 0, "minionId": "oathbroken_blade_soul", "permanentAttackBonus": 8, "permanentHealthBonus": 2, "expectedNormalAttack": 16, "expectedNormalHealth": 7, "expectedHighAttack": 32, "expectedHighHealth": 14 },
+        { "slot": 1, "minionId": "ember_engraver", "permanentAttackBonus": 2, "permanentHealthBonus": 3, "expectedNormalAttack": 4, "expectedNormalHealth": 6, "expectedHighAttack": 8, "expectedHighHealth": 12 },
+        { "slot": 2, "minionId": "undying_furnace_king", "permanentAttackBonus": 3, "permanentHealthBonus": 2, "expectedNormalAttack": 9, "expectedNormalHealth": 10, "expectedHighAttack": 18, "expectedHighHealth": 20 },
+        { "slot": 3, "minionId": "counterflow_smith", "permanentAttackBonus": 3, "permanentHealthBonus": 2, "expectedNormalAttack": 6, "expectedNormalHealth": 6, "expectedHighAttack": 12, "expectedHighHealth": 12 },
+        { "slot": 4, "minionId": "cracked_armor_avenger", "permanentAttackBonus": 5, "permanentHealthBonus": 2, "expectedNormalAttack": 10, "expectedNormalHealth": 6, "expectedHighAttack": 20, "expectedHighHealth": 12 }
+      ]
+    },
+    {
+      "buildId": "B03_SUMMON",
+      "slots": [
+        { "slot": 0, "minionId": "fox_den_matriarch", "permanentAttackBonus": 4, "permanentHealthBonus": 5, "expectedNormalAttack": 8, "expectedNormalHealth": 10, "expectedHighAttack": 16, "expectedHighHealth": 20 },
+        { "slot": 1, "minionId": "hundred_song_herd", "permanentAttackBonus": 3, "permanentHealthBonus": 4, "expectedNormalAttack": 7, "expectedNormalHealth": 8, "expectedHighAttack": 14, "expectedHighHealth": 16 },
+        { "slot": 2, "minionId": "ten_thousand_hoof_surge", "permanentAttackBonus": 5, "permanentHealthBonus": 4, "expectedNormalAttack": 12, "expectedNormalHealth": 12, "expectedHighAttack": 24, "expectedHighHealth": 24 },
+        { "slot": 3, "minionId": "many_branch_invoker", "permanentAttackBonus": 5, "permanentHealthBonus": 4, "expectedNormalAttack": 7, "expectedNormalHealth": 8, "expectedHighAttack": 14, "expectedHighHealth": 16 },
+        { "slot": 4, "minionId": "vinecrown_priest", "permanentAttackBonus": 4, "permanentHealthBonus": 3, "normalFlourishStacks": 2, "highFlourishStacks": 4, "expectedNormalAttack": 7, "expectedNormalHealth": 9, "expectedHighAttack": 14, "expectedHighHealth": 18 }
+      ]
+    },
+    {
+      "buildId": "B04_DEATH",
+      "slots": [
+        { "slot": 0, "minionId": "rootbound_soul_guide", "permanentAttackBonus": 2, "permanentHealthBonus": 1, "expectedNormalAttack": 5, "expectedNormalHealth": 6, "expectedHighAttack": 10, "expectedHighHealth": 12 },
+        { "slot": 1, "minionId": "rotleaf_heir", "permanentAttackBonus": 3, "permanentHealthBonus": 2, "expectedNormalAttack": 5, "expectedNormalHealth": 6, "expectedHighAttack": 10, "expectedHighHealth": 12 },
+        { "slot": 2, "minionId": "ancient_moss_hatchling", "permanentAttackBonus": 5, "permanentHealthBonus": 4, "expectedNormalAttack": 8, "expectedNormalHealth": 9, "expectedHighAttack": 16, "expectedHighHealth": 18 },
+        { "slot": 3, "minionId": "ancient_mountain_spirit", "permanentAttackBonus": 6, "permanentHealthBonus": 4, "expectedNormalAttack": 12, "expectedNormalHealth": 13, "expectedHighAttack": 24, "expectedHighHealth": 26 },
+        { "slot": 4, "minionId": "world_eating_final_bloom", "permanentAttackBonus": 6, "permanentHealthBonus": 4, "expectedNormalAttack": 10, "expectedNormalHealth": 16, "expectedHighAttack": 20, "expectedHighHealth": 32 }
+      ]
+    },
+    {
+      "buildId": "B05_SPELL",
+      "slots": [
+        { "slot": 0, "minionId": "glimmer_mage", "permanentAttackBonus": 7, "permanentHealthBonus": 12, "expectedNormalAttack": 9, "expectedNormalHealth": 13, "expectedHighAttack": 18, "expectedHighHealth": 26 },
+        { "slot": 1, "minionId": "rune_ward_reader", "permanentAttackBonus": 8, "permanentHealthBonus": 8, "expectedNormalAttack": 9, "expectedNormalHealth": 12, "expectedHighAttack": 18, "expectedHighHealth": 24 },
+        { "slot": 2, "minionId": "echo_starchanter", "permanentAttackBonus": 10, "permanentHealthBonus": 9, "expectedNormalAttack": 13, "expectedNormalHealth": 12, "expectedHighAttack": 26, "expectedHighHealth": 24 },
+        { "slot": 3, "minionId": "secret_page_refractor", "permanentAttackBonus": 10, "permanentHealthBonus": 9, "expectedNormalAttack": 13, "expectedNormalHealth": 13, "expectedHighAttack": 26, "expectedHighHealth": 26 },
+        { "slot": 4, "minionId": "falling_star_prophet", "permanentAttackBonus": 15, "permanentHealthBonus": 10, "expectedNormalAttack": 21, "expectedNormalHealth": 16, "expectedHighAttack": 42, "expectedHighHealth": 32 }
+      ],
+      "normalOverlay": [
+        { "slot": 0, "keywords": ["Shield"] },
+        { "slot": 1, "attack": 1, "health": 4 }
+      ],
+      "highOverlay": [
+        { "slot": 0, "keywords": ["Shield"] },
+        { "slot": 1, "attack": 1, "health": 4 },
+        { "slot": 2, "attack": 1, "health": 4 }
+      ]
+    },
+    {
+      "buildId": "B06_REFRESH",
+      "slots": [
+        { "slot": 0, "minionId": "stardust_attendant", "permanentAttackBonus": 7, "permanentHealthBonus": 7, "expectedNormalAttack": 8, "expectedNormalHealth": 10, "expectedHighAttack": 16, "expectedHighHealth": 20 },
+        { "slot": 1, "minionId": "star_etched_timekeeper", "permanentAttackBonus": 6, "permanentHealthBonus": 6, "expectedNormalAttack": 8, "expectedNormalHealth": 9, "expectedHighAttack": 16, "expectedHighHealth": 18 },
+        { "slot": 2, "minionId": "fate_track_recorder", "permanentAttackBonus": 7, "permanentHealthBonus": 7, "expectedNormalAttack": 9, "expectedNormalHealth": 12, "expectedHighAttack": 18, "expectedHighHealth": 24 },
+        { "slot": 3, "minionId": "star_ring_treasurer", "permanentAttackBonus": 7, "permanentHealthBonus": 7, "expectedNormalAttack": 11, "expectedNormalHealth": 13, "expectedHighAttack": 22, "expectedHighHealth": 26 },
+        { "slot": 4, "minionId": "sky_covenant_bearer", "permanentAttackBonus": 8, "permanentHealthBonus": 8, "expectedNormalAttack": 12, "expectedNormalHealth": 16, "expectedHighAttack": 24, "expectedHighHealth": 32 }
+      ],
+      "normalOverlay": [
+        { "slot": 0, "keywords": ["Shield"] },
+        { "slot": 3, "keywords": ["Shield"] },
+        { "slot": 4, "keywords": ["Shield"] }
+      ],
+      "highOverlay": [
+        { "slot": 0, "keywords": ["Shield"] },
+        { "slot": 1, "keywords": ["Shield"] },
+        { "slot": 2, "keywords": ["Shield"] },
+        { "slot": 3, "keywords": ["Shield"] },
+        { "slot": 4, "keywords": ["Shield"] }
+      ]
+    }
+  ],
+  "dummies": [
+    { "id": "D00_OUTPUT_DUMMY", "minionId": "wandering_swordsman", "attack": 0, "health": 500 },
+    { "id": "D01_MECHANIC_PRESSURE_N", "minionId": "wandering_swordsman", "attack": 8, "health": 500 },
+    { "id": "D01_MECHANIC_PRESSURE_H", "minionId": "wandering_swordsman", "attack": 16, "health": 1000 }
+  ]
+}

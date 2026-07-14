@@ -21,6 +21,8 @@ namespace SpireChess.Battle
         private int processedEffectCount;
         private long nextSummonEventId;
         private bool isDrainingEffects;
+        private int currentRound;
+        private BattleDiagnostics diagnostics;
         private const int MaxEffectEvents = 2048;
 
         public BattleSimulator()
@@ -61,6 +63,8 @@ namespace SpireChess.Battle
             processedEffectCount = 0;
             nextSummonEventId = 0;
             isDrainingEffects = false;
+            currentRound = 0;
+            diagnostics = new BattleDiagnostics();
 
             AddStep(state, steps, log, new[] { "战斗开始。" });
 
@@ -77,6 +81,7 @@ namespace SpireChess.Battle
 
             while (!battleOver && round <= MaxRounds)
             {
+                currentRound = round;
                 AddStep(state, steps, log, new[] { $"第 {round} 轮。" });
 
                 var playerActorsThatActed = new HashSet<BattleMinionRuntime>();
@@ -163,13 +168,16 @@ namespace SpireChess.Battle
             DrainEffectQueue(state, combatEndLog, combatEndActions);
             AddStep(state, steps, log, combatEndLog);
             ResolvePendingActions(state, combatEndActions, log, steps);
+            diagnostics.RoundCount = Math.Min(round - 1, MaxRounds);
+            diagnostics.ProcessedEffectCount = processedEffectCount;
             return new BattleSimulationResult(
                 state,
                 winner,
                 outcomeReason,
                 log,
                 steps ?? new List<BattleStep>(),
-                permanentDeltas.Values.OrderBy(value => value.SourceInstanceId));
+                permanentDeltas.Values.OrderBy(value => value.SourceInstanceId),
+                diagnostics);
         }
 
         private void ResolveAttackStep(
@@ -281,6 +289,14 @@ namespace SpireChess.Battle
             log.Add(isImmediateAttack
                 ? $"{BuildSideName(attackerSide)} {attacker.Name} 立即攻击 {target.Name}。"
                 : $"{BuildSideName(attackerSide)} {attacker.Name} 攻击 {target.Name}。");
+            if (isImmediateAttack)
+            {
+                diagnostics.For(attackerSide).ImmediateAttacks++;
+            }
+            else
+            {
+                diagnostics.For(attackerSide).NormalAttacks++;
+            }
 
             EnqueueSourceEffects(
                 attacker,
@@ -302,14 +318,25 @@ namespace SpireChess.Battle
                 .Where(value => value != null)
                 .ToDictionary(value => value, value => value.HasShield);
 
-            target.TakeDamage(attackerDamage, log);
+            ApplyDamage(
+                attackerSide,
+                GetOpposingSide(attackerSide),
+                target,
+                attackerDamage,
+                log);
             splashTargetIndexes = ResolveCleave(
+                attackerSide,
                 attacker,
                 targets,
                 targetIndex,
                 attackerDamage,
                 log);
-            attacker.TakeDamage(counterDamage, log);
+            ApplyDamage(
+                GetOpposingSide(attackerSide),
+                attackerSide,
+                attacker,
+                counterDamage,
+                log);
 
             foreach (var pair in shieldState)
             {
@@ -384,6 +411,7 @@ namespace SpireChess.Battle
         }
 
         private List<int> ResolveCleave(
+            BattleSide attackerSide,
             BattleMinionRuntime attacker,
             IList<BattleMinionRuntime> targets,
             int targetIndex,
@@ -421,6 +449,7 @@ namespace SpireChess.Battle
             }
 
             ApplyCleaveDamage(
+                attackerSide,
                 attacker,
                 targets,
                 targetIndex - 1,
@@ -428,6 +457,7 @@ namespace SpireChess.Battle
                 splashTargetIndexes,
                 log);
             ApplyCleaveDamage(
+                attackerSide,
                 attacker,
                 targets,
                 targetIndex + 1,
@@ -437,7 +467,8 @@ namespace SpireChess.Battle
             return splashTargetIndexes;
         }
 
-        private static void ApplyCleaveDamage(
+        private void ApplyCleaveDamage(
+            BattleSide attackerSide,
             BattleMinionRuntime attacker,
             IList<BattleMinionRuntime> targets,
             int targetIndex,
@@ -457,8 +488,55 @@ namespace SpireChess.Battle
             }
 
             splashTargetIndexes.Add(targetIndex);
+            diagnostics.For(attackerSide).CleaveHits++;
             log.Add($"{attacker.Name} 的溅射对 {target.Name} 造成 {damage} 点伤害。");
-            target.TakeDamage(damage, log);
+            ApplyDamage(
+                attackerSide,
+                GetOpposingSide(attackerSide),
+                target,
+                damage,
+                log);
+        }
+
+        private void ApplyDamage(
+            BattleSide sourceSide,
+            BattleSide targetSide,
+            BattleMinionRuntime target,
+            int amount,
+            IList<string> log)
+        {
+            if (target == null || amount <= 0 || !target.IsAlive)
+            {
+                return;
+            }
+
+            var source = diagnostics.For(sourceSide);
+            var targetDiagnostics = diagnostics.For(targetSide);
+            var hadShield = target.HasShield;
+            var healthBefore = target.CurrentHealth;
+            target.TakeDamage(amount, log);
+            var effectiveDamage = hadShield
+                ? 0
+                : Math.Min(amount, Math.Max(0, healthBefore));
+
+            if (currentRound == 0)
+            {
+                source.OpeningRawDamage += amount;
+                source.OpeningEffectiveDamage += effectiveDamage;
+                source.RoundOneRawDamage += amount;
+                source.RoundOneEffectiveDamage += effectiveDamage;
+            }
+            else if (currentRound == 1)
+            {
+                source.RoundOneRawDamage += amount;
+                source.RoundOneEffectiveDamage += effectiveDamage;
+            }
+
+            if (hadShield && !target.HasShield)
+            {
+                targetDiagnostics.ShieldsLost++;
+                targetDiagnostics.ShieldDamageBlocks++;
+            }
         }
 
         private void ResolveDeathEffects(
@@ -662,12 +740,15 @@ namespace SpireChess.Battle
             {
                 while (effectQueue.Count > 0)
                 {
-                    if (++processedEffectCount > MaxEffectEvents)
+                    if (processedEffectCount >= MaxEffectEvents)
                     {
+                        diagnostics.HitEffectLimit = true;
                         effectQueue.Clear();
                         log.Add("效果队列超过 2048 个事件，已终止后续效果结算。");
                         break;
                     }
+
+                    processedEffectCount++;
 
                     var pending = effectQueue.Dequeue();
                     if (!CanExecuteEffect(state, pending))
@@ -768,6 +849,15 @@ namespace SpireChess.Battle
             PendingBattleActions pendingActions)
         {
             var effect = pending.Effect;
+            if (effect.Trigger == "OnShieldLost" && effect.Action != "AddShield")
+            {
+                diagnostics.For(pending.Side).ShieldBenefitTriggers++;
+            }
+            if (effect.Trigger == "OnFriendlyDeath" &&
+                pending.Subject != null && !pending.Subject.Config.IsToken)
+            {
+                diagnostics.For(pending.Side).NonTokenDeathBenefitTriggers++;
+            }
             if (effect.Action == "SummonToken")
             {
                 var death = pending.Death ?? new DeathRecord(
@@ -811,10 +901,28 @@ namespace SpireChess.Battle
                 var difference = Math.Max(0, enemyAttack - pending.Source.CurrentAttack);
                 var cap = Math.Max(0, effect.Value?.Amount ?? 0);
                 var gainedAttack = Math.Min(difference, cap);
-                pending.Source.AddTemporaryStats(gainedAttack, 0, log);
+                AddTemporaryStats(
+                    pending.Side,
+                    pending.Source,
+                    gainedAttack,
+                    0,
+                    log);
                 if (gainedAttack >= Math.Max(1, effect.Value?.Count ?? int.MaxValue))
                 {
                     pending.Source.TryAddKeyword(effect.Value?.Keyword, log);
+                }
+                return;
+            }
+
+            if (effect.Action == "GainFlourish")
+            {
+                var gained = pending.Source.GainFlourish(
+                    Math.Max(0, effect.Value?.Amount ?? 0),
+                    Math.Max(0, effect.Value?.Count ?? 0));
+                if (gained > 0)
+                {
+                    log.Add($"{pending.Source.Name} 获得 {gained} 层繁茂，当前为 {pending.Source.FlourishStacks} 层。");
+                    AddPermanentFlourish(pending.Side, pending.Source, gained);
                 }
                 return;
             }
@@ -842,7 +950,9 @@ namespace SpireChess.Battle
                              IsValidEffectTarget(value, targetConfig) &&
                              !selectedSet.Contains(value)))
                 {
-                    target.AddTemporaryStats(
+                    AddTemporaryStats(
+                        pending.Side,
+                        target,
                         effect.Value?.Attack ?? 0,
                         effect.Value?.Health ?? 0,
                         log);
@@ -856,16 +966,19 @@ namespace SpireChess.Battle
                 switch (effect.Action)
                 {
                     case "ModifyStats":
-                        var attack = effect.Value?.Resource == "SubjectAttack"
-                            ? Math.Max(0, pending.Subject?.CurrentAttack ?? 0)
-                            : effect.Value?.Attack ?? 0;
+                        var attack = effect.Value?.Attack ?? 0;
+                        if (effect.Value?.Resource == "SubjectAttack")
+                        {
+                            attack = Math.Max(0, pending.Subject?.CurrentAttack ?? 0);
+                        }
+                        else if (effect.Value?.Resource == "SourceFlourish")
+                        {
+                            attack = Math.Max(0, pending.Source.FlourishStacks);
+                        }
                         var health = effect.Value?.Health ?? 0;
-                        target.AddTemporaryStats(
-                            attack,
-                            health,
-                            log);
                         if (effect.Value?.Duration == "Permanent")
                         {
+                            target.AddTemporaryStats(attack, health, log);
                             AddPermanentDelta(
                                 pending.Side,
                                 target,
@@ -873,11 +986,26 @@ namespace SpireChess.Battle
                                 health,
                                 null);
                         }
+                        else
+                        {
+                            AddTemporaryStats(
+                                GetRuntimeSide(state, target, pending.Side),
+                                target,
+                                attack,
+                                health,
+                                log);
+                        }
                         break;
                     case "AddShield":
                         if (target.TryAddShield(log))
                         {
                             var side = GetRuntimeSide(state, target, pending.Side);
+                            diagnostics.For(side).ShieldsGranted++;
+                            if (effect.Id != null &&
+                                effect.Id.Contains("undying_furnace_king_transfer"))
+                            {
+                                diagnostics.For(pending.Side).FurnaceTransfers++;
+                            }
                             EnqueueObservedEffects(
                                 state,
                                 side,
@@ -890,6 +1018,7 @@ namespace SpireChess.Battle
                         if (target.TryRemoveShield(log))
                         {
                             var side = GetRuntimeSide(state, target, pending.Side);
+                            diagnostics.For(side).ShieldsLost++;
                             EnqueueObservedEffects(
                                 state,
                                 side,
@@ -899,15 +1028,22 @@ namespace SpireChess.Battle
                         }
                         break;
                     case "AddKeyword":
-                        if (target.TryAddKeyword(effect.Value?.Keyword, log) &&
-                            effect.Value?.Duration == "Permanent")
+                        if (target.TryAddKeyword(effect.Value?.Keyword, log))
                         {
-                            AddPermanentDelta(
-                                pending.Side,
-                                target,
-                                0,
-                                0,
-                                effect.Value.Keyword);
+                            if (effect.Value?.Keyword == "Shield")
+                            {
+                                diagnostics.For(GetRuntimeSide(state, target, pending.Side))
+                                    .ShieldsGranted++;
+                            }
+                            if (effect.Value?.Duration == "Permanent")
+                            {
+                                AddPermanentDelta(
+                                    pending.Side,
+                                    target,
+                                    0,
+                                    0,
+                                    effect.Value.Keyword);
+                            }
                         }
                         break;
                     case "DealDamage":
@@ -1073,6 +1209,23 @@ namespace SpireChess.Battle
             }
         }
 
+        private void AddTemporaryStats(
+            BattleSide side,
+            BattleMinionRuntime target,
+            int attack,
+            int health,
+            IList<string> log)
+        {
+            if (target == null || !target.IsAlive || (attack == 0 && health == 0))
+            {
+                return;
+            }
+
+            target.AddTemporaryStats(attack, health, log);
+            diagnostics.For(side).TemporaryAttackGained += Math.Max(0, attack);
+            diagnostics.For(side).TemporaryHealthGained += Math.Max(0, health);
+        }
+
         private void ApplyEffectDamage(
             BattleBoardState state,
             PendingBattleEffect pending,
@@ -1086,9 +1239,9 @@ namespace SpireChess.Battle
                 return;
             }
 
-            var hadShield = target.HasShield;
-            target.TakeDamage(amount, log);
             var targetSide = GetRuntimeSide(state, target, GetOpposingSide(pending.Side));
+            var hadShield = target.HasShield;
+            ApplyDamage(pending.Side, targetSide, target, amount, log);
             if (hadShield && !target.HasShield)
             {
                 EnqueueObservedEffects(
@@ -1113,8 +1266,15 @@ namespace SpireChess.Battle
             int health,
             string keyword)
         {
-            if (effectSide != BattleSide.Player || target == null ||
-                target.Config.IsToken || string.IsNullOrWhiteSpace(target.SourceInstanceId))
+            if (target == null || target.Config.IsToken)
+            {
+                return;
+            }
+
+            diagnostics.For(effectSide).PermanentAttackDelta += attack;
+            diagnostics.For(effectSide).PermanentHealthDelta += health;
+            if (effectSide != BattleSide.Player ||
+                string.IsNullOrWhiteSpace(target.SourceInstanceId))
             {
                 return;
             }
@@ -1126,6 +1286,32 @@ namespace SpireChess.Battle
             }
 
             delta.Add(attack, health, keyword);
+        }
+
+        private void AddPermanentFlourish(
+            BattleSide effectSide,
+            BattleMinionRuntime target,
+            int amount)
+        {
+            if (target == null || target.Config.IsToken || amount <= 0)
+            {
+                return;
+            }
+
+            diagnostics.For(effectSide).FlourishGained += amount;
+            if (effectSide != BattleSide.Player ||
+                string.IsNullOrWhiteSpace(target.SourceInstanceId))
+            {
+                return;
+            }
+
+            if (!permanentDeltas.TryGetValue(target.SourceInstanceId, out var delta))
+            {
+                delta = new BattlePermanentDelta(target.SourceInstanceId);
+                permanentDeltas.Add(target.SourceInstanceId, delta);
+            }
+
+            delta.AddFlourish(amount);
         }
 
         private static BattleSide GetRuntimeSide(
@@ -1176,6 +1362,9 @@ namespace SpireChess.Battle
                 : resolveMinionConfig?.Invoke(resourceId);
             if (tokenConfig == null || !tokenConfig.IsToken)
             {
+                var failedAttempts = Math.Max(1, effect.Value?.Amount ?? 1);
+                diagnostics.For(death.Side).SummonAttempts += failedAttempts;
+                diagnostics.For(death.Side).SummonFailures += failedAttempts;
                 log.Add($"{death.Minion.Name} 的召唤失败：找不到 Token 配置 {resourceId}。");
                 return;
             }
@@ -1198,14 +1387,17 @@ namespace SpireChess.Battle
             var effect = pending.Effect;
             var tokenConfig = pending.TokenConfig;
             var row = state.GetRow(death.Side);
+            diagnostics.For(death.Side).SummonAttempts++;
             var slotIndex = FindSummonSlot(row, death.OriginalIndex);
             if (slotIndex < 0)
             {
+                diagnostics.For(death.Side).SummonFailures++;
                 log.Add($"{death.Minion.Name} 召唤 {tokenConfig.Name} 失败：没有空位。");
-                ResolveFallbackEffects(row, effect.FallbackEffects, log);
+                ResolveFallbackEffects(death.Side, row, effect.FallbackEffects, log);
             }
             else
             {
+                diagnostics.For(death.Side).SummonSuccesses++;
                 var attackOverride = effect.Value != null && effect.Value.Attack > 0
                     ? (int?)(effect.Value.Attack * death.Minion.SummonEffectMultiplier)
                     : null;
@@ -1259,6 +1451,7 @@ namespace SpireChess.Battle
         }
 
         private void ResolveFallbackEffects(
+            BattleSide side,
             IReadOnlyList<BattleMinionRuntime> row,
             IEnumerable<EffectConfig> effects,
             IList<string> log)
@@ -1282,7 +1475,9 @@ namespace SpireChess.Battle
                 var targetIndex = candidates.Count == 1
                     ? candidates[0]
                     : candidates[random.Next(candidates.Count)];
-                row[targetIndex].AddTemporaryStats(
+                AddTemporaryStats(
+                    side,
+                    row[targetIndex],
                     effect.Value.Attack,
                     effect.Value.Health,
                     log);
@@ -1337,7 +1532,10 @@ namespace SpireChess.Battle
                          .Where(allowed.Contains)
                          .Distinct())
             {
-                pending.Source.TryAddKeyword(keyword, log);
+                if (pending.Source.TryAddKeyword(keyword, log) && keyword == "Shield")
+                {
+                    diagnostics.For(pending.Side).ShieldsGranted++;
+                }
             }
         }
 
@@ -1390,7 +1588,7 @@ namespace SpireChess.Battle
             return -1;
         }
 
-        private static List<DeathRecord> RemoveDead(
+        private List<DeathRecord> RemoveDead(
             IList<BattleMinionRuntime> row,
             BattleSide side,
             IList<string> log)
@@ -1404,6 +1602,14 @@ namespace SpireChess.Battle
                 }
 
                 var minion = row[i];
+                if (minion.Config.IsToken)
+                {
+                    diagnostics.For(side).TokenDeaths++;
+                }
+                else
+                {
+                    diagnostics.For(side).NonTokenDeaths++;
+                }
                 log.Add($"{minion.Name} 从 {i + 1} 号位移除。");
                 deaths.Add(new DeathRecord(side, i, minion));
                 row[i] = null;

@@ -730,11 +730,11 @@
       "iconId": "icon_wild_spirit",
       "audioId": "",
       "effects": [
-        { "id": "many_branch_invoker_summon", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 1, "health": 1, "duration": "Combat" } },
+        { "id": "many_branch_invoker_summon", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "attack": 1, "health": 1, "duration": "Combat" } },
         { "id": "many_branch_invoker_summon_permanent", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
       ],
       "goldenEffects": [
-        { "id": "golden_many_branch_invoker_summon", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 2, "health": 2, "duration": "Combat" } },
+        { "id": "golden_many_branch_invoker_summon", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "attack": 2, "health": 2, "duration": "Combat" } },
         { "id": "golden_many_branch_invoker_summon_permanent", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
       ],
       "tags": ["summon_buff"],
@@ -1005,11 +1005,11 @@
       "id": "vinecrown_priest",
       "name": "藤冠祭司",
       "title": "",
-      "description": "你的召唤物死亡时，使一个友方荒灵本场获得 +2/+2；每场第一次额外使一个友方荒灵永久获得 +1/+1。",
-      "goldenDescription": "你的召唤物死亡时，使一个友方荒灵本场获得 +4/+4；每场前两次额外使一个友方荒灵永久获得 +1/+1。",
+      "description": "每当两个友方随从死亡后，本随从永久获得 1 层繁茂，每场战斗最多触发一次，最多 4 层。每当你召唤一个 Token，使其本场获得等同于繁茂层数的攻击。",
+      "goldenDescription": "每当两个友方随从死亡后，本随从永久获得 1 层繁茂，每场战斗最多触发一次，最多 8 层。每当你召唤一个 Token，使其本场获得等同于繁茂层数的攻击。",
       "tier": 4,
       "race": "WildSpirit",
-      "archetypes": ["DeathGrower"],
+      "archetypes": ["SummonTempo"],
       "keywords": [],
       "isToken": false,
       "attack": 3,
@@ -1020,16 +1020,16 @@
       "iconId": "icon_wild_spirit",
       "audioId": "",
       "effects": [
-        { "id": "vinecrown_priest_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 2, "health": 2, "duration": "Combat" } },
-        { "id": "vinecrown_priest_token_death_permanent", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
+        { "id": "vinecrown_priest_flourish", "trigger": "OnFriendlyDeath", "action": "GainFlourish", "condition": { "type": "TriggerCountAtLeast", "threshold": 2 }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "amount": 1, "count": 4, "duration": "Permanent" }, "limit": { "perCombat": 1 } },
+        { "id": "vinecrown_priest_summon", "trigger": "OnSummon", "action": "ModifyStats", "condition": { "type": "SubjectIsToken" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "resource": "SourceFlourish", "duration": "Combat" } }
       ],
       "goldenEffects": [
-        { "id": "golden_vinecrown_priest_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 4, "health": 4, "duration": "Combat" } },
-        { "id": "golden_vinecrown_priest_token_death_permanent", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
+        { "id": "golden_vinecrown_priest_flourish", "trigger": "OnFriendlyDeath", "action": "GainFlourish", "condition": { "type": "TriggerCountAtLeast", "threshold": 2 }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "amount": 1, "count": 8, "duration": "Permanent" }, "limit": { "perCombat": 1 } },
+        { "id": "golden_vinecrown_priest_summon", "trigger": "OnSummon", "action": "ModifyStats", "condition": { "type": "SubjectIsToken" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "resource": "SourceFlourish", "duration": "Combat" } }
       ],
-      "tags": ["summon_death", "growth"],
+      "tags": ["summon", "token_attack", "growth"],
       "enabled": true,
-      "devNote": ""
+      "devNote": "繁茂保存在藤冠祭司持有实例上，Token 仅获得本场攻击。"
     },
     {
       "id": "hundred_song_herd",
@@ -1240,8 +1240,8 @@
       "id": "undying_furnace_king",
       "name": "不熄炉王",
       "title": "",
-      "description": "战斗开始：获得护盾。每当一个友方铸魂失去护盾，使另一个无护盾友方铸魂获得护盾。每场战斗最多触发 3 次。",
-      "goldenDescription": "战斗开始：获得护盾。每当一个友方铸魂失去护盾，使另一个无护盾友方铸魂获得护盾。",
+      "description": "战斗开始：获得护盾。每当一个友方铸魂失去护盾，使另一个无护盾友方铸魂获得护盾。每场战斗最多触发 2 次。",
+      "goldenDescription": "战斗开始：获得护盾。每当一个友方铸魂失去护盾，使另一个无护盾友方铸魂获得护盾。每场战斗最多触发 4 次。",
       "tier": 5,
       "race": "ForgeSoul",
       "archetypes": ["ShieldWall"],
@@ -1256,11 +1256,11 @@
       "audioId": "",
       "effects": [
         { "id": "undying_furnace_king_start", "trigger": "OnBattleStart", "action": "AddShield", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "duration": "Combat", "keyword": "Shield" } },
-        { "id": "undying_furnace_king_transfer", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "HasUnshieldedRaceTarget", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "NoShieldRandom" }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 3 } }
+        { "id": "undying_furnace_king_transfer", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "HasUnshieldedRaceTarget", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "NoShieldRandom" }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 2 } }
       ],
       "goldenEffects": [
         { "id": "golden_undying_furnace_king_start", "trigger": "OnBattleStart", "action": "AddShield", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "duration": "Combat", "keyword": "Shield" } },
-        { "id": "golden_undying_furnace_king_transfer", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "HasUnshieldedRaceTarget", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "NoShieldRandom" }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 6 } }
+        { "id": "golden_undying_furnace_king_transfer", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "HasUnshieldedRaceTarget", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "NoShieldRandom" }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 4 } }
       ],
       "tags": ["shield_loop"],
       "enabled": true,
@@ -1271,7 +1271,7 @@
       "name": "断誓刃魂",
       "title": "",
       "description": "每当友方随从失去护盾，获得 +2 攻击；每场战斗首次触发时，永久获得 +1 攻击。每当本随从击杀敌人，重新获得护盾。",
-      "goldenDescription": "每当友方随从失去护盾，永久获得 +1 攻击，并在本场战斗额外获得 +3 攻击；每当本随从击杀敌人，重新获得护盾。",
+      "goldenDescription": "每当友方随从失去护盾，本场额外获得 +3 攻击；每场战斗前 3 次额外永久获得 +1 攻击。每当本随从击杀敌人，重新获得护盾。",
       "tier": 5,
       "race": "ForgeSoul",
       "archetypes": ["ShieldBreakCounter"],
@@ -1286,11 +1286,11 @@
       "audioId": "",
       "effects": [
         { "id": "oathbroken_blade_soul_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 0, "duration": "Combat" } },
-        { "id": "oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 2 } },
+        { "id": "oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 1 } },
         { "id": "oathbroken_blade_soul_kill", "trigger": "OnKill", "action": "AddShield", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "duration": "Combat", "keyword": "Shield" } }
       ],
       "goldenEffects": [
-        { "id": "golden_oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 4 } },
+        { "id": "golden_oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 3 } },
         { "id": "golden_oathbroken_blade_soul_lost_combat", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 3, "health": 0, "duration": "Combat" } },
         { "id": "golden_oathbroken_blade_soul_kill", "trigger": "OnKill", "action": "AddShield", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "duration": "Combat", "keyword": "Shield" } }
       ],
@@ -1368,20 +1368,20 @@
       "keywords": [],
       "isToken": false,
       "attack": 7,
-      "health": 6,
+      "health": 8,
       "goldenAttack": 14,
-      "goldenHealth": 12,
+      "goldenHealth": 16,
       "artId": "placeholder_card_ten_thousand_hoof_surge",
       "iconId": "icon_wild_spirit",
       "audioId": "",
       "effects": [
-        { "id": "ten_thousand_hoof_surge_buff", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 2, "health": 0, "duration": "Combat" } },
+        { "id": "ten_thousand_hoof_surge_buff", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "attack": 2, "health": 0, "duration": "Combat" } },
         { "id": "ten_thousand_hoof_surge_attack", "trigger": "OnSummon", "action": "ImmediateAttack", "condition": { "type": "SubjectIsToken" } },
         { "id": "ten_thousand_hoof_surge_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
       ],
       "goldenEffects": [
-        { "id": "golden_ten_thousand_hoof_surge_buff", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 4, "health": 0, "duration": "Combat" } },
-        { "id": "golden_ten_thousand_hoof_surge_cleave", "trigger": "OnSummon", "action": "AddKeyword", "condition": { "type": "SubjectIsToken" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "duration": "Combat", "keyword": "Cleave" } },
+        { "id": "golden_ten_thousand_hoof_surge_buff", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "attack": 4, "health": 0, "duration": "Combat" } },
+        { "id": "golden_ten_thousand_hoof_surge_cleave", "trigger": "OnSummon", "action": "AddKeyword", "condition": { "type": "SubjectIsToken" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "duration": "Combat", "keyword": "Cleave" } },
         { "id": "golden_ten_thousand_hoof_surge_attack", "trigger": "OnSummon", "action": "ImmediateAttack", "condition": { "type": "SubjectIsToken" } },
         { "id": "golden_ten_thousand_hoof_surge_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
       ],
@@ -1740,14 +1740,14 @@
       "id": "star_ring_treasurer",
       "name": "星环司库",
       "title": "",
-      "description": "每个商店阶段第 4 次刷新后，获得 1 金币，并使一个友方星契下一场战斗获得护盾。",
+      "description": "每个商店阶段第 4 次刷新后，获得 1 金币，并使两个友方星契下一场战斗获得护盾。",
       "goldenDescription": "每个商店阶段第 4 次刷新后，获得 2 金币，并使两个友方星契下一场战斗获得护盾。",
       "tier": 4, "race": "Starbound", "keywords": [], "isToken": false,
       "attack": 4, "health": 6, "goldenAttack": 8, "goldenHealth": 12,
       "artId": "placeholder_card_star_ring_treasurer", "iconId": "icon_starbound", "audioId": "",
       "effects": [
         { "id": "star_ring_treasurer_gold", "trigger": "OnRefresh", "action": "GainGold", "condition": { "type": "PhaseStatAtLeast", "phaseStat": "RefreshCount", "threshold": 4 }, "value": { "amount": 1, "duration": "ShopPhase" }, "limit": { "perShop": 1 } },
-        { "id": "star_ring_treasurer_shield", "trigger": "OnRefresh", "action": "AddShield", "condition": { "type": "PhaseStatAtLeast", "phaseStat": "RefreshCount", "threshold": 4 }, "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "race": "Starbound", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "keyword": "Shield", "duration": "NextCombat" }, "limit": { "perShop": 1 } }
+        { "id": "star_ring_treasurer_shield", "trigger": "OnRefresh", "action": "AddShield", "condition": { "type": "PhaseStatAtLeast", "phaseStat": "RefreshCount", "threshold": 4 }, "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "race": "Starbound", "includeSelf": true, "includeToken": false, "maxTargets": 2, "selector": "Random" }, "value": { "keyword": "Shield", "duration": "NextCombat" }, "limit": { "perShop": 1 } }
       ],
       "goldenEffects": [
         { "id": "golden_star_ring_treasurer_gold", "trigger": "OnRefresh", "action": "GainGold", "condition": { "type": "PhaseStatAtLeast", "phaseStat": "RefreshCount", "threshold": 4 }, "value": { "amount": 2, "duration": "ShopPhase" }, "limit": { "perShop": 1 } },

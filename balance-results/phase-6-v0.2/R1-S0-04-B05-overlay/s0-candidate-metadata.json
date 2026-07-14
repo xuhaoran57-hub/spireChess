@@ -1,0 +1,12 @@
+{
+  "candidateId": "R1-S0-04-B05-overlay",
+  "seedSet": "S0_SMOKE",
+  "battles": 8400,
+  "replayBattles": 8400,
+  "determinismFailures": 0,
+  "exceptions": 0,
+  "effectLimitHits": 0,
+  "competitiveRoundLimits": 0,
+  "outputDummyRoundLimits": 276,
+  "elapsedSeconds": 5.1445851
+}

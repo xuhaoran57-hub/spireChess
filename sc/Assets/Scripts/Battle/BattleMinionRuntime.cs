@@ -18,7 +18,8 @@ namespace SpireChess.Battle
             int permanentAttackBonus = 0,
             int permanentHealthBonus = 0,
             IEnumerable<string> permanentKeywords = null,
-            int summonEffectMultiplier = 1)
+            int summonEffectMultiplier = 1,
+            int flourishStacks = 0)
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             IsGolden = isGolden;
@@ -31,6 +32,7 @@ namespace SpireChess.Battle
             CurrentHealth = initialHealth ?? BaseHealth + permanentHealthBonus;
             HasShield = keywords.Contains("Shield");
             SummonEffectMultiplier = Math.Max(1, summonEffectMultiplier);
+            FlourishStacks = Math.Max(0, Math.Min(isGolden ? 8 : 4, flourishStacks));
         }
 
         private BattleMinionRuntime(
@@ -43,7 +45,8 @@ namespace SpireChess.Battle
             bool hasShield,
             IEnumerable<string> keywords,
             string sourceInstanceId,
-            int summonEffectMultiplier)
+            int summonEffectMultiplier,
+            int flourishStacks)
         {
             Config = config;
             IsGolden = isGolden;
@@ -55,6 +58,7 @@ namespace SpireChess.Battle
             SourceInstanceId = sourceInstanceId;
             this.keywords = new HashSet<string>(keywords ?? Enumerable.Empty<string>());
             SummonEffectMultiplier = summonEffectMultiplier;
+            FlourishStacks = flourishStacks;
         }
 
         public MinionConfig Config { get; }
@@ -70,6 +74,7 @@ namespace SpireChess.Battle
         public bool HasShield { get; private set; }
         public bool IsGolden { get; }
         public int SummonEffectMultiplier { get; }
+        public int FlourishStacks { get; private set; }
         public bool IsAlive => CurrentHealth > 0;
         public bool HasTaunt => keywords.Contains("Taunt");
         public bool HasCleave => keywords.Contains("Cleave");
@@ -87,7 +92,20 @@ namespace SpireChess.Battle
                 HasShield,
                 keywords,
                 SourceInstanceId,
-                SummonEffectMultiplier);
+                SummonEffectMultiplier,
+                FlourishStacks);
+        }
+
+        public int GainFlourish(int amount, int maximum)
+        {
+            if (amount <= 0 || maximum <= FlourishStacks)
+            {
+                return 0;
+            }
+
+            var previous = FlourishStacks;
+            FlourishStacks = Math.Min(maximum, FlourishStacks + amount);
+            return FlourishStacks - previous;
         }
 
         public bool TakeDamage(int damage, IList<string> log)

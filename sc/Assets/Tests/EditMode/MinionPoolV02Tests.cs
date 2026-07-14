@@ -81,6 +81,25 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void RootAndResourcesSpellConfigs_AreExactMirrors()
+        {
+            var resourcesPath = Path.Combine(
+                Application.dataPath,
+                "Resources",
+                "Configs",
+                "Json",
+                "spells.v0.1.json");
+            var rootPath = Path.GetFullPath(Path.Combine(
+                Application.dataPath,
+                "..",
+                "..",
+                "spells.v0.1.json"));
+
+            Assert.That(File.Exists(rootPath), Is.True);
+            Assert.That(File.ReadAllText(rootPath), Is.EqualTo(File.ReadAllText(resourcesPath)));
+        }
+
+        [Test]
         public void EncountersAndRewards_ReferenceV02Content()
         {
             var encounterIds = configs.Encounters
@@ -102,25 +121,30 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void FurnaceKingAndGrowthFinishers_HaveV02Caps()
+        public void FurnaceKingAndGrowthFinishers_HaveR1Caps()
         {
             var furnace = configs.MinionsById["undying_furnace_king"];
             var normalTransfer = furnace.Effects.Single(value =>
                 value.Id == "undying_furnace_king_transfer");
             var goldenTransfer = furnace.GoldenEffects.Single(value =>
                 value.Id == "golden_undying_furnace_king_transfer");
-            Assert.That(normalTransfer.Limit.PerCombat, Is.EqualTo(3));
-            Assert.That(goldenTransfer.Limit.PerCombat, Is.EqualTo(6));
+            Assert.That(normalTransfer.Limit.PerCombat, Is.EqualTo(2));
+            Assert.That(goldenTransfer.Limit.PerCombat, Is.EqualTo(4));
             Assert.That(normalTransfer.Condition.Type, Is.EqualTo("HasUnshieldedRaceTarget"));
             Assert.That(goldenTransfer.Condition.Type, Is.EqualTo("HasUnshieldedRaceTarget"));
 
             var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
             Assert.That(oathbroken.Effects.Single(value =>
                 value.Id == "oathbroken_blade_soul_lost_permanent").Limit.PerCombat,
-                Is.EqualTo(2));
+                Is.EqualTo(1));
             Assert.That(oathbroken.GoldenEffects.Single(value =>
                 value.Id == "golden_oathbroken_blade_soul_lost_permanent").Limit.PerCombat,
-                Is.EqualTo(4));
+                Is.EqualTo(3));
+
+            var treasurer = configs.MinionsById["star_ring_treasurer"];
+            Assert.That(treasurer.Effects.Single(value =>
+                value.Id == "star_ring_treasurer_shield").Target.MaxTargets,
+                Is.EqualTo(2));
 
             var finalBloom = configs.MinionsById["world_eating_final_bloom"];
             Assert.That(finalBloom.GoldenEffects.Single(value =>
