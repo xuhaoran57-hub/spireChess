@@ -26,7 +26,7 @@ namespace SpireChess.Run
 
     public sealed class BalanceRunSummary
     {
-        public string BalanceSchemaVersion { get; set; } = "0.2.0";
+        public string BalanceSchemaVersion { get; set; } = "0.3.0";
         public string TuningRound { get; set; }
         public string CandidateId { get; set; }
         public string ContentVersion { get; set; }
@@ -46,6 +46,15 @@ namespace SpireChess.Run
         public int TurnTenPermanentAttack { get; set; }
         public int TurnTenPermanentHealth { get; set; }
         public string TurnTenCoreInstanceIds { get; set; }
+        public string TurnTenBuildId { get; set; }
+        public int TurnTenRefreshesPaid { get; set; }
+        public int TurnTenRefreshesFree { get; set; }
+        public int TurnTenMinionsBought { get; set; }
+        public int TurnTenMinionsSold { get; set; }
+        public int TurnTenSpellsUsed { get; set; }
+        public int TurnTenTavernUpgrades { get; set; }
+        public int TurnTenGoldWasted { get; set; }
+        public int TurnTenTriplesFormed { get; set; }
         public string Result { get; set; }
         public int FloorReached { get; set; }
         public int RunTurn { get; set; }
@@ -185,12 +194,22 @@ namespace SpireChess.Run
                 TurnTenBoardJson = turnTenBoard?.ToString(Formatting.None),
                 TurnTenPermanentAttack = SumBoard(turnTenBoard, "attack"),
                 TurnTenPermanentHealth = SumBoard(turnTenBoard, "health"),
+                TurnTenBuildId = turnTen?["payload"]?.Value<string>("buildId") ??
+                    "Unclassified",
                 TurnTenCoreInstanceIds = string.Join(";", (turnTenBoard ?? new JArray())
                     .OfType<JObject>()
                     .Where(value => CoreBuildClassifier.IsCoreCardId(
                         value.Value<string>("cardId")))
                     .Select(value => value.Value<string>("instanceId"))
                     .Where(value => !string.IsNullOrWhiteSpace(value))),
+                TurnTenRefreshesPaid = turnTen?["payload"]?.Value<int?>("RefreshesPaid") ?? 0,
+                TurnTenRefreshesFree = turnTen?["payload"]?.Value<int?>("RefreshesFree") ?? 0,
+                TurnTenMinionsBought = turnTen?["payload"]?.Value<int?>("MinionsBought") ?? 0,
+                TurnTenMinionsSold = turnTen?["payload"]?.Value<int?>("MinionsSold") ?? 0,
+                TurnTenSpellsUsed = turnTen?["payload"]?.Value<int?>("SpellsUsed") ?? 0,
+                TurnTenTavernUpgrades = turnTen?["payload"]?.Value<int?>("TavernUpgrades") ?? 0,
+                TurnTenGoldWasted = turnTen?["payload"]?.Value<int?>("GoldWasted") ?? 0,
+                TurnTenTriplesFormed = turnTen?["payload"]?.Value<int?>("TriplesFormed") ?? 0,
                 Result = payload.Value<string>("result"),
                 FloorReached = payload.Value<int?>("floorReached") ?? 0,
                 RunTurn = payload.Value<int?>("runTurn") ?? 0,
@@ -397,7 +416,7 @@ namespace SpireChess.Run
         public static string SerializeRunSummaries(IEnumerable<BalanceRunSummary> summaries)
         {
             var builder = new StringBuilder();
-            builder.AppendLine("balanceSchemaVersion,tuningRound,candidateId,contentVersion,configHash,gitCommit,unityVersion,coreClassifierVersion,seed,tester,intendedBuildId,finalBuildId,finalBoardJson,finalPermanentAttack,finalPermanentHealth,turnTenReached,turnTenBoardJson,turnTenPermanentAttack,turnTenPermanentHealth,turnTenCoreInstanceIds,result,floorReached,runTurn,elapsedMinutes,healthRemaining,battlesWon,battlesNotWon,elitesAttempted,elitesDefeated,bossAttempts,bossesDefeated,coreSurvivorsByBattleJson,permanentDeltasByInstanceJson,refreshesPaid,refreshesFree,minionsBought,minionsSold,spellsUsed,tavernUpgrades,goldWasted,firstCoreTurn,secondCoreTurn,dualCoreBeforeFloorThreeBoss,triplesFormed,targetedDiscoversUsed,routeNodeIds,eliteRouteChosen,eventChoicesJson,rewardChoicesJson,failureReason,boringMoment,unfairMoment,decisionSummaryPath,rawTelemetryPath");
+            builder.AppendLine("balanceSchemaVersion,tuningRound,candidateId,contentVersion,configHash,gitCommit,unityVersion,coreClassifierVersion,seed,tester,intendedBuildId,finalBuildId,finalBoardJson,finalPermanentAttack,finalPermanentHealth,turnTenReached,turnTenBuildId,turnTenBoardJson,turnTenPermanentAttack,turnTenPermanentHealth,turnTenCoreInstanceIds,turnTenRefreshesPaid,turnTenRefreshesFree,turnTenMinionsBought,turnTenMinionsSold,turnTenSpellsUsed,turnTenTavernUpgrades,turnTenGoldWasted,turnTenTriplesFormed,result,floorReached,runTurn,elapsedMinutes,healthRemaining,battlesWon,battlesNotWon,elitesAttempted,elitesDefeated,bossAttempts,bossesDefeated,coreSurvivorsByBattleJson,permanentDeltasByInstanceJson,refreshesPaid,refreshesFree,minionsBought,minionsSold,spellsUsed,tavernUpgrades,goldWasted,firstCoreTurn,secondCoreTurn,dualCoreBeforeFloorThreeBoss,triplesFormed,targetedDiscoversUsed,routeNodeIds,eliteRouteChosen,eventChoicesJson,rewardChoicesJson,failureReason,boringMoment,unfairMoment,decisionSummaryPath,rawTelemetryPath");
             foreach (var row in summaries ?? Enumerable.Empty<BalanceRunSummary>())
             {
                 AppendRow(builder, new object[]
@@ -406,9 +425,14 @@ namespace SpireChess.Run
                     row.ContentVersion, row.ConfigHash, row.GitCommit, row.UnityVersion,
                     row.CoreClassifierVersion, row.Seed, row.Tester, row.IntendedBuildId,
                     row.FinalBuildId, row.FinalBoardJson, row.FinalPermanentAttack,
-                    row.FinalPermanentHealth, row.TurnTenReached, row.TurnTenBoardJson,
+                    row.FinalPermanentHealth, row.TurnTenReached, row.TurnTenBuildId,
+                    row.TurnTenBoardJson,
                     row.TurnTenPermanentAttack, row.TurnTenPermanentHealth,
-                    row.TurnTenCoreInstanceIds, row.Result, row.FloorReached, row.RunTurn,
+                    row.TurnTenCoreInstanceIds, row.TurnTenRefreshesPaid,
+                    row.TurnTenRefreshesFree, row.TurnTenMinionsBought,
+                    row.TurnTenMinionsSold, row.TurnTenSpellsUsed,
+                    row.TurnTenTavernUpgrades, row.TurnTenGoldWasted,
+                    row.TurnTenTriplesFormed, row.Result, row.FloorReached, row.RunTurn,
                     row.ElapsedMinutes.ToString("0.###", CultureInfo.InvariantCulture),
                     row.HealthRemaining, row.BattlesWon, row.BattlesNotWon,
                     row.ElitesAttempted, row.ElitesDefeated, row.BossAttempts,

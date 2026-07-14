@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using SpireChess.Config;
 using SpireChess.Run;
@@ -13,6 +14,8 @@ namespace SpireChess.App
     {
         private const string TestSaveKey = "save_smoke_test.json";
         private const string RunTestSceneName = "RunTest";
+        private const string BalanceRunSeedArgument = "-balanceRunSeed";
+        private const string BalanceRunOutputArgument = "-balanceRunOutput";
         private static GameApp instance;
 
         public static GameApp Instance => instance;
@@ -78,9 +81,63 @@ namespace SpireChess.App
         public void StartNewRun(int? randomSeed = null)
         {
             Run?.ReleaseOutstandingRewards();
+            var seed = randomSeed ?? ReadIntArgument(BalanceRunSeedArgument) ??
+                Environment.TickCount;
             Run = new RunSession(
                 Configs,
-                randomSeed ?? Environment.TickCount);
+                seed);
+            EnableBalanceRunTelemetryIfRequested(seed);
+        }
+
+        private void EnableBalanceRunTelemetryIfRequested(int seed)
+        {
+            var outputDirectory = ReadArgument(BalanceRunOutputArgument);
+            if (string.IsNullOrWhiteSpace(outputDirectory))
+            {
+                return;
+            }
+
+            if (!Path.IsPathRooted(outputDirectory))
+            {
+                var projectRoot = Directory.GetParent(Application.dataPath)?.FullName ??
+                                  Application.dataPath;
+                var repositoryRoot = Directory.GetParent(projectRoot)?.FullName ??
+                                     projectRoot;
+                outputDirectory = Path.Combine(repositoryRoot, outputDirectory);
+            }
+            outputDirectory = Path.GetFullPath(outputDirectory);
+            var path = Path.Combine(outputDirectory, $"run-{seed}.ndjson");
+            if (File.Exists(path))
+            {
+                path = Path.Combine(
+                    outputDirectory,
+                    $"run-{seed}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.ndjson");
+            }
+
+            Run.EnableTelemetry(new RunTelemetry(
+                path,
+                Configs.ContentRelease.ContentVersion,
+                seed));
+            Debug.Log($"[Balance] Run telemetry enabled: seed={seed}, path={path}");
+        }
+
+        private static int? ReadIntArgument(string name)
+        {
+            var value = ReadArgument(name);
+            return int.TryParse(value, out var parsed) ? parsed : (int?)null;
+        }
+
+        private static string ReadArgument(string name)
+        {
+            var arguments = Environment.GetCommandLineArgs();
+            for (var index = 0; index < arguments.Length - 1; index++)
+            {
+                if (string.Equals(arguments[index], name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return arguments[index + 1];
+                }
+            }
+            return null;
         }
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)

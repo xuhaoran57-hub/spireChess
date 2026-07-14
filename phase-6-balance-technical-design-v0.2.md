@@ -1,10 +1,10 @@
 # 阶段 6 平衡调试与体验迭代技术方案 v0.2
 
 版本：0.2 设计稿
-状态：统计与遥测基础设施、`.NET` R0/R1 预演已完成，待 Unity 全量回归、正式基线和人工单局
+状态：统计与遥测基础设施、Unity 正式批次入口、成长速度校准链路、`R1-flourish-unity` S0/S1、`R2-shield-source-consolidation` S0 与 `R3-B02-B04-trigger-conversion` S0 已完成，待 S2 人工单局采样与 fixture v0.3 定标
 Unity：2022.3.62f3c1
 内容基线：`content-release 5.1.0`，64 个非 Token 随从、3 个 Token、16 张法术
-自动化基线：待 Unity 运行 EditMode 101、PlayMode 14；`.NET` 领域编译与 R1 确定性复跑通过
+自动化基线：Unity EditMode 111 / 111、PlayMode 14 / 14；`R1-flourish-unity`、`R2-shield-source-consolidation` 与 `R3-B02-B04-trigger-conversion` S0 确定性复跑通过
 关联文档：`development-plan.md`、`phase-5c-content-pool-balance-technical-design-v0.1.md`、`minion-pool-expansion-rebalance-design-v0.2.md`、`phase-5-unity-acceptance-checklist.md`
 
 ## 1. 目标与边界
@@ -40,10 +40,11 @@ Unity：2022.3.62f3c1
 
 ### 2.1 发育档位
 
-- `N`（Normal）：第 10 回合正常发育快照。五个随从均为普通版本，使用本文件锁定的永久加成。
-- `H`（High）：最高发育压力快照。五个随从均为金色版本，每张牌的永久加成为对应 `N` 快照的 2 倍。
-- `N` 和 `H` 都是可重复的比较夹具，不代表每局都必须精确形成该阵容。
-- `H` 采用“金色基础身材 + 2 倍永久加成”，用于限制最高发育上界；不模拟三个素材全部拥有同等成长的理论极端。
+- `fixtureVersion = 0.2.0` 的 `N` 是人工锁定的第 10 回合正常发育快照；`H` 使用全金色基础身材和 `N` 永久加成的 2 倍。它们只比较阵容成型后的战斗强度，不能证明真实成长速度。
+- `fixtureVersion = 0.3.0` 的 `N` 改为可识别成型样本第 10 回合永久面板的 P50，`H` 改为 P90；两个档位的金色状态和永久加成逐槽独立记录，不再强制 `H = N × 2`。
+- v0.3 同时记录各构筑第 10 回合成型率、首个/第二个核心回合、三连、施法、刷新和购买投入；战斗胜率与成型率分开评价。
+- 初始 20 局 `S2_RUNS` 可以产生 provisional 结果，但每个构筑少于 10 个可识别第 10 回合样本时不得将校准状态标为 `Ready`，也不得替换当前 v0.2 夹具。
+- `N` 和 `H` 都是可重复的代表夹具，不代表每局都必须精确形成该阵容。
 
 ### 2.2 面板与输出
 
@@ -118,8 +119,9 @@ Unity：2022.3.62f3c1
 夹具要求：
 
 - 每张非 Token 随从设置稳定且非空的 `SourceInstanceId`：`{fixtureId}-S{slot}`；
-- `N` 使用普通基础身材和表中永久加成；
-- `H` 使用金色基础身材和表中永久加成的 2 倍；
+- v0.2 的 `N` 使用普通基础身材和表中永久加成，`H` 使用金色基础身材和表中永久加成的 2 倍；
+- v0.3 每个槽位必须显式提供 `normalIsGolden`、`highIsGolden`、`highPermanentAttackBonus` 和 `highPermanentHealthBonus`；
+- v0.3 文件必须引用 `balance_fixture_calibration.csv`，每个构筑必须提供样本量、成型率、P50/P90 代表种子和 `Ready` 状态；未达到样本门槛时夹具校验直接失败；
 - 配置基础身材、表中加成和最终身材任一不一致时，夹具校验直接失败；
 - 牌池副本数量不限制战斗夹具；完整单局仍严格使用有限牌池。
 
@@ -241,6 +243,25 @@ Unity：2022.3.62f3c1
 
 “构筑意图”只约束优先评估方向，不允许为了完成指定阵容而重开或修改随机结果。未找到核心、被迫转型和最终形成混合构筑都属于扩池体验数据，必须记录 `intendedBuildId` 与 `finalBuildId`。
 
+人工单局采集通过 Unity 启动参数启用；进入运行场景后仍由测试者完成决策：
+
+```powershell
+Unity.exe -projectPath sc `
+  -balanceRunSeed 2000 `
+  -balanceRunOutput balance-results/phase-6-v0.2/R3-growth-calibration/S2_RUNS/raw
+```
+
+完成若干或全部种子后，运行离线聚合：
+
+```powershell
+Unity.exe -batchmode -nographics -projectPath sc `
+  -executeMethod SpireChess.Editor.RunGrowthCalibrationCommand.RunFromCommandLine `
+  -runTelemetryInput balance-results/phase-6-v0.2/R3-growth-calibration/S2_RUNS/raw `
+  -runDecisionInput balance-results/phase-6-v0.2/R3-growth-calibration/S2_RUNS/decisions `
+  -balanceCandidate R3-growth-calibration -balanceTuningRound R3 `
+  -balanceOutput balance-results/phase-6-v0.2/R3-growth-calibration/S2_RUNS
+```
+
 ## 5. 数据结构
 
 ### 5.1 现状与扩展原则
@@ -249,7 +270,7 @@ Unity：2022.3.62f3c1
 
 - 原始 NDJSON 继续使用现有外壳；
 - 新增事件使用向后兼容的 payload；
-- 聚合产物独立使用 `balanceSchemaVersion = "0.2.0"`；
+- 战斗与卡牌漏斗聚合继续使用 `balanceSchemaVersion = "0.2.0"`；增加第 10 回合流派/投入字段后的单局汇总和成长校准表使用 `0.3.0`；
 - `configHash` 为随从、法术、遭遇、奖励和发布清单规范化 JSON 按固定顺序拼接后的 SHA-256，用于阻止同名候选混入不同配置；
 - CSV 使用 UTF-8、英文列名、`.` 作为小数点、空值留空；
 - 所有百分比在文件中保存 `0-1` 小数，展示时再格式化为百分数。
@@ -323,7 +344,8 @@ Unity：2022.3.62f3c1
 | --- | --- |
 | 身份 | `tuningRound`、`candidateId`、`contentVersion`、`configHash`、`gitCommit`、`unityVersion`、`coreClassifierVersion`、`seed`、`tester` |
 | 构筑 | `intendedBuildId`、`finalBuildId`、`finalBoardJson`、`finalPermanentAttack`、`finalPermanentHealth` |
-| 回合 10 | `turn10Reached`、`turn10BoardJson`、`turn10PermanentAttack`、`turn10PermanentHealth`、`turn10CoreInstanceIds` |
+| 回合 10 | `turn10Reached`、`turn10BuildId`、`turn10BoardJson`、`turn10PermanentAttack`、`turn10PermanentHealth`、`turn10CoreInstanceIds` |
+| 回合 10 投入 | `turn10RefreshesPaid`、`turn10RefreshesFree`、`turn10MinionsBought`、`turn10MinionsSold`、`turn10SpellsUsed`、`turn10TavernUpgrades`、`turn10GoldWasted`、`turn10TriplesFormed` |
 | 进度 | `result`、`floorReached`、`runTurn`、`elapsedMinutes`、`healthRemaining` |
 | 战斗 | `battlesWon`、`battlesNotWon`、`elitesAttempted`、`elitesDefeated`、`bossAttempts`、`bossesDefeated`、`coreSurvivorsByBattleJson`、`permanentDeltasByInstanceJson` |
 | 商店 | `refreshesPaid`、`refreshesFree`、`minionsBought`、`minionsSold`、`spellsUsed`、`tavernUpgrades`、`goldWasted` |
@@ -346,7 +368,16 @@ Unity：2022.3.62f3c1
 
 只有 `offered >= 10` 的卡牌才进入审查列表；比较时使用平滑转化率 `(boughtOrPicked + 1) / (offered + 2)`，同时展示原始分子分母。低样本卡牌只展示，不据此单卡调数。
 
-### 5.7 调数日志 `balance_change_log.csv`
+### 5.7 成长速度校准表 `balance_fixture_calibration.csv`
+
+按构筑输出：意图局数、第 10 回合到达率、按意图成型率、可识别样本数、P50/P90 永久面板、核心回合与商店投入中位数、P50/P90 代表种子和完整棋盘 JSON。状态分为：
+
+- `NoFormedSamples`：没有可识别成型样本；
+- `Insufficient`：少于 3 个样本；
+- `Provisional`：3-9 个样本，只能用于调查；
+- `Ready`：至少 10 个样本，可以生成 fixture v0.3 候选。
+
+### 5.8 调数日志 `balance_change_log.csv`
 
 每次配置或规则修改一行：
 
@@ -362,7 +393,7 @@ Unity：2022.3.62f3c1
 | `affectedFixtures`、`affectedTests` | 必须重跑的范围 |
 | `result` | `Kept` / `Reverted` / `Superseded` |
 
-### 5.8 文件布局
+### 5.9 文件布局
 
 ```text
 sc/Assets/Tests/Fixtures/Balance/
@@ -375,6 +406,8 @@ balance-results/phase-6-v0.2/
   final/
 ```
 
+每个执行 S2 的候选在 `S2_RUNS/` 下保存 `raw/*.ndjson`、`decisions/*.json`、`balance_run_summary.csv`、`balance_card_funnel.csv`、`balance_fixture_calibration.csv` 和 `calibration_metadata.json`。
+
 - 夹具属于测试数据，不加入正式内容发布清单；
 - 每个候选目录保存原始逐场样本、聚合表、20 局 NDJSON、人工摘要和调数日志；
 - `final/` 只复制最终保留候选的聚合结果与报告，不覆盖原始候选；
@@ -384,7 +417,7 @@ balance-results/phase-6-v0.2/
 
 R0 不改数值，只验证工具和生成原始基线：
 
-1. 运行 EditMode 93 / 93、PlayMode 14 / 14；
+1. 运行当前全量 EditMode 111 / 111、PlayMode 14 / 14；
 2. 校验 12 个构筑快照的 ID、站位、金色状态、永久加成、覆盖层和总面板；
 3. 对 `S0_SMOKE` 重复运行两次，要求所有 `determinismHash` 一致；
 4. 对 `S1_CALIBRATION` 运行 84,000 场正式批次；
@@ -411,6 +444,50 @@ R0 不改数值，只验证工具和生成原始基线：
 - B05 N 木桩首轮输出由 133.826 降至 131.813，但仍领先第二名 B06 的 95.988 达 37.32%，尚未通过 35% 专项目标；
 - D01 攻击降至 8/16 后十二个压力板场景仍为零最终存活；它可继续用于触发机制，但不能作为核心存活率的充分测量，需要新增时点存活遥测或重新设计压力板；
 - 结果见 `balance-results/phase-6-v0.2/R1-combined-dotnet/`；由于运行时为 `.NET 8.0.20`，仍不能替代 Unity 正式批次与 20 局人工单局。
+
+### 6.3 Unity R1 繁茂候选记录（2026-07-14）
+
+- 新增 `SpireChess.Editor.BalanceBatchCommand.RunFromCommandLine`，支持 `S0/S1/S3/S4`、候选 ID、调数轮次、自定义输出目录和可选确定性复跑；
+- `R1-flourish-unity/S0_SMOKE` 完成 8,400 场首跑与 8,400 场同种子复跑，确定性失败、异常、效果上限和竞技回合上限均为 0；
+- `R1-flourish-unity/S1_CALIBRATION` 完成 84,000 场正式矩阵，异常、效果上限和竞技回合上限均为 0；S0/S1 的 `configHash` 均为 `61d16989844d94b2d008d876273b5893c6713bf7ed52623f74e604508081de42`；
+- B03 N/H 等权得分率为 12.38%/45.30%，H 档整体已进入可观察区，但 B03-H 对 B04-H 仍为 97.48%，N 档对 B01/B02/B05 仍明显偏弱；
+- 30 组镜像对局中仍有 24 组位于 25%-75% 触发线之外；B05 N 木桩首轮输出 131.813，仍领先 B06 N 的 95.988 达 37.32%；
+- 完整结果和结论见 `balance-results/phase-6-v0.2/R1-flourish-unity/`，该候选尚未完成 20 局人工单局，不能冻结。
+
+命令行执行格式：
+
+```powershell
+Unity.exe -batchmode -nographics -quit -projectPath sc `
+  -executeMethod SpireChess.Editor.BalanceBatchCommand.RunFromCommandLine `
+  -balanceCandidate R1-flourish-unity -balanceTuningRound R1 `
+  -balanceSeedSet S0
+```
+
+### 6.4 Unity R2 补盾来源收敛候选（2026-07-14）
+
+- 断誓刃魂与不熄炉王保持不变；盾墙执炉者改为限次失盾属性补偿，共鸣钟卫移除补盾并提高生命补偿，炉心圣盾官保留开场定向护盾、将友军死亡补盾改为临时 +2/+2；
+- `R2-shield-source-consolidation/S0_SMOKE` 完成 8,400 场首跑与 8,400 场同种子复跑，确定性失败、异常、效果上限和竞技回合上限均为 0；配置哈希为 `439b15d313a72914b994171d0358b6819d2f493b5f6487f66bc2fa4e72a38876`；
+- B01 N/H 等权得分率由 86.20%/96.10% 降至 50.70%/73.30%，平均挡盾次数由 6.50/8.82 降至 3.98/5.58；不熄炉王平均转移次数仍为 1.99/3.76，符合保留 T5 补盾核心的目标；
+- 25%-75% 触发线外的镜像对局由 24/30 降至 19/30，但 35%-65% 目标带外仍有 23/30；B01-H 仍偏强；
+- B02 对 B03/B04/B05/B06 的同种子结果与 R1 完全相同，只因对 B01 的优势扩大而使整体 N/H 得分率升至 91.85%/86.15%，需要作为独立问题处理；
+- 结果见 `balance-results/phase-6-v0.2/R2-shield-source-consolidation/`；S0 方向通过，可进入 S1 扩样，但尚未执行 S1。
+
+### 6.5 当前六流派 Unity S0 总览（2026-07-14）
+
+- 使用与 R2 补盾来源收敛候选相同的配置哈希 `439b15d313a72914b994171d0358b6819d2f493b5f6487f66bc2fa4e72a38876` 重跑全部 84 个场景；8,400 场首跑与 8,400 场复跑的确定性失败、异常、效果上限和竞技回合上限均为 0；
+- N 档等权得分率由高到低为 B02 91.85%、B05 64.80%、B01 50.70%、B04 45.00%、B06 29.85%、B03 17.80%；
+- H 档等权得分率由高到低为 B02 86.15%、B01 73.30%、B03 51.40%、B06 46.30%、B05 39.20%、B04 3.65%；
+- 30 组镜像对局中 19 组越过 25%-75% 触发线，只有 7 组进入 35%-65% 目标带；主要后续问题为 B02 全档偏强、B03-N 与 B04-H 失效、B01-H 偏强、B05-N 输出偏高和 B06-N 偏弱；
+- 完整对局矩阵和逐流派结论见 `balance-results/phase-6-v0.2/R2-current-all-builds-unity/R2-current-all-builds-S0-report.md`。
+
+### 6.6 Unity R3 失盾压缩与亡语转化候选（2026-07-14）
+
+- 断誓刃魂改为只响应自身失盾；裂甲复仇者改为限次成长；群山古灵改为前三次全体永久成长；金色终花吞世者前两次额外复制死亡单位的战斗生命上限并永久获得 +2/+2；
+- 战斗运行时新增独立的战斗生命上限，Unity EditMode 109/109、PlayMode 14/14 全量通过；
+- `R3-B02-B04-trigger-conversion/S0_SMOKE` 完成 8,400 场首跑与 8,400 场同种子复跑，确定性失败、异常、效果上限和竞技回合上限均为 0；配置哈希为 `208cdc47928dd51ab6951974c06dc25379e6c72a52d2a7669dd6121e10a3794a`；
+- B02 N/H 等权得分率由 91.85%/86.15% 降至 79.40%/69.75%，临时攻击由 23.19/47.81 降至 5.97/14.43，但永久差量升至 7.00/10.14，仍需小步压缩；
+- B04-H 由 3.65% 恢复到 39.75%，临时生命由 13.37 提高到 42.21，没有整体超调；B04-N 由 45.00% 降到 31.05%，需要补回第一次死亡的本场 +1/+1；
+- 30 组镜像对局中，25%-75% 触发线外由 19 组降至 11 组，35%-65% 目标带内由 7 组增加到 10 组；完整报告见 `balance-results/phase-6-v0.2/R3-B02-B04-trigger-conversion/R3-B02-B04-trigger-conversion-S0-report.md`。
 
 ## 7. 第一轮调数：极端值与系统性问题
 
@@ -533,11 +610,15 @@ R0 不改数值，只验证工具和生成原始基线：
 - [x] 扩展 `BattleBatchRunner`，输出逐场样本和镜像聚合；
 - [x] 增加确定性哈希与同种子复跑测试；
 - [x] 建立 CSV/NDJSON 聚合器并校验 schema 版本。
+- [x] 增加 Unity Editor/CLI 正式批次入口，版本化输出逐场样本、场景/镜像汇总、确定性差异和 metadata。
+- [x] 增加 fixture v0.3 的逐槽 N/H 金色状态与独立永久加成，并以校准证据和样本门槛阻止人工假设直接进入正式夹具。
 
 ### P0：完整单局遥测
 
 - [x] 新增 `RunEnded`、`ShopSnapshot`、`Turn10Snapshot`、`EventChoiceResolved`、`RewardChoiceResolved` 和扩展 `BattleCompleted`；
 - [x] 区分付费/免费刷新，记录购买、出售、施法、升级和金币浪费；
+- [x] 第 10 回合额外记录实际流派、经济投入与三连，并生成按构筑的成型率、P50/P90 面板和代表棋盘；
+- [x] 增加固定种子人工单局启动参数与 `RunGrowthCalibrationCommand` 离线聚合入口；
 - [x] 记录核心首次获得、第二核心形成、三连和定向发现；
 - [x] 提供人工决策摘要模板，不实现完整命令重放；
 - [x] 从 20 份 NDJSON 自动生成 `balance_run_summary.csv` 和卡牌漏斗。

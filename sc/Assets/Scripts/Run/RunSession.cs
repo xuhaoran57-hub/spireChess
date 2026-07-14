@@ -1369,10 +1369,21 @@ namespace SpireChess.Run
                 runTurn = State.RunTurn,
                 health = State.Health,
                 tavernTier = Shop.TavernTier,
+                buildId = CoreBuildClassifier.ClassifyFinalBuild(
+                    Shop.Collection.Battle,
+                    coreEvidence),
                 battle = BuildCardSnapshots(Shop.Collection.Battle),
                 bench = BuildCardSnapshots(Shop.Collection.Bench),
                 firstCoreTurn = State.Statistics.FirstCoreTurn,
-                secondCoreTurn = State.Statistics.SecondCoreTurn
+                secondCoreTurn = State.Statistics.SecondCoreTurn,
+                State.Statistics.RefreshesPaid,
+                State.Statistics.RefreshesFree,
+                State.Statistics.MinionsBought,
+                State.Statistics.MinionsSold,
+                State.Statistics.SpellsUsed,
+                State.Statistics.TavernUpgrades,
+                State.Statistics.GoldWasted,
+                State.Statistics.TriplesFormed
             });
         }
 

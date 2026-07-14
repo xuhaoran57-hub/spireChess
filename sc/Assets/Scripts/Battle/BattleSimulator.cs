@@ -976,6 +976,10 @@ namespace SpireChess.Battle
                             attack = Math.Max(0, pending.Source.FlourishStacks);
                         }
                         var health = effect.Value?.Health ?? 0;
+                        if (effect.Value?.Resource == "SubjectHealth")
+                        {
+                            health = Math.Max(0, pending.Subject?.CombatMaxHealth ?? 0);
+                        }
                         if (effect.Value?.Duration == "Permanent")
                         {
                             target.AddTemporaryStats(attack, health, log);

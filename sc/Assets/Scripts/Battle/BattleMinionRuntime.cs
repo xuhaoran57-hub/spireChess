@@ -30,6 +30,7 @@ namespace SpireChess.Battle
             PermanentHealthBonus = permanentHealthBonus;
             CurrentAttack = initialAttack ?? BaseAttack + permanentAttackBonus;
             CurrentHealth = initialHealth ?? BaseHealth + permanentHealthBonus;
+            CombatMaxHealth = CurrentHealth;
             HasShield = keywords.Contains("Shield");
             SummonEffectMultiplier = Math.Max(1, summonEffectMultiplier);
             FlourishStacks = Math.Max(0, Math.Min(isGolden ? 8 : 4, flourishStacks));
@@ -40,6 +41,7 @@ namespace SpireChess.Battle
             bool isGolden,
             int currentAttack,
             int currentHealth,
+            int combatMaxHealth,
             int permanentAttackBonus,
             int permanentHealthBonus,
             bool hasShield,
@@ -52,6 +54,7 @@ namespace SpireChess.Battle
             IsGolden = isGolden;
             CurrentAttack = currentAttack;
             CurrentHealth = currentHealth;
+            CombatMaxHealth = combatMaxHealth;
             PermanentAttackBonus = permanentAttackBonus;
             PermanentHealthBonus = permanentHealthBonus;
             HasShield = hasShield;
@@ -69,6 +72,7 @@ namespace SpireChess.Battle
         public int BaseHealth => IsGolden ? Config.GoldenHealth : Config.Health;
         public int CurrentAttack { get; private set; }
         public int CurrentHealth { get; private set; }
+        public int CombatMaxHealth { get; private set; }
         public int PermanentAttackBonus { get; private set; }
         public int PermanentHealthBonus { get; private set; }
         public bool HasShield { get; private set; }
@@ -87,6 +91,7 @@ namespace SpireChess.Battle
                 IsGolden,
                 CurrentAttack,
                 CurrentHealth,
+                CombatMaxHealth,
                 PermanentAttackBonus,
                 PermanentHealthBonus,
                 HasShield,
@@ -143,6 +148,7 @@ namespace SpireChess.Battle
 
             CurrentAttack += attack;
             CurrentHealth += health;
+            CombatMaxHealth += health;
             log.Add($"{Name} 获得 {FormatStatChange(attack, health)}，当前为 {CurrentAttack}/{CurrentHealth}。");
         }
 

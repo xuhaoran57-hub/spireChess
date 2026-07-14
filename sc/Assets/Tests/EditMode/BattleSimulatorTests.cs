@@ -310,6 +310,42 @@ namespace SpireChess.Tests
             Assert.That(normalStepIndex < secondRoundStepIndex, Is.True);
         }
 
+        [Test]
+        public void SubjectHealth_UsesCombatMaxHealthAfterLethalDamage()
+        {
+            var observerConfig = CreateConfig("observer", 0, 100, false, "Shield");
+            observerConfig.Effects.Add(new EffectConfig
+            {
+                Id = "copy_subject_health",
+                Trigger = "OnFriendlyDeath",
+                Action = "ModifyStats",
+                Target = new TargetConfig
+                {
+                    Side = "Ally",
+                    Scope = "Self",
+                    IncludeSelf = true
+                },
+                Value = new ValueConfig
+                {
+                    Duration = "Combat",
+                    Resource = "SubjectHealth"
+                },
+                Limit = new LimitConfig { PerCombat = 1 }
+            });
+            var doomed = CreateMinion("doomed", 0, 7, "Taunt");
+            doomed.AddTemporaryStats(0, 3, new List<string>());
+            var state = CreateState();
+            state.Player[0] = new BattleMinionRuntime(observerConfig);
+            state.Player[1] = doomed;
+            state.Enemy[0] = CreateMinion("enemy", 20, 100);
+
+            var result = new BattleSimulator(new SequenceRandom()).SimulatePlayback(state);
+            var deathStep = result.Steps.First(step => step.BoardState.Player[1] == null);
+
+            Assert.That(deathStep.BoardState.Player[0].CurrentHealth, Is.EqualTo(110));
+            Assert.That(deathStep.BoardState.Player[0].CombatMaxHealth, Is.EqualTo(110));
+        }
+
         private static BattleBoardState CreateCleaveState(bool golden)
         {
             var state = CreateState();

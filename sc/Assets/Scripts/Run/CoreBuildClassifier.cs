@@ -43,6 +43,9 @@ namespace SpireChess.Run
                     new[] { "stardust_attendant", "astrolabe_calibrator", "moonwheel_dispatcher", "star_ring_treasurer", "sky_covenant_bearer" })
             };
 
+        public static IReadOnlyList<string> BuildIds { get; } =
+            Definitions.Keys.OrderBy(value => value).ToList().AsReadOnly();
+
         public static bool ContainsAnyCore(IEnumerable<ShopCardInstance> cards)
         {
             var ids = new HashSet<string>((cards ?? Enumerable.Empty<ShopCardInstance>())

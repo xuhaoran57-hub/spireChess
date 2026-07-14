@@ -330,8 +330,8 @@
       "id": "shieldwall_furnace_keeper",
       "name": "盾墙执炉者",
       "title": "",
-      "description": "每场战斗首次有相邻友方随从失去护盾时，使其重新获得护盾。",
-      "goldenDescription": "每场战斗前 2 次有相邻友方随从失去护盾时，使其重新获得护盾。",
+      "description": "每场战斗首次有相邻友方随从失去护盾时，使其本场获得 +1/+2。",
+      "goldenDescription": "每场战斗前 2 次有相邻友方随从失去护盾时，使其本场获得 +2/+4。",
       "tier": 2,
       "race": "ForgeSoul",
       "archetypes": ["ShieldWall"],
@@ -345,12 +345,12 @@
       "iconId": "icon_forge_soul",
       "audioId": "",
       "effects": [
-        { "id": "shieldwall_furnace_keeper_lost", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 1 } }
+        { "id": "shieldwall_furnace_keeper_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 1, "health": 2, "duration": "Combat" }, "limit": { "perCombat": 1 } }
       ],
       "goldenEffects": [
-        { "id": "golden_shieldwall_furnace_keeper_lost", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 2 } }
+        { "id": "golden_shieldwall_furnace_keeper_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 2, "health": 4, "duration": "Combat" }, "limit": { "perCombat": 2 } }
       ],
-      "tags": ["adjacent", "shield"],
+      "tags": ["adjacent", "shield_break", "survival"],
       "enabled": true,
       "devNote": ""
     },
@@ -655,8 +655,8 @@
       "id": "resonance_bell_guard",
       "name": "共鸣钟卫",
       "title": "",
-      "description": "每当相邻友方随从失去护盾，若其仍存活，使其获得 +1/+1；每场战斗首次触发时，使其重新获得护盾。",
-      "goldenDescription": "每当相邻友方随从失去护盾，若其仍存活，使其获得 +2/+2；每场战斗前 2 次触发时，使其重新获得护盾。",
+      "description": "每当相邻友方随从失去护盾，若其仍存活，使其本场获得 +1/+2。",
+      "goldenDescription": "每当相邻友方随从失去护盾，若其仍存活，使其本场获得 +2/+4。",
       "tier": 3,
       "race": "ForgeSoul",
       "archetypes": ["ShieldWall"],
@@ -670,14 +670,12 @@
       "iconId": "icon_forge_soul",
       "audioId": "",
       "effects": [
-        { "id": "resonance_bell_guard_stats", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 1, "health": 1, "duration": "Combat" } },
-        { "id": "resonance_bell_guard_shield", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 1 } }
+        { "id": "resonance_bell_guard_stats", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 1, "health": 2, "duration": "Combat" } }
       ],
       "goldenEffects": [
-        { "id": "golden_resonance_bell_guard_stats", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 2, "health": 2, "duration": "Combat" } },
-        { "id": "golden_resonance_bell_guard_shield", "trigger": "OnShieldLost", "action": "AddShield", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "duration": "Combat", "keyword": "Shield" }, "limit": { "perCombat": 2 } }
+        { "id": "golden_resonance_bell_guard_stats", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectAdjacent" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false }, "value": { "attack": 2, "health": 4, "duration": "Combat" } }
       ],
-      "tags": ["adjacent", "shield"],
+      "tags": ["adjacent", "shield_break", "survival"],
       "enabled": true,
       "devNote": ""
     },
@@ -916,8 +914,8 @@
       "id": "hearth_core_aegis_officer",
       "name": "炉心圣盾官",
       "title": "",
-      "description": "战斗开始：使最左友方随从获得护盾。每当一个友方铸魂死亡，使一个无护盾友方随从获得护盾。",
-      "goldenDescription": "战斗开始：使最左和最右友方随从获得护盾。每当一个友方铸魂死亡，使两个无护盾友方随从获得护盾。",
+      "description": "战斗开始：使最左友方随从获得护盾。每当一个友方铸魂死亡，使一个友方铸魂本场获得 +2/+2。",
+      "goldenDescription": "战斗开始：使最左和最右友方随从获得护盾。每当一个友方铸魂死亡，使两个友方铸魂本场获得 +2/+2。",
       "tier": 4,
       "race": "ForgeSoul",
       "archetypes": ["ShieldWall"],
@@ -932,14 +930,14 @@
       "audioId": "",
       "effects": [
         { "id": "hearth_core_aegis_officer_start", "trigger": "OnBattleStart", "action": "AddShield", "target": { "side": "Ally", "scope": "Single", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Leftmost" }, "value": { "duration": "Combat", "keyword": "Shield" } },
-        { "id": "hearth_core_aegis_officer_death", "trigger": "OnFriendlyDeath", "action": "AddShield", "condition": { "type": "SubjectRace", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "NoShieldRandom" }, "value": { "duration": "Combat", "keyword": "Shield" } }
+        { "id": "hearth_core_aegis_officer_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectRace", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 2, "health": 2, "duration": "Combat" } }
       ],
       "goldenEffects": [
         { "id": "golden_hearth_core_aegis_officer_start_left", "trigger": "OnBattleStart", "action": "AddShield", "target": { "side": "Ally", "scope": "Single", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Leftmost" }, "value": { "duration": "Combat", "keyword": "Shield" } },
         { "id": "golden_hearth_core_aegis_officer_start_right", "trigger": "OnBattleStart", "action": "AddShield", "target": { "side": "Ally", "scope": "Single", "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "Rightmost" }, "value": { "duration": "Combat", "keyword": "Shield" } },
-        { "id": "golden_hearth_core_aegis_officer_death", "trigger": "OnFriendlyDeath", "action": "AddShield", "condition": { "type": "SubjectRace", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": true, "includeToken": false, "maxTargets": 2, "selector": "NoShieldRandom" }, "value": { "duration": "Combat", "keyword": "Shield" } }
+        { "id": "golden_hearth_core_aegis_officer_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectRace", "race": "ForgeSoul" }, "target": { "side": "Ally", "scope": "Single", "race": "ForgeSoul", "includeSelf": true, "includeToken": false, "maxTargets": 2, "selector": "Random" }, "value": { "attack": 2, "health": 2, "duration": "Combat" } }
       ],
-      "tags": ["shield"],
+      "tags": ["shield", "death_buff"],
       "enabled": true,
       "devNote": ""
     },
@@ -947,8 +945,8 @@
       "id": "cracked_armor_avenger",
       "name": "裂甲复仇者",
       "title": "",
-      "description": "每当一个友方随从失去护盾，本场获得 +2/+1；每场第一次额外永久获得 +1 生命。",
-      "goldenDescription": "每当一个友方随从失去护盾，本场获得 +4/+2；每场前两次额外永久获得 +1 生命。",
+      "description": "护盾。每场战斗前 2 次有友方随从失去护盾时，永久获得 +1/+1。",
+      "goldenDescription": "护盾。每场战斗前 2 次有友方随从失去护盾时，永久获得 +1/+1，并额外在本场获得 +1/+1。",
       "tier": 4,
       "race": "ForgeSoul",
       "archetypes": ["ShieldBreakCounter"],
@@ -962,12 +960,11 @@
       "iconId": "icon_forge_soul",
       "audioId": "",
       "effects": [
-        { "id": "cracked_armor_avenger_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 1, "duration": "Combat" } },
-        { "id": "cracked_armor_avenger_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 0, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
+        { "id": "cracked_armor_avenger_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
       ],
       "goldenEffects": [
-        { "id": "golden_cracked_armor_avenger_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 4, "health": 2, "duration": "Combat" } },
-        { "id": "golden_cracked_armor_avenger_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 0, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
+        { "id": "golden_cracked_armor_avenger_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 2 } },
+        { "id": "golden_cracked_armor_avenger_lost_combat", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 1, "duration": "Combat" }, "limit": { "perCombat": 2 } }
       ],
       "tags": ["shield_break"],
       "enabled": true,
@@ -1270,8 +1267,8 @@
       "id": "oathbroken_blade_soul",
       "name": "断誓刃魂",
       "title": "",
-      "description": "每当友方随从失去护盾，获得 +2 攻击；每场战斗首次触发时，永久获得 +1 攻击。每当本随从击杀敌人，重新获得护盾。",
-      "goldenDescription": "每当友方随从失去护盾，本场额外获得 +3 攻击；每场战斗前 3 次额外永久获得 +1 攻击。每当本随从击杀敌人，重新获得护盾。",
+      "description": "每当本随从失去护盾，本场获得 +2 攻击；每场战斗首次额外永久获得 +1 攻击。每当本随从击杀敌人，重新获得护盾。",
+      "goldenDescription": "每当本随从失去护盾，本场获得 +3 攻击；每场战斗前 3 次额外永久获得 +1 攻击。每当本随从击杀敌人，重新获得护盾。",
       "tier": 5,
       "race": "ForgeSoul",
       "archetypes": ["ShieldBreakCounter"],
@@ -1285,13 +1282,13 @@
       "iconId": "icon_forge_soul",
       "audioId": "",
       "effects": [
-        { "id": "oathbroken_blade_soul_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 0, "duration": "Combat" } },
-        { "id": "oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 1 } },
+        { "id": "oathbroken_blade_soul_lost", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectIsSelf" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 0, "duration": "Combat" } },
+        { "id": "oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectIsSelf" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 1 } },
         { "id": "oathbroken_blade_soul_kill", "trigger": "OnKill", "action": "AddShield", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "duration": "Combat", "keyword": "Shield" } }
       ],
       "goldenEffects": [
-        { "id": "golden_oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 3 } },
-        { "id": "golden_oathbroken_blade_soul_lost_combat", "trigger": "OnShieldLost", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 3, "health": 0, "duration": "Combat" } },
+        { "id": "golden_oathbroken_blade_soul_lost_permanent", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectIsSelf" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 3 } },
+        { "id": "golden_oathbroken_blade_soul_lost_combat", "trigger": "OnShieldLost", "action": "ModifyStats", "condition": { "type": "SubjectIsSelf" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 3, "health": 0, "duration": "Combat" } },
         { "id": "golden_oathbroken_blade_soul_kill", "trigger": "OnKill", "action": "AddShield", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "duration": "Combat", "keyword": "Shield" } }
       ],
       "tags": ["shield_break", "permanent_growth"],
@@ -1331,8 +1328,8 @@
       "id": "ancient_mountain_spirit",
       "name": "群山古灵",
       "title": "",
-      "description": "每场战斗前 3 次非召唤物友方荒灵死亡时，所有荒灵本场获得 +1/+1；第一次额外永久获得 +1/+1。",
-      "goldenDescription": "每场战斗前 3 次非召唤物友方荒灵死亡时，所有荒灵永久获得 +1/+1。",
+      "description": "每场战斗前 3 次非召唤物友方荒灵死亡时，所有荒灵永久获得 +1/+1。",
+      "goldenDescription": "每场战斗前 3 次非召唤物友方荒灵死亡时，所有荒灵永久获得 +2/+2。",
       "tier": 5,
       "race": "WildSpirit",
       "archetypes": ["DeathGrower"],
@@ -1346,11 +1343,10 @@
       "iconId": "icon_wild_spirit",
       "audioId": "",
       "effects": [
-        { "id": "ancient_mountain_spirit_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "All", "race": "WildSpirit", "includeSelf": true, "includeToken": false }, "value": { "attack": 1, "health": 1, "duration": "Combat" }, "limit": { "perCombat": 3 } },
-        { "id": "ancient_mountain_spirit_death_permanent", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "All", "race": "WildSpirit", "includeSelf": true, "includeToken": false }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
+        { "id": "ancient_mountain_spirit_death_permanent", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "All", "race": "WildSpirit", "includeSelf": true, "includeToken": false }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 3 } }
       ],
       "goldenEffects": [
-        { "id": "golden_ancient_mountain_spirit_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "All", "race": "WildSpirit", "includeSelf": true, "includeToken": false }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 3 } }
+        { "id": "golden_ancient_mountain_spirit_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "All", "race": "WildSpirit", "includeSelf": true, "includeToken": false }, "value": { "attack": 2, "health": 2, "duration": "Permanent" }, "limit": { "perCombat": 3 } }
       ],
       "tags": ["death_growth", "permanent_growth"],
       "enabled": true,
@@ -1394,7 +1390,7 @@
       "name": "终花吞世者",
       "title": "",
       "description": "每当非召唤物友方荒灵死亡，本场获得其当前攻击力；每场前两次额外永久获得 +2 攻击。",
-      "goldenDescription": "每当非召唤物友方荒灵死亡，本场获得其当前攻击力；每场前两次额外永久获得 +4 攻击。",
+      "goldenDescription": "每当非召唤物友方荒灵死亡，本场获得其当前攻击力；每场前 2 次额外获得其战斗生命上限，并永久获得 +2/+2。",
       "tier": 5,
       "race": "WildSpirit",
       "archetypes": ["DeathGrower"],
@@ -1413,7 +1409,8 @@
       ],
       "goldenEffects": [
         { "id": "golden_world_eating_final_bloom_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 0, "health": 0, "duration": "Combat", "resource": "SubjectAttack" } },
-        { "id": "golden_world_eating_final_bloom_death_permanent", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 4, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
+        { "id": "golden_world_eating_final_bloom_death_health", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 0, "health": 0, "duration": "Combat", "resource": "SubjectHealth" }, "limit": { "perCombat": 2 } },
+        { "id": "golden_world_eating_final_bloom_death_permanent", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 2, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
       ],
       "tags": ["death_growth", "permanent_growth"],
       "enabled": true,

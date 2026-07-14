@@ -62,9 +62,13 @@ namespace SpireChess.Simulation
         public IReadOnlyList<string> Validate()
         {
             var errors = new List<string>();
-            if (file.FixtureVersion != "0.2.0")
+            if (file.FixtureVersion != "0.2.0" && file.FixtureVersion != "0.3.0")
             {
-                errors.Add("fixtureVersion must be 0.2.0.");
+                errors.Add("fixtureVersion must be 0.2.0 or 0.3.0.");
+            }
+            if (file.FixtureVersion == "0.3.0" && file.Calibration == null)
+            {
+                errors.Add("fixtureVersion 0.3.0 requires calibration metadata.");
             }
             if (file.CoreClassifierVersion != "0.2.1")
             {
@@ -110,22 +114,28 @@ namespace SpireChess.Simulation
 
             var state = new BattleBoardState();
             var fixtureId = $"{buildId}_{developmentLevel}";
-            var multiplier = developmentLevel == "H" ? 2 : 1;
             var overlays = developmentLevel == "H" ? build.HighOverlay : build.NormalOverlay;
             foreach (var slot in build.Slots.OrderBy(value => value.Slot))
             {
                 var config = resolveMinion(slot.MinionId);
                 var overlay = (overlays ?? new List<BalanceOverlayDefinition>())
                     .FirstOrDefault(value => value.Slot == slot.Slot);
-                var permanentAttack = slot.PermanentAttackBonus * multiplier;
-                var permanentHealth = slot.PermanentHealthBonus * multiplier;
-                var baseAttack = developmentLevel == "H" ? config.GoldenAttack : config.Attack;
-                var baseHealth = developmentLevel == "H" ? config.GoldenHealth : config.Health;
+                var isGolden = developmentLevel == "H"
+                    ? slot.HighIsGolden ?? true
+                    : slot.NormalIsGolden ?? false;
+                var permanentAttack = developmentLevel == "H"
+                    ? slot.HighPermanentAttackBonus ?? slot.PermanentAttackBonus * 2
+                    : slot.PermanentAttackBonus;
+                var permanentHealth = developmentLevel == "H"
+                    ? slot.HighPermanentHealthBonus ?? slot.PermanentHealthBonus * 2
+                    : slot.PermanentHealthBonus;
+                var baseAttack = isGolden ? config.GoldenAttack : config.Attack;
+                var baseHealth = isGolden ? config.GoldenHealth : config.Health;
                 var temporaryAttack = overlay?.Attack ?? 0;
                 var temporaryHealth = overlay?.Health ?? 0;
                 var runtime = new BattleMinionRuntime(
                     config,
-                    developmentLevel == "H",
+                    isGolden,
                     baseAttack + permanentAttack + temporaryAttack,
                     baseHealth + permanentHealth + temporaryHealth,
                     $"{fixtureId}-S{slot.Slot}",
@@ -201,6 +211,19 @@ namespace SpireChess.Simulation
                 errors.Add("Every build requires buildId.");
                 return;
             }
+            if (file.FixtureVersion == "0.3.0")
+            {
+                if (build.Calibration == null)
+                {
+                    errors.Add($"{build.BuildId} requires v0.3 calibration evidence.");
+                }
+                else if (build.Calibration.ObservedSamples <
+                         Math.Max(1, file.Calibration?.MinimumSamplesPerBuild ?? 1) ||
+                         build.Calibration.Status != "Ready")
+                {
+                    errors.Add($"{build.BuildId} does not have ready v0.3 calibration evidence.");
+                }
+            }
             if (build.Slots == null || build.Slots.Count != BattleBoardState.SlotCount ||
                 !build.Slots.Select(value => value.Slot)
                     .OrderBy(value => value)
@@ -223,20 +246,39 @@ namespace SpireChess.Simulation
                     errors.Add($"{build.BuildId} slot {slot.Slot} cannot use a Token.");
                     continue;
                 }
-                if (config.Attack + slot.PermanentAttackBonus != slot.ExpectedNormalAttack ||
-                    config.Health + slot.PermanentHealthBonus != slot.ExpectedNormalHealth)
+                var normalGolden = slot.NormalIsGolden ?? false;
+                var highGolden = slot.HighIsGolden ?? true;
+                var highAttackBonus = slot.HighPermanentAttackBonus ??
+                    slot.PermanentAttackBonus * 2;
+                var highHealthBonus = slot.HighPermanentHealthBonus ??
+                    slot.PermanentHealthBonus * 2;
+                if ((normalGolden ? config.GoldenAttack : config.Attack) +
+                        slot.PermanentAttackBonus != slot.ExpectedNormalAttack ||
+                    (normalGolden ? config.GoldenHealth : config.Health) +
+                        slot.PermanentHealthBonus != slot.ExpectedNormalHealth)
                 {
                     errors.Add($"{build.BuildId} slot {slot.Slot} normal stats do not match config.");
                 }
-                if (config.GoldenAttack + slot.PermanentAttackBonus * 2 != slot.ExpectedHighAttack ||
-                    config.GoldenHealth + slot.PermanentHealthBonus * 2 != slot.ExpectedHighHealth)
+                if ((highGolden ? config.GoldenAttack : config.Attack) + highAttackBonus !=
+                        slot.ExpectedHighAttack ||
+                    (highGolden ? config.GoldenHealth : config.Health) + highHealthBonus !=
+                        slot.ExpectedHighHealth)
                 {
                     errors.Add($"{build.BuildId} slot {slot.Slot} high stats do not match config.");
                 }
-                if (slot.NormalFlourishStacks < 0 || slot.NormalFlourishStacks > 4 ||
-                    slot.HighFlourishStacks < 0 || slot.HighFlourishStacks > 8)
+                if (slot.NormalFlourishStacks < 0 ||
+                    slot.NormalFlourishStacks > (normalGolden ? 8 : 4) ||
+                    slot.HighFlourishStacks < 0 ||
+                    slot.HighFlourishStacks > (highGolden ? 8 : 4))
                 {
                     errors.Add($"{build.BuildId} slot {slot.Slot} has invalid flourish stacks.");
+                }
+                if (file.FixtureVersion == "0.3.0" &&
+                    (!slot.NormalIsGolden.HasValue || !slot.HighIsGolden.HasValue ||
+                     !slot.HighPermanentAttackBonus.HasValue ||
+                     !slot.HighPermanentHealthBonus.HasValue))
+                {
+                    errors.Add($"{build.BuildId} slot {slot.Slot} requires explicit v0.3 N/H values.");
                 }
             }
 
@@ -266,6 +308,9 @@ namespace SpireChess.Simulation
         [JsonProperty("coreClassifierVersion")]
         public string CoreClassifierVersion { get; set; }
 
+        [JsonProperty("calibration")]
+        public BalanceFixtureCalibrationDefinition Calibration { get; set; }
+
         [JsonProperty("builds")]
         public List<BalanceBuildDefinition> Builds { get; set; } = new List<BalanceBuildDefinition>();
 
@@ -288,6 +333,9 @@ namespace SpireChess.Simulation
         [JsonProperty("highOverlay")]
         public List<BalanceOverlayDefinition> HighOverlay { get; set; }
             = new List<BalanceOverlayDefinition>();
+
+        [JsonProperty("calibration")]
+        public BalanceBuildCalibrationDefinition Calibration { get; set; }
     }
 
     public sealed class BalanceSlotDefinition
@@ -303,6 +351,18 @@ namespace SpireChess.Simulation
 
         [JsonProperty("permanentHealthBonus")]
         public int PermanentHealthBonus { get; set; }
+
+        [JsonProperty("normalIsGolden")]
+        public bool? NormalIsGolden { get; set; }
+
+        [JsonProperty("highIsGolden")]
+        public bool? HighIsGolden { get; set; }
+
+        [JsonProperty("highPermanentAttackBonus")]
+        public int? HighPermanentAttackBonus { get; set; }
+
+        [JsonProperty("highPermanentHealthBonus")]
+        public int? HighPermanentHealthBonus { get; set; }
 
         [JsonProperty("normalFlourishStacks")]
         public int NormalFlourishStacks { get; set; }
@@ -321,6 +381,42 @@ namespace SpireChess.Simulation
 
         [JsonProperty("expectedHighHealth")]
         public int ExpectedHighHealth { get; set; }
+    }
+
+    public sealed class BalanceFixtureCalibrationDefinition
+    {
+        [JsonProperty("candidateId")]
+        public string CandidateId { get; set; }
+
+        [JsonProperty("sourceCsv")]
+        public string SourceCsv { get; set; }
+
+        [JsonProperty("normalPercentile")]
+        public string NormalPercentile { get; set; }
+
+        [JsonProperty("highPercentile")]
+        public string HighPercentile { get; set; }
+
+        [JsonProperty("minimumSamplesPerBuild")]
+        public int MinimumSamplesPerBuild { get; set; } = 10;
+    }
+
+    public sealed class BalanceBuildCalibrationDefinition
+    {
+        [JsonProperty("observedSamples")]
+        public int ObservedSamples { get; set; }
+
+        [JsonProperty("formationRate")]
+        public double FormationRate { get; set; }
+
+        [JsonProperty("normalRepresentativeSeed")]
+        public int NormalRepresentativeSeed { get; set; }
+
+        [JsonProperty("highRepresentativeSeed")]
+        public int HighRepresentativeSeed { get; set; }
+
+        [JsonProperty("status")]
+        public string Status { get; set; }
     }
 
     public sealed class BalanceOverlayDefinition

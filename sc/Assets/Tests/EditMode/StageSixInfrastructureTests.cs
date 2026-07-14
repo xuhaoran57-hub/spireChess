@@ -125,7 +125,7 @@ namespace SpireChess.Tests.EditMode
                 initialHealth: 100,
                 sourceInstanceId: "enemy");
 
-            var result = new BattleSimulator(new Random(17), ResolveMinion).Simulate(state);
+            var result = new BattleSimulator(new System.Random(17), ResolveMinion).Simulate(state);
 
             Assert.That(result.Diagnostics.RoundCount, Is.GreaterThan(0));
             Assert.That(result.Diagnostics.Player.NormalAttacks, Is.GreaterThan(0));
@@ -180,7 +180,28 @@ namespace SpireChess.Tests.EditMode
                     type = "OnBuy",
                     cardId = "young_deer_spirit"
                 });
-                telemetry.Record("Turn10Snapshot", new { battle = new object[0] });
+                telemetry.Record("Turn10Snapshot", new
+                {
+                    buildId = "B03_SUMMON",
+                    battle = new[]
+                    {
+                        new
+                        {
+                            instanceId = "turn10-core",
+                            cardId = "young_deer_spirit",
+                            attack = 12,
+                            health = 20
+                        }
+                    },
+                    RefreshesPaid = 3,
+                    RefreshesFree = 1,
+                    MinionsBought = 6,
+                    MinionsSold = 1,
+                    SpellsUsed = 2,
+                    TavernUpgrades = 3,
+                    GoldWasted = 1,
+                    TriplesFormed = 1
+                });
                 telemetry.Record("RunEnded", new
                 {
                     result = "Won",
@@ -220,6 +241,12 @@ namespace SpireChess.Tests.EditMode
 
                 Assert.That(summary.Result, Is.EqualTo("Won"));
                 Assert.That(summary.FinalBuildId, Is.EqualTo("B03_SUMMON"));
+                Assert.That(summary.TurnTenBuildId, Is.EqualTo("B03_SUMMON"));
+                Assert.That(summary.TurnTenPermanentAttack, Is.EqualTo(12));
+                Assert.That(summary.TurnTenPermanentHealth, Is.EqualTo(20));
+                Assert.That(summary.TurnTenRefreshesPaid, Is.EqualTo(3));
+                Assert.That(summary.TurnTenSpellsUsed, Is.EqualTo(2));
+                Assert.That(summary.TurnTenTriplesFormed, Is.EqualTo(1));
                 Assert.That(summary.RouteNodeIds, Is.EqualTo("f1_start"));
                 var minionRow = funnel.Single(value => value.CardId == "young_deer_spirit");
                 Assert.That(minionRow.Offered, Is.EqualTo(1));
@@ -232,6 +259,88 @@ namespace SpireChess.Tests.EditMode
             {
                 if (File.Exists(path)) File.Delete(path);
             }
+        }
+
+        [Test]
+        public void GrowthCalibration_UsesTurnTenFormationAndP50P90Panels()
+        {
+            var summaries = new[]
+            {
+                CalibrationSummary(2003, "B02_BREAK", "B02_BREAK", 40, 30),
+                CalibrationSummary(2004, "B02_BREAK", "B02_BREAK", 50, 40),
+                CalibrationSummary(2005, "B02_BREAK", "B02_BREAK", 60, 50),
+                CalibrationSummary(2020, "B02_BREAK", "Unclassified", 0, 0)
+            };
+
+            var row = new RunGrowthCalibrationAggregator()
+                .Aggregate(summaries, "R3", "R3")
+                .Single(value => value.BuildId == "B02_BREAK");
+
+            Assert.That(row.IntendedRuns, Is.EqualTo(4));
+            Assert.That(row.IntendedRunsFormedByTurnTen, Is.EqualTo(3));
+            Assert.That(row.FormationRate, Is.EqualTo(0.75d));
+            Assert.That(row.NormalAttackP50, Is.EqualTo(50));
+            Assert.That(row.NormalHealthP50, Is.EqualTo(40));
+            Assert.That(row.HighAttackP90, Is.EqualTo(60));
+            Assert.That(row.HighHealthP90, Is.EqualTo(50));
+            Assert.That(row.NormalRepresentativeSeed, Is.EqualTo(2004));
+            Assert.That(row.HighRepresentativeSeed, Is.EqualTo(2005));
+            Assert.That(row.CalibrationStatus, Is.EqualTo("Provisional"));
+            Assert.That(BalanceGrowthCalibrationCsv.Serialize(new[] { row }),
+                Does.Contain("normalAttackP50"));
+        }
+
+        [Test]
+        public void FixtureV03_AllowsIndependentNormalAndHighDevelopmentStats()
+        {
+            var serializer = new NewtonsoftJsonSerializer();
+            var document = serializer.FromJson<BalanceFixtureFile>(
+                File.ReadAllText(FixturePath()));
+            document.FixtureVersion = "0.3.0";
+            document.Calibration = new BalanceFixtureCalibrationDefinition
+            {
+                CandidateId = "test-calibration",
+                SourceCsv = "balance_fixture_calibration.csv",
+                NormalPercentile = "P50",
+                HighPercentile = "P90",
+                MinimumSamplesPerBuild = 1
+            };
+            foreach (var build in document.Builds)
+            {
+                build.Calibration = new BalanceBuildCalibrationDefinition
+                {
+                    ObservedSamples = 1,
+                    FormationRate = 1d,
+                    NormalRepresentativeSeed = 2000,
+                    HighRepresentativeSeed = 2001,
+                    Status = "Ready"
+                };
+                foreach (var slot in build.Slots)
+                {
+                    var config = ResolveMinion(slot.MinionId);
+                    var highAttackBonus = slot.PermanentAttackBonus + 1;
+                    var highHealthBonus = slot.PermanentHealthBonus + 1;
+                    slot.NormalIsGolden = false;
+                    slot.HighIsGolden = false;
+                    slot.HighPermanentAttackBonus = highAttackBonus;
+                    slot.HighPermanentHealthBonus = highHealthBonus;
+                    slot.ExpectedHighAttack = config.Attack + highAttackBonus;
+                    slot.ExpectedHighHealth = config.Health + highHealthBonus;
+                    if (slot.HighFlourishStacks > 4)
+                    {
+                        slot.HighFlourishStacks = 4;
+                    }
+                }
+            }
+
+            var calibrated = BalanceFixtureCatalog.Load(
+                serializer.ToJson(document),
+                ResolveMinion);
+            var high = calibrated.CreateFixture("B02_BREAK", "H");
+
+            Assert.That(high.Player[0].IsGolden, Is.False);
+            Assert.That(high.Player[0].CurrentAttack,
+                Is.EqualTo(ResolveMinion("oathbroken_blade_soul").Attack + 9));
         }
 
         [Test]
@@ -266,6 +375,33 @@ namespace SpireChess.Tests.EditMode
                 "Fixtures",
                 "Balance",
                 "balance-fixtures.v0.2.json");
+        }
+
+        private static BalanceRunSummary CalibrationSummary(
+            int seed,
+            string intendedBuildId,
+            string turnTenBuildId,
+            int attack,
+            int health)
+        {
+            return new BalanceRunSummary
+            {
+                Seed = seed,
+                IntendedBuildId = intendedBuildId,
+                TurnTenReached = true,
+                TurnTenBuildId = turnTenBuildId,
+                TurnTenPermanentAttack = attack,
+                TurnTenPermanentHealth = health,
+                TurnTenBoardJson = $"[{{\"seed\":{seed}}}]",
+                FirstCoreTurn = 4,
+                SecondCoreTurn = 8,
+                TurnTenRefreshesPaid = 3,
+                TurnTenRefreshesFree = 1,
+                TurnTenMinionsBought = 6,
+                TurnTenSpellsUsed = 2,
+                TurnTenTavernUpgrades = 3,
+                TurnTenTriplesFormed = 1
+            };
         }
 
         private MinionConfig ResolveMinion(string id)

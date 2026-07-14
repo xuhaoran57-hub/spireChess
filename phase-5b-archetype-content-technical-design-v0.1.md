@@ -117,11 +117,11 @@
 | 1 | 铸魂盾侍 | `OnBattleStart + AddShield`，金色增加 Left 目标 | 护盾启动 |
 | 1 | 炉心火种 | 自身 `OnShieldLost + ModifyStats(Combat)` | 失盾输出 |
 | 1 | 铜环学徒 | `OnBattleStart + Left + ModifyStats(Combat)` | 站位教学 |
-| 2 | 盾墙执炉者 | 相邻友方失盾观察、`perCombat`、重新加盾 | 护盾循环 |
+| 2 | 盾墙执炉者 | 相邻友方失盾观察、`perCombat`、临时属性补偿 | 失盾保护 |
 | 2 | 破盾刃胚 | 任意友方失盾观察、自身临时攻击 | 失盾核心 |
 | 2 | 回火修补匠 | 目标型战吼、已有盾 fallback；金色永久生命 | 主动补盾 |
 | 3 | 誓刃甲胄 | 失盾事件携带攻击者，对攻击者伤害 | 反伤 |
-| 3 | 共鸣钟卫 | Adjacent 条件、临时属性与限次补盾 | 站位核心 |
+| 3 | 共鸣钟卫 | Adjacent 条件与临时攻血补偿 | 站位核心 |
 | 3 | 熔核执旗手 | 友方 `OnShieldGained`，目标自身加攻击 | 护盾转输出 |
 
 ### 5.3 关键规则

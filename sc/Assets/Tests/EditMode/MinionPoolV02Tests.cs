@@ -156,6 +156,101 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void BreakAndDeathFinishers_HaveR3TriggerAndGrowthRules()
+        {
+            var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
+            Assert.That(oathbroken.Effects.Where(effect =>
+                    effect.Trigger == "OnShieldLost"),
+                Has.All.Matches<EffectConfig>(effect =>
+                    effect.Condition?.Type == "SubjectIsSelf"));
+            Assert.That(oathbroken.GoldenEffects.Where(effect =>
+                    effect.Trigger == "OnShieldLost"),
+                Has.All.Matches<EffectConfig>(effect =>
+                    effect.Condition?.Type == "SubjectIsSelf"));
+
+            var avenger = configs.MinionsById["cracked_armor_avenger"];
+            Assert.That(avenger.Effects, Has.Count.EqualTo(1));
+            Assert.That(avenger.Effects[0].Value.Duration, Is.EqualTo("Permanent"));
+            Assert.That(avenger.Effects[0].Value.Attack, Is.EqualTo(1));
+            Assert.That(avenger.Effects[0].Value.Health, Is.EqualTo(1));
+            Assert.That(avenger.Effects[0].Limit.PerCombat, Is.EqualTo(2));
+            Assert.That(avenger.GoldenEffects, Has.Count.EqualTo(2));
+            Assert.That(avenger.GoldenEffects.Select(effect => effect.Value.Duration),
+                Is.EquivalentTo(new[] { "Permanent", "Combat" }));
+            Assert.That(avenger.GoldenEffects,
+                Has.All.Matches<EffectConfig>(effect => effect.Limit.PerCombat == 2));
+
+            var mountain = configs.MinionsById["ancient_mountain_spirit"];
+            Assert.That(mountain.Effects, Has.Count.EqualTo(1));
+            Assert.That(mountain.Effects[0].Value.Duration, Is.EqualTo("Permanent"));
+            Assert.That(mountain.Effects[0].Value.Attack, Is.EqualTo(1));
+            Assert.That(mountain.Effects[0].Limit.PerCombat, Is.EqualTo(3));
+            Assert.That(mountain.GoldenEffects[0].Value.Attack, Is.EqualTo(2));
+            Assert.That(mountain.GoldenEffects[0].Value.Health, Is.EqualTo(2));
+
+            var finalBloom = configs.MinionsById["world_eating_final_bloom"];
+            var copiedHealth = finalBloom.GoldenEffects.Single(effect =>
+                effect.Id == "golden_world_eating_final_bloom_death_health");
+            Assert.That(copiedHealth.Value.Resource, Is.EqualTo("SubjectHealth"));
+            Assert.That(copiedHealth.Value.Duration, Is.EqualTo("Combat"));
+            Assert.That(copiedHealth.Limit.PerCombat, Is.EqualTo(2));
+            var permanentGrowth = finalBloom.GoldenEffects.Single(effect =>
+                effect.Id == "golden_world_eating_final_bloom_death_permanent");
+            Assert.That(permanentGrowth.Value.Attack, Is.EqualTo(2));
+            Assert.That(permanentGrowth.Value.Health, Is.EqualTo(2));
+            Assert.That(permanentGrowth.Limit.PerCombat, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ForgeSoulReplenishment_IsRemovedFromLowerTierSupports()
+        {
+            var keeper = configs.MinionsById["shieldwall_furnace_keeper"];
+            Assert.That(keeper.Effects, Has.Count.EqualTo(1));
+            Assert.That(keeper.Effects[0].Action, Is.EqualTo("ModifyStats"));
+            Assert.That(keeper.Effects[0].Value.Attack, Is.EqualTo(1));
+            Assert.That(keeper.Effects[0].Value.Health, Is.EqualTo(2));
+            Assert.That(keeper.Effects[0].Limit.PerCombat, Is.EqualTo(1));
+            Assert.That(keeper.GoldenEffects[0].Value.Attack, Is.EqualTo(2));
+            Assert.That(keeper.GoldenEffects[0].Value.Health, Is.EqualTo(4));
+            Assert.That(keeper.GoldenEffects[0].Limit.PerCombat, Is.EqualTo(2));
+
+            var bellGuard = configs.MinionsById["resonance_bell_guard"];
+            Assert.That(bellGuard.Effects, Has.Count.EqualTo(1));
+            Assert.That(bellGuard.Effects[0].Action, Is.EqualTo("ModifyStats"));
+            Assert.That(bellGuard.Effects[0].Value.Health, Is.EqualTo(2));
+            Assert.That(bellGuard.GoldenEffects, Has.Count.EqualTo(1));
+            Assert.That(bellGuard.GoldenEffects[0].Value.Health, Is.EqualTo(4));
+
+            var officer = configs.MinionsById["hearth_core_aegis_officer"];
+            var deathEffect = officer.Effects.Single(effect =>
+                effect.Id == "hearth_core_aegis_officer_death");
+            Assert.That(deathEffect.Action, Is.EqualTo("ModifyStats"));
+            Assert.That(deathEffect.Target.Selector, Is.EqualTo("Random"));
+            Assert.That(deathEffect.Value.Attack, Is.EqualTo(2));
+            Assert.That(deathEffect.Value.Health, Is.EqualTo(2));
+            var goldenDeathEffect = officer.GoldenEffects.Single(effect =>
+                effect.Id == "golden_hearth_core_aegis_officer_death");
+            Assert.That(goldenDeathEffect.Action, Is.EqualTo("ModifyStats"));
+            Assert.That(goldenDeathEffect.Target.MaxTargets, Is.EqualTo(2));
+
+            var allowedMidCombatShieldEffects = configs.Minions
+                .Where(minion => minion.Race == "ForgeSoul")
+                .SelectMany(minion => minion.Effects.Concat(minion.GoldenEffects))
+                .Where(effect => effect.Action == "AddShield" &&
+                                 effect.Trigger != "OnBattleStart" &&
+                                 effect.Trigger != "OnPlay")
+                .Select(effect => effect.Id)
+                .ToList();
+            Assert.That(allowedMidCombatShieldEffects, Is.EquivalentTo(new[]
+            {
+                "undying_furnace_king_transfer",
+                "golden_undying_furnace_king_transfer",
+                "oathbroken_blade_soul_kill",
+                "golden_oathbroken_blade_soul_kill"
+            }));
+        }
+
+        [Test]
         public void NewStarboundMinions_ExecuteRefreshAndNextCombatEffects()
         {
             var shop = new ShopSession(configs.Minions, configs.Spells, new Random(11));
