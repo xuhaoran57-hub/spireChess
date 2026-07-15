@@ -114,6 +114,10 @@ namespace SpireChess.Simulation
 
             var state = new BattleBoardState();
             var fixtureId = $"{buildId}_{developmentLevel}";
+            var flourishStacks = developmentLevel == "H"
+                ? build.HighFlourishStacks
+                : build.NormalFlourishStacks;
+            state.PlayerFlourishStacks = flourishStacks;
             var overlays = developmentLevel == "H" ? build.HighOverlay : build.NormalOverlay;
             foreach (var slot in build.Slots.OrderBy(value => value.Slot))
             {
@@ -133,18 +137,16 @@ namespace SpireChess.Simulation
                 var baseHealth = isGolden ? config.GoldenHealth : config.Health;
                 var temporaryAttack = overlay?.Attack ?? 0;
                 var temporaryHealth = overlay?.Health ?? 0;
+                var flourishAttack = config.Race == "WildSpirit" ? flourishStacks : 0;
                 var runtime = new BattleMinionRuntime(
                     config,
                     isGolden,
-                    baseAttack + permanentAttack + temporaryAttack,
+                    baseAttack + permanentAttack + temporaryAttack + flourishAttack,
                     baseHealth + permanentHealth + temporaryHealth,
                     $"{fixtureId}-S{slot.Slot}",
                     permanentAttack,
                     permanentHealth,
-                    overlay?.Keywords,
-                    flourishStacks: developmentLevel == "H"
-                        ? slot.HighFlourishStacks
-                        : slot.NormalFlourishStacks);
+                    overlay?.Keywords);
                 state.Player[slot.Slot] = runtime;
             }
 
@@ -183,6 +185,8 @@ namespace SpireChess.Simulation
                 state.Player[slot] = player.Player[slot]?.Clone();
                 state.Enemy[slot] = enemy.Player[slot]?.Clone();
             }
+            state.PlayerFlourishStacks = player.PlayerFlourishStacks;
+            state.EnemyFlourishStacks = enemy.PlayerFlourishStacks;
             return state;
         }
 
@@ -266,13 +270,6 @@ namespace SpireChess.Simulation
                 {
                     errors.Add($"{build.BuildId} slot {slot.Slot} high stats do not match config.");
                 }
-                if (slot.NormalFlourishStacks < 0 ||
-                    slot.NormalFlourishStacks > (normalGolden ? 8 : 4) ||
-                    slot.HighFlourishStacks < 0 ||
-                    slot.HighFlourishStacks > (highGolden ? 8 : 4))
-                {
-                    errors.Add($"{build.BuildId} slot {slot.Slot} has invalid flourish stacks.");
-                }
                 if (file.FixtureVersion == "0.3.0" &&
                     (!slot.NormalIsGolden.HasValue || !slot.HighIsGolden.HasValue ||
                      !slot.HighPermanentAttackBonus.HasValue ||
@@ -280,6 +277,11 @@ namespace SpireChess.Simulation
                 {
                     errors.Add($"{build.BuildId} slot {slot.Slot} requires explicit v0.3 N/H values.");
                 }
+            }
+
+            if (build.NormalFlourishStacks < 0 || build.HighFlourishStacks < 0)
+            {
+                errors.Add($"{build.BuildId} has invalid flourish stacks.");
             }
 
             ValidateOverlays(build.BuildId, build.NormalOverlay, errors);
@@ -326,6 +328,12 @@ namespace SpireChess.Simulation
         [JsonProperty("slots")]
         public List<BalanceSlotDefinition> Slots { get; set; } = new List<BalanceSlotDefinition>();
 
+        [JsonProperty("normalFlourishStacks")]
+        public int NormalFlourishStacks { get; set; }
+
+        [JsonProperty("highFlourishStacks")]
+        public int HighFlourishStacks { get; set; }
+
         [JsonProperty("normalOverlay")]
         public List<BalanceOverlayDefinition> NormalOverlay { get; set; }
             = new List<BalanceOverlayDefinition>();
@@ -363,12 +371,6 @@ namespace SpireChess.Simulation
 
         [JsonProperty("highPermanentHealthBonus")]
         public int? HighPermanentHealthBonus { get; set; }
-
-        [JsonProperty("normalFlourishStacks")]
-        public int NormalFlourishStacks { get; set; }
-
-        [JsonProperty("highFlourishStacks")]
-        public int HighFlourishStacks { get; set; }
 
         [JsonProperty("expectedNormalAttack")]
         public int ExpectedNormalAttack { get; set; }

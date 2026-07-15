@@ -40,6 +40,11 @@ namespace SpireChess.Shop
 
         public MinionConfig Draw(int maximumTier, Random random)
         {
+            return Draw(maximumTier, null, random);
+        }
+
+        public MinionConfig Draw(int maximumTier, string race, Random random)
+        {
             if (random == null)
             {
                 throw new ArgumentNullException(nameof(random));
@@ -48,7 +53,8 @@ namespace SpireChess.Shop
             var totalCopies = 0;
             foreach (var minion in minions)
             {
-                if (minion.Tier <= maximumTier)
+                if (minion.Tier <= maximumTier &&
+                    (string.IsNullOrWhiteSpace(race) || minion.Race == race))
                 {
                     totalCopies += remainingCopies[minion.Id];
                 }
@@ -62,7 +68,8 @@ namespace SpireChess.Shop
             var roll = random.Next(totalCopies);
             foreach (var minion in minions)
             {
-                if (minion.Tier > maximumTier)
+                if (minion.Tier > maximumTier ||
+                    (!string.IsNullOrWhiteSpace(race) && minion.Race != race))
                 {
                     continue;
                 }

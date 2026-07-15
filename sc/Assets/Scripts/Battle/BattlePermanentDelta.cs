@@ -16,7 +16,6 @@ namespace SpireChess.Battle
         public string SourceInstanceId { get; }
         public int Attack { get; private set; }
         public int Health { get; private set; }
-        public int Flourish { get; private set; }
         public IReadOnlyCollection<string> Keywords => keywords;
         public int ApplicationCount { get; private set; }
 
@@ -29,17 +28,6 @@ namespace SpireChess.Battle
                 keywords.Add(keyword);
             }
 
-            ApplicationCount++;
-        }
-
-        internal void AddFlourish(int amount)
-        {
-            if (amount <= 0)
-            {
-                return;
-            }
-
-            Flourish += amount;
             ApplicationCount++;
         }
     }

@@ -27,6 +27,7 @@ namespace SpireChess.Shop
         private readonly Action<int> grantGold;
         private readonly Action<int> grantFreeRefreshes;
         private readonly Action<int> scheduleGold;
+        private readonly Action<ShopCardInstance> shieldGained;
 
         public ShopEffectEngine(
             PlayerCollection collection,
@@ -34,7 +35,8 @@ namespace SpireChess.Shop
             ShopPhaseStats stats,
             Action<int> grantGold,
             Action<int> grantFreeRefreshes,
-            Action<int> scheduleGold)
+            Action<int> scheduleGold,
+            Action<ShopCardInstance> shieldGained)
         {
             this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
             this.random = random ?? throw new ArgumentNullException(nameof(random));
@@ -43,6 +45,8 @@ namespace SpireChess.Shop
             this.grantFreeRefreshes = grantFreeRefreshes ??
                 throw new ArgumentNullException(nameof(grantFreeRefreshes));
             this.scheduleGold = scheduleGold ?? throw new ArgumentNullException(nameof(scheduleGold));
+            this.shieldGained = shieldGained ??
+                throw new ArgumentNullException(nameof(shieldGained));
         }
 
         public bool TryBuildPlan(
@@ -52,7 +56,8 @@ namespace SpireChess.Shop
             int playerTargetIndex,
             bool requireEveryEffect,
             out List<ResolvedShopEffect> plan,
-            out ShopOperationError error)
+            out ShopOperationError error,
+            ShopCardInstance eventSubject = null)
         {
             plan = new List<ResolvedShopEffect>();
             error = ShopOperationError.None;
@@ -89,6 +94,7 @@ namespace SpireChess.Shop
                                 source,
                                 sourceBattleIndex,
                                 playerTargetIndex,
+                                eventSubject,
                                 out var targets,
                                 out error))
                         {
@@ -189,6 +195,22 @@ namespace SpireChess.Shop
                         }
                         break;
                     case "AddShield":
+                        foreach (var target in resolved.Targets)
+                        {
+                            var alreadyHasShield = target.HasEffectiveKeyword("Shield") ||
+                                target.HasPendingCombatShield;
+                            target.AddPendingCombatModifier(new PendingCombatModifier(
+                                resolved.Effect.Id,
+                                value.Attack,
+                                value.Health,
+                                value.Keyword,
+                                true));
+                            if (!alreadyHasShield)
+                            {
+                                shieldGained(target);
+                            }
+                        }
+                        break;
                     case "SetPendingCombatBuff":
                         foreach (var target in resolved.Targets)
                         {
@@ -197,7 +219,6 @@ namespace SpireChess.Shop
                                 value.Attack,
                                 value.Health,
                                 value.Keyword,
-                                resolved.Effect.Action == "AddShield" ||
                                 value.Keyword == "Shield"));
                         }
                         break;
@@ -309,6 +330,7 @@ namespace SpireChess.Shop
             ShopCardInstance source,
             int sourceBattleIndex,
             int playerTargetIndex,
+            ShopCardInstance eventSubject,
             out IReadOnlyList<ShopCardInstance> targets,
             out ShopOperationError error)
         {
@@ -328,6 +350,16 @@ namespace SpireChess.Shop
                 if (source != null)
                 {
                     targets = new[] { source };
+                }
+
+                return true;
+            }
+
+            if (target.Scope == "EventSubject")
+            {
+                if (IsEligibleTarget(eventSubject, source, target))
+                {
+                    targets = new[] { eventSubject };
                 }
 
                 return true;

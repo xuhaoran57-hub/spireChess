@@ -30,7 +30,7 @@ namespace SpireChess.Tests.EditMode
         [Test]
         public void BalanceFixtures_DefineAndValidateAllNormalAndHighSnapshots()
         {
-            Assert.That(fixtures.FixtureVersion, Is.EqualTo("0.2.0"));
+            Assert.That(fixtures.FixtureVersion, Is.EqualTo("0.3.0"));
             Assert.That(fixtures.CoreClassifierVersion, Is.EqualTo("0.2.1"));
             Assert.That(fixtures.BuildIds, Has.Count.EqualTo(6));
             foreach (var buildId in fixtures.BuildIds)
@@ -71,12 +71,14 @@ namespace SpireChess.Tests.EditMode
 
             var summonNormal = fixtures.CreateFixture("B03_SUMMON", "N");
             var summonHigh = fixtures.CreateFixture("B03_SUMMON", "H");
-            Assert.That(summonNormal.Player[0].CurrentHealth, Is.EqualTo(10));
-            Assert.That(summonHigh.Player[0].CurrentHealth, Is.EqualTo(20));
-            Assert.That(summonNormal.Player[4].Id, Is.EqualTo("vinecrown_priest"));
-            Assert.That(summonNormal.Player[4].FlourishStacks, Is.EqualTo(2));
-            Assert.That(summonHigh.Player[4].Id, Is.EqualTo("vinecrown_priest"));
-            Assert.That(summonHigh.Player[4].FlourishStacks, Is.EqualTo(4));
+            Assert.That(summonNormal.PlayerFlourishStacks, Is.EqualTo(12));
+            Assert.That(summonHigh.PlayerFlourishStacks, Is.EqualTo(12));
+            Assert.That(summonNormal.Player[0].CurrentAttack, Is.EqualTo(18));
+            Assert.That(summonHigh.Player[0].CurrentAttack, Is.EqualTo(22));
+            Assert.That(summonNormal.Player[0].CurrentHealth, Is.EqualTo(13));
+            Assert.That(summonHigh.Player[0].CurrentHealth, Is.EqualTo(19));
+            Assert.That(summonNormal.Player[0].Id, Is.EqualTo("hundred_song_herd"));
+            Assert.That(summonHigh.Player[0].Id, Is.EqualTo("hundred_song_herd"));
         }
 
         [Test]
@@ -326,13 +328,13 @@ namespace SpireChess.Tests.EditMode
                     slot.HighPermanentHealthBonus = highHealthBonus;
                     slot.ExpectedHighAttack = config.Attack + highAttackBonus;
                     slot.ExpectedHighHealth = config.Health + highHealthBonus;
-                    if (slot.HighFlourishStacks > 4)
-                    {
-                        slot.HighFlourishStacks = 4;
-                    }
                 }
             }
 
+            var expectedHighAttack = document.Builds
+                .Single(build => build.BuildId == "B02_BREAK")
+                .Slots.Single(slot => slot.Slot == 0)
+                .ExpectedHighAttack;
             var calibrated = BalanceFixtureCatalog.Load(
                 serializer.ToJson(document),
                 ResolveMinion);
@@ -340,7 +342,7 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(high.Player[0].IsGolden, Is.False);
             Assert.That(high.Player[0].CurrentAttack,
-                Is.EqualTo(ResolveMinion("oathbroken_blade_soul").Attack + 9));
+                Is.EqualTo(expectedHighAttack));
         }
 
         [Test]
@@ -374,7 +376,7 @@ namespace SpireChess.Tests.EditMode
                 "Tests",
                 "Fixtures",
                 "Balance",
-                "balance-fixtures.v0.2.json");
+                "balance-fixtures.v0.3.json");
         }
 
         private static BalanceRunSummary CalibrationSummary(

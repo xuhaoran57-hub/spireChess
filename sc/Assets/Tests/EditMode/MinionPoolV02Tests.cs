@@ -134,16 +134,17 @@ namespace SpireChess.Tests.EditMode
             Assert.That(goldenTransfer.Condition.Type, Is.EqualTo("HasUnshieldedRaceTarget"));
 
             var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
-            Assert.That(oathbroken.Effects.Single(value =>
-                value.Id == "oathbroken_blade_soul_lost_permanent").Limit.PerCombat,
-                Is.EqualTo(1));
-            Assert.That(oathbroken.GoldenEffects.Single(value =>
-                value.Id == "golden_oathbroken_blade_soul_lost_permanent").Limit.PerCombat,
-                Is.EqualTo(3));
+            Assert.That(oathbroken.Effects.Concat(oathbroken.GoldenEffects),
+                Has.None.Matches<EffectConfig>(value =>
+                    value.Trigger == "OnShieldLost" &&
+                    value.Value?.Duration == "Permanent"));
 
             var treasurer = configs.MinionsById["star_ring_treasurer"];
             Assert.That(treasurer.Effects.Single(value =>
                 value.Id == "star_ring_treasurer_shield").Target.MaxTargets,
+                Is.EqualTo(1));
+            Assert.That(treasurer.GoldenEffects.Single(value =>
+                value.Id == "golden_star_ring_treasurer_shield").Target.MaxTargets,
                 Is.EqualTo(2));
 
             var finalBloom = configs.MinionsById["world_eating_final_bloom"];
@@ -170,9 +171,11 @@ namespace SpireChess.Tests.EditMode
 
             var avenger = configs.MinionsById["cracked_armor_avenger"];
             Assert.That(avenger.Effects, Has.Count.EqualTo(1));
-            Assert.That(avenger.Effects[0].Value.Duration, Is.EqualTo("Permanent"));
-            Assert.That(avenger.Effects[0].Value.Attack, Is.EqualTo(1));
-            Assert.That(avenger.Effects[0].Value.Health, Is.EqualTo(1));
+            Assert.That(avenger.Effects[0].Action,
+                Is.EqualTo("GrantRandomMinionAfterCombat"));
+            Assert.That(avenger.Effects[0].Value.Amount, Is.EqualTo(1));
+            Assert.That(avenger.GoldenEffects[0].Value.Amount, Is.EqualTo(2));
+            Assert.That(avenger.Effects[0].Discover.Race, Is.EqualTo("ForgeSoul"));
             Assert.That(avenger.Effects[0].Limit.PerCombat, Is.EqualTo(2));
             Assert.That(avenger.GoldenEffects, Has.Count.EqualTo(2));
             Assert.That(avenger.GoldenEffects.Select(effect => effect.Value.Duration),
@@ -246,7 +249,9 @@ namespace SpireChess.Tests.EditMode
                 "undying_furnace_king_transfer",
                 "golden_undying_furnace_king_transfer",
                 "oathbroken_blade_soul_kill",
-                "golden_oathbroken_blade_soul_kill"
+                "golden_oathbroken_blade_soul_kill",
+                "thousand_ring_tomb_guardian_death_shield",
+                "golden_thousand_ring_tomb_guardian_death_shield"
             }));
         }
 

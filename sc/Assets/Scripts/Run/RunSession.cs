@@ -560,6 +560,8 @@ namespace SpireChess.Run
             PendingBattle = null;
             Shop.ApplyPostCombatSurvivorBuffs(result);
             ApplyBattlePermanentDeltas(result);
+            Shop.ApplyFlourish(result.Diagnostics.Player.FlourishGained);
+            QueuePostCombatRewards(result);
             AccumulateBattleCoreEvidence(result.Diagnostics);
             UpdateCoreProgress();
             Telemetry?.Record("BattleCompleted", new
@@ -582,8 +584,14 @@ namespace SpireChess.Run
                     value.SourceInstanceId,
                     value.Attack,
                     value.Health,
-                    value.Flourish,
                     keywords = value.Keywords.ToArray()
+                }).ToArray(),
+                flourishStacks = Shop.FlourishStacks,
+                postCombatRewardRequests = result.PostCombatRewardRequests.Select(value => new
+                {
+                    side = value.Side.ToString(),
+                    value.Race,
+                    value.Count
                 }).ToArray(),
                 diagnostics = result.Diagnostics
             });
@@ -604,8 +612,7 @@ namespace SpireChess.Run
                 Shop.ModifyOwnedBattleMinion(
                     delta.SourceInstanceId,
                     delta.Attack,
-                    delta.Health,
-                    flourish: delta.Flourish);
+                    delta.Health);
                 foreach (var keyword in delta.Keywords)
                 {
                     Shop.ModifyOwnedBattleMinion(
@@ -613,6 +620,38 @@ namespace SpireChess.Run
                         0,
                         0,
                         keyword);
+                }
+            }
+        }
+
+        private void QueuePostCombatRewards(BattleSimulationResult result)
+        {
+            var maximumTier = Shop.TavernTier - 1;
+            if (maximumTier < 1)
+            {
+                return;
+            }
+
+            foreach (var request in result.PostCombatRewardRequests.Where(value =>
+                         value.Side == BattleSide.Player))
+            {
+                for (var index = 0; index < request.Count; index++)
+                {
+                    var minion = Shop.MinionPool.Draw(
+                        maximumTier,
+                        request.Race,
+                        rewardRandom);
+                    if (minion == null)
+                    {
+                        break;
+                    }
+
+                    rewardSequence++;
+                    State.EnqueueCardReward(new PendingCardReward(
+                        $"reward_{rewardSequence:D6}",
+                        ShopCardType.Minion,
+                        minion.Id,
+                        1));
                 }
             }
         }
@@ -1342,6 +1381,7 @@ namespace SpireChess.Run
                 minionOfferIds = Shop.MinionOffers
                     .Select(value => value?.Id).ToArray(),
                 spellOfferId = Shop.SpellOffer?.Id,
+                flourishStacks = Shop.FlourishStacks,
                 battle = BuildCardSnapshots(Shop.Collection.Battle),
                 bench = BuildCardSnapshots(Shop.Collection.Bench),
                 firstCoreTurn = State.Statistics.FirstCoreTurn,
@@ -1372,6 +1412,7 @@ namespace SpireChess.Run
                 buildId = CoreBuildClassifier.ClassifyFinalBuild(
                     Shop.Collection.Battle,
                     coreEvidence),
+                flourishStacks = Shop.FlourishStacks,
                 battle = BuildCardSnapshots(Shop.Collection.Battle),
                 bench = BuildCardSnapshots(Shop.Collection.Bench),
                 firstCoreTurn = State.Statistics.FirstCoreTurn,
@@ -1418,7 +1459,7 @@ namespace SpireChess.Run
                         health = card.CurrentHealth,
                         permanentAttack = card.PermanentAttackBonus,
                         permanentHealth = card.PermanentHealthBonus,
-                        flourishStacks = card.FlourishStacks,
+                        flourishAttackBonus = card.FlourishAttackBonus,
                         permanentKeywords = card.PermanentKeywords.OrderBy(value => value).ToArray(),
                         pendingCombatModifiers = card.PendingCombatModifiers.Select(value => new
                         {
@@ -1519,6 +1560,7 @@ namespace SpireChess.Run
                 finalBuildId = CoreBuildClassifier.ClassifyFinalBuild(
                     Shop.Collection.Battle,
                     coreEvidence),
+                flourishStacks = Shop.FlourishStacks,
                 finalBoard = BuildCardSnapshots(Shop.Collection.Battle)
             });
         }

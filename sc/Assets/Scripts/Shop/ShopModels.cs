@@ -87,8 +87,7 @@ namespace SpireChess.Shop
             int permanentHealthBonus,
             IEnumerable<string> permanentKeywords,
             bool tripleDiscoveryPending,
-            bool expiresAtShopEnd,
-            int flourishStacks)
+            bool expiresAtShopEnd)
         {
             InstanceId = instanceId;
             CardType = cardType;
@@ -102,7 +101,6 @@ namespace SpireChess.Shop
             PermanentKeywords = permanentKeywordsSet;
             TripleDiscoveryPending = tripleDiscoveryPending;
             ExpiresAtShopEnd = expiresAtShopEnd;
-            FlourishStacks = Math.Max(0, Math.Min(isGolden ? 8 : 4, flourishStacks));
         }
 
         public string InstanceId { get; }
@@ -113,7 +111,7 @@ namespace SpireChess.Shop
         public bool IsGolden { get; }
         public int PermanentAttackBonus { get; private set; }
         public int PermanentHealthBonus { get; private set; }
-        public int FlourishStacks { get; private set; }
+        public int FlourishAttackBonus { get; private set; }
         private readonly HashSet<string> permanentKeywordsSet;
         public IReadOnlyCollection<string> PermanentKeywords { get; }
         public bool TripleDiscoveryPending { get; internal set; }
@@ -127,7 +125,8 @@ namespace SpireChess.Shop
             modifier.AddShield || modifier.Keyword == "Shield");
         public int PoolCopiesHeld => IsGolden ? 3 : 1;
         public int CurrentAttack => CardType == ShopCardType.Minion
-            ? (IsGolden ? Minion.GoldenAttack : Minion.Attack) + PermanentAttackBonus
+            ? (IsGolden ? Minion.GoldenAttack : Minion.Attack) +
+              PermanentAttackBonus + FlourishAttackBonus
             : 0;
         public int CurrentHealth => CardType == ShopCardType.Minion
             ? (IsGolden ? Minion.GoldenHealth : Minion.Health) + PermanentHealthBonus
@@ -140,8 +139,7 @@ namespace SpireChess.Shop
             int permanentAttackBonus = 0,
             int permanentHealthBonus = 0,
             IEnumerable<string> permanentKeywords = null,
-            bool tripleDiscoveryPending = false,
-            int flourishStacks = 0)
+            bool tripleDiscoveryPending = false)
         {
             return new ShopCardInstance(
                 instanceId,
@@ -153,8 +151,7 @@ namespace SpireChess.Shop
                 permanentHealthBonus,
                 permanentKeywords,
                 tripleDiscoveryPending,
-                false,
-                flourishStacks);
+                false);
         }
 
         public static ShopCardInstance CreateSpell(
@@ -172,8 +169,7 @@ namespace SpireChess.Shop
                 0,
                 null,
                 false,
-                expiresAtShopEnd,
-                0);
+                expiresAtShopEnd);
         }
 
         internal void ApplyPermanentStats(int attack, int health)
@@ -187,14 +183,11 @@ namespace SpireChess.Shop
             PermanentHealthBonus += health;
         }
 
-        internal void ApplyFlourish(int amount)
+        internal void SetFlourishAttackBonus(int amount)
         {
-            if (CardType != ShopCardType.Minion || amount <= 0)
-            {
-                return;
-            }
-
-            FlourishStacks = Math.Min(IsGolden ? 8 : 4, FlourishStacks + amount);
+            FlourishAttackBonus = CardType == ShopCardType.Minion
+                ? Math.Max(0, amount)
+                : 0;
         }
 
         internal bool HasEffectiveKeyword(string keyword)

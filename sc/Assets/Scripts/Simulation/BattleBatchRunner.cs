@@ -34,7 +34,6 @@ namespace SpireChess.Simulation
                     value.SourceInstanceId,
                     value.Attack,
                     value.Health,
-                    value.Flourish,
                     keywords = value.Keywords.OrderBy(keyword => keyword).ToArray()
                 }));
         }
@@ -203,14 +202,24 @@ namespace SpireChess.Simulation
                 .Append(result.OutcomeReason).Append('|');
             AppendRow(builder, result.FinalState.Player, "P");
             AppendRow(builder, result.FinalState.Enemy, "E");
+            builder.Append("F:")
+                .Append(result.FinalState.PlayerFlourishStacks).Append(':')
+                .Append(result.FinalState.EnemyFlourishStacks).Append('|');
             foreach (var delta in result.PermanentDeltas
                          .OrderBy(value => value.SourceInstanceId))
             {
                 builder.Append("D:").Append(delta.SourceInstanceId).Append(':')
                     .Append(delta.Attack).Append(':').Append(delta.Health).Append(':')
-                    .Append(delta.Flourish).Append(':')
                     .Append(string.Join(",", delta.Keywords.OrderBy(value => value)))
                     .Append('|');
+            }
+            foreach (var reward in result.PostCombatRewardRequests
+                         .OrderBy(value => value.Side)
+                         .ThenBy(value => value.Race)
+                         .ThenBy(value => value.Count))
+            {
+                builder.Append("W:").Append(reward.Side).Append(':')
+                    .Append(reward.Race).Append(':').Append(reward.Count).Append('|');
             }
 
             AppendDiagnostics(builder, result.Diagnostics.Player, "P");
@@ -248,7 +257,6 @@ namespace SpireChess.Simulation
                     .Append(minion.CurrentHealth).Append(':')
                     .Append(minion.PermanentAttackBonus).Append(':')
                     .Append(minion.PermanentHealthBonus).Append(':')
-                    .Append(minion.FlourishStacks).Append(':')
                     .Append(minion.HasShield ? 1 : 0).Append(':')
                     .Append(string.Join(",", minion.Keywords.OrderBy(value => value)))
                     .Append('|');

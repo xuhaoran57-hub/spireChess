@@ -1,0 +1,13 @@
+{
+  "candidateId": "R6-B03-full-flourish-dotnet",
+  "seedSet": "S0_SMOKE",
+  "scenarioCount": 24,
+  "battles": 2400,
+  "replayBattles": 2400,
+  "determinismFailures": 0,
+  "exceptions": 0,
+  "effectLimitHits": 0,
+  "competitiveRoundLimits": 0,
+  "outputDummyRoundLimits": 100,
+  "elapsedSeconds": 2.6831518
+}

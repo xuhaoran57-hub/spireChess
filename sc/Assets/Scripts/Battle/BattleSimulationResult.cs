@@ -51,6 +51,20 @@ namespace SpireChess.Battle
         }
     }
 
+    public sealed class BattlePostCombatRewardRequest
+    {
+        public BattlePostCombatRewardRequest(BattleSide side, string race, int count)
+        {
+            Side = side;
+            Race = race;
+            Count = count;
+        }
+
+        public BattleSide Side { get; }
+        public string Race { get; }
+        public int Count { get; }
+    }
+
     public sealed class BattleSimulationResult
     {
         public BattleSimulationResult(BattleBoardState finalState, BattleSide? winner, List<string> log)
@@ -90,7 +104,8 @@ namespace SpireChess.Battle
             List<string> log,
             List<BattleStep> steps,
             IEnumerable<BattlePermanentDelta> permanentDeltas = null,
-            BattleDiagnostics diagnostics = null)
+            BattleDiagnostics diagnostics = null,
+            IEnumerable<BattlePostCombatRewardRequest> postCombatRewardRequests = null)
         {
             FinalState = finalState;
             Winner = winner;
@@ -100,6 +115,9 @@ namespace SpireChess.Battle
             PermanentDeltas = (permanentDeltas ?? Enumerable.Empty<BattlePermanentDelta>())
                 .ToList().AsReadOnly();
             Diagnostics = diagnostics ?? new BattleDiagnostics();
+            PostCombatRewardRequests = (postCombatRewardRequests ??
+                    Enumerable.Empty<BattlePostCombatRewardRequest>())
+                .ToList().AsReadOnly();
         }
 
         public BattleBoardState FinalState { get; }
@@ -109,6 +127,7 @@ namespace SpireChess.Battle
         public IReadOnlyList<BattleStep> Steps { get; }
         public IReadOnlyList<BattlePermanentDelta> PermanentDeltas { get; }
         public BattleDiagnostics Diagnostics { get; }
+        public IReadOnlyList<BattlePostCombatRewardRequest> PostCombatRewardRequests { get; }
     }
 
     public sealed class BattleStep

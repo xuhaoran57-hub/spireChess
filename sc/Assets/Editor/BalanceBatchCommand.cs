@@ -79,7 +79,7 @@ namespace SpireChess.Editor
                 "Tests",
                 "Fixtures",
                 "Balance",
-                "balance-fixtures.v0.2.json");
+                "balance-fixtures.v0.3.json");
             var fixtures = BalanceFixtureCatalog.Load(
                 File.ReadAllText(fixturePath),
                 ResolveMinion);

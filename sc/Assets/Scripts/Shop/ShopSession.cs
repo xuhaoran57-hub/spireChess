@@ -53,7 +53,8 @@ namespace SpireChess.Shop
                 PhaseStats,
                 GrantGold,
                 GrantFreeRefreshes,
-                amount => scheduledGold += Math.Max(0, amount));
+                amount => scheduledGold += Math.Max(0, amount),
+                target => ResolveShopTrigger("OnShieldGained", target));
             TavernTier = 1;
             EnsureMinionOfferCapacity();
         }
@@ -77,6 +78,7 @@ namespace SpireChess.Shop
         public PendingEffectChoice PendingChoice { get; private set; }
         public ShopPhaseStats PhaseStats { get; }
         public int ScheduledGold => scheduledGold;
+        public int FlourishStacks { get; private set; }
 
         public int CurrentUpgradeCost
         {
@@ -290,6 +292,7 @@ namespace SpireChess.Shop
             }
 
             var card = ShopCardInstance.CreateMinion(NextCardInstanceId(), config);
+            ApplyFlourishAttackBonus(card);
             Collection.TryAddToBench(card, out var benchIndex);
             Gold -= ShopEconomyRules.MinionPurchaseCost;
             PhaseStats.MinionBoughtCount++;
@@ -675,6 +678,7 @@ namespace SpireChess.Shop
             var selectedCard = ShopCardInstance.CreateMinion(
                 NextCardInstanceId(),
                 selectedConfig);
+            ApplyFlourishAttackBonus(selectedCard);
             if (!Collection.ReplaceBenchCard(
                     state.BenchIndex,
                     state.SourceSpell,
@@ -768,6 +772,7 @@ namespace SpireChess.Shop
                     grantedCard = ShopCardInstance.CreateMinion(
                         NextCardInstanceId(),
                         candidate.Minion);
+                    ApplyFlourishAttackBonus(grantedCard);
                     if (state.ReplaceSourceCard
                         ? !Collection.ReplaceBenchCard(
                             state.BenchIndex, state.SourceCard, grantedCard)
@@ -807,6 +812,7 @@ namespace SpireChess.Shop
                     grantedCard = ShopCardInstance.CreateMinion(
                         NextCardInstanceId(),
                         candidate.Target.Minion);
+                    ApplyFlourishAttackBonus(grantedCard);
                     if (!Collection.ReplaceBenchCard(
                             state.BenchIndex,
                             state.SourceCard,
@@ -896,6 +902,7 @@ namespace SpireChess.Shop
         public BattleBoardState CreateBattleSnapshot()
         {
             var state = new BattleBoardState();
+            state.PlayerFlourishStacks = FlourishStacks;
             for (var i = 0; i < Collection.Battle.Count; i++)
             {
                 var card = Collection.Battle[i];
@@ -922,8 +929,7 @@ namespace SpireChess.Shop
                     card.InstanceId,
                     card.PermanentAttackBonus,
                     card.PermanentHealthBonus,
-                    modifierKeywords,
-                    flourishStacks: card.FlourishStacks);
+                    modifierKeywords);
             }
 
             foreach (var effect in pendingBattleStartEffects)
@@ -1074,6 +1080,7 @@ namespace SpireChess.Shop
             }
 
             var card = ShopCardInstance.CreateMinion(NextCardInstanceId(), config);
+            ApplyFlourishAttackBonus(card);
             Collection.TryAddToBench(card, out var benchIndex);
             var triples = ResolveAllTriples();
             RaiseTripleEvents(triples);
@@ -1108,8 +1115,7 @@ namespace SpireChess.Shop
             string instanceId,
             int attack,
             int health,
-            string keyword = null,
-            int flourish = 0)
+            string keyword = null)
         {
             if (string.IsNullOrWhiteSpace(instanceId))
             {
@@ -1123,8 +1129,7 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.InvalidTarget);
             }
 
-            if (attack == 0 && health == 0 && flourish <= 0 &&
-                string.IsNullOrWhiteSpace(keyword))
+            if (attack == 0 && health == 0 && string.IsNullOrWhiteSpace(keyword))
             {
                 return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
             }
@@ -1146,8 +1151,6 @@ namespace SpireChess.Shop
             {
                 target.ApplyPermanentStats(attack, health);
             }
-
-            target.ApplyFlourish(flourish);
 
             return ShopOperationResult.Succeed();
         }
@@ -1435,9 +1438,8 @@ namespace SpireChess.Shop
                     permanentHealthBonus: materials.Sum(
                         card => card.PermanentHealthBonus),
                     permanentKeywords: permanentKeywords,
-                    tripleDiscoveryPending: true,
-                    flourishStacks: Math.Min(8, materials.Sum(
-                        card => card.FlourishStacks)));
+                    tripleDiscoveryPending: true);
+                ApplyFlourishAttackBonus(golden);
 
                 if (!Collection.RemoveTripleMaterials(materials) ||
                     !Collection.TryAddToBench(golden, out _))
@@ -1559,7 +1561,7 @@ namespace SpireChess.Shop
                     continue;
                 }
 
-                ResolveCardTrigger(source, trigger, i);
+                ResolveCardTrigger(source, trigger, i, subject);
             }
 
             foreach (var active in activeShopEffects.ToArray())
@@ -1609,7 +1611,8 @@ namespace SpireChess.Shop
         private void ResolveCardTrigger(
             ShopCardInstance source,
             string trigger,
-            int sourceBattleIndex)
+            int sourceBattleIndex,
+            ShopCardInstance eventSubject = null)
         {
             foreach (var effect in GetTriggeredEffects(source, trigger))
             {
@@ -1635,7 +1638,8 @@ namespace SpireChess.Shop
                         -1,
                         false,
                         out var plan,
-                        out _))
+                        out _,
+                        eventSubject))
                 {
                     continue;
                 }
@@ -1648,6 +1652,31 @@ namespace SpireChess.Shop
                 effectEngine.ApplyPlan(plan);
                 RecordEffectUse(source.InstanceId, effect);
             }
+        }
+
+        public void ApplyFlourish(int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            FlourishStacks += amount;
+            foreach (var card in Collection.Battle.Concat(Collection.Bench))
+            {
+                ApplyFlourishAttackBonus(card);
+            }
+        }
+
+        private void ApplyFlourishAttackBonus(ShopCardInstance card)
+        {
+            if (card?.CardType != ShopCardType.Minion)
+            {
+                return;
+            }
+
+            card.SetFlourishAttackBonus(
+                card.Minion.Race == "WildSpirit" ? FlourishStacks : 0);
         }
 
         private bool MeetsShopCondition(ConditionConfig condition)

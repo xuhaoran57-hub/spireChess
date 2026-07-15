@@ -20,7 +20,8 @@ namespace SpireChess.Effects
             "DiscoverSpell", "GrantRandomSpell", "CopyMinion", "SummonToken",
             "ImmediateAttack", "ActivateCardListeners", "SetPendingCombatBuff",
             "SetPostCombatSurvivorBuff", "CopyCombatKeywords", "GainAttackDifference",
-            "ModifySelectedPermanentAndOthersCombat", "GainFlourish"
+            "ModifySelectedPermanentAndOthersCombat", "GainFlourish",
+            "GrantRandomMinionAfterCombat"
         };
 
         public static readonly HashSet<string> Conditions = new HashSet<string>
@@ -30,7 +31,7 @@ namespace SpireChess.Effects
             "PhaseStatAtLeast", "IsMostCommonMainRace", "HasGoldenMinion", "CombatWon",
             "AttackerExists", "NoBoardSpace", "SubjectAdjacent", "AttackBelowHealth",
             "SubjectIsSelf", "HasAdjacentNonRace", "TriggerCountAtLeast",
-            "TriggerCountEquals", "EnemyAttackDifferenceAtLeast",
+            "TriggerCountEquals", "TriggerCountMultipleOf", "EnemyAttackDifferenceAtLeast",
             "HasUnshieldedRaceTarget"
         };
 

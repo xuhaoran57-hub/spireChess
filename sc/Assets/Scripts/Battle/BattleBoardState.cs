@@ -30,6 +30,32 @@ namespace SpireChess.Battle
         public List<BattleMinionRuntime> Player { get; }
         public List<BattleMinionRuntime> Enemy { get; }
         public List<BattleStartEffectState> BattleStartEffects { get; }
+        public int PlayerFlourishStacks { get; set; }
+        public int EnemyFlourishStacks { get; set; }
+
+        public int GetFlourishStacks(BattleSide side)
+        {
+            return side == BattleSide.Player
+                ? PlayerFlourishStacks
+                : EnemyFlourishStacks;
+        }
+
+        public void AddFlourishStacks(BattleSide side, int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            if (side == BattleSide.Player)
+            {
+                PlayerFlourishStacks += amount;
+            }
+            else
+            {
+                EnemyFlourishStacks += amount;
+            }
+        }
 
         public List<BattleMinionRuntime> GetRow(BattleSide side)
         {
@@ -51,6 +77,8 @@ namespace SpireChess.Battle
             var clone = new BattleBoardState();
             CopyRow(Player, clone.Player);
             CopyRow(Enemy, clone.Enemy);
+            clone.PlayerFlourishStacks = PlayerFlourishStacks;
+            clone.EnemyFlourishStacks = EnemyFlourishStacks;
             clone.BattleStartEffects.AddRange(BattleStartEffects);
             return clone;
         }

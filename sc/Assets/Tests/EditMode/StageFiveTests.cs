@@ -37,6 +37,38 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void SpellEchoGrowth_HasPerShopCapsAndLimitedProphetTargets()
+        {
+            var glimmer = configs.MinionsById["glimmer_mage"];
+            Assert.That(glimmer.Effects.Single(effect =>
+                effect.Id == "glimmer_mage_spell_health").Limit.PerShop, Is.EqualTo(2));
+            Assert.That(glimmer.GoldenEffects.Single(effect =>
+                effect.Id == "golden_glimmer_mage_spell_health").Limit.PerShop, Is.EqualTo(2));
+
+            var reader = configs.MinionsById["rune_ward_reader"];
+            Assert.That(reader.Effects.Single(effect =>
+                effect.Id == "rune_ward_reader_spell").Limit.PerShop, Is.EqualTo(2));
+            Assert.That(reader.GoldenEffects.Single(effect =>
+                effect.Id == "golden_rune_ward_reader_spell").Limit.PerShop, Is.EqualTo(2));
+
+            var prophet = configs.MinionsById["falling_star_prophet"];
+            var normalProphet = prophet.Effects.Single(effect =>
+                effect.Id == "falling_star_prophet_spell");
+            var goldenProphet = prophet.GoldenEffects.Single(effect =>
+                effect.Id == "golden_falling_star_prophet_spell");
+            Assert.That(normalProphet.Target.Scope, Is.EqualTo("Single"));
+            Assert.That(normalProphet.Target.Race, Is.EqualTo("Starbound"));
+            Assert.That(normalProphet.Target.Selector, Is.EqualTo("LowestAttack"));
+            Assert.That(normalProphet.Target.MaxTargets, Is.EqualTo(2));
+            Assert.That(normalProphet.Limit.PerShop, Is.EqualTo(2));
+            Assert.That(goldenProphet.Target.Scope, Is.EqualTo("Single"));
+            Assert.That(goldenProphet.Target.Race, Is.EqualTo("Starbound"));
+            Assert.That(goldenProphet.Target.Selector, Is.EqualTo("LowestAttack"));
+            Assert.That(goldenProphet.Target.MaxTargets, Is.EqualTo(4));
+            Assert.That(goldenProphet.Limit.PerShop, Is.EqualTo(2));
+        }
+
+        [Test]
         public void CardTierPalette_UsesFiveDistinctReadableBackgrounds()
         {
             var colors = Enumerable.Range(1, 5)
@@ -144,57 +176,54 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void BattleStartAndPermanentDeathEffect_UseQueueAndProduceWriteback()
+        public void RingingIronBastion_BattlecryPermanentlyBuffsAdjacentMinion()
         {
-            var state = new BattleBoardState();
+            var shop = CreateShop();
+            Assert.That(shop.StartRound(1).Success, Is.True);
             var bastion = configs.MinionsById["ringing_iron_bastion"];
             var ally = configs.MinionsById["stargazing_apprentice"];
-            var enemy = configs.MinionsById["royal_bounty_hunter"];
-            state.Player[0] = new BattleMinionRuntime(
-                bastion, true, sourceInstanceId: "bastion", permanentKeywords: new[] { "Taunt" });
-            state.Player[1] = new BattleMinionRuntime(ally, false, sourceInstanceId: "ally");
-            state.Enemy[0] = new BattleMinionRuntime(enemy, false, initialAttack: 99, initialHealth: 20);
+            Assert.That(shop.ClaimRewardMinion(ally).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, ally.Id), 0).Success, Is.True);
+            Assert.That(shop.ClaimRewardMinion(bastion).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, bastion.Id), 1).Success, Is.True);
 
-            var result = new BattleSimulator(new Random(7), ResolveMinion).Simulate(state);
-            var delta = result.PermanentDeltas.Single(value => value.SourceInstanceId == "ally");
-            Assert.That(delta.Attack, Is.EqualTo(3));
-            Assert.That(delta.Health, Is.EqualTo(3));
+            Assert.That(shop.Collection.Battle[0].PermanentAttackBonus, Is.EqualTo(3));
+            Assert.That(shop.Collection.Battle[0].PermanentHealthBonus, Is.EqualTo(3));
         }
 
         [Test]
-        public void NormalForgeAndWildFinishers_HaveLimitedPermanentGrowth()
+        public void UpdatedForgeAndWildFinishers_HaveExpectedRules()
         {
             var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
-            var oathbrokenGrowth = oathbroken.Effects.Single(
-                effect => effect.Id == "oathbroken_blade_soul_lost_permanent");
-            Assert.That(oathbrokenGrowth.Value.Attack, Is.EqualTo(1));
-            Assert.That(oathbrokenGrowth.Value.Duration, Is.EqualTo("Permanent"));
-            Assert.That(oathbrokenGrowth.Limit.PerCombat, Is.EqualTo(1));
+            Assert.That(oathbroken.Effects.Concat(oathbroken.GoldenEffects),
+                Has.None.Matches<EffectConfig>(effect =>
+                    effect.Trigger == "OnShieldLost" &&
+                    effect.Value?.Duration == "Permanent"));
 
             var tombGuardian = configs.MinionsById["thousand_ring_tomb_guardian"];
             var tombGrowth = tombGuardian.Effects.Single(
                 effect => effect.Id == "thousand_ring_tomb_guardian_death_permanent");
             Assert.That(tombGrowth.Value.Attack, Is.EqualTo(1));
             Assert.That(tombGrowth.Value.Health, Is.EqualTo(1));
-            Assert.That(tombGrowth.Target.MaxTargets, Is.EqualTo(2));
+            Assert.That(tombGrowth.Target.Scope, Is.EqualTo("All"));
+            Assert.That(tombGuardian.Effects.Single(effect =>
+                effect.Id == "thousand_ring_tomb_guardian_death_shield").Action,
+                Is.EqualTo("AddShield"));
 
             var vinecrown = configs.MinionsById["vinecrown_priest"];
             var vinecrownGrowth = vinecrown.Effects.Single(
                 effect => effect.Id == "vinecrown_priest_flourish");
             Assert.That(vinecrownGrowth.Trigger, Is.EqualTo("OnFriendlyDeath"));
             Assert.That(vinecrownGrowth.Action, Is.EqualTo("GainFlourish"));
-            Assert.That(vinecrownGrowth.Condition.Type, Is.EqualTo("TriggerCountAtLeast"));
+            Assert.That(vinecrownGrowth.Condition.Type, Is.EqualTo("TriggerCountMultipleOf"));
             Assert.That(vinecrownGrowth.Condition.Threshold, Is.EqualTo(2));
-            Assert.That(vinecrownGrowth.Value.Count, Is.EqualTo(4));
-            Assert.That(vinecrownGrowth.Limit.PerCombat, Is.EqualTo(1));
+            Assert.That(vinecrownGrowth.Value.Amount, Is.EqualTo(1));
+            Assert.That(vinecrownGrowth.Value.Count, Is.Zero);
+            Assert.That(vinecrownGrowth.Limit, Is.Null);
             var goldenVinecrownGrowth = vinecrown.GoldenEffects.Single(
                 effect => effect.Id == "golden_vinecrown_priest_flourish");
-            Assert.That(goldenVinecrownGrowth.Value.Count, Is.EqualTo(8));
-            Assert.That(goldenVinecrownGrowth.Limit.PerCombat, Is.EqualTo(1));
-            Assert.That(new BattleMinionRuntime(
-                vinecrown, flourishStacks: 99).FlourishStacks, Is.EqualTo(4));
-            Assert.That(new BattleMinionRuntime(
-                vinecrown, true, flourishStacks: 99).FlourishStacks, Is.EqualTo(8));
+            Assert.That(goldenVinecrownGrowth.Value.Count, Is.Zero);
+            Assert.That(goldenVinecrownGrowth.Limit, Is.Null);
 
             var soulEater = configs.MinionsById["mountain_belly_soul_eater"];
             var soulEaterGrowth = soulEater.Effects.Single(
@@ -226,12 +255,11 @@ namespace SpireChess.Tests.EditMode
         public void SummonedToken_ReceivesBranchHoofAndFlourishBeforeOneImmediateAttack()
         {
             var state = new BattleBoardState();
+            state.PlayerFlourishStacks = 3;
             state.Player[0] = new BattleMinionRuntime(
                 configs.MinionsById["young_deer_spirit"], initialHealth: 1);
             state.Player[1] = new BattleMinionRuntime(configs.MinionsById["many_branch_invoker"]);
             state.Player[2] = new BattleMinionRuntime(configs.MinionsById["ten_thousand_hoof_surge"]);
-            state.Player[3] = new BattleMinionRuntime(
-                configs.MinionsById["vinecrown_priest"], flourishStacks: 3);
             state.Enemy[0] = new BattleMinionRuntime(
                 configs.MinionsById["royal_bounty_hunter"],
                 initialAttack: 0,
@@ -269,63 +297,190 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void Vinecrown_GainsOneFlourishAfterTwoDeathsAndBuffsTokensWithNewStack()
+        public void Vinecrown_GainsGlobalFlourishAfterTwoDeathsAndBuffsLivingWildSpirits()
         {
             var state = new BattleBoardState();
             state.Player[0] = new BattleMinionRuntime(
-                configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+                configs.MinionsById["wandering_swordsman"], initialHealth: 1);
             state.Player[1] = new BattleMinionRuntime(
-                configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+                configs.MinionsById["wandering_swordsman"], initialHealth: 1);
             state.Player[2] = new BattleMinionRuntime(
                 configs.MinionsById["vinecrown_priest"],
+                initialAttack: 3,
                 initialHealth: 100,
-                sourceInstanceId: "vinecrown",
-                flourishStacks: 3);
+                sourceInstanceId: "vinecrown");
             state.Enemy[0] = new BattleMinionRuntime(
                 configs.MinionsById["royal_bounty_hunter"],
-                initialAttack: 0,
+                initialAttack: 100,
                 initialHealth: 100);
 
             var result = new BattleSimulator(new Random(31), ResolveMinion).Simulate(state);
             var vinecrown = result.FinalState.Player.Single(value =>
                 value?.SourceInstanceId == "vinecrown");
-            var delta = result.PermanentDeltas.Single(value =>
-                value.SourceInstanceId == "vinecrown");
-            var tokens = result.FinalState.Player.Where(value =>
-                value?.Config.IsToken == true).ToList();
-
-            Assert.That(vinecrown.FlourishStacks, Is.EqualTo(4));
-            Assert.That(delta.Flourish, Is.EqualTo(1));
-            Assert.That(delta.Attack, Is.Zero);
-            Assert.That(delta.Health, Is.Zero);
+            Assert.That(result.FinalState.PlayerFlourishStacks, Is.EqualTo(1));
+            Assert.That(vinecrown.CurrentAttack, Is.EqualTo(4));
             Assert.That(result.Diagnostics.Player.FlourishGained, Is.EqualTo(1));
-            Assert.That(tokens, Has.Count.EqualTo(2));
-            Assert.That(tokens, Has.All.Matches<BattleMinionRuntime>(value =>
-                value.CurrentAttack == 5));
         }
 
         [Test]
-        public void VinecrownTriple_SumsFlourishAndCapsGoldenAtEight()
+        public void Vinecrown_GainsOneFlourishForEveryTwoFriendlyDeaths()
+        {
+            var state = new BattleBoardState();
+            for (var slot = 0; slot < 4; slot++)
+            {
+                state.Player[slot] = new BattleMinionRuntime(
+                    configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+            }
+            state.Player[4] = new BattleMinionRuntime(
+                configs.MinionsById["vinecrown_priest"],
+                initialHealth: 100,
+                sourceInstanceId: "vinecrown");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 0,
+                initialHealth: 100);
+
+            var result = new BattleSimulator(new Random(37), ResolveMinion).Simulate(state);
+            Assert.That(result.FinalState.PlayerFlourishStacks, Is.EqualTo(2));
+            Assert.That(result.Diagnostics.Player.FlourishGained, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void HoofImmediateTokenDeaths_AdvanceVinecrownFlourish()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["hundred_song_herd"], initialHealth: 1);
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["ten_thousand_hoof_surge"]);
+            state.Player[2] = new BattleMinionRuntime(
+                configs.MinionsById["vinecrown_priest"],
+                initialHealth: 100,
+                sourceInstanceId: "vinecrown");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 100,
+                initialHealth: 8);
+
+            var result = new BattleSimulator(new Random(41), ResolveMinion).Simulate(state);
+            Assert.That(result.Diagnostics.Player.ImmediateAttacks, Is.EqualTo(2));
+            Assert.That(result.Diagnostics.Player.TokenDeaths, Is.EqualTo(2));
+            Assert.That(result.FinalState.PlayerFlourishStacks, Is.EqualTo(2));
+            Assert.That(result.Diagnostics.Player.FlourishGained, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void GlobalFlourish_IsUncappedAndDoesNotMultiplyWhenTripling()
         {
             var shop = CreateShop();
             Assert.That(shop.StartRound(1).Success, Is.True);
             var vinecrown = configs.MinionsById["vinecrown_priest"];
+            shop.ApplyFlourish(12);
 
             Assert.That(shop.ClaimRewardMinion(vinecrown).Success, Is.True);
             Assert.That(shop.PlayMinion(FindBench(shop, vinecrown.Id), 0).Success, Is.True);
-            Assert.That(shop.ModifyOwnedBattleMinion(
-                shop.Collection.Battle[0].InstanceId, 0, 0, flourish: 4).Success, Is.True);
 
             Assert.That(shop.ClaimRewardMinion(vinecrown).Success, Is.True);
             Assert.That(shop.PlayMinion(FindBench(shop, vinecrown.Id), 1).Success, Is.True);
-            Assert.That(shop.ModifyOwnedBattleMinion(
-                shop.Collection.Battle[1].InstanceId, 0, 0, flourish: 4).Success, Is.True);
 
             Assert.That(shop.ClaimRewardMinion(vinecrown).Success, Is.True);
             var golden = shop.Collection.Bench.Single(value =>
                 value?.ConfigId == vinecrown.Id);
             Assert.That(golden.IsGolden, Is.True);
-            Assert.That(golden.FlourishStacks, Is.EqualTo(8));
+            Assert.That(shop.FlourishStacks, Is.EqualTo(12));
+            Assert.That(golden.FlourishAttackBonus, Is.EqualTo(12));
+        }
+
+        [Test]
+        public void MoltenStandard_CountsPreparedShieldOnceAndIgnoresExistingShield()
+        {
+            var shop = CreateShop();
+            Assert.That(shop.StartRound(1).Success, Is.True);
+            var standard = configs.MinionsById["molten_core_standard"];
+            var ally = configs.MinionsById["wandering_swordsman"];
+
+            Assert.That(shop.ClaimRewardMinion(standard).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, standard.Id), 0).Success, Is.True);
+            Assert.That(shop.ClaimRewardMinion(ally).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, ally.Id), 1).Success, Is.True);
+
+            Assert.That(shop.ClaimRewardSpell(
+                configs.SpellsById["temporary_ward"]).Success, Is.True);
+            Assert.That(shop.UseSpell(
+                FindBench(shop, "temporary_ward"), 1).Success, Is.True);
+            Assert.That(shop.Collection.Battle[1].PermanentAttackBonus, Is.EqualTo(1));
+
+            Assert.That(shop.ClaimRewardSpell(
+                configs.SpellsById["temporary_ward"]).Success, Is.True);
+            Assert.That(shop.UseSpell(
+                FindBench(shop, "temporary_ward"), 1).Success, Is.True);
+            Assert.That(shop.Collection.Battle[1].PermanentAttackBonus, Is.EqualTo(1));
+
+            shop.CreateBattleSnapshot();
+            Assert.That(shop.Collection.Battle[1].PermanentAttackBonus, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void MoltenStandard_WritesBackCombatShieldGrowthButNotForTokens()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["thousand_ring_tomb_guardian"],
+                initialHealth: 1,
+                sourceInstanceId: "guardian");
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["molten_core_standard"],
+                initialHealth: 100,
+                sourceInstanceId: "standard");
+            state.Player[2] = new BattleMinionRuntime(
+                configs.MinionsById["wandering_swordsman"],
+                initialHealth: 100,
+                sourceInstanceId: "ally");
+            state.Player[3] = new BattleMinionRuntime(
+                configs.MinionsById["token_swift_young_spirit"],
+                initialAttack: 0,
+                initialHealth: 100,
+                sourceInstanceId: "token");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 100,
+                initialHealth: 500);
+
+            var result = new BattleSimulator(new Random(43), ResolveMinion).Simulate(state);
+            var standardDelta = result.PermanentDeltas.Single(value =>
+                value.SourceInstanceId == "standard");
+            var allyDelta = result.PermanentDeltas.Single(value =>
+                value.SourceInstanceId == "ally");
+
+            Assert.That(standardDelta.Attack, Is.EqualTo(2));
+            Assert.That(standardDelta.Health, Is.EqualTo(1));
+            Assert.That(allyDelta.Attack, Is.EqualTo(2));
+            Assert.That(allyDelta.Health, Is.EqualTo(1));
+            Assert.That(result.PermanentDeltas.Any(value =>
+                value.SourceInstanceId == "token"), Is.False);
+        }
+
+        [TestCase(false, 1)]
+        [TestCase(true, 2)]
+        public void CrackedArmorAvenger_RequestsPostCombatForgeSoulRewards(
+            bool isGolden,
+            int expectedCount)
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["cracked_armor_avenger"],
+                isGolden,
+                initialHealth: 1);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 100,
+                initialHealth: 100);
+
+            var result = new BattleSimulator(new Random(47), ResolveMinion).Simulate(state);
+            var request = result.PostCombatRewardRequests.Single();
+            Assert.That(request.Side, Is.EqualTo(BattleSide.Player));
+            Assert.That(request.Race, Is.EqualTo("ForgeSoul"));
+            Assert.That(request.Count, Is.EqualTo(expectedCount));
         }
 
         [Test]

@@ -18,6 +18,8 @@ namespace SpireChess.Battle
             new Dictionary<string, BattlePermanentDelta>();
         private readonly Dictionary<string, int> triggerCounts =
             new Dictionary<string, int>();
+        private readonly List<BattlePostCombatRewardRequest> postCombatRewardRequests =
+            new List<BattlePostCombatRewardRequest>();
         private int processedEffectCount;
         private long nextSummonEventId;
         private bool isDrainingEffects;
@@ -60,6 +62,7 @@ namespace SpireChess.Battle
             effectUsage.Clear();
             permanentDeltas.Clear();
             triggerCounts.Clear();
+            postCombatRewardRequests.Clear();
             processedEffectCount = 0;
             nextSummonEventId = 0;
             isDrainingEffects = false;
@@ -177,7 +180,8 @@ namespace SpireChess.Battle
                 log,
                 steps ?? new List<BattleStep>(),
                 permanentDeltas.Values.OrderBy(value => value.SourceInstanceId),
-                diagnostics);
+                diagnostics,
+                postCombatRewardRequests);
         }
 
         private void ResolveAttackStep(
@@ -701,7 +705,8 @@ namespace SpireChess.Battle
             long summonEventId = 0)
         {
             var triggerKey = BuildTriggerCountKey(source, trigger);
-            triggerCounts[triggerKey] = GetTriggerCount(source, trigger) + 1;
+            var triggerCount = GetTriggerCount(source, trigger) + 1;
+            triggerCounts[triggerKey] = triggerCount;
             var effects = source.IsGolden
                 ? source.Config.GoldenEffects
                 : source.Config.Effects;
@@ -721,7 +726,8 @@ namespace SpireChess.Battle
                     effect,
                     death,
                     winner,
-                    summonEventId));
+                    summonEventId,
+                    triggerCount: triggerCount));
             }
         }
 
@@ -818,11 +824,13 @@ namespace SpireChess.Battle
                             entry.value != null && entry.value.IsAlive &&
                             entry.value.Config.Race != condition.Race);
                 case "TriggerCountAtLeast":
-                    return GetTriggerCount(pending.Source, pending.Effect.Trigger) >=
-                        condition.Threshold;
+                    return pending.TriggerCount >= condition.Threshold;
                 case "TriggerCountEquals":
-                    return GetTriggerCount(pending.Source, pending.Effect.Trigger) ==
-                        condition.Threshold;
+                    return pending.TriggerCount == condition.Threshold;
+                case "TriggerCountMultipleOf":
+                    return condition.Threshold > 0 &&
+                        pending.TriggerCount > 0 &&
+                        pending.TriggerCount % condition.Threshold == 0;
                 case "EnemyAttackDifferenceAtLeast":
                     var opposingRow = state.GetRow(GetOpposingSide(pending.Side));
                     var highestAttack = opposingRow
@@ -916,14 +924,30 @@ namespace SpireChess.Battle
 
             if (effect.Action == "GainFlourish")
             {
-                var gained = pending.Source.GainFlourish(
-                    Math.Max(0, effect.Value?.Amount ?? 0),
-                    Math.Max(0, effect.Value?.Count ?? 0));
+                var gained = Math.Max(0, effect.Value?.Amount ?? 0);
                 if (gained > 0)
                 {
-                    log.Add($"{pending.Source.Name} 获得 {gained} 层繁茂，当前为 {pending.Source.FlourishStacks} 层。");
-                    AddPermanentFlourish(pending.Side, pending.Source, gained);
+                    state.AddFlourishStacks(pending.Side, gained);
+                    diagnostics.For(pending.Side).FlourishGained += gained;
+                    foreach (var target in state.GetRow(pending.Side).Where(value =>
+                                 value != null && value.IsAlive &&
+                                 value.Config.Race == "WildSpirit"))
+                    {
+                        AddTemporaryStats(pending.Side, target, gained, 0, log);
+                    }
+                    log.Add($"{pending.Source.Name} 使繁茂增加 {gained} 层，当前为 " +
+                            $"{state.GetFlourishStacks(pending.Side)} 层。");
                 }
+                return;
+            }
+
+            if (effect.Action == "GrantRandomMinionAfterCombat")
+            {
+                var count = Math.Max(1, effect.Value?.Amount ?? 1);
+                postCombatRewardRequests.Add(new BattlePostCombatRewardRequest(
+                    pending.Side,
+                    effect.Discover?.Race,
+                    count));
                 return;
             }
 
@@ -970,10 +994,6 @@ namespace SpireChess.Battle
                         if (effect.Value?.Resource == "SubjectAttack")
                         {
                             attack = Math.Max(0, pending.Subject?.CurrentAttack ?? 0);
-                        }
-                        else if (effect.Value?.Resource == "SourceFlourish")
-                        {
-                            attack = Math.Max(0, pending.Source.FlourishStacks);
                         }
                         var health = effect.Value?.Health ?? 0;
                         if (effect.Value?.Resource == "SubjectHealth")
@@ -1292,32 +1312,6 @@ namespace SpireChess.Battle
             delta.Add(attack, health, keyword);
         }
 
-        private void AddPermanentFlourish(
-            BattleSide effectSide,
-            BattleMinionRuntime target,
-            int amount)
-        {
-            if (target == null || target.Config.IsToken || amount <= 0)
-            {
-                return;
-            }
-
-            diagnostics.For(effectSide).FlourishGained += amount;
-            if (effectSide != BattleSide.Player ||
-                string.IsNullOrWhiteSpace(target.SourceInstanceId))
-            {
-                return;
-            }
-
-            if (!permanentDeltas.TryGetValue(target.SourceInstanceId, out var delta))
-            {
-                delta = new BattlePermanentDelta(target.SourceInstanceId);
-                permanentDeltas.Add(target.SourceInstanceId, delta);
-            }
-
-            delta.AddFlourish(amount);
-        }
-
         private static BattleSide GetRuntimeSide(
             BattleBoardState state,
             BattleMinionRuntime runtime,
@@ -1408,10 +1402,14 @@ namespace SpireChess.Battle
                 var healthOverride = effect.Value != null && effect.Value.Health > 0
                     ? (int?)(effect.Value.Health * death.Minion.SummonEffectMultiplier)
                     : null;
+                var flourishAttack = tokenConfig.Race == "WildSpirit"
+                    ? state.GetFlourishStacks(death.Side)
+                    : 0;
+                var summonedAttack = (attackOverride ?? tokenConfig.Attack) + flourishAttack;
                 var token = new BattleMinionRuntime(
                     tokenConfig,
                     false,
-                    attackOverride,
+                    summonedAttack,
                     healthOverride,
                     summonEffectMultiplier: Math.Max(
                         1,
@@ -1790,7 +1788,8 @@ namespace SpireChess.Battle
                 DeathRecord death,
                 BattleSide? winner,
                 long summonEventId,
-                bool sourceIsSynthetic = false)
+                bool sourceIsSynthetic = false,
+                int triggerCount = 0)
             {
                 Source = source;
                 Side = side;
@@ -1802,6 +1801,7 @@ namespace SpireChess.Battle
                 Winner = winner;
                 SummonEventId = summonEventId;
                 SourceIsSynthetic = sourceIsSynthetic;
+                TriggerCount = triggerCount;
             }
 
             public BattleMinionRuntime Source { get; }
@@ -1814,6 +1814,7 @@ namespace SpireChess.Battle
             public BattleSide? Winner { get; }
             public long SummonEventId { get; }
             public bool SourceIsSynthetic { get; }
+            public int TriggerCount { get; }
         }
     }
 }
