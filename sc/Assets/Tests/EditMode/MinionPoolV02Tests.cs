@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using SpireChess.Battle;
 using SpireChess.Config;
@@ -157,7 +158,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void BreakAndDeathFinishers_HaveR3TriggerAndGrowthRules()
+        public void BreakAndDeathFinishers_HaveCurrentTriggerAndGrowthRules()
         {
             var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
             Assert.That(oathbroken.Effects.Where(effect =>
@@ -171,17 +172,29 @@ namespace SpireChess.Tests.EditMode
 
             var avenger = configs.MinionsById["cracked_armor_avenger"];
             Assert.That(avenger.Effects, Has.Count.EqualTo(1));
-            Assert.That(avenger.Effects[0].Action,
+            Assert.That(avenger.GoldenEffects, Has.Count.EqualTo(1));
+            var normalReward = avenger.Effects[0];
+            var goldenReward = avenger.GoldenEffects[0];
+            Assert.That(normalReward.Trigger, Is.EqualTo("OnDeath"));
+            Assert.That(goldenReward.Trigger, Is.EqualTo("OnDeath"));
+            Assert.That(normalReward.Action,
                 Is.EqualTo("GrantRandomMinionAfterCombat"));
-            Assert.That(avenger.Effects[0].Value.Amount, Is.EqualTo(1));
-            Assert.That(avenger.GoldenEffects[0].Value.Amount, Is.EqualTo(2));
-            Assert.That(avenger.Effects[0].Discover.Race, Is.EqualTo("ForgeSoul"));
-            Assert.That(avenger.Effects[0].Limit.PerCombat, Is.EqualTo(2));
-            Assert.That(avenger.GoldenEffects, Has.Count.EqualTo(2));
-            Assert.That(avenger.GoldenEffects.Select(effect => effect.Value.Duration),
-                Is.EquivalentTo(new[] { "Permanent", "Combat" }));
-            Assert.That(avenger.GoldenEffects,
-                Has.All.Matches<EffectConfig>(effect => effect.Limit.PerCombat == 2));
+            Assert.That(goldenReward.Action,
+                Is.EqualTo("GrantRandomMinionAfterCombat"));
+            Assert.That(normalReward.Value.Amount, Is.EqualTo(1));
+            Assert.That(goldenReward.Value.Amount, Is.EqualTo(2));
+            Assert.That(normalReward.Value.Duration, Is.EqualTo("Run"));
+            Assert.That(goldenReward.Value.Duration, Is.EqualTo("Run"));
+            Assert.That(normalReward.Discover.CardType, Is.EqualTo("Minion"));
+            Assert.That(goldenReward.Discover.CardType, Is.EqualTo("Minion"));
+            Assert.That(normalReward.Discover.Race, Is.EqualTo("ForgeSoul"));
+            Assert.That(goldenReward.Discover.Race, Is.EqualTo("ForgeSoul"));
+            Assert.That(normalReward.Discover.TierMode,
+                Is.EqualTo("BelowCurrentTavernTier"));
+            Assert.That(goldenReward.Discover.TierMode,
+                Is.EqualTo("BelowCurrentTavernTier"));
+            Assert.That(normalReward.Limit, Is.Null);
+            Assert.That(goldenReward.Limit, Is.Null);
 
             var mountain = configs.MinionsById["ancient_mountain_spirit"];
             Assert.That(mountain.Effects, Has.Count.EqualTo(1));
@@ -256,7 +269,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void NewStarboundMinions_ExecuteRefreshAndNextCombatEffects()
+        public void NewStarboundMinions_ExecuteRefreshAndPermanentSpellGrowth()
         {
             var shop = new ShopSession(configs.Minions, configs.Spells, new Random(11));
             Assert.That(shop.StartRound(1).Success, Is.True);
@@ -278,10 +291,59 @@ namespace SpireChess.Tests.EditMode
             Assert.That(shop.ClaimRewardSpell(
                 configs.SpellsById["delayed_supply"]).Success, Is.True);
             Assert.That(shop.UseSpell(FindBench(shop, "delayed_supply")).Success, Is.True);
-            var timekeeper = shop.Collection.Battle[0];
-            Assert.That(timekeeper.PendingCombatModifiers, Has.Count.EqualTo(1));
-            Assert.That(timekeeper.PendingCombatModifiers[0].Attack, Is.EqualTo(1));
-            Assert.That(timekeeper.PendingCombatModifiers[0].Health, Is.EqualTo(2));
+            Assert.That(shop.ClaimRewardSpell(
+                configs.SpellsById["delayed_supply"]).Success, Is.True);
+            Assert.That(shop.UseSpell(FindBench(shop, "delayed_supply")).Success, Is.True);
+            Assert.That(shop.ClaimRewardSpell(
+                configs.SpellsById["delayed_supply"]).Success, Is.True);
+            Assert.That(shop.UseSpell(FindBench(shop, "delayed_supply")).Success, Is.True);
+            var refractor = shop.Collection.Battle[1];
+            Assert.That(refractor.HasPermanentShield, Is.True);
+            Assert.That(refractor.PermanentAttackBonus, Is.EqualTo(2));
+            Assert.That(refractor.PermanentHealthBonus, Is.EqualTo(2));
+            Assert.That(refractor.PendingCombatModifiers, Is.Empty);
+        }
+
+        [TestCase(false, 1)]
+        [TestCase(true, 2)]
+        public void SkyCovenantBearer_BuffsAllStarboundAfterEveryFourRefreshes(
+            bool golden,
+            int statsPerTrigger)
+        {
+            var sky = configs.MinionsById["sky_covenant_bearer"];
+            var effect = (golden ? sky.GoldenEffects : sky.Effects).Single();
+            Assert.That(effect.Condition.Type, Is.EqualTo("PhaseStatMultipleOf"));
+            Assert.That(effect.Condition.PhaseStat, Is.EqualTo("RefreshCount"));
+            Assert.That(effect.Condition.Threshold, Is.EqualTo(4));
+            Assert.That(effect.Limit, Is.Null);
+
+            var shop = new ShopSession(configs.Minions, configs.Spells, new Random(19));
+            Assert.That(shop.StartRound(1).Success, Is.True);
+            Assert.That(shop.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion(
+                    "sky-test-ally",
+                    configs.MinionsById["glimmer_mage"]),
+                out var allyBench), Is.True);
+            Assert.That(shop.PlayMinion(allyBench, 0).Success, Is.True);
+            Assert.That(shop.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion("sky-test-source", sky, golden),
+                out var skyBench), Is.True);
+            Assert.That(shop.PlayMinion(skyBench, 1).Success, Is.True);
+            SetGold(shop, 20);
+
+            for (var refresh = 1; refresh <= 8; refresh++)
+            {
+                Assert.That(shop.Refresh().Success, Is.True);
+                var expected = (refresh / 4) * statsPerTrigger;
+                Assert.That(shop.Collection.Battle[0].PermanentAttackBonus,
+                    Is.EqualTo(expected), $"ally attack after refresh {refresh}");
+                Assert.That(shop.Collection.Battle[0].PermanentHealthBonus,
+                    Is.EqualTo(expected), $"ally health after refresh {refresh}");
+                Assert.That(shop.Collection.Battle[1].PermanentAttackBonus,
+                    Is.EqualTo(expected), $"source attack after refresh {refresh}");
+                Assert.That(shop.Collection.Battle[1].PermanentHealthBonus,
+                    Is.EqualTo(expected), $"source health after refresh {refresh}");
+            }
         }
 
         [Test]
@@ -433,6 +495,16 @@ namespace SpireChess.Tests.EditMode
             }
 
             return -1;
+        }
+
+        private static void SetGold(ShopSession shop, int value)
+        {
+            var setter = typeof(ShopSession).GetProperty(
+                    nameof(ShopSession.Gold),
+                    BindingFlags.Instance | BindingFlags.Public)
+                ?.GetSetMethod(true);
+            Assert.That(setter, Is.Not.Null);
+            setter.Invoke(shop, new object[] { value });
         }
     }
 }

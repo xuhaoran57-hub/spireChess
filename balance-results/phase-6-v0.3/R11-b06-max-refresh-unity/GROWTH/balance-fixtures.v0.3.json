@@ -1,0 +1,578 @@
+{
+  "fixtureVersion": "0.3.0",
+  "coreClassifierVersion": "0.2.2",
+  "calibration": {
+    "candidateId": "R11-b06-max-refresh-unity",
+    "sourceCsv": "balance-fixture-calibration.v0.3.csv",
+    "normalPercentile": "P50",
+    "highPercentile": "P50",
+    "minimumSamplesPerBuild": 1000
+  },
+  "builds": [
+    {
+      "buildId": "B01_SHIELD",
+      "calibration": {
+        "observedSamples": 1000,
+        "formationRate": 1.0,
+        "normalRepresentativeSeed": -62054778,
+        "highRepresentativeSeed": -28507214,
+        "status": "Ready"
+      },
+      "slots": [
+        {
+          "slot": 0,
+          "minionId": "molten_core_standard",
+          "permanentAttackBonus": 15,
+          "permanentHealthBonus": 6,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 24,
+          "highPermanentHealthBonus": 9,
+          "expectedNormalAttack": 18,
+          "expectedNormalHealth": 10,
+          "expectedHighAttack": 30,
+          "expectedHighHealth": 17
+        },
+        {
+          "slot": 1,
+          "minionId": "resonance_bell_guard",
+          "permanentAttackBonus": 6,
+          "permanentHealthBonus": 4,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 8,
+          "highPermanentHealthBonus": 8,
+          "expectedNormalAttack": 8,
+          "expectedNormalHealth": 9,
+          "expectedHighAttack": 12,
+          "expectedHighHealth": 18
+        },
+        {
+          "slot": 2,
+          "minionId": "hearth_core_aegis_officer",
+          "permanentAttackBonus": 8,
+          "permanentHealthBonus": 6,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 8,
+          "highPermanentHealthBonus": 2,
+          "expectedNormalAttack": 12,
+          "expectedNormalHealth": 12,
+          "expectedHighAttack": 16,
+          "expectedHighHealth": 14
+        },
+        {
+          "slot": 3,
+          "minionId": "thousand_ring_tomb_guardian",
+          "permanentAttackBonus": 3,
+          "permanentHealthBonus": 0,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 6,
+          "highPermanentHealthBonus": 6,
+          "expectedNormalAttack": 8,
+          "expectedNormalHealth": 10,
+          "expectedHighAttack": 16,
+          "expectedHighHealth": 26
+        },
+        {
+          "slot": 4,
+          "minionId": "undying_furnace_king",
+          "permanentAttackBonus": 9,
+          "permanentHealthBonus": 10,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 27,
+          "highPermanentHealthBonus": 7,
+          "expectedNormalAttack": 15,
+          "expectedNormalHealth": 18,
+          "expectedHighAttack": 39,
+          "expectedHighHealth": 23
+        }
+      ],
+      "normalFlourishStacks": 0,
+      "highFlourishStacks": 0
+    },
+    {
+      "buildId": "B02_BREAK",
+      "calibration": {
+        "observedSamples": 1000,
+        "formationRate": 1.0,
+        "normalRepresentativeSeed": -324736085,
+        "highRepresentativeSeed": -224070371,
+        "status": "Ready"
+      },
+      "slots": [
+        {
+          "slot": 0,
+          "minionId": "oathbroken_blade_soul",
+          "permanentAttackBonus": 3,
+          "permanentHealthBonus": 3,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 9,
+          "highPermanentHealthBonus": 4,
+          "expectedNormalAttack": 11,
+          "expectedNormalHealth": 8,
+          "expectedHighAttack": 25,
+          "expectedHighHealth": 14
+        },
+        {
+          "slot": 1,
+          "minionId": "molten_core_standard",
+          "permanentAttackBonus": 4,
+          "permanentHealthBonus": 3,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 10,
+          "highPermanentHealthBonus": 8,
+          "expectedNormalAttack": 7,
+          "expectedNormalHealth": 7,
+          "expectedHighAttack": 16,
+          "expectedHighHealth": 16
+        },
+        {
+          "slot": 2,
+          "minionId": "undying_furnace_king",
+          "permanentAttackBonus": 9,
+          "permanentHealthBonus": 6,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 15,
+          "highPermanentHealthBonus": 4,
+          "expectedNormalAttack": 15,
+          "expectedNormalHealth": 14,
+          "expectedHighAttack": 27,
+          "expectedHighHealth": 20
+        },
+        {
+          "slot": 3,
+          "minionId": "counterflow_smith",
+          "permanentAttackBonus": 9,
+          "permanentHealthBonus": 0,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 11,
+          "highPermanentHealthBonus": 1,
+          "expectedNormalAttack": 12,
+          "expectedNormalHealth": 4,
+          "expectedHighAttack": 17,
+          "expectedHighHealth": 9
+        },
+        {
+          "slot": 4,
+          "minionId": "cinder_armor_arbiter",
+          "permanentAttackBonus": 10,
+          "permanentHealthBonus": 11,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 14,
+          "highPermanentHealthBonus": 9,
+          "expectedNormalAttack": 16,
+          "expectedNormalHealth": 16,
+          "expectedHighAttack": 26,
+          "expectedHighHealth": 19
+        }
+      ],
+      "normalFlourishStacks": 0,
+      "highFlourishStacks": 0
+    },
+    {
+      "buildId": "B03_SUMMON",
+      "normalFlourishStacks": 7,
+      "highFlourishStacks": 12,
+      "calibration": {
+        "observedSamples": 1000,
+        "formationRate": 1.0,
+        "normalRepresentativeSeed": 1610191414,
+        "highRepresentativeSeed": 1643746513,
+        "status": "Ready"
+      },
+      "slots": [
+        {
+          "slot": 0,
+          "minionId": "hundred_song_herd",
+          "permanentAttackBonus": 1,
+          "permanentHealthBonus": 1,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 1,
+          "highPermanentHealthBonus": 4,
+          "expectedNormalAttack": 5,
+          "expectedNormalHealth": 5,
+          "expectedHighAttack": 9,
+          "expectedHighHealth": 12
+        },
+        {
+          "slot": 1,
+          "minionId": "fox_den_matriarch",
+          "permanentAttackBonus": 1,
+          "permanentHealthBonus": 1,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 2,
+          "highPermanentHealthBonus": 3,
+          "expectedNormalAttack": 5,
+          "expectedNormalHealth": 6,
+          "expectedHighAttack": 10,
+          "expectedHighHealth": 13
+        },
+        {
+          "slot": 2,
+          "minionId": "many_branch_invoker",
+          "permanentAttackBonus": 7,
+          "permanentHealthBonus": 14,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 13,
+          "highPermanentHealthBonus": 9,
+          "expectedNormalAttack": 9,
+          "expectedNormalHealth": 18,
+          "expectedHighAttack": 17,
+          "expectedHighHealth": 17
+        },
+        {
+          "slot": 3,
+          "minionId": "vinecrown_priest",
+          "permanentAttackBonus": 3,
+          "permanentHealthBonus": 4,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 4,
+          "highPermanentHealthBonus": 3,
+          "expectedNormalAttack": 6,
+          "expectedNormalHealth": 10,
+          "expectedHighAttack": 10,
+          "expectedHighHealth": 15
+        },
+        {
+          "slot": 4,
+          "minionId": "ten_thousand_hoof_surge",
+          "permanentAttackBonus": 12,
+          "permanentHealthBonus": 3,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 13,
+          "highPermanentHealthBonus": 7,
+          "expectedNormalAttack": 19,
+          "expectedNormalHealth": 11,
+          "expectedHighAttack": 27,
+          "expectedHighHealth": 23
+        }
+      ]
+    },
+    {
+      "buildId": "B04_DEATH",
+      "calibration": {
+        "observedSamples": 1000,
+        "formationRate": 1.0,
+        "normalRepresentativeSeed": -1252306599,
+        "highRepresentativeSeed": -1151377801,
+        "status": "Ready"
+      },
+      "slots": [
+        {
+          "slot": 0,
+          "minionId": "rootbound_soul_guide",
+          "permanentAttackBonus": 6,
+          "permanentHealthBonus": 5,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 2,
+          "highPermanentHealthBonus": 3,
+          "expectedNormalAttack": 9,
+          "expectedNormalHealth": 10,
+          "expectedHighAttack": 8,
+          "expectedHighHealth": 13
+        },
+        {
+          "slot": 1,
+          "minionId": "ancient_moss_hatchling",
+          "permanentAttackBonus": 6,
+          "permanentHealthBonus": 9,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 15,
+          "highPermanentHealthBonus": 16,
+          "expectedNormalAttack": 9,
+          "expectedNormalHealth": 14,
+          "expectedHighAttack": 21,
+          "expectedHighHealth": 26
+        },
+        {
+          "slot": 2,
+          "minionId": "mountain_belly_soul_eater",
+          "permanentAttackBonus": 9,
+          "permanentHealthBonus": 9,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 16,
+          "highPermanentHealthBonus": 22,
+          "expectedNormalAttack": 14,
+          "expectedNormalHealth": 15,
+          "expectedHighAttack": 26,
+          "expectedHighHealth": 34
+        },
+        {
+          "slot": 3,
+          "minionId": "ancient_mountain_spirit",
+          "permanentAttackBonus": 11,
+          "permanentHealthBonus": 15,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 17,
+          "highPermanentHealthBonus": 15,
+          "expectedNormalAttack": 17,
+          "expectedNormalHealth": 24,
+          "expectedHighAttack": 29,
+          "expectedHighHealth": 33
+        },
+        {
+          "slot": 4,
+          "minionId": "world_eating_final_bloom",
+          "permanentAttackBonus": 22,
+          "permanentHealthBonus": 11,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 32,
+          "highPermanentHealthBonus": 33,
+          "expectedNormalAttack": 26,
+          "expectedNormalHealth": 23,
+          "expectedHighAttack": 40,
+          "expectedHighHealth": 57
+        }
+      ],
+      "normalFlourishStacks": 0,
+      "highFlourishStacks": 0
+    },
+    {
+      "buildId": "B05_SPELL",
+      "calibration": {
+        "observedSamples": 1000,
+        "formationRate": 1.0,
+        "normalRepresentativeSeed": 1103493827,
+        "highRepresentativeSeed": 1204159541,
+        "status": "Ready"
+      },
+      "slots": [
+        {
+          "slot": 0,
+          "minionId": "secret_page_refractor",
+          "permanentAttackBonus": 18,
+          "permanentHealthBonus": 19,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 27,
+          "highPermanentHealthBonus": 30,
+          "expectedNormalAttack": 21,
+          "expectedNormalHealth": 23,
+          "expectedHighAttack": 33,
+          "expectedHighHealth": 38
+        },
+        {
+          "slot": 1,
+          "minionId": "rune_ward_reader",
+          "permanentAttackBonus": 15,
+          "permanentHealthBonus": 12,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 30,
+          "highPermanentHealthBonus": 14,
+          "expectedNormalAttack": 16,
+          "expectedNormalHealth": 16,
+          "expectedHighAttack": 32,
+          "expectedHighHealth": 22
+        },
+        {
+          "slot": 2,
+          "minionId": "echo_starchanter",
+          "permanentAttackBonus": 13,
+          "permanentHealthBonus": 6,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 22,
+          "highPermanentHealthBonus": 21,
+          "expectedNormalAttack": 16,
+          "expectedNormalHealth": 9,
+          "expectedHighAttack": 28,
+          "expectedHighHealth": 27
+        },
+        {
+          "slot": 3,
+          "minionId": "falling_light_arbiter",
+          "permanentAttackBonus": 10,
+          "permanentHealthBonus": 11,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 18,
+          "highPermanentHealthBonus": 17,
+          "expectedNormalAttack": 15,
+          "expectedNormalHealth": 15,
+          "expectedHighAttack": 28,
+          "expectedHighHealth": 25
+        },
+        {
+          "slot": 4,
+          "minionId": "falling_star_prophet",
+          "permanentAttackBonus": 9,
+          "permanentHealthBonus": 12,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 18,
+          "highPermanentHealthBonus": 18,
+          "expectedNormalAttack": 15,
+          "expectedNormalHealth": 18,
+          "expectedHighAttack": 30,
+          "expectedHighHealth": 30
+        }
+      ],
+      "normalOverlay": [
+        {
+          "slot": 3,
+          "attack": 2,
+          "keywords": [
+            "Cleave"
+          ]
+        }
+      ],
+      "highOverlay": [
+        {
+          "slot": 3,
+          "attack": 4,
+          "keywords": [
+            "Cleave",
+            "Shield"
+          ]
+        }
+      ],
+      "normalFlourishStacks": 0,
+      "highFlourishStacks": 0
+    },
+    {
+      "buildId": "B06_REFRESH",
+      "calibration": {
+        "observedSamples": 1000,
+        "formationRate": 1.0,
+        "normalRepresentativeSeed": 221881932,
+        "highRepresentativeSeed": 322555510,
+        "status": "Ready"
+      },
+      "slots": [
+        {
+          "slot": 0,
+          "minionId": "astrolabe_calibrator",
+          "permanentAttackBonus": 9,
+          "permanentHealthBonus": 9,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 22,
+          "highPermanentHealthBonus": 22,
+          "expectedNormalAttack": 11,
+          "expectedNormalHealth": 11,
+          "expectedHighAttack": 26,
+          "expectedHighHealth": 26
+        },
+        {
+          "slot": 1,
+          "minionId": "fate_track_recorder",
+          "permanentAttackBonus": 12,
+          "permanentHealthBonus": 12,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 21,
+          "highPermanentHealthBonus": 21,
+          "expectedNormalAttack": 14,
+          "expectedNormalHealth": 17,
+          "expectedHighAttack": 25,
+          "expectedHighHealth": 31
+        },
+        {
+          "slot": 2,
+          "minionId": "moonwheel_dispatcher",
+          "permanentAttackBonus": 9,
+          "permanentHealthBonus": 9,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 20,
+          "highPermanentHealthBonus": 20,
+          "expectedNormalAttack": 12,
+          "expectedNormalHealth": 15,
+          "expectedHighAttack": 26,
+          "expectedHighHealth": 32
+        },
+        {
+          "slot": 3,
+          "minionId": "star_ring_treasurer",
+          "permanentAttackBonus": 8,
+          "permanentHealthBonus": 8,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 18,
+          "highPermanentHealthBonus": 18,
+          "expectedNormalAttack": 12,
+          "expectedNormalHealth": 14,
+          "expectedHighAttack": 26,
+          "expectedHighHealth": 30
+        },
+        {
+          "slot": 4,
+          "minionId": "sky_covenant_bearer",
+          "permanentAttackBonus": 7,
+          "permanentHealthBonus": 7,
+          "normalIsGolden": false,
+          "highIsGolden": true,
+          "highPermanentAttackBonus": 22,
+          "highPermanentHealthBonus": 22,
+          "expectedNormalAttack": 11,
+          "expectedNormalHealth": 15,
+          "expectedHighAttack": 30,
+          "expectedHighHealth": 38
+        }
+      ],
+      "normalOverlay": [
+        {
+          "slot": 0,
+          "keywords": [
+            "Shield"
+          ]
+        }
+      ],
+      "highOverlay": [
+        {
+          "slot": 0,
+          "keywords": [
+            "Shield"
+          ]
+        },
+        {
+          "slot": 1,
+          "keywords": [
+            "Shield"
+          ]
+        }
+      ],
+      "normalFlourishStacks": 0,
+      "highFlourishStacks": 0
+    }
+  ],
+  "dummies": [
+    {
+      "id": "D00_OUTPUT_DUMMY",
+      "minionId": "wandering_swordsman",
+      "attack": 0,
+      "health": 500
+    },
+    {
+      "id": "D01_MECHANIC_PRESSURE_N",
+      "minionId": "wandering_swordsman",
+      "attack": 8,
+      "health": 500
+    },
+    {
+      "id": "D01_MECHANIC_PRESSURE_H",
+      "minionId": "wandering_swordsman",
+      "attack": 16,
+      "health": 1000
+    }
+  ]
+}

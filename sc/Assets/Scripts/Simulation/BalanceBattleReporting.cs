@@ -21,7 +21,7 @@ namespace SpireChess.Simulation
         public string TuningRound { get; set; }
         public string BatchId { get; set; }
         public string FixtureVersion { get; set; } = "0.2.0";
-        public string CoreClassifierVersion { get; set; } = "0.2.1";
+        public string CoreClassifierVersion { get; set; } = "0.2.2";
         public string SeedSet { get; set; }
         public string PlayerFixtureId { get; set; }
         public string EnemyFixtureId { get; set; }

@@ -1,0 +1,19 @@
+{
+  "candidateId": "R10-sky-hoof-unity",
+  "sampleCountPerBuildAndLevel": 1000,
+  "growthTurnCount": 5,
+  "growthSpellIds": [
+    "minor_tempering",
+    "precise_training",
+    "thickhide_potion"
+  ],
+  "pressureBattleTurns": [
+    1,
+    3,
+    5
+  ],
+  "normalRefreshesPerTurn": 4,
+  "highRefreshesPerTurn": 5,
+  "generatedAtUtc": "2026-07-15T14:50:10.1754454Z",
+  "unityVersion": "2022.3.62f3c1"
+}

@@ -93,9 +93,9 @@ function countFor(race, token) {
 const lines = [
   `# 全随从身材与效果图鉴（内容版本 ${release.contentVersion}）`,
   "",
-  `生成日期：2026-07-15  `,
-  `配置版本：${config.version}  `,
-  `规则最低版本：${release.minimumRulesVersion}  `,
+  `生成日期：2026-07-15`,
+  `配置版本：${config.version}`,
+  `规则最低版本：${release.minimumRulesVersion}`,
   `随从配置 SHA256：\`${hash}\``,
   "",
   "本文档由运行时随从配置自动生成。身材均为卡牌基础身材，不包含阵容夹具成长、永久加成、繁茂、商店法术或战斗内临时增益。关键词栏表示普通与金色形态共享的基础关键词；效果授予的临时关键词以效果文案为准。",

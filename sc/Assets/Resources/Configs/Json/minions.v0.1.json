@@ -997,7 +997,7 @@
       "id": "vinecrown_priest",
       "name": "藤冠祭司",
       "title": "",
-      "description": "本场每有 2 个友方随从死亡，获得 1 层繁茂。每层繁茂使所有友方荒灵获得 +1 攻击，整局永久生效。",
+      "description": "本场每有 4 个友方随从死亡，获得 1 层繁茂。每层繁茂使所有友方荒灵获得 +1 攻击，整局永久生效。",
       "goldenDescription": "本场每有 2 个友方随从死亡，获得 1 层繁茂。每层繁茂使所有友方荒灵获得 +1 攻击，整局永久生效。",
       "tier": 4,
       "race": "WildSpirit",
@@ -1012,7 +1012,7 @@
       "iconId": "icon_wild_spirit",
       "audioId": "",
       "effects": [
-        { "id": "vinecrown_priest_flourish", "trigger": "OnFriendlyDeath", "action": "GainFlourish", "condition": { "type": "TriggerCountMultipleOf", "threshold": 2 }, "value": { "amount": 1, "duration": "Run" } }
+        { "id": "vinecrown_priest_flourish", "trigger": "OnFriendlyDeath", "action": "GainFlourish", "condition": { "type": "TriggerCountMultipleOf", "threshold": 4 }, "value": { "amount": 1, "duration": "Run" } }
       ],
       "goldenEffects": [
         { "id": "golden_vinecrown_priest_flourish", "trigger": "OnFriendlyDeath", "action": "GainFlourish", "condition": { "type": "TriggerCountMultipleOf", "threshold": 2 }, "value": { "amount": 1, "duration": "Run" } }
@@ -1323,7 +1323,7 @@
       "name": "万蹄奔潮",
       "title": "",
       "description": "每当你召唤一个随从，使其本场获得 +2 攻击；若它是召唤物，使其立即攻击一次。每场前两次召唤物死亡时，自身永久获得 +1 攻击。",
-      "goldenDescription": "每当你召唤一个随从，使其本场获得 +4 攻击；若它是召唤物，使其立即攻击一次并获得溅射。每场前两次召唤物死亡时，自身永久获得 +2 攻击。",
+      "goldenDescription": "每当你召唤一个随从，使其本场获得 +4 攻击；若它是召唤物，使其立即攻击一次。每场前两次召唤物死亡时，自身永久获得 +2 攻击。",
       "tier": 5,
       "race": "WildSpirit",
       "archetypes": ["SummonTempo"],
@@ -1343,7 +1343,6 @@
       ],
       "goldenEffects": [
         { "id": "golden_ten_thousand_hoof_surge_buff", "trigger": "OnSummon", "action": "ModifyStats", "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "attack": 4, "health": 0, "duration": "Combat" } },
-        { "id": "golden_ten_thousand_hoof_surge_cleave", "trigger": "OnSummon", "action": "AddKeyword", "condition": { "type": "SubjectIsToken" }, "target": { "side": "Ally", "scope": "EventSubject", "includeSelf": false, "includeToken": true }, "value": { "duration": "Combat", "keyword": "Cleave" } },
         { "id": "golden_ten_thousand_hoof_surge_attack", "trigger": "OnSummon", "action": "ImmediateAttack", "condition": { "type": "SubjectIsToken" } },
         { "id": "golden_ten_thousand_hoof_surge_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 0, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
       ],
@@ -1444,8 +1443,8 @@
       "id": "sky_covenant_bearer",
       "name": "天穹契约者",
       "title": "",
-      "description": "每个商店阶段第 4 次刷新后，所有友方星契永久获得 +1/+1。",
-      "goldenDescription": "每个商店阶段第 4 次刷新后，所有友方星契永久获得 +2/+2。",
+      "description": "每 4 次刷新后，所有友方星契永久获得 +1/+1。",
+      "goldenDescription": "每 4 次刷新后，所有友方星契永久获得 +2/+2。",
       "tier": 5,
       "race": "Starbound",
       "archetypes": ["RefreshEconomy"],
@@ -1459,10 +1458,10 @@
       "iconId": "icon_starbound",
       "audioId": "",
       "effects": [
-        { "id": "sky_covenant_bearer_stats", "trigger": "OnRefresh", "action": "ModifyStats", "condition": { "type": "PhaseStatAtLeast", "phaseStat": "RefreshCount", "threshold": 4 }, "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "race": "Starbound", "includeSelf": true, "includeToken": false }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perShop": 1 } }
+        { "id": "sky_covenant_bearer_stats", "trigger": "OnRefresh", "action": "ModifyStats", "condition": { "type": "PhaseStatMultipleOf", "phaseStat": "RefreshCount", "threshold": 4 }, "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "race": "Starbound", "includeSelf": true, "includeToken": false }, "value": { "attack": 1, "health": 1, "duration": "Permanent" } }
       ],
       "goldenEffects": [
-        { "id": "golden_sky_covenant_bearer_stats", "trigger": "OnRefresh", "action": "ModifyStats", "condition": { "type": "PhaseStatAtLeast", "phaseStat": "RefreshCount", "threshold": 4 }, "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "race": "Starbound", "includeSelf": true, "includeToken": false }, "value": { "attack": 2, "health": 2, "duration": "Permanent" }, "limit": { "perShop": 1 } }
+        { "id": "golden_sky_covenant_bearer_stats", "trigger": "OnRefresh", "action": "ModifyStats", "condition": { "type": "PhaseStatMultipleOf", "phaseStat": "RefreshCount", "threshold": 4 }, "target": { "side": "Ally", "scope": "All", "zones": ["Battle"], "race": "Starbound", "includeSelf": true, "includeToken": false }, "value": { "attack": 2, "health": 2, "duration": "Permanent" } }
       ],
       "tags": ["refresh_growth"],
       "enabled": true,
@@ -1684,18 +1683,18 @@
       "id": "secret_page_refractor",
       "name": "秘页折光师",
       "title": "",
-      "description": "每个商店阶段前两次施法后，使生命最低的友方随从下一场战斗获得 +1/+2。",
-      "goldenDescription": "每个商店阶段前两次施法后，使生命最低的两个友方随从下一场战斗获得 +1/+2。",
-      "tier": 3, "race": "Starbound", "keywords": [], "isToken": false,
+      "description": "护盾。每个商店阶段前两次施法后，永久获得 +1/+1。",
+      "goldenDescription": "护盾。每个商店阶段前两次施法后，永久获得 +2/+2。",
+      "tier": 3, "race": "Starbound", "keywords": ["Shield"], "isToken": false,
       "attack": 3, "health": 4, "goldenAttack": 6, "goldenHealth": 8,
       "artId": "placeholder_card_secret_page_refractor", "iconId": "icon_starbound", "audioId": "",
       "effects": [
-        { "id": "secret_page_refractor_spell", "trigger": "OnSpellUsed", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": true, "includeToken": false, "maxTargets": 1, "selector": "LowestHealth" }, "value": { "attack": 1, "health": 2, "duration": "NextCombat" }, "limit": { "perShop": 2 } }
+        { "id": "secret_page_refractor_spell", "trigger": "OnSpellUsed", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "zones": ["Battle"], "includeSelf": true, "includeToken": false }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perShop": 2 } }
       ],
       "goldenEffects": [
-        { "id": "golden_secret_page_refractor_spell", "trigger": "OnSpellUsed", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "zones": ["Battle"], "includeSelf": true, "includeToken": false, "maxTargets": 2, "selector": "LowestHealth" }, "value": { "attack": 1, "health": 2, "duration": "NextCombat" }, "limit": { "perShop": 2 } }
+        { "id": "golden_secret_page_refractor_spell", "trigger": "OnSpellUsed", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "zones": ["Battle"], "includeSelf": true, "includeToken": false }, "value": { "attack": 2, "health": 2, "duration": "Permanent" }, "limit": { "perShop": 2 } }
       ],
-      "tags": ["spell", "next_combat"], "enabled": true, "devNote": ""
+      "tags": ["shield", "spell", "permanent_growth"], "enabled": true, "devNote": ""
     },
     {
       "id": "star_ring_treasurer",

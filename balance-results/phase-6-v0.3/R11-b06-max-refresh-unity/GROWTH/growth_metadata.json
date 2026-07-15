@@ -1,0 +1,23 @@
+{
+  "candidateId": "R11-b06-max-refresh-unity",
+  "sampleCountPerBuildAndLevel": 1000,
+  "growthTurnCount": 5,
+  "growthSpellIdsForNonRefreshBuilds": [
+    "minor_tempering",
+    "precise_training",
+    "thickhide_potion"
+  ],
+  "pressureBattleTurns": [
+    1,
+    3,
+    5
+  ],
+  "b06Route": {
+    "goldPolicy": "Natural round budget plus effect-generated gold",
+    "refreshPolicy": "Refresh while a paid or free refresh is affordable",
+    "spellPolicy": "Use only temporary spells granted by refresh effects",
+    "fixedGrowthSpells": []
+  },
+  "generatedAtUtc": "2026-07-15T15:06:25.6224930Z",
+  "unityVersion": "2022.3.62f3c1"
+}

@@ -1687,11 +1687,6 @@ namespace SpireChess.Shop
                 return true;
             }
 
-            if (condition.Type != "PhaseStatAtLeast")
-            {
-                return false;
-            }
-
             int value;
             switch (condition.PhaseStat)
             {
@@ -1702,7 +1697,16 @@ namespace SpireChess.Shop
                 default: return false;
             }
 
-            return value >= condition.Threshold;
+            switch (condition.Type)
+            {
+                case "PhaseStatAtLeast":
+                    return value >= condition.Threshold;
+                case "PhaseStatMultipleOf":
+                    return condition.Threshold > 0 && value > 0 &&
+                           value % condition.Threshold == 0;
+                default:
+                    return false;
+            }
         }
 
         private bool TryGrantRandomSpell(EffectConfig effect)

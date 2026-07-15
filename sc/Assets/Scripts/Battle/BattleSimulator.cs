@@ -1405,7 +1405,7 @@ namespace SpireChess.Battle
                 var flourishAttack = tokenConfig.Race == "WildSpirit"
                     ? state.GetFlourishStacks(death.Side)
                     : 0;
-                var summonedAttack = (attackOverride ?? tokenConfig.Attack) + flourishAttack;
+                var summonedAttack = attackOverride ?? tokenConfig.Attack;
                 var token = new BattleMinionRuntime(
                     tokenConfig,
                     false,
@@ -1416,6 +1416,12 @@ namespace SpireChess.Battle
                         effect.Value?.SummonEffectMultiplier ?? 1));
                 row[slotIndex] = token;
                 log.Add($"{death.Minion.Name} 在 {slotIndex + 1} 号位召唤了 {token.Name}。");
+                AddTemporaryStats(
+                    death.Side,
+                    token,
+                    flourishAttack,
+                    0,
+                    log);
                 var summonEventId = ++nextSummonEventId;
                 EnqueueSourceEffects(
                     token,

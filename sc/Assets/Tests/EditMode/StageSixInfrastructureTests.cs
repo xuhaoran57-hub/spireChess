@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Run;
+using SpireChess.Shop;
 using SpireChess.Simulation;
 using SpireChess.Utils;
 using UnityEngine;
@@ -31,7 +32,7 @@ namespace SpireChess.Tests.EditMode
         public void BalanceFixtures_DefineAndValidateAllNormalAndHighSnapshots()
         {
             Assert.That(fixtures.FixtureVersion, Is.EqualTo("0.3.0"));
-            Assert.That(fixtures.CoreClassifierVersion, Is.EqualTo("0.2.1"));
+            Assert.That(fixtures.CoreClassifierVersion, Is.EqualTo("0.2.2"));
             Assert.That(fixtures.BuildIds, Has.Count.EqualTo(6));
             foreach (var buildId in fixtures.BuildIds)
             {
@@ -71,12 +72,12 @@ namespace SpireChess.Tests.EditMode
 
             var summonNormal = fixtures.CreateFixture("B03_SUMMON", "N");
             var summonHigh = fixtures.CreateFixture("B03_SUMMON", "H");
-            Assert.That(summonNormal.PlayerFlourishStacks, Is.EqualTo(12));
+            Assert.That(summonNormal.PlayerFlourishStacks, Is.EqualTo(7));
             Assert.That(summonHigh.PlayerFlourishStacks, Is.EqualTo(12));
-            Assert.That(summonNormal.Player[0].CurrentAttack, Is.EqualTo(18));
-            Assert.That(summonHigh.Player[0].CurrentAttack, Is.EqualTo(22));
-            Assert.That(summonNormal.Player[0].CurrentHealth, Is.EqualTo(13));
-            Assert.That(summonHigh.Player[0].CurrentHealth, Is.EqualTo(19));
+            Assert.That(summonNormal.Player[0].CurrentAttack, Is.EqualTo(12));
+            Assert.That(summonHigh.Player[0].CurrentAttack, Is.EqualTo(23));
+            Assert.That(summonNormal.Player[0].CurrentHealth, Is.EqualTo(5));
+            Assert.That(summonHigh.Player[0].CurrentHealth, Is.EqualTo(12));
             Assert.That(summonNormal.Player[0].Id, Is.EqualTo("hundred_song_herd"));
             Assert.That(summonHigh.Player[0].Id, Is.EqualTo("hundred_song_herd"));
         }
@@ -97,6 +98,32 @@ namespace SpireChess.Tests.EditMode
             Assert.That(first.Samples, Has.All.Matches<BattleSample>(value =>
                 !string.IsNullOrWhiteSpace(value.DeterminismHash)));
             Assert.That(BattleBatchComparer.CountDeterminismFailures(first, second), Is.Zero);
+        }
+
+        [Test]
+        public void CoreClassifier_MoltenBreakLineupIsB02InsteadOfMixed()
+        {
+            var ids = new[]
+            {
+                "oathbroken_blade_soul",
+                "molten_core_standard",
+                "undying_furnace_king",
+                "counterflow_smith",
+                "cinder_armor_arbiter"
+            };
+            var cards = ids.Select((id, index) => ShopCardInstance.CreateMinion(
+                $"classifier-{index}",
+                configs.MinionsById[id])).ToList();
+            var classified = CoreBuildClassifier.ClassifyFinalBuild(
+                cards,
+                new CoreActivationEvidence
+                {
+                    ShieldEvents = 2,
+                    ShieldBenefitEvents = 1
+                });
+
+            Assert.That(CoreBuildClassifier.Version, Is.EqualTo("0.2.2"));
+            Assert.That(classified, Is.EqualTo("B02_BREAK"));
         }
 
         [Test]

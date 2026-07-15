@@ -269,6 +269,10 @@ namespace SpireChess.Shop
                     return collection.Battle.Any(card => card != null && card.IsGolden);
                 case "PhaseStatAtLeast":
                     return GetPhaseStat(condition.PhaseStat) >= condition.Threshold;
+                case "PhaseStatMultipleOf":
+                    return condition.Threshold > 0 &&
+                           GetPhaseStat(condition.PhaseStat) > 0 &&
+                           GetPhaseStat(condition.PhaseStat) % condition.Threshold == 0;
                 case "RaceCountAtLeast":
                     return collection.Battle.Count(card =>
                         card != null && card.Minion.Race == condition.Race) >= condition.Threshold;

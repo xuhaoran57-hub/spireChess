@@ -18,17 +18,17 @@ namespace SpireChess.Run
 
     public static class CoreBuildClassifier
     {
-        public const string Version = "0.2.1";
+        public const string Version = "0.2.2";
 
         private static readonly IReadOnlyDictionary<string, CoreDefinition> Definitions =
             new Dictionary<string, CoreDefinition>
             {
                 ["B01_SHIELD"] = new CoreDefinition(
-                    new[] { "shieldwall_furnace_keeper", "resonance_bell_guard", "hearth_core_aegis_officer", "undying_furnace_king" },
+                    new[] { "shieldwall_furnace_keeper", "resonance_bell_guard", "hearth_core_aegis_officer" },
                     new[] { "molten_core_standard", "thousand_ring_tomb_guardian" }),
                 ["B02_BREAK"] = new CoreDefinition(
                     new[] { "shieldbreaker_blade_blank", "oathblade_armor", "cracked_armor_avenger", "cinder_armor_arbiter", "oathbroken_blade_soul" },
-                    new[] { "ember_engraver", "counterflow_smith", "cracked_armor_avenger", "cinder_armor_arbiter", "oathbroken_blade_soul" }),
+                    new[] { "ember_engraver", "molten_core_standard", "counterflow_smith", "cracked_armor_avenger", "cinder_armor_arbiter", "oathbroken_blade_soul" }),
                 ["B03_SUMMON"] = new CoreDefinition(
                     new[] { "young_deer_spirit", "two_tailed_fox_spirit", "fox_den_matriarch", "hundred_song_herd" },
                     new[] { "rending_cub", "swiftwing_forest_hawk", "many_branch_invoker", "vinecrown_priest", "tuskherd_pathrunner", "ten_thousand_hoof_surge" }),

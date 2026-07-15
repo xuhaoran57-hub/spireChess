@@ -216,12 +216,15 @@ namespace SpireChess.Tests.EditMode
             Assert.That(vinecrownGrowth.Trigger, Is.EqualTo("OnFriendlyDeath"));
             Assert.That(vinecrownGrowth.Action, Is.EqualTo("GainFlourish"));
             Assert.That(vinecrownGrowth.Condition.Type, Is.EqualTo("TriggerCountMultipleOf"));
-            Assert.That(vinecrownGrowth.Condition.Threshold, Is.EqualTo(2));
+            Assert.That(vinecrownGrowth.Condition.Threshold, Is.EqualTo(4));
             Assert.That(vinecrownGrowth.Value.Amount, Is.EqualTo(1));
             Assert.That(vinecrownGrowth.Value.Count, Is.Zero);
             Assert.That(vinecrownGrowth.Limit, Is.Null);
             var goldenVinecrownGrowth = vinecrown.GoldenEffects.Single(
                 effect => effect.Id == "golden_vinecrown_priest_flourish");
+            Assert.That(goldenVinecrownGrowth.Condition.Type,
+                Is.EqualTo("TriggerCountMultipleOf"));
+            Assert.That(goldenVinecrownGrowth.Condition.Threshold, Is.EqualTo(2));
             Assert.That(goldenVinecrownGrowth.Value.Count, Is.Zero);
             Assert.That(goldenVinecrownGrowth.Limit, Is.Null);
 
@@ -234,7 +237,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void SummonBuffs_IncludeTokensAndGoldenHoofCleaveTargetsToken()
+        public void SummonBuffs_IncludeTokensAndGoldenHoofDoesNotGrantCleave()
         {
             var branch = configs.MinionsById["many_branch_invoker"];
             Assert.That(branch.Effects.Single(value =>
@@ -247,8 +250,8 @@ namespace SpireChess.Tests.EditMode
                 value.Id == "ten_thousand_hoof_surge_buff").Target.IncludeToken, Is.True);
             Assert.That(hoof.GoldenEffects.Single(value =>
                 value.Id == "golden_ten_thousand_hoof_surge_buff").Target.IncludeToken, Is.True);
-            Assert.That(hoof.GoldenEffects.Single(value =>
-                value.Id == "golden_ten_thousand_hoof_surge_cleave").Target.IncludeToken, Is.True);
+            Assert.That(hoof.GoldenEffects.Any(value =>
+                value.Action == "AddKeyword" && value.Value?.Keyword == "Cleave"), Is.False);
         }
 
         [Test]
@@ -272,11 +275,11 @@ namespace SpireChess.Tests.EditMode
             Assert.That(token.CurrentHealth, Is.EqualTo(2));
             Assert.That(result.Diagnostics.Player.ImmediateAttacks, Is.EqualTo(1));
             Assert.That(result.Diagnostics.Player.TemporaryAttackGained,
-                Is.GreaterThanOrEqualTo(6));
+                Is.EqualTo(6));
         }
 
         [Test]
-        public void GoldenHoof_GrantsSummonedTokenCleaveAndAttacksOnce()
+        public void GoldenHoof_BuffsSummonedTokenWithoutCleaveAndAttacksOnce()
         {
             var state = new BattleBoardState();
             state.Player[0] = new BattleMinionRuntime(
@@ -292,27 +295,28 @@ namespace SpireChess.Tests.EditMode
             var token = result.FinalState.Player.Single(value => value?.Config.IsToken == true);
 
             Assert.That(token.CurrentAttack, Is.EqualTo(5));
-            Assert.That(token.HasCleave, Is.True);
+            Assert.That(token.HasCleave, Is.False);
             Assert.That(result.Diagnostics.Player.ImmediateAttacks, Is.EqualTo(1));
         }
 
         [Test]
-        public void Vinecrown_GainsGlobalFlourishAfterTwoDeathsAndBuffsLivingWildSpirits()
+        public void NormalVinecrown_GainsGlobalFlourishAfterFourDeaths()
         {
             var state = new BattleBoardState();
-            state.Player[0] = new BattleMinionRuntime(
-                configs.MinionsById["wandering_swordsman"], initialHealth: 1);
-            state.Player[1] = new BattleMinionRuntime(
-                configs.MinionsById["wandering_swordsman"], initialHealth: 1);
-            state.Player[2] = new BattleMinionRuntime(
+            for (var slot = 0; slot < 4; slot++)
+            {
+                state.Player[slot] = new BattleMinionRuntime(
+                    configs.MinionsById["wandering_swordsman"], initialHealth: 1);
+            }
+            state.Player[4] = new BattleMinionRuntime(
                 configs.MinionsById["vinecrown_priest"],
                 initialAttack: 3,
-                initialHealth: 100,
+                initialHealth: 200,
                 sourceInstanceId: "vinecrown");
             state.Enemy[0] = new BattleMinionRuntime(
                 configs.MinionsById["royal_bounty_hunter"],
-                initialAttack: 100,
-                initialHealth: 100);
+                initialAttack: 0,
+                initialHealth: 5);
 
             var result = new BattleSimulator(new Random(31), ResolveMinion).Simulate(state);
             var vinecrown = result.FinalState.Player.Single(value =>
@@ -323,26 +327,27 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void Vinecrown_GainsOneFlourishForEveryTwoFriendlyDeaths()
+        public void GoldenVinecrown_GainsOneFlourishAfterTwoFriendlyDeaths()
         {
             var state = new BattleBoardState();
-            for (var slot = 0; slot < 4; slot++)
+            for (var slot = 0; slot < 2; slot++)
             {
                 state.Player[slot] = new BattleMinionRuntime(
-                    configs.MinionsById["young_deer_spirit"], initialHealth: 1);
+                    configs.MinionsById["wandering_swordsman"], initialHealth: 1);
             }
-            state.Player[4] = new BattleMinionRuntime(
+            state.Player[2] = new BattleMinionRuntime(
                 configs.MinionsById["vinecrown_priest"],
-                initialHealth: 100,
+                true,
+                initialHealth: 200,
                 sourceInstanceId: "vinecrown");
             state.Enemy[0] = new BattleMinionRuntime(
                 configs.MinionsById["royal_bounty_hunter"],
                 initialAttack: 0,
-                initialHealth: 100);
+                initialHealth: 5);
 
             var result = new BattleSimulator(new Random(37), ResolveMinion).Simulate(state);
-            Assert.That(result.FinalState.PlayerFlourishStacks, Is.EqualTo(2));
-            Assert.That(result.Diagnostics.Player.FlourishGained, Is.EqualTo(2));
+            Assert.That(result.FinalState.PlayerFlourishStacks, Is.EqualTo(1));
+            Assert.That(result.Diagnostics.Player.FlourishGained, Is.EqualTo(1));
         }
 
         [Test]
@@ -355,6 +360,7 @@ namespace SpireChess.Tests.EditMode
                 configs.MinionsById["ten_thousand_hoof_surge"]);
             state.Player[2] = new BattleMinionRuntime(
                 configs.MinionsById["vinecrown_priest"],
+                true,
                 initialHealth: 100,
                 sourceInstanceId: "vinecrown");
             state.Enemy[0] = new BattleMinionRuntime(

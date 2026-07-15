@@ -70,9 +70,10 @@ namespace SpireChess.Simulation
             {
                 errors.Add("fixtureVersion 0.3.0 requires calibration metadata.");
             }
-            if (file.CoreClassifierVersion != "0.2.1")
+            if (file.CoreClassifierVersion != "0.2.1" &&
+                file.CoreClassifierVersion != "0.2.2")
             {
-                errors.Add("coreClassifierVersion must be 0.2.1.");
+                errors.Add("coreClassifierVersion must be 0.2.1 or 0.2.2.");
             }
             if (file.Builds == null || file.Builds.Count != 6)
             {
