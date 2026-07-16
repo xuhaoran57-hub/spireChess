@@ -199,6 +199,14 @@ namespace SpireChess.Tests.EditMode
                 Has.None.Matches<EffectConfig>(effect =>
                     effect.Trigger == "OnShieldLost" &&
                     effect.Value?.Duration == "Permanent"));
+            var goldenKillGrowth = oathbroken.GoldenEffects.Single(effect =>
+                effect.Id == "golden_oathbroken_blade_soul_kill_permanent");
+            Assert.That(goldenKillGrowth.Trigger, Is.EqualTo("OnKill"));
+            Assert.That(goldenKillGrowth.Action, Is.EqualTo("ModifyStats"));
+            Assert.That(goldenKillGrowth.Value.Attack, Is.EqualTo(2));
+            Assert.That(goldenKillGrowth.Value.Health, Is.Zero);
+            Assert.That(goldenKillGrowth.Value.Duration, Is.EqualTo("Permanent"));
+            Assert.That(goldenKillGrowth.Limit, Is.Null);
 
             var tombGuardian = configs.MinionsById["thousand_ring_tomb_guardian"];
             var tombGrowth = tombGuardian.Effects.Single(
@@ -206,9 +214,25 @@ namespace SpireChess.Tests.EditMode
             Assert.That(tombGrowth.Value.Attack, Is.EqualTo(1));
             Assert.That(tombGrowth.Value.Health, Is.EqualTo(1));
             Assert.That(tombGrowth.Target.Scope, Is.EqualTo("All"));
-            Assert.That(tombGuardian.Effects.Single(effect =>
-                effect.Id == "thousand_ring_tomb_guardian_death_shield").Action,
-                Is.EqualTo("AddShield"));
+            var tombShield = tombGuardian.Effects.Single(effect =>
+                effect.Id == "thousand_ring_tomb_guardian_death_shield");
+            Assert.That(tombShield.Action, Is.EqualTo("AddShield"));
+            Assert.That(tombShield.Target.Scope, Is.EqualTo("Single"));
+            Assert.That(tombShield.Target.MaxTargets, Is.EqualTo(2));
+            Assert.That(tombShield.Target.Selector, Is.EqualTo("Random"));
+            Assert.That(tombGuardian.GoldenEffects.Single(effect =>
+                effect.Id == "golden_thousand_ring_tomb_guardian_death_shield")
+                .Target.Scope, Is.EqualTo("All"));
+
+            var astrolabe = configs.MinionsById["astrolabe_calibrator"];
+            var normalCalibration = astrolabe.Effects.Single();
+            var goldenCalibration = astrolabe.GoldenEffects.Single();
+            Assert.That(normalCalibration.Target.MaxTargets, Is.EqualTo(1));
+            Assert.That(normalCalibration.Value.Attack, Is.EqualTo(1));
+            Assert.That(normalCalibration.Value.Health, Is.Zero);
+            Assert.That(goldenCalibration.Target.MaxTargets, Is.EqualTo(1));
+            Assert.That(goldenCalibration.Value.Attack, Is.EqualTo(2));
+            Assert.That(goldenCalibration.Value.Health, Is.Zero);
 
             var vinecrown = configs.MinionsById["vinecrown_priest"];
             var vinecrownGrowth = vinecrown.Effects.Single(
@@ -224,7 +248,7 @@ namespace SpireChess.Tests.EditMode
                 effect => effect.Id == "golden_vinecrown_priest_flourish");
             Assert.That(goldenVinecrownGrowth.Condition.Type,
                 Is.EqualTo("TriggerCountMultipleOf"));
-            Assert.That(goldenVinecrownGrowth.Condition.Threshold, Is.EqualTo(2));
+            Assert.That(goldenVinecrownGrowth.Condition.Threshold, Is.EqualTo(3));
             Assert.That(goldenVinecrownGrowth.Value.Count, Is.Zero);
             Assert.That(goldenVinecrownGrowth.Limit, Is.Null);
 
@@ -234,6 +258,28 @@ namespace SpireChess.Tests.EditMode
             Assert.That(soulEaterGrowth.Condition.Type, Is.EqualTo("CombatWon"));
             Assert.That(soulEaterGrowth.Value.Health, Is.EqualTo(1));
             Assert.That(soulEaterGrowth.Limit.PerCombat, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void GoldenOathbroken_KillGrantsPermanentAttack()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["oathbroken_blade_soul"],
+                true,
+                sourceInstanceId: "golden-oathbroken");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["wandering_swordsman"],
+                initialAttack: 0,
+                initialHealth: 1);
+
+            var result = new BattleSimulator(new Random(21), ResolveMinion).Simulate(state);
+            var delta = result.PermanentDeltas.Single(value =>
+                value.SourceInstanceId == "golden-oathbroken");
+
+            Assert.That(delta.Attack, Is.EqualTo(2));
+            Assert.That(delta.Health, Is.Zero);
+            Assert.That(result.FinalState.Player[0].CurrentAttack, Is.EqualTo(18));
         }
 
         [Test]
@@ -327,15 +373,15 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void GoldenVinecrown_GainsOneFlourishAfterTwoFriendlyDeaths()
+        public void GoldenVinecrown_GainsOneFlourishAfterThreeFriendlyDeaths()
         {
             var state = new BattleBoardState();
-            for (var slot = 0; slot < 2; slot++)
+            for (var slot = 0; slot < 3; slot++)
             {
                 state.Player[slot] = new BattleMinionRuntime(
                     configs.MinionsById["wandering_swordsman"], initialHealth: 1);
             }
-            state.Player[2] = new BattleMinionRuntime(
+            state.Player[3] = new BattleMinionRuntime(
                 configs.MinionsById["vinecrown_priest"],
                 true,
                 initialHealth: 200,

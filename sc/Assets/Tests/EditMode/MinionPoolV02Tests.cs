@@ -205,6 +205,11 @@ namespace SpireChess.Tests.EditMode
             Assert.That(mountain.GoldenEffects[0].Value.Health, Is.EqualTo(2));
 
             var finalBloom = configs.MinionsById["world_eating_final_bloom"];
+            var normalPermanentGrowth = finalBloom.Effects.Single(effect =>
+                effect.Id == "world_eating_final_bloom_death_permanent");
+            Assert.That(normalPermanentGrowth.Value.Attack, Is.EqualTo(1));
+            Assert.That(normalPermanentGrowth.Value.Health, Is.EqualTo(1));
+            Assert.That(normalPermanentGrowth.Limit.PerCombat, Is.EqualTo(2));
             var copiedHealth = finalBloom.GoldenEffects.Single(effect =>
                 effect.Id == "golden_world_eating_final_bloom_death_health");
             Assert.That(copiedHealth.Value.Resource, Is.EqualTo("SubjectHealth"));
@@ -233,7 +238,7 @@ namespace SpireChess.Tests.EditMode
             var bellGuard = configs.MinionsById["resonance_bell_guard"];
             Assert.That(bellGuard.Effects, Has.Count.EqualTo(1));
             Assert.That(bellGuard.Effects[0].Action, Is.EqualTo("ModifyStats"));
-            Assert.That(bellGuard.Effects[0].Value.Health, Is.EqualTo(2));
+            Assert.That(bellGuard.Effects[0].Value.Health, Is.EqualTo(1));
             Assert.That(bellGuard.GoldenEffects, Has.Count.EqualTo(1));
             Assert.That(bellGuard.GoldenEffects[0].Value.Health, Is.EqualTo(4));
 
@@ -304,45 +309,56 @@ namespace SpireChess.Tests.EditMode
             Assert.That(refractor.PendingCombatModifiers, Is.Empty);
         }
 
-        [TestCase(false, 1)]
-        [TestCase(true, 2)]
-        public void SkyCovenantBearer_BuffsAllStarboundAfterEveryFourRefreshes(
+        [TestCase(false, 4)]
+        [TestCase(true, 3)]
+        public void SkyCovenantBearer_BuffsAllStarboundAtConfiguredRefreshInterval(
             bool golden,
-            int statsPerTrigger)
+            int refreshInterval)
         {
             var sky = configs.MinionsById["sky_covenant_bearer"];
             var effect = (golden ? sky.GoldenEffects : sky.Effects).Single();
             Assert.That(effect.Condition.Type, Is.EqualTo("PhaseStatMultipleOf"));
             Assert.That(effect.Condition.PhaseStat, Is.EqualTo("RefreshCount"));
-            Assert.That(effect.Condition.Threshold, Is.EqualTo(4));
+            Assert.That(effect.Condition.Threshold, Is.EqualTo(refreshInterval));
             Assert.That(effect.Limit, Is.Null);
+            Assert.That(effect.Target.Scope, Is.EqualTo("All"));
+            Assert.That(effect.Value.Attack, Is.EqualTo(1));
+            Assert.That(effect.Value.Health, Is.EqualTo(1));
 
             var shop = new ShopSession(configs.Minions, configs.Spells, new Random(19));
             Assert.That(shop.StartRound(1).Success, Is.True);
-            Assert.That(shop.Collection.TryAddToBench(
-                ShopCardInstance.CreateMinion(
-                    "sky-test-ally",
-                    configs.MinionsById["glimmer_mage"]),
-                out var allyBench), Is.True);
-            Assert.That(shop.PlayMinion(allyBench, 0).Success, Is.True);
+            var allyIds = new[]
+            {
+                "glimmer_mage",
+                "glimmer_mage",
+                "glimmer_mage"
+            };
+            for (var index = 0; index < allyIds.Length; index++)
+            {
+                Assert.That(shop.Collection.TryAddToBench(
+                    ShopCardInstance.CreateMinion(
+                        $"sky-test-ally-{index}",
+                        configs.MinionsById[allyIds[index]]),
+                    out var allyBench), Is.True);
+                Assert.That(shop.PlayMinion(allyBench, index).Success, Is.True);
+            }
             Assert.That(shop.Collection.TryAddToBench(
                 ShopCardInstance.CreateMinion("sky-test-source", sky, golden),
                 out var skyBench), Is.True);
-            Assert.That(shop.PlayMinion(skyBench, 1).Success, Is.True);
+            Assert.That(shop.PlayMinion(skyBench, 3).Success, Is.True);
             SetGold(shop, 20);
 
-            for (var refresh = 1; refresh <= 8; refresh++)
+            for (var refresh = 1; refresh <= 12; refresh++)
             {
                 Assert.That(shop.Refresh().Success, Is.True);
-                var expected = (refresh / 4) * statsPerTrigger;
-                Assert.That(shop.Collection.Battle[0].PermanentAttackBonus,
-                    Is.EqualTo(expected), $"ally attack after refresh {refresh}");
-                Assert.That(shop.Collection.Battle[0].PermanentHealthBonus,
-                    Is.EqualTo(expected), $"ally health after refresh {refresh}");
-                Assert.That(shop.Collection.Battle[1].PermanentAttackBonus,
-                    Is.EqualTo(expected), $"source attack after refresh {refresh}");
-                Assert.That(shop.Collection.Battle[1].PermanentHealthBonus,
-                    Is.EqualTo(expected), $"source health after refresh {refresh}");
+                var expected = refresh / refreshInterval;
+                var cards = shop.Collection.Battle.Where(card => card != null).ToList();
+                Assert.That(cards.All(card =>
+                    card.PermanentAttackBonus == expected), Is.True,
+                    $"attack after refresh {refresh}");
+                Assert.That(cards.All(card =>
+                    card.PermanentHealthBonus == expected), Is.True,
+                    $"health after refresh {refresh}");
             }
         }
 
@@ -363,6 +379,35 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(immediateAttackCount, Is.EqualTo(2),
                 "Each of the two summon events should enqueue one immediate attack.");
+        }
+
+        [Test]
+        public void GoldenHundredSongHerd_SummonsFourTwoOneSpiritsWithImmediateAttacks()
+        {
+            var hundredSong = configs.MinionsById["hundred_song_herd"];
+            var summon = hundredSong.GoldenEffects.Single(effect =>
+                effect.Action == "SummonToken");
+            Assert.That(summon.Value.Attack, Is.EqualTo(2));
+            Assert.That(summon.Value.Health, Is.EqualTo(1));
+            Assert.That(summon.Value.Amount, Is.EqualTo(4));
+
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                hundredSong,
+                true,
+                initialHealth: 1);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["mirrorsteel_duelist"],
+                initialAttack: 100,
+                initialHealth: 500);
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var immediateAttackCount = result.Log.Count(message =>
+                message.Contains("迅捷幼灵") && message.Contains("立即攻击"));
+
+            Assert.That(result.FinalState.PlayerFlourishStacks, Is.EqualTo(1));
+            Assert.That(result.Diagnostics.Player.SummonSuccesses, Is.EqualTo(4));
+            Assert.That(immediateAttackCount, Is.EqualTo(4));
         }
 
         [Test]

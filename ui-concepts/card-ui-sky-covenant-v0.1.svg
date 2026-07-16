@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1440" viewBox="0 0 960 1440">
+  <defs>
+    <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080d1b"/>
+      <stop offset="0.52" stop-color="#111933"/>
+      <stop offset="1" stop-color="#080b17"/>
+    </linearGradient>
+    <linearGradient id="cardBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#253468"/>
+      <stop offset="0.45" stop-color="#121c3e"/>
+      <stop offset="1" stop-color="#0b1127"/>
+    </linearGradient>
+    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#72d7ff"/>
+      <stop offset="0.35" stop-color="#8279ff"/>
+      <stop offset="0.7" stop-color="#d39aff"/>
+      <stop offset="1" stop-color="#5bc4ff"/>
+    </linearGradient>
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#283e7a"/>
+      <stop offset="0.55" stop-color="#413879"/>
+      <stop offset="1" stop-color="#253b70"/>
+    </linearGradient>
+    <linearGradient id="artBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#071c3f"/>
+      <stop offset="0.55" stop-color="#183b75"/>
+      <stop offset="1" stop-color="#35245c"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="45%" r="52%">
+      <stop offset="0" stop-color="#ddfbff" stop-opacity="0.95"/>
+      <stop offset="0.18" stop-color="#8ee8ff" stop-opacity="0.7"/>
+      <stop offset="0.48" stop-color="#8a79ff" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#281c62" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="textPanel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#172346"/>
+      <stop offset="1" stop-color="#101832"/>
+    </linearGradient>
+    <linearGradient id="attack" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffad74"/>
+      <stop offset="1" stop-color="#ee4e62"/>
+    </linearGradient>
+    <linearGradient id="health" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#65efbe"/>
+      <stop offset="1" stop-color="#209a7c"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#00030b" flood-opacity="0.72"/>
+    </filter>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="artClip">
+      <rect x="174" y="294" width="612" height="392" rx="28"/>
+    </clipPath>
+  </defs>
+
+  <rect width="960" height="1440" fill="url(#pageBg)"/>
+  <circle cx="120" cy="160" r="180" fill="#3664b8" opacity="0.08"/>
+  <circle cx="892" cy="1300" r="250" fill="#8a4dcc" opacity="0.07"/>
+  <g fill="#a8dfff" opacity="0.32">
+    <circle cx="88" cy="290" r="2"/><circle cx="870" cy="246" r="3"/>
+    <circle cx="906" cy="510" r="2"/><circle cx="74" cy="1080" r="3"/>
+    <circle cx="116" cy="1270" r="2"/><circle cx="842" cy="1160" r="2"/>
+  </g>
+  <text x="480" y="54" text-anchor="middle" fill="#8491b5" font-size="18"
+        font-family="Microsoft YaHei, Noto Sans SC, sans-serif" letter-spacing="5">CARD UI CONCEPT · FULL</text>
+
+  <g filter="url(#shadow)">
+    <rect x="110" y="86" width="740" height="1270" rx="62" fill="#050916" stroke="#111a35" stroke-width="12"/>
+    <rect x="124" y="100" width="712" height="1242" rx="50" fill="url(#cardBg)" stroke="url(#frame)" stroke-width="6"/>
+    <rect x="138" y="114" width="684" height="1214" rx="40" fill="none" stroke="#bdeeff" stroke-width="1.5" opacity="0.27"/>
+
+    <!-- Header -->
+    <path d="M168 132 H792 Q810 132 810 150 V254 Q810 272 792 272 H168 Q150 272 150 254 V150 Q150 132 168 132 Z"
+          fill="url(#header)" stroke="#78d9ff" stroke-opacity="0.45" stroke-width="2"/>
+    <circle cx="194" cy="202" r="54" fill="#111b3d" stroke="#f5ca65" stroke-width="5"/>
+    <circle cx="194" cy="202" r="43" fill="#263b76" stroke="#fff0aa" stroke-opacity="0.4"/>
+    <path d="M194 166 l9 22 24 2-18 15 6 24-21-13-21 13 6-24-18-15 24-2z" fill="#ffd66e"/>
+    <text x="194" y="211" text-anchor="middle" fill="#172044" font-size="27" font-weight="800"
+          font-family="Microsoft YaHei, Noto Sans SC, sans-serif">5</text>
+    <text x="480" y="196" text-anchor="middle" fill="#f5f8ff" font-size="48" font-weight="700"
+          font-family="Microsoft YaHei, Noto Sans SC, sans-serif" letter-spacing="3">天穹契约者</text>
+    <text x="480" y="236" text-anchor="middle" fill="#aec8ff" font-size="20"
+          font-family="Microsoft YaHei, Noto Sans SC, sans-serif" letter-spacing="7">SKY COVENANT</text>
+    <g transform="translate(742 164)">
+      <circle cx="34" cy="34" r="34" fill="#5d4216" stroke="#ffd776" stroke-width="3"/>
+      <circle cx="34" cy="34" r="23" fill="#d99b33" stroke="#ffe2a0" stroke-width="2"/>
+      <text x="34" y="45" text-anchor="middle" fill="#fff8dd" font-size="31" font-weight="800"
+            font-family="Arial, sans-serif">3</text>
+    </g>
+
+    <!-- Illustration -->
+    <g clip-path="url(#artClip)">
+      <rect x="174" y="294" width="612" height="392" fill="url(#artBg)"/>
+      <rect x="174" y="294" width="612" height="392" fill="url(#halo)"/>
+      <path d="M130 590 C300 430 346 420 480 544 C610 662 704 520 844 380 V720 H130 Z" fill="#101a42" opacity="0.86"/>
+      <path d="M150 622 C290 492 380 494 488 588 C602 686 706 590 822 478" fill="none" stroke="#7068d8" stroke-width="4" opacity="0.6"/>
+      <circle cx="478" cy="463" r="128" fill="none" stroke="#8de6ff" stroke-width="3" opacity="0.65"/>
+      <circle cx="478" cy="463" r="97" fill="none" stroke="#a99aff" stroke-width="2" opacity="0.55"/>
+      <path d="M350 458 C405 344 565 332 615 458" fill="none" stroke="#d4f8ff" stroke-width="3" opacity="0.55"/>
+      <path d="M421 585 Q445 517 448 457 Q452 397 480 381 Q508 397 512 457 Q515 517 540 585 Z" fill="#0a1738" stroke="#92eaff" stroke-width="3"/>
+      <circle cx="480" cy="376" r="25" fill="#14295a" stroke="#d0f8ff" stroke-width="3"/>
+      <path d="M447 436 Q480 410 513 436 L545 586 H415 Z" fill="#1b3166" opacity="0.95"/>
+      <path d="M438 476 L366 554 M522 476 L594 554" stroke="#9beaff" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+      <path d="M350 572 Q480 510 610 572" fill="none" stroke="#dfc6ff" stroke-width="6" opacity="0.7" filter="url(#glow)"/>
+      <g fill="#d9f9ff" filter="url(#glow)">
+        <circle cx="326" cy="370" r="4"/><circle cx="615" cy="358" r="5"/>
+        <circle cx="675" cy="458" r="3"/><circle cx="284" cy="506" r="4"/>
+        <circle cx="558" cy="329" r="3"/><circle cx="390" cy="325" r="3"/>
+      </g>
+      <path d="M205 632 C340 604 620 605 755 632" fill="none" stroke="#79e7ff" stroke-width="2" opacity="0.42"/>
+      <rect x="174" y="294" width="612" height="392" fill="none" stroke="#b5ebff" stroke-width="3" opacity="0.5"/>
+    </g>
+
+    <!-- Tribe and state chips -->
+    <g transform="translate(174 706)">
+      <rect width="152" height="52" rx="26" fill="#253c79" stroke="#77dcff" stroke-width="2"/>
+      <circle cx="29" cy="26" r="13" fill="none" stroke="#c9f5ff" stroke-width="2"/>
+      <path d="M29 8 V44 M11 26 H47 M17 14 L41 38 M41 14 L17 38" stroke="#c9f5ff" stroke-width="1.6" opacity="0.8"/>
+      <text x="94" y="35" text-anchor="middle" fill="#dff9ff" font-size="25" font-weight="700"
+            font-family="Microsoft YaHei, Noto Sans SC, sans-serif">星契</text>
+    </g>
+    <g transform="translate(340 706)">
+      <rect width="190" height="52" rx="26" fill="#3b2d68" stroke="#b895ff" stroke-width="2"/>
+      <path d="M24 15 A13 13 0 1 0 39 37" fill="none" stroke="#e2d4ff" stroke-width="3" stroke-linecap="round"/>
+      <path d="M37 12 L41 24 29 21 Z" fill="#e2d4ff"/>
+      <text x="118" y="35" text-anchor="middle" fill="#eee7ff" font-size="23" font-weight="700"
+            font-family="Microsoft YaHei, Noto Sans SC, sans-serif">刷新成长</text>
+    </g>
+    <g transform="translate(544 706)">
+      <rect width="242" height="52" rx="26" fill="#1f4a52" stroke="#69e1d6" stroke-width="2"/>
+      <path d="M24 14 V38 M16 22 H32" stroke="#affff4" stroke-width="3" stroke-linecap="round"/>
+      <text x="142" y="35" text-anchor="middle" fill="#cafff7" font-size="23" font-weight="700"
+            font-family="Microsoft YaHei, Noto Sans SC, sans-serif">永久属性</text>
+    </g>
+
+    <!-- Rules panel -->
+    <rect x="174" y="782" width="612" height="300" rx="30" fill="url(#textPanel)" stroke="#6079ba" stroke-width="2"/>
+    <rect x="190" y="798" width="580" height="268" rx="22" fill="none" stroke="#a9c5ff" stroke-opacity="0.12"/>
+    <text x="480" y="858" text-anchor="middle" fill="#f4f7ff" font-size="31" font-weight="600"
+          font-family="Microsoft YaHei, Noto Sans SC, sans-serif">
+      <tspan x="480" dy="0">每 4 次刷新后，</tspan>
+      <tspan x="480" dy="52">所有友方星契永久获得</tspan>
+      <tspan x="480" dy="58" fill="#79f0c0" font-size="42" font-weight="800">+1/+1</tspan>
+    </text>
+    <g transform="translate(218 1006)">
+      <text x="0" y="14" fill="#8fa7d9" font-size="20" font-family="Microsoft YaHei, Noto Sans SC, sans-serif">刷新进度</text>
+      <rect x="120" y="-8" width="390" height="26" rx="13" fill="#0a1024" stroke="#354d82"/>
+      <rect x="124" y="-4" width="286" height="18" rx="9" fill="url(#frame)"/>
+      <circle cx="222" cy="5" r="4" fill="#e9fbff"/><circle cx="316" cy="5" r="4" fill="#e9fbff"/><circle cx="410" cy="5" r="4" fill="#e9fbff"/>
+      <text x="540" y="14" fill="#d9e8ff" font-size="22" font-weight="700" font-family="Arial, sans-serif">3 / 4</text>
+    </g>
+
+    <!-- Footer stats -->
+    <path d="M174 1112 H786 V1260 Q786 1296 750 1296 H210 Q174 1296 174 1260 Z" fill="#0b1229" stroke="#405888" stroke-width="2"/>
+    <g transform="translate(202 1136)">
+      <path d="M48 4 L92 30 L84 87 L48 110 L12 87 L4 30 Z" fill="url(#attack)" stroke="#ffd0af" stroke-width="3"/>
+      <path d="M48 22 L58 48 L78 55 L58 65 L48 92 L38 65 L18 55 L38 48 Z" fill="#fff1df" opacity="0.9"/>
+      <text x="48" y="77" text-anchor="middle" fill="#5a1726" font-size="40" font-weight="900" font-family="Arial, sans-serif">4</text>
+      <text x="48" y="144" text-anchor="middle" fill="#aebbd8" font-size="18" font-family="Microsoft YaHei, Noto Sans SC, sans-serif">攻击</text>
+    </g>
+    <g transform="translate(662 1136)">
+      <path d="M48 6 C80 6 98 27 96 57 C94 86 73 103 48 116 C23 103 2 86 0 57 C-2 27 16 6 48 6 Z" fill="url(#health)" stroke="#bdffe8" stroke-width="3"/>
+      <text x="48" y="79" text-anchor="middle" fill="#073d33" font-size="42" font-weight="900" font-family="Arial, sans-serif">8</text>
+      <text x="48" y="144" text-anchor="middle" fill="#aebbd8" font-size="18" font-family="Microsoft YaHei, Noto Sans SC, sans-serif">生命</text>
+    </g>
+    <g transform="translate(372 1152)">
+      <rect width="216" height="66" rx="33" fill="#172448" stroke="#6582c0" stroke-width="2"/>
+      <circle cx="34" cy="33" r="15" fill="#5baed5" opacity="0.35"/>
+      <path d="M26 33 H42 M34 25 V41" stroke="#b9edff" stroke-width="3" stroke-linecap="round"/>
+      <text x="130" y="42" text-anchor="middle" fill="#c8d7f5" font-size="23" font-family="Microsoft YaHei, Noto Sans SC, sans-serif">基础身材</text>
+    </g>
+  </g>
+
+  <text x="480" y="1401" text-anchor="middle" fill="#6f7c9e" font-size="18"
+        font-family="Microsoft YaHei, Noto Sans SC, sans-serif" letter-spacing="2">星契 · T5 · 商店完整卡面概念稿 v0.1</text>
+</svg>
