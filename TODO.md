@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R16 工程基线已冻结。Unity 2022.3.62f3c1 全量回归为 EditMode 128 / 128、PlayMode 14 / 14；同配置 S0 完成 8,400 场首跑和 8,400 场复跑，安全门全绿，并与 .NET 的 8,400 个逐场确定性哈希完全一致。下一步按 `phase-7-ui-vertical-slice-technical-design-v0.1.md` 先确认卡牌 UI 契约，再落地共享卡牌组件和正式商店纵向切片；完整人工体验平衡转入 UI 可用后的 Phase 6B。
+当前目标：R16 工程基线已冻结。完整随从卡 UI v0.2 已通过普通星契、金色风格和荒灵长文案三种概念验证；下一步按 `phase-7-ui-vertical-slice-technical-design-v0.1.md` 补齐紧凑卡、法术卡和状态层契约，然后实现 `CardViewModel`、共享卡牌组件和正式商店纵向切片。完整人工体验平衡转入 UI 可用后的 Phase 6B。
 
 ## 已完成：阶段 0 项目准备
 
@@ -320,8 +320,12 @@
 
 - [x] 完成正式商店 UI 技术实施方案，见 `phase-7-ui-vertical-slice-technical-design-v0.1.md`。
 - [x] 完成天穹契约者完整卡面 v0.1 概念稿，见 `ui-concepts/card-ui-sky-covenant-v0.1.svg` 和 PNG 预览。
-- [ ] 切换 Codex App 后新建开发线程，验证该会话是否提供 AI 位图生成工具；若可用，以现有 SVG/PNG 为布局参考生成高保真风格变体。
-- [ ] 确认卡牌 UI：完整卡与紧凑卡的信息层级、尺寸、配色、插画占比、刷新进度和状态标签。
+- [x] 验证 AI 位图生成流程并保留第一版独立探索稿，见 `ui-concepts/card-ui-generated-initial-draft-v0.1.png`。
+- [x] 确认完整随从卡 UI v0.2 的视觉语言和信息骨架：
+  - 普通天穹契约者验证银黑公共框架、星契种族皮肤、两项能力标签和可选刷新进度，见 `ui-concepts/card-ui-sky-covenant-normal-v0.2.png`；
+  - 金色天穹契约者验证金色框架、流光和高稀有度表现，见 `ui-concepts/card-ui-sky-covenant-golden-style-v0.2.png`；该图只作为金色风格参考，正式数据必须使用 8/16、每 3 次刷新和对应的三段进度；
+  - 万蹄奔潮验证荒灵种族皮肤、三项能力标签、无进度模块和 64 字长文案，见 `ui-concepts/card-ui-ten-thousand-hoof-normal-v0.2.png`。
+- [ ] 补齐卡牌 UI 契约：固定费用、等级、名称、种族、标签、描述和攻防徽章的几何规格；定义完整/紧凑模式、随从/法术变体，以及普通、金色、成长、护盾、下场护盾、临时、选中、合法目标和不可操作状态。
 - [ ] 实现 `CardViewModel`、`ShopCardViewModelFactory` 和对应 EditMode 测试。
 - [ ] 制作共享 `PF_Card`，支持完整/紧凑模式及普通、金色、成长、护盾、下场护盾、临时和目标状态。
 - [ ] 制作 `PF_ShopScreen`、`PF_ShopSlot` 和统一选择弹窗，接入现有 `ShopTestController` 与 `ShopSession`。
