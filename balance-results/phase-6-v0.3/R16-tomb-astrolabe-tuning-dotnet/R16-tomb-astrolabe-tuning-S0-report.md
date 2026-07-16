@@ -35,4 +35,4 @@
 - 25%-75% 外对局 9/30；35%-65% 内对局 15/30。
 - B06 两档均回到目标带；B01-N 仍偏高，B04-H 仍为主要高侧项。
 
-当前环境无 Unity Editor；仍需 Unity EditMode、PlayMode 与同配置 S0 复核。
+后续已在 Unity 2022.3.62f3c1 完成 EditMode 128 / 128、PlayMode 14 / 14，以及同配置 S0 的 8,400 场首跑和 8,400 场复跑。Unity 与本报告的 8,400 个逐场确定性哈希全部一致，工程基线冻结记录见 `balance-results/phase-6-v0.3/R16-tomb-astrolabe-tuning-unity/R16-engineering-baseline-freeze-report.md`。

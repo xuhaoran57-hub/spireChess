@@ -282,6 +282,44 @@ namespace SpireChess.Tests.EditMode
             Assert.That(result.FinalState.Player[0].CurrentAttack, Is.EqualTo(18));
         }
 
+        [TestCase(false, 2)]
+        [TestCase(true, 3)]
+        public void ThousandRingTombGuardian_DeathShieldsDistinctConfiguredSurvivors(
+            bool golden,
+            int expectedShieldCount)
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["thousand_ring_tomb_guardian"],
+                golden,
+                initialAttack: 0,
+                initialHealth: 1,
+                sourceInstanceId: "tomb-guardian",
+                permanentKeywords: new[] { "Taunt" });
+            for (var slot = 1; slot <= 3; slot++)
+            {
+                state.Player[slot] = new BattleMinionRuntime(
+                    configs.MinionsById["wandering_swordsman"],
+                    initialAttack: 0,
+                    initialHealth: 20,
+                    sourceInstanceId: $"tomb-survivor-{slot}");
+            }
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["wandering_swordsman"],
+                initialAttack: 100,
+                initialHealth: 500);
+
+            var result = new BattleSimulator(new Random(27), ResolveMinion)
+                .SimulatePlayback(state);
+            var maximumSimultaneousShields = result.Steps.Max(step =>
+                step.BoardState.Player.Count(card => card?.HasShield == true));
+
+            Assert.That(result.Diagnostics.Player.ShieldsGranted,
+                Is.EqualTo(expectedShieldCount));
+            Assert.That(maximumSimultaneousShields, Is.EqualTo(expectedShieldCount),
+                "The death effect must select distinct surviving allies.");
+        }
+
         [Test]
         public void SummonBuffs_IncludeTokensAndGoldenHoofDoesNotGrantCleave()
         {

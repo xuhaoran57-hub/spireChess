@@ -73,13 +73,46 @@ namespace SpireChess.Tests.EditMode
             var summonNormal = fixtures.CreateFixture("B03_SUMMON", "N");
             var summonHigh = fixtures.CreateFixture("B03_SUMMON", "H");
             Assert.That(summonNormal.PlayerFlourishStacks, Is.EqualTo(7));
-            Assert.That(summonHigh.PlayerFlourishStacks, Is.EqualTo(12));
+            Assert.That(summonHigh.PlayerFlourishStacks, Is.EqualTo(10));
             Assert.That(summonNormal.Player[0].CurrentAttack, Is.EqualTo(12));
-            Assert.That(summonHigh.Player[0].CurrentAttack, Is.EqualTo(23));
+            Assert.That(summonHigh.Player[0].CurrentAttack, Is.EqualTo(24));
             Assert.That(summonNormal.Player[0].CurrentHealth, Is.EqualTo(5));
-            Assert.That(summonHigh.Player[0].CurrentHealth, Is.EqualTo(12));
+            Assert.That(summonHigh.Player[0].CurrentHealth, Is.EqualTo(13));
             Assert.That(summonNormal.Player[0].Id, Is.EqualTo("hundred_song_herd"));
             Assert.That(summonHigh.Player[0].Id, Is.EqualTo("hundred_song_herd"));
+        }
+
+        [Test]
+        public void R16EngineeringBaseline_ConfigAndFixtureIdentityAreFrozen()
+        {
+            var configRoot = Path.Combine(
+                Application.dataPath,
+                "Resources",
+                "Configs",
+                "Json");
+            var configHash = BalanceConfigHasher.Compute(new[]
+            {
+                "minions.v0.1.json",
+                "spells.v0.1.json",
+                "encounters.v0.1.json",
+                "rewards.v0.1.json",
+                "content-release.v0.1.json"
+            }.Select(file => File.ReadAllText(Path.Combine(configRoot, file))).ToArray());
+            Assert.That(configHash, Is.EqualTo(
+                "6c1651db1ffe5f9033c7cde15f3f33f50b25320584a7ed035c6dbd9c493db7f9"));
+
+            var serializer = new NewtonsoftJsonSerializer();
+            var document = serializer.FromJson<BalanceFixtureFile>(
+                File.ReadAllText(FixturePath()));
+            Assert.That(document.FixtureVersion, Is.EqualTo("0.3.0"));
+            Assert.That(document.CoreClassifierVersion, Is.EqualTo("0.2.2"));
+            Assert.That(document.Calibration.CandidateId,
+                Is.EqualTo("R16-tomb-astrolabe-tuning-dotnet"));
+            Assert.That(document.Calibration.MinimumSamplesPerBuild, Is.EqualTo(1000));
+            Assert.That(document.Builds,
+                Has.All.Matches<BalanceBuildDefinition>(build =>
+                    build.Calibration.ObservedSamples == 1000 &&
+                    build.Calibration.Status == "Ready"));
         }
 
         [Test]

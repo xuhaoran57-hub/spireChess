@@ -309,6 +309,59 @@ namespace SpireChess.Tests.EditMode
             Assert.That(refractor.PendingCombatModifiers, Is.Empty);
         }
 
+        [TestCase(false, 1)]
+        [TestCase(true, 2)]
+        public void AstrolabeCalibrator_BuffsLowestAttackOncePerShopAndResetsNextShop(
+            bool golden,
+            int attackPerShop)
+        {
+            var shop = new ShopSession(configs.Minions, configs.Spells, new Random(17));
+            Assert.That(shop.StartRound(1).Success, Is.True);
+
+            Assert.That(shop.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion(
+                    "astrolabe-lowest",
+                    configs.MinionsById["rune_ward_reader"]),
+                out var lowestBench), Is.True);
+            Assert.That(shop.PlayMinion(lowestBench, 0).Success, Is.True);
+            Assert.That(shop.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion(
+                    "astrolabe-higher",
+                    configs.MinionsById["echo_starchanter"]),
+                out var higherBench), Is.True);
+            Assert.That(shop.PlayMinion(higherBench, 1).Success, Is.True);
+            Assert.That(shop.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion(
+                    "astrolabe-source",
+                    configs.MinionsById["astrolabe_calibrator"],
+                    golden),
+                out var sourceBench), Is.True);
+            Assert.That(shop.PlayMinion(sourceBench, 2).Success, Is.True);
+            SetGold(shop, 20);
+
+            Assert.That(shop.Refresh().Success, Is.True);
+            Assert.That(shop.Collection.Battle[0].PermanentAttackBonus,
+                Is.EqualTo(attackPerShop));
+            Assert.That(shop.Collection.Battle[0].PermanentHealthBonus, Is.Zero);
+            Assert.That(shop.Collection.Battle[1].PermanentAttackBonus, Is.Zero);
+            Assert.That(shop.Collection.Battle[2].PermanentAttackBonus, Is.Zero);
+
+            Assert.That(shop.Refresh().Success, Is.True);
+            Assert.That(shop.Collection.Battle.Sum(card =>
+                card?.PermanentAttackBonus ?? 0), Is.EqualTo(attackPerShop),
+                "The calibrator must trigger only once in one shop phase.");
+
+            Assert.That(shop.EndRound().Success, Is.True);
+            Assert.That(shop.StartRound(2).Success, Is.True);
+            SetGold(shop, 20);
+            Assert.That(shop.Refresh().Success, Is.True);
+            Assert.That(shop.Collection.Battle[0].PermanentAttackBonus,
+                Is.EqualTo(attackPerShop * 2),
+                "Per-shop usage must reset when the next shop starts.");
+            Assert.That(shop.Collection.Battle.Sum(card =>
+                card?.PermanentHealthBonus ?? 0), Is.Zero);
+        }
+
         [TestCase(false, 4)]
         [TestCase(true, 3)]
         public void SkyCovenantBearer_BuffsAllStarboundAtConfiguredRefreshInterval(

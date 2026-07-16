@@ -582,6 +582,18 @@ Unity.exe -batchmode -nographics -quit -projectPath sc `
 - 完整结果见 `balance-results/phase-6-v0.3/R15-four-outlier-tuning-dotnet/R15-four-outlier-tuning-S0-report.md`；
 - 当前环境无 Unity Editor，本轮不能替代 Unity EditMode、PlayMode 与同配置 S0 复核。
 
+### 6.16 R16 工程基线冻结（2026-07-16）
+
+- 普通千环守墓者亡语护盾改为两个随机存活友军；星盘校准师改为每个商店阶段第一次刷新后使最低攻击友方星契永久 +1 攻击，金色为 +2 攻击；
+- 五回合夹具更新为 B01-N 60/59、B06-N 88/95、B06-H 165/179，B03-H 保持 10 层繁茂；
+- `.NET 8` S0 与 Unity 2022.3.62f3c1 S0 均完成 8,400 场首跑和 8,400 场同种子复跑，安全门全部为 0；
+- Unity 全量自动化为 EditMode 128 / 128、PlayMode 14 / 14，并新增星盘首次刷新限次/跨商店重置、千环两目标/全体护盾行为测试和 R16 配置/fixture 身份门禁；
+- Unity 与 `.NET` 的 `configHash` 一致，8,400 个逐场确定性哈希差异为 0，镜像战斗汇总逐字节一致；
+- 等权得分率为 B01 N/H 69.15%/53.70%，B02 47.00%/33.85%，B03 49.30%/33.05%，B04 39.30%/74.00%，B05 45.95%/46.00%，B06 49.30%/59.40%；
+- 当前配置和 fixture v0.3 冻结为阶段 7 UI 开发的工程基线；除功能回归、安全门失败或阻塞缺陷外不再调数；
+- 本冻结不宣称第 8.3 节人工体验门槛已经完成。当前候选 S1、20 局人工单局和留出集转入正式 UI 可用后的 Phase 6B；
+- 完整记录见 `balance-results/phase-6-v0.3/R16-tomb-astrolabe-tuning-unity/R16-engineering-baseline-freeze-report.md`。
+
 ## 7. 第一轮调数：极端值与系统性问题
 
 ### 7.1 第一轮修改范围

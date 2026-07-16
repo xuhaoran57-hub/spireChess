@@ -1,0 +1,59 @@
+{
+  "freezeSchemaVersion": "1.0.0",
+  "candidateId": "R16-tomb-astrolabe-tuning-unity",
+  "sourceCandidateId": "R16-tomb-astrolabe-tuning-dotnet",
+  "freezeDate": "2026-07-16",
+  "freezeScope": "phase-6-engineering-baseline",
+  "baseGitCommit": "5ba468eadaa4",
+  "gitStateAtBatch": "5ba468eadaa4+dirty",
+  "unityVersion": "2022.3.62f3c1",
+  "contentVersion": "5.1.0",
+  "configHash": "6c1651db1ffe5f9033c7cde15f3f33f50b25320584a7ed035c6dbd9c493db7f9",
+  "fixtureVersion": "0.3.0",
+  "coreClassifierVersion": "0.2.2",
+  "frozenFiles": [
+    {
+      "path": "sc/Assets/Resources/Configs/Json/minions.v0.1.json",
+      "sha256": "1be7bbb1a0d8130f93a0b6f896c405a19ca72d025a9ee2e1985ee09f381e01fb"
+    },
+    {
+      "path": "sc/Assets/Resources/Configs/Json/spells.v0.1.json",
+      "sha256": "4e3fd14d0bb59f34786dddbbbf5fedaf78f3e9997fb559d04b2e1db6303ecc86"
+    },
+    {
+      "path": "sc/Assets/Resources/Configs/Json/encounters.v0.1.json",
+      "sha256": "f2704befd7fbe2e69949b6c2bebdafbc228d4486d5e80c8586deac02cb4c0f3d"
+    },
+    {
+      "path": "sc/Assets/Resources/Configs/Json/rewards.v0.1.json",
+      "sha256": "36d9c425f19ee7f7bd36c1fa15930ea29995a5d11ec595c9a12d2c6bd313f4e0"
+    },
+    {
+      "path": "sc/Assets/Resources/Configs/Json/content-release.v0.1.json",
+      "sha256": "546bdadb39dc3ac4ab540786abcd18787da7ffe4e2c3fdb81f02ad4b381f46d6"
+    },
+    {
+      "path": "sc/Assets/Tests/Fixtures/Balance/balance-fixtures.v0.3.json",
+      "sha256": "3b94e5e9212ffe15aaad4faa8990b91a7bc7cf190acf345997c1830cd1fb6e73"
+    },
+    {
+      "path": "sc/Assets/Tests/Fixtures/Balance/balance-fixture-calibration.v0.3.csv",
+      "sha256": "7e745f17855bd28dc6c16a44f5d0b2e4286d3e8e1db35b6e5dedea66d9d97ad2"
+    }
+  ],
+  "verification": {
+    "editModePassed": 128,
+    "editModeTotal": 128,
+    "playModePassed": 14,
+    "playModeTotal": 14,
+    "battleCount": 8400,
+    "replayBattleCount": 8400,
+    "determinismFailureCount": 0,
+    "totalExceptions": 0,
+    "effectLimitHits": 0,
+    "competitiveRoundLimits": 0,
+    "crossRuntimeBattleHashMismatches": 0,
+    "crossRuntimeBattleSummarySha256": "b4e3bc9b13f2465c62d38c7f857906392879a7248a1813a9614bd3d0563a66fe",
+    "unitySampleFileSha256": "928f209a7fb792e8269f0f4a9144147331dd2d8256b6a95376e08d002723f870"
+  }
+}
