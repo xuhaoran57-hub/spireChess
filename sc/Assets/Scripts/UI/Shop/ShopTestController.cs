@@ -24,6 +24,8 @@ namespace SpireChess.UI.Shop
 
         private readonly Dictionary<string, Transform> slotRoots = new Dictionary<string, Transform>();
         private readonly List<string> eventLog = new List<string>();
+        [SerializeField] private ShopScreenView screenView;
+        [SerializeField] private bool useLegacyRuntimeUi = true;
         private ShopSession session;
         private RunSession runSession;
         private Canvas canvas;
@@ -45,19 +47,37 @@ namespace SpireChess.UI.Shop
         private int selectedEffectTargetIndex = -1;
         private bool initialized;
         private bool subscribed;
+        private bool statusIsError;
+        private int statusRevision;
+        private int renderedFormalStatusRevision = -1;
         private static Font uiFont;
 
         public ShopSession Session => session;
         public bool IsInitialized => initialized;
-        public bool DiscoverModalVisible => discoverOverlay != null && discoverOverlay.activeSelf;
+        public bool IsUsingFormalView => initialized && UsesFormalView;
+        public bool IsUsingLegacyRuntimeUi => initialized && !UsesFormalView;
+        public ShopScreenView FormalScreenView => screenView;
+        public bool DiscoverModalVisible => UsesFormalView
+            ? screenView.IsChoiceVisible
+            : discoverOverlay != null && discoverOverlay.activeSelf;
         public bool DiscoverCancelInteractable =>
-            discoverCancelButton != null && discoverCancelButton.interactable;
-        public bool RewardModalVisible => rewardOverlay != null && rewardOverlay.activeSelf;
+            UsesFormalView
+                ? screenView.ChoiceCanCancel
+                : discoverCancelButton != null &&
+                  discoverCancelButton.interactable;
+        public bool RewardModalVisible => UsesFormalView
+            ? screenView.IsRewardVisible
+            : rewardOverlay != null && rewardOverlay.activeSelf;
         public int EventLogCount => eventLog.Count;
         public int SelectedBenchIndex => selectedBenchIndex;
-        public string ResourceSummary => resourceText == null ? string.Empty : resourceText.text;
+        public string ResourceSummary => initialized
+            ? BuildResourceSummary()
+            : string.Empty;
         public ShopOperationResult LastOperationResult { get; private set; }
         public string StatusMessage { get; private set; }
+
+        private bool UsesFormalView => screenView != null &&
+                                       !useLegacyRuntimeUi;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RegisterSceneHook()
@@ -128,6 +148,18 @@ namespace SpireChess.UI.Shop
             Initialize(customSession, customRunSession);
         }
 
+        public void ConfigureFormalViewForTests(ShopScreenView value)
+        {
+            if (initialized)
+            {
+                throw new InvalidOperationException(
+                    "Configure the formal view before initialization.");
+            }
+
+            screenView = value ?? throw new ArgumentNullException(nameof(value));
+            useLegacyRuntimeUi = false;
+        }
+
         private void Initialize(ShopSession value, RunSession owningRunSession)
         {
             session = value ?? throw new ArgumentNullException(nameof(value));
@@ -141,7 +173,21 @@ namespace SpireChess.UI.Shop
                     : runSession.EnsureShopOpen();
             }
 
-            BuildUi();
+            EnsureEventSystem();
+            if (UsesFormalView)
+            {
+                screenView.gameObject.SetActive(true);
+                screenView.Bind(this);
+            }
+            else
+            {
+                if (screenView != null)
+                {
+                    screenView.gameObject.SetActive(false);
+                }
+
+                BuildUi();
+            }
             SetStatus($"第 {session.Round} 回合商店已开启");
             RefreshAll();
         }
@@ -272,7 +318,9 @@ namespace SpireChess.UI.Shop
             }
 
             var result = runSession.ClaimNextCardReward();
-            SetStatus(result.Success ? result.Message : BuildRunErrorMessage(result.Error));
+            SetStatus(
+                result.Success ? result.Message : BuildRunErrorMessage(result.Error),
+                !result.Success);
             RefreshAll();
             return result;
         }
@@ -285,7 +333,9 @@ namespace SpireChess.UI.Shop
             }
 
             var result = runSession.SkipNextCardReward();
-            SetStatus(result.Success ? result.Message : BuildRunErrorMessage(result.Error));
+            SetStatus(
+                result.Success ? result.Message : BuildRunErrorMessage(result.Error),
+                !result.Success);
             RefreshAll();
             return result;
         }
@@ -392,9 +442,11 @@ namespace SpireChess.UI.Shop
                 }
 
                 LastOperationResult = result;
-                SetStatus(result.Error == ShopOperationError.InvalidTarget
-                    ? "请选择一个战斗区随从作为法术目标"
-                    : BuildErrorMessage(result.Error));
+                SetStatus(
+                    result.Error == ShopOperationError.InvalidTarget
+                        ? "请选择一个战斗区随从作为法术目标"
+                        : BuildErrorMessage(result.Error),
+                    true);
             }
             else
             {
@@ -474,7 +526,7 @@ namespace SpireChess.UI.Shop
             }
             else
             {
-                SetStatus(BuildErrorMessage(result.Error));
+                SetStatus(BuildErrorMessage(result.Error), true);
             }
 
             RefreshAll();
@@ -517,8 +569,6 @@ namespace SpireChess.UI.Shop
             {
                 eventLog.RemoveAt(0);
             }
-
-            RefreshAll();
         }
 
         private void BuildUi()
@@ -668,14 +718,42 @@ namespace SpireChess.UI.Shop
 
         private void RefreshAll()
         {
-            if (!initialized || canvas == null)
+            if (!initialized)
             {
                 return;
             }
 
-            resourceText.text = $"回合 {session.Round}   金币 {session.Gold}   酒馆 T{session.TavernTier}   " +
-                                $"升级 {session.CurrentUpgradeCost}   刷新 {session.RefreshCount}   " +
-                                $"免费刷新 {session.FreeRefreshes}";
+            if (UsesFormalView)
+            {
+                var state = ShopScreenStateBuilder.Build(
+                    session,
+                    runSession,
+                    selectedHandIndex: selectedBenchIndex,
+                    selectedBattleIndex: selectedBattleIndex,
+                    selectedEffectTargetIndex: selectedEffectTargetIndex,
+                    statusMessage: StatusMessage);
+                screenView.Render(state);
+                screenView.RenderChoice(BuildChoiceViewModel());
+                screenView.RenderReward(BuildPendingRewardMessage());
+                if (renderedFormalStatusRevision != statusRevision)
+                {
+                    screenView.ShowStatus(StatusMessage, statusIsError);
+                    renderedFormalStatusRevision = statusRevision;
+                }
+                return;
+            }
+
+            RefreshLegacyUi();
+        }
+
+        private void RefreshLegacyUi()
+        {
+            if (canvas == null)
+            {
+                return;
+            }
+
+            resourceText.text = BuildResourceSummary();
             statusText.text = StatusMessage ?? string.Empty;
             logText.text = eventLog.Count == 0 ? "等待商店操作" : string.Join("   |   ", eventLog);
 
@@ -697,6 +775,163 @@ namespace SpireChess.UI.Shop
             freezeButton.GetComponentInChildren<Text>().text = session.IsFrozen ? "解冻" : "冻结";
         }
 
+        private ChoiceViewModel BuildChoiceViewModel()
+        {
+            var discover = session.PendingDiscover;
+            if (discover != null)
+            {
+                return new ChoiceViewModel
+                {
+                    Title = "选择一个发现随从",
+                    Description = discover.CanCancel
+                        ? "选择一张卡牌，或取消本次发现。"
+                        : "三连发现必须选择一张卡牌。",
+                    CanCancel = discover.CanCancel,
+                    Candidates = discover.Candidates
+                        .Select(candidate => new ChoiceCandidateViewModel
+                        {
+                            Id = candidate.Id,
+                            Label = candidate.Name,
+                            Card = ToChoiceCard(candidate)
+                        })
+                        .ToArray()
+                };
+            }
+
+            var effectChoice = session.PendingChoice;
+            if (effectChoice == null)
+            {
+                return null;
+            }
+
+            return new ChoiceViewModel
+            {
+                Title = ToChoiceTitle(effectChoice.ChoiceType),
+                Description = "请选择一个效果结果后继续商店操作。",
+                CanCancel = true,
+                Candidates = effectChoice.Candidates
+                    .Select(ToChoiceCandidate)
+                    .ToArray()
+            };
+        }
+
+        private static ChoiceCandidateViewModel ToChoiceCandidate(
+            EffectChoiceCandidate candidate)
+        {
+            if (candidate.Minion != null)
+            {
+                return new ChoiceCandidateViewModel
+                {
+                    Id = candidate.Id,
+                    Label = candidate.DisplayName,
+                    Card = ToChoiceCard(candidate.Minion)
+                };
+            }
+
+            if (candidate.Spell != null)
+            {
+                return new ChoiceCandidateViewModel
+                {
+                    Id = candidate.Id,
+                    Label = candidate.DisplayName,
+                    Card = ToChoiceCard(candidate.Spell)
+                };
+            }
+
+            if (candidate.Target != null)
+            {
+                var card = ShopCardViewModelFactory.FromOwned(
+                    candidate.Target,
+                    false);
+                card.DisplayMode = CardDisplayMode.Full;
+                card.ShowCost = false;
+                return new ChoiceCandidateViewModel
+                {
+                    Id = candidate.Id,
+                    Label = candidate.DisplayName,
+                    Description = "复制该随从的基础形态",
+                    Card = card
+                };
+            }
+
+            return new ChoiceCandidateViewModel
+            {
+                Id = candidate.Id,
+                Label = ToRaceName(candidate.DisplayName),
+                Description = "选择该种族作为效果目标"
+            };
+        }
+
+        private static CardViewModel ToChoiceCard(MinionConfig config)
+        {
+            var card = ShopCardViewModelFactory.FromOffer(config, int.MaxValue);
+            card.ShowCost = false;
+            card.IsInteractable = true;
+            card.IsAffordable = true;
+            return card;
+        }
+
+        private static CardViewModel ToChoiceCard(SpellConfig config)
+        {
+            var card = ShopCardViewModelFactory.FromOffer(config, int.MaxValue);
+            card.ShowCost = false;
+            card.IsInteractable = true;
+            card.IsAffordable = true;
+            return card;
+        }
+
+        private static string ToChoiceTitle(EffectChoiceType choiceType)
+        {
+            switch (choiceType)
+            {
+                case EffectChoiceType.MinionCard: return "选择一个随从";
+                case EffectChoiceType.SpellCard: return "选择一个法术";
+                case EffectChoiceType.BattleTarget: return "选择一个复制目标";
+                case EffectChoiceType.Race: return "选择一个种族";
+                default: return "选择一个效果结果";
+            }
+        }
+
+        private string BuildPendingRewardMessage()
+        {
+            var reward = runSession?.State.PendingCardRewards.Count > 0
+                ? runSession.State.PendingCardRewards[0]
+                : null;
+            if (reward == null)
+            {
+                return null;
+            }
+
+            var displayName = reward.ConfigId;
+            var configs = GameApp.Instance == null
+                ? null
+                : GameApp.Instance.Configs;
+            if (configs != null &&
+                reward.CardType == ShopCardType.Minion &&
+                configs.TryGetMinion(reward.ConfigId, out var minion))
+            {
+                displayName = minion.Name;
+            }
+            else if (configs != null &&
+                     reward.CardType == ShopCardType.Spell &&
+                     configs.TryGetSpell(reward.ConfigId, out var spell))
+            {
+                displayName = spell.Name;
+            }
+
+            return $"{displayName}\n队列剩余 " +
+                   $"{runSession.State.PendingCardRewards.Count} 项";
+        }
+
+        private string BuildResourceSummary()
+        {
+            return $"回合 {session.Round}   金币 {session.Gold}   " +
+                   $"酒馆 T{session.TavernTier}   " +
+                   $"升级 {session.CurrentUpgradeCost}   " +
+                   $"刷新 {session.RefreshCount}   " +
+                   $"免费刷新 {session.FreeRefreshes}";
+        }
+
         private void RefreshReward()
         {
             if (rewardOverlay == null)
@@ -704,28 +939,14 @@ namespace SpireChess.UI.Shop
                 return;
             }
 
-            var reward = runSession?.State.PendingCardRewards.Count > 0
-                ? runSession.State.PendingCardRewards[0]
-                : null;
-            rewardOverlay.SetActive(reward != null);
-            if (reward == null)
+            var message = BuildPendingRewardMessage();
+            rewardOverlay.SetActive(message != null);
+            if (message == null)
             {
                 return;
             }
 
-            var displayName = reward.ConfigId;
-            if (reward.CardType == ShopCardType.Minion &&
-                GameApp.Instance.Configs.TryGetMinion(reward.ConfigId, out var minion))
-            {
-                displayName = minion.Name;
-            }
-            else if (reward.CardType == ShopCardType.Spell &&
-                     GameApp.Instance.Configs.TryGetSpell(reward.ConfigId, out var spell))
-            {
-                displayName = spell.Name;
-            }
-
-            rewardText.text = $"{displayName}\n队列剩余 {runSession.State.PendingCardRewards.Count} 项";
+            rewardText.text = message;
         }
 
         private void RebuildOffers()
@@ -972,9 +1193,11 @@ namespace SpireChess.UI.Shop
             }
         }
 
-        private void SetStatus(string message)
+        private void SetStatus(string message, bool isError = false)
         {
             StatusMessage = message ?? string.Empty;
+            statusIsError = isError;
+            statusRevision++;
             if (statusText != null)
             {
                 statusText.text = StatusMessage;

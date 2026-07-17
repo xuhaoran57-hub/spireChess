@@ -39,7 +39,7 @@ namespace SpireChess.Tests.EditMode
                 labels,
                 CardDisplayMode.Compact);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(full, Is.EqualTo(new[] { "一", "二", "+3" }));
                 Assert.That(compact, Is.EqualTo(new[] { "一", "+4" }));
@@ -61,7 +61,7 @@ namespace SpireChess.Tests.EditMode
         [Test]
         public void DescriptionLineLimits_MatchFrozenLayoutContract()
         {
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(UiTextFormatter.GetDescriptionMaxLines(
                     CardDisplayMode.Full, true, false), Is.EqualTo(4));
@@ -87,7 +87,7 @@ namespace SpireChess.Tests.EditMode
                 value,
                 candidate => UiTextFormatter.CountTextElements(candidate) <= 3);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(result, Is.EqualTo("甲e\u0301…"));
                 Assert.That(UiTextFormatter.CountTextElements(result), Is.EqualTo(3));
@@ -135,7 +135,7 @@ namespace SpireChess.Tests.EditMode
                 candidate => UiTextFormatter.CountTextElements(candidate) <=
                              UiTextFormatter.CurrentSpellDescriptionLimit);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(minionResult, Is.EqualTo(minionDescription));
                 Assert.That(spellResult, Is.EqualTo(spellDescription));
@@ -163,11 +163,24 @@ namespace SpireChess.Tests.EditMode
                 return candidate == value;
             });
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(result, Is.EqualTo(value));
                 Assert.That(calls, Is.EqualTo(1));
             });
+        }
+    }
+
+    internal static class SequentialAssert
+    {
+        public static void Run(Action assertions)
+        {
+            if (assertions == null)
+            {
+                throw new ArgumentNullException(nameof(assertions));
+            }
+
+            assertions();
         }
     }
 }

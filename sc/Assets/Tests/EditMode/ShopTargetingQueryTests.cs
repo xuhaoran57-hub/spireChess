@@ -36,7 +36,7 @@ namespace SpireChess.Tests.EditMode
                 session,
                 selectedHandIndex: handIndex);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(result.RequiresBattleTarget, Is.True);
                 Assert.That(result.LegalBattleTargetIndexes, Is.EqualTo(new[] { 0 }));
@@ -107,7 +107,7 @@ namespace SpireChess.Tests.EditMode
 
             var result = ShopTargetingQuery.ForHandCard(session, handIndex);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(result.RequiresBattleTarget, Is.True);
                 Assert.That(result.LegalBattleTargetIndexes, Is.EqualTo(new[] { 0 }));
@@ -134,7 +134,7 @@ namespace SpireChess.Tests.EditMode
                 session,
                 selectedHandIndex: handIndex);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(result.RequiresBattleTarget, Is.False);
                 Assert.That(result.LegalBattleTargetIndexes, Is.Empty);
@@ -161,7 +161,7 @@ namespace SpireChess.Tests.EditMode
                 session,
                 selectedHandIndex: handIndex);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(query.RequiresBattleTarget, Is.True);
                 Assert.That(query.LegalBattleTargetIndexes, Is.Empty);
@@ -198,7 +198,7 @@ namespace SpireChess.Tests.EditMode
                 session,
                 copyIndex);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(resourceResult.RequiresBattleTarget, Is.False);
                 Assert.That(resourceResult.LegalBattleTargetIndexes, Is.Empty);
@@ -238,7 +238,7 @@ namespace SpireChess.Tests.EditMode
                 session,
                 selectedHandIndex: targetedIndex);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(available.BattleCards[0].IsLegalTarget, Is.True);
                 Assert.That(blocked.IsInteractionBlocked, Is.True);
@@ -279,7 +279,7 @@ namespace SpireChess.Tests.EditMode
             Assert.That(queried.Refresh().Success, Is.True);
             Assert.That(control.Refresh().Success, Is.True);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(queried.MinionOffers.Select(card => card?.Id),
                     Is.EqualTo(control.MinionOffers.Select(card => card?.Id)));

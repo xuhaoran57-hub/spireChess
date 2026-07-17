@@ -24,7 +24,7 @@ namespace SpireChess.Tests.EditMode
 
             var model = ShopCardViewModelFactory.FromOffer(minion, 2);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(model.InstanceId, Is.Null);
                 Assert.That(model.Name, Is.EqualTo("天穹契约者"));
@@ -64,7 +64,7 @@ namespace SpireChess.Tests.EditMode
 
             var model = ShopCardViewModelFactory.FromOffer(spell, 0);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(model.InstanceId, Is.Null);
                 Assert.That(model.Name, Is.EqualTo("高阶发现"));
@@ -114,7 +114,7 @@ namespace SpireChess.Tests.EditMode
 
             var model = ShopCardViewModelFactory.FromOwned(owned, true);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(model.InstanceId, Is.EqualTo("owned_001"));
                 Assert.That(model.Description, Is.EqualTo("金色描述"));
@@ -148,7 +148,7 @@ namespace SpireChess.Tests.EditMode
 
             var model = ShopCardViewModelFactory.FromOwned(owned, false);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(model.InstanceId, Is.EqualTo("spell_001"));
                 Assert.That(model.RaceText, Is.EqualTo("防御"));
@@ -245,6 +245,7 @@ namespace SpireChess.Tests.EditMode
                 Description = "使一个随从下一场战斗获得护盾。",
                 Tier = 1,
                 SpellType = "Defense",
+                UseTiming = new List<string> { "Shop" },
                 Cost = 1,
                 Enabled = true
             };

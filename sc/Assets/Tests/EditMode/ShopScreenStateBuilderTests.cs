@@ -28,7 +28,7 @@ namespace SpireChess.Tests.EditMode
                 session,
                 statusMessage: "商店已开启");
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(state.Round, Is.EqualTo(1));
                 Assert.That(state.Gold, Is.EqualTo(3));
@@ -74,7 +74,7 @@ namespace SpireChess.Tests.EditMode
 
             var state = ShopScreenStateBuilder.Build(session);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(state.Gold, Is.Zero);
                 Assert.That(state.TavernTier, Is.EqualTo(2));
@@ -108,7 +108,7 @@ namespace SpireChess.Tests.EditMode
 
             var state = ShopScreenStateBuilder.Build(session);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(state.TavernTier,
                     Is.EqualTo(ShopEconomyRules.MaximumTavernTier));
@@ -140,7 +140,7 @@ namespace SpireChess.Tests.EditMode
                 session,
                 selectedHandIndex: 2);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(state.HandCards.Count, Is.EqualTo(5));
                 Assert.That(state.HandCards.VisibleSlots[2].Card.IsSelected, Is.True);
@@ -183,7 +183,7 @@ namespace SpireChess.Tests.EditMode
                 selectedBattleIndex: 0,
                 selectedEffectTargetIndex: 0);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(state.BattleCards[0].IsSelected, Is.True);
                 Assert.That(state.BattleCards[0].Attack, Is.EqualTo(4));
@@ -227,7 +227,7 @@ namespace SpireChess.Tests.EditMode
 
             var state = ShopScreenStateBuilder.Build(session);
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(state.IsInteractionBlocked, Is.True);
                 Assert.That(state.BlockReason, Is.EqualTo("请先完成发现选择"));

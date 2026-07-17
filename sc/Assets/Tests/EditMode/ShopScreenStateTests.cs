@@ -11,7 +11,7 @@ namespace SpireChess.Tests.EditMode
         {
             var state = new ShopScreenState();
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(state.MinionOffers, Is.Empty);
                 Assert.That(state.BattleCards, Is.Empty);
@@ -58,7 +58,7 @@ namespace SpireChess.Tests.EditMode
                 CanPageRight = false
             };
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(current.Limit, Is.EqualTo(5));
                 Assert.That(current.PageCount, Is.EqualTo(1));
@@ -83,7 +83,7 @@ namespace SpireChess.Tests.EditMode
             };
             var empty = new HandCardSlotState { SlotIndex = 8 };
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(occupied.SlotIndex, Is.EqualTo(7));
                 Assert.That(occupied.IsEmpty, Is.False);
@@ -125,7 +125,7 @@ namespace SpireChess.Tests.EditMode
                 }
             };
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(buttons.Refresh.Text, Is.EqualTo("Refresh (Free)"));
                 Assert.That(buttons.Refresh.IsInteractable, Is.True);
@@ -165,7 +165,7 @@ namespace SpireChess.Tests.EditMode
                 }
             };
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(hidden.IsVisible, Is.False);
                 Assert.That(hidden.Location, Is.EqualTo(ShopCardLocation.None));
@@ -183,7 +183,7 @@ namespace SpireChess.Tests.EditMode
             visible.Location = ShopCardLocation.Hand;
             visible.SlotIndex = 4;
 
-            Assert.Multiple(() =>
+            SequentialAssert.Run(() =>
             {
                 Assert.That(visible.Location, Is.EqualTo(ShopCardLocation.Hand));
                 Assert.That(visible.SlotIndex, Is.EqualTo(4));

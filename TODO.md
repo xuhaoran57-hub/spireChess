@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R16 工程基线已冻结。卡牌 UI 契约、`CardViewModel`、`ShopCardViewModelFactory` 和对应 EditMode 测试已落地；下一步按 `phase-7-ui-vertical-slice-technical-design-v0.1.md` 制作共享 `PF_Card`，再接入正式商店纵向切片。完整人工体验平衡转入 UI 可用后的 Phase 6B。
+当前目标：R16 工程基线已冻结，正式商店真实 Session、输入级回归和首版操作反馈均已完成，并保留 legacy 对照路径。下一步在 Unity 中完成 1920×1080、1920×1200 正式 Session 实机手工验收；确认新旧路径领域结果一致后，删除 legacy 运行时搭建代码。完整人工体验平衡转入 UI 可用后的 Phase 6B。
 
 ## 已完成：阶段 0 项目准备
 
@@ -333,10 +333,32 @@
 - [x] 实现只读 `ShopTargetingQuery` 并接入 Builder，复用 `ShopEffectEngine` 目标语义映射 `IsLegalTarget`、非法目标和无目标原因；补充 8 个 EditMode 测试，覆盖定向法术、种族/金色/Token 过滤、战吼、无目标战吼例外、模态选择隔离、全局阻塞、领域状态与 RNG 不变。
 - [x] 实现纯 C# `UiTextFormatter` 和 10 个 EditMode 测试，覆盖空白/显式换行、单行文本、3/2 能力标签、描述行数、代理对与组合字符安全截断、完整/紧凑模式和异常布局；内容复核将完整随从真实上限由 64 修正为 66（金色 `old_tower_guide`），法术保持 45，待 Unity 下复验几何。
 - [x] 整理 `PF_Card` Unity 落地任务单与逐项验收矩阵，见 `pf-card-unity-implementation-checklist-v0.1.md`；覆盖进入门、Prefab 层级、两套几何、TextGenerator、四变体、状态优先级、自动化、两分辨率截图和 DoD。
-- [ ] 制作共享 `PF_Card`，支持完整/紧凑模式及普通、金色、成长、护盾、下场护盾、临时和目标状态。
-- [ ] 制作 `PF_ShopScreen`、`PF_ShopSlot` 和统一选择弹窗，接入现有 `ShopTestController` 与 `ShopSession`。
-- [ ] 打通商店购买、出售、刷新、冻结、升级、上阵、换位、发现和进入战斗的正式 UI 闭环。
-- [ ] 补充正式商店 PlayMode 回归，并完成 1920×1080、1920×1200 手工验收。
+- [x] 制作共享 `PF_Card`，支持完整/紧凑模式及普通、金色、成长、护盾、下场护盾、临时和目标状态。
+  - 固定使用 Noto Sans CJK SC Regular，并随项目保留 SIL OFL 1.1 许可证。
+  - 66 字随从、64 字万蹄奔潮和 45 字法术均通过实际字体 Full 文案门；Full 描述区实测扩展为 `12, 256, 216, 52/31`。
+  - 新增真实 Prefab Layout/Render 测试，全量结果为 EditMode 173 / 173、PlayMode 14 / 14。
+  - 1920×1080、1920×1200 验收截图位于 `ui-concepts/unity-validation/pf-card-v0.1/`。
+- [x] 制作静态 `PF_ShopSlot`、`PF_ShopScreen` 和 `PF_ChoiceOverlay`，实现只消费 ViewModel 的 `ShopScreenView` / `ChoiceOverlayView` 渲染骨架。
+  - 商品区固定显示 4 个 Full 随从位和 1 个 Full 法术位，战斗区与手牌区各使用 5 个 Compact 槽位；Canvas 固定 1920×1080、Match 0.5、TopBar 96px、ActionRail 220px。
+  - 使用布局组完成三行排布，不在运行时代码中计算卡牌坐标；临时状态覆盖五张商品、长文案、金色、选中、护盾、空槽位、详情栏和三选一弹窗。
+  - 新增 5 个真实 Prefab 层级、绑定、布局、重复渲染和选择弹窗 EditMode 测试；全量结果为 EditMode 178 / 178、PlayMode 14 / 14。
+  - 1920×1080、1920×1200 商店验收图及 1920×1080 选择弹窗验收图位于 `ui-concepts/unity-validation/pf-shop-screen-v0.1/`。
+- [x] 将 `ShopScreenStateBuilder` 和正式 View 接入现有 `ShopTestController` / `ShopSession`，保留旧动态 UI 作为迁移期对照。
+  - `ShopTest.unity` 默认使用序列化 `PF_ShopScreen` 和 `useLegacyRuntimeUi=false`；程序化创建的 Controller 默认保持 legacy 路径，便于同一套公开操作接口做迁移对照。
+  - 正式路径每次操作只在 `ApplyOperation()` 后构建并渲染一次最终状态；领域事件只记录事件日志，不再触发重复 Render。
+  - 正式 View 已接入动态按钮、商品/战斗/手牌槽位、选择弹窗和待领取奖励；选择容量由 3 扩展到 4，覆盖四种族效果选择。
+- [x] 打通商店购买、出售、刷新、冻结、升级、上阵、换位、发现、奖励处理和进入战斗的正式 UI 调用链。
+  - 新增正式场景状态渲染/按钮与卡牌点击回归，以及正式弹窗候选按钮完成强制三连发现回归；既有 RunFlow 同时验证正式奖励弹窗。
+  - 当前全量结果为 EditMode 180 / 180、PlayMode 17 / 17；legacy 专用用例继续通过并明确断言使用保留路径。
+- [x] 补齐升级、拖拽上阵、战斗位换位和出售的正式 UI 输入级 PlayMode 回归。
+  - 按 `BeginDrag → Drop → EndDrag` 真实事件顺序验证手牌上阵与战斗位换位，覆盖正式按钮和卡牌/槽位组件，而非直接调用领域方法。
+  - 修复 Drop 触发重渲染后旧拖拽对象返回原槽形成幽灵卡的问题；由目标槽标记已处理拖拽，`EndDrag` 销毁旧视觉实例。
+- [x] 实现首版正式商店操作反馈。
+  - `ShopScreenView` 只比较同一 `InstanceId` 的前后 ViewModel 快照，显示绿色成长或红色下降浮字，不重新计算领域效果；首次渲染和卡牌跨槽移动不会误播。
+  - 新获得永久/下场护盾时放大对应徽章，冻结状态切换时脉冲冻结按钮。
+  - Controller 为成功与错误状态提供独立 Toast 语义；Toast 使用非阻塞 CanvasGroup，在运行时停留 1.25 秒后淡出，重复 Render 不会重启同一条消息。
+  - 新增卡牌反馈和正式商店状态差值 EditMode 测试；反馈验收图位于 `ui-concepts/unity-validation/pf-shop-screen-v0.1/shop-feedback-1920x1080.png`。
+- [ ] 完成 1920×1080、1920×1200 正式 Session 场景实机手工验收。
 
 ## 暂缓
 

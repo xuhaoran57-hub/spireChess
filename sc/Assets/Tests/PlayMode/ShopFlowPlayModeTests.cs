@@ -7,13 +7,235 @@ using SpireChess.Shop;
 using SpireChess.UI.Battle;
 using SpireChess.UI.Shop;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine.TestTools;
 
 namespace SpireChess.Tests
 {
     public sealed class ShopFlowPlayModeTests
     {
+        [UnityTest]
+        public IEnumerator FormalShopScene_RendersSessionAndRoutesUiOperations()
+        {
+            yield return EnsureGameApp();
+            GameApp.Instance.StartNewRun(13);
+            var run = GameApp.Instance.Run;
+
+            SceneManager.LoadScene("ShopTest");
+            yield return null;
+
+            var controller = Object.FindObjectOfType<ShopTestController>();
+            var screen = Object.FindObjectOfType<ShopScreenView>();
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(screen, Is.Not.Null);
+            Assert.That(controller.IsUsingFormalView, Is.True);
+            Assert.That(controller.FormalScreenView, Is.SameAs(screen));
+            Assert.That(GameObject.Find("ShopTestCanvas"), Is.Null);
+
+            var expected = ShopScreenStateBuilder.Build(
+                run.Shop,
+                run,
+                statusMessage: controller.StatusMessage);
+            var expectedCards = expected.MinionOffers.Count(value => value != null) +
+                                (expected.SpellOffer == null ? 0 : 1) +
+                                expected.BattleCards.Count(value => value != null) +
+                                expected.HandCards.VisibleSlots.Count(
+                                    value => value.Card != null);
+            Assert.That(screen.RenderedCardCount, Is.EqualTo(expectedCards));
+            Assert.That(
+                screen.transform.Find("SafeArea/TopBar/GoldText")
+                    .GetComponent<Text>().text,
+                Is.EqualTo($"金币：{run.Shop.Gold}"));
+
+            run.Shop.GrantGold(10);
+            var freezeButton = screen.transform
+                .Find("SafeArea/ActionRail/FreezeButton")
+                .GetComponent<Button>();
+            freezeButton.onClick.Invoke();
+            Assert.That(run.Shop.IsFrozen, Is.True);
+            Assert.That(controller.ResourceSummary, Does.Contain("金币 13"));
+
+            var offerIndex = Enumerable.Range(0, run.Shop.MinionOffers.Count)
+                .First(index => run.Shop.MinionOffers[index] != null);
+            var offerContent = screen.transform.Find(
+                "SafeArea/Content/OfferPanel/OfferSlots/MinionSlot" +
+                offerIndex + "/Content");
+            var offerInteraction = offerContent
+                .GetComponentInChildren<ShopCardView>();
+            Assert.That(offerInteraction, Is.Not.Null);
+            var goldBeforePurchase = run.Shop.Gold;
+            offerInteraction.OnPointerClick(
+                new PointerEventData(EventSystem.current));
+            Assert.That(run.Shop.Gold,
+                Is.EqualTo(goldBeforePurchase - ShopEconomyRules.MinionPurchaseCost));
+            Assert.That(run.Shop.Collection.Bench.Any(value => value != null),
+                Is.True);
+            Assert.That(
+                screen.transform.Find("SafeArea/TopBar/GoldText")
+                    .GetComponent<Text>().text,
+                Is.EqualTo($"金币：{run.Shop.Gold}"));
+        }
+
+        [UnityTest]
+        public IEnumerator FormalShopScene_ResolvesMandatoryDiscoverThroughOverlay()
+        {
+            yield return EnsureGameApp();
+            var configs = GameApp.Instance.Configs;
+            var minion = configs.Minions.First(config =>
+                config.Enabled && !config.IsToken && config.Tier == 1);
+            GameApp.Instance.StartNewRun(31);
+
+            SceneManager.LoadScene("ShopTest");
+            yield return null;
+            var controller = Object.FindObjectOfType<ShopTestController>();
+            Assert.That(controller, Is.Not.Null);
+            var session = controller.Session;
+
+            Assert.That(controller.IsUsingFormalView, Is.True);
+            Assert.That(session.ClaimRewardMinion(minion).Success, Is.True);
+            Assert.That(session.ClaimRewardMinion(minion).Success, Is.True);
+            Assert.That(session.ClaimRewardMinion(minion).Success, Is.True);
+            var goldenIndex = Enumerable.Range(0, session.Collection.Bench.Count)
+                .First(index => session.Collection.Bench[index]?.IsGolden == true);
+            Assert.That(controller.PlayBenchMinion(goldenIndex, 0).Success, Is.True);
+            var rewardIndex = Enumerable.Range(0, session.Collection.Bench.Count)
+                .First(index => session.Collection.Bench[index]?.ConfigId ==
+                                ShopSession.TripleDiscoveryRewardSpellId);
+            Assert.That(controller.UseBenchSpell(rewardIndex).Success, Is.True);
+
+            var screen = controller.FormalScreenView;
+            var overlay = screen.GetComponentInChildren<ChoiceOverlayView>(true);
+            Assert.That(session.PendingDiscover, Is.Not.Null);
+            Assert.That(controller.DiscoverModalVisible, Is.True);
+            Assert.That(controller.DiscoverCancelInteractable, Is.False);
+            Assert.That(overlay.RenderedCandidateCount,
+                Is.EqualTo(session.PendingDiscover.Candidates.Count));
+
+            screen.transform
+                .Find("SafeArea/ModalLayer/ChoiceOverlay/Dialog/Candidates/Candidate0")
+                .GetComponent<Button>().onClick.Invoke();
+            Assert.That(session.PendingDiscover, Is.Null);
+            Assert.That(controller.DiscoverModalVisible, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator FormalShopScene_UpgradeDragRepositionAndSellUseUiInputs()
+        {
+            yield return EnsureGameApp();
+            GameApp.Instance.StartNewRun(43);
+            var run = GameApp.Instance.Run;
+            SceneManager.LoadScene("ShopTest");
+            yield return null;
+
+            var controller = Object.FindObjectOfType<ShopTestController>();
+            var screen = controller.FormalScreenView;
+            var session = controller.Session;
+            Assert.That(controller.IsUsingFormalView, Is.True);
+            session.GrantGold(30);
+
+            var freezeButton = screen.transform
+                .Find("SafeArea/ActionRail/FreezeButton")
+                .GetComponent<Button>();
+            freezeButton.onClick.Invoke();
+            var tierBeforeUpgrade = session.TavernTier;
+            var goldBeforeUpgrade = session.Gold;
+            var upgradeCost = session.CurrentUpgradeCost;
+            var upgradeButton = screen.transform
+                .Find("SafeArea/ActionRail/UpgradeButton")
+                .GetComponent<Button>();
+            Assert.That(upgradeButton.interactable, Is.True);
+            upgradeButton.onClick.Invoke();
+            Assert.That(session.TavernTier, Is.EqualTo(tierBeforeUpgrade + 1));
+            Assert.That(session.Gold, Is.EqualTo(goldBeforeUpgrade - upgradeCost));
+            Assert.That(upgradeButton.interactable, Is.False);
+
+            var offerIndex = Enumerable.Range(0, session.MinionOffers.Count)
+                .First(index => session.MinionOffers[index] != null);
+            var offerCard = screen.transform.Find(
+                    "SafeArea/Content/OfferPanel/OfferSlots/MinionSlot" +
+                    offerIndex + "/Content")
+                .GetComponentInChildren<ShopCardView>();
+            offerCard.OnPointerClick(new PointerEventData(EventSystem.current));
+            Assert.That(controller.LastOperationResult.Success, Is.True);
+            var handIndex = controller.LastOperationResult.BenchIndex;
+            var instanceId = session.Collection.Bench[handIndex].InstanceId;
+
+            var handContent = screen.transform.Find(
+                "SafeArea/Content/HandPanel/HandSlots/HandSlot" +
+                handIndex + "/Content");
+            var handCard = handContent.GetComponentInChildren<ShopCardView>();
+            var playDrag = new PointerEventData(EventSystem.current)
+            {
+                pointerDrag = handCard.gameObject
+            };
+            handCard.OnBeginDrag(playDrag);
+            Assert.That(handCard.IsDragging, Is.True);
+            screen.transform
+                .Find("SafeArea/Content/BattlePanel/BattleSlots/BattleSlot0")
+                .GetComponent<ShopSlotView>().OnDrop(playDrag);
+            handCard.OnEndDrag(playDrag);
+            yield return null;
+
+            Assert.That(session.Collection.Bench[handIndex], Is.Null);
+            Assert.That(session.Collection.Battle[0].InstanceId,
+                Is.EqualTo(instanceId));
+            Assert.That(handContent.childCount, Is.Zero,
+                "Handled drag must not restore a stale card to the hand slot.");
+            Assert.That(screen.transform
+                    .Find("SafeArea/Content/BattlePanel/BattleSlots/BattleSlot0/Content")
+                    .childCount,
+                Is.EqualTo(1));
+
+            var battleZeroContent = screen.transform.Find(
+                "SafeArea/Content/BattlePanel/BattleSlots/BattleSlot0/Content");
+            var battleCard = battleZeroContent
+                .GetComponentInChildren<ShopCardView>();
+            var repositionDrag = new PointerEventData(EventSystem.current)
+            {
+                pointerDrag = battleCard.gameObject
+            };
+            battleCard.OnBeginDrag(repositionDrag);
+            Assert.That(battleCard.IsDragging, Is.True);
+            screen.transform
+                .Find("SafeArea/Content/BattlePanel/BattleSlots/BattleSlot1")
+                .GetComponent<ShopSlotView>().OnDrop(repositionDrag);
+            battleCard.OnEndDrag(repositionDrag);
+            yield return null;
+
+            Assert.That(session.Collection.Battle[0], Is.Null);
+            Assert.That(session.Collection.Battle[1].InstanceId,
+                Is.EqualTo(instanceId));
+            Assert.That(battleZeroContent.childCount, Is.Zero,
+                "Handled reposition must not restore a stale battle card.");
+
+            var movedCard = screen.transform.Find(
+                    "SafeArea/Content/BattlePanel/BattleSlots/BattleSlot1/Content")
+                .GetComponentInChildren<ShopCardView>();
+            movedCard.OnPointerClick(new PointerEventData(EventSystem.current));
+            var sellButton = screen.transform
+                .Find("SafeArea/ActionRail/SellButton")
+                .GetComponent<Button>();
+            Assert.That(sellButton.interactable, Is.True);
+            var goldBeforeSell = session.Gold;
+            sellButton.onClick.Invoke();
+            Assert.That(session.Collection.Battle[1], Is.Null);
+            Assert.That(session.Gold,
+                Is.EqualTo(goldBeforeSell + ShopEconomyRules.MinionSellValue));
+            Assert.That(sellButton.interactable, Is.False);
+
+            var failedSell = controller.SellSelectedBattleMinion();
+            Assert.That(failedSell.Success, Is.False);
+            var toast = screen.transform.Find(
+                "SafeArea/FeedbackLayer/StatusToast");
+            Assert.That(toast.gameObject.activeSelf, Is.True);
+            Assert.That(toast.GetComponent<Image>().color.r,
+                Is.GreaterThan(toast.GetComponent<Image>().color.g));
+            yield return new WaitForSecondsRealtime(1.7f);
+            Assert.That(toast.gameObject.activeSelf, Is.False);
+        }
+
         [UnityTest]
         public IEnumerator ShopToBattleAndBack_PreservesRunSessionAndOwnedMinion()
         {
@@ -87,6 +309,7 @@ namespace SpireChess.Tests
             var controllerObject = new GameObject("ShopControllerUnderTest");
             var controller = controllerObject.AddComponent<ShopTestController>();
             controller.InitializeForTests(session);
+            Assert.That(controller.IsUsingLegacyRuntimeUi, Is.True);
             session.GrantGold(20);
             yield return null;
 

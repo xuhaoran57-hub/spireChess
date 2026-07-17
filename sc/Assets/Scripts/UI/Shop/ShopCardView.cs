@@ -24,9 +24,11 @@ namespace SpireChess.UI.Shop
         private Transform originalParent;
         private Vector2 originalAnchoredPosition;
         private bool draggable;
+        private bool dropHandled;
 
         public ShopCardZone Zone { get; private set; }
         public int Index { get; private set; }
+        public bool IsDragging => originalParent != null;
 
         public void Initialize(
             ShopTestController controller,
@@ -58,6 +60,7 @@ namespace SpireChess.UI.Shop
 
             originalParent = transform.parent;
             originalAnchoredPosition = rectTransform.anchoredPosition;
+            dropHandled = false;
             transform.SetParent(rootCanvas.transform, true);
             transform.SetAsLastSibling();
             canvasGroup.blocksRaycasts = false;
@@ -81,6 +84,13 @@ namespace SpireChess.UI.Shop
 
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1f;
+            if (dropHandled)
+            {
+                originalParent = null;
+                Destroy(gameObject);
+                return;
+            }
+
             if (transform.parent == rootCanvas.transform)
             {
                 transform.SetParent(originalParent, false);
@@ -88,6 +98,14 @@ namespace SpireChess.UI.Shop
             }
 
             originalParent = null;
+        }
+
+        public void CompleteDrop()
+        {
+            if (originalParent != null)
+            {
+                dropHandled = true;
+            }
         }
     }
 }
