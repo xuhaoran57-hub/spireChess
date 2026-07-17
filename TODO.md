@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R16 工程基线已冻结。完整随从卡 UI v0.2 已通过普通星契、金色风格和荒灵长文案三种概念验证；下一步按 `phase-7-ui-vertical-slice-technical-design-v0.1.md` 补齐紧凑卡、法术卡和状态层契约，然后实现 `CardViewModel`、共享卡牌组件和正式商店纵向切片。完整人工体验平衡转入 UI 可用后的 Phase 6B。
+当前目标：R16 工程基线已冻结。卡牌 UI 契约、`CardViewModel`、`ShopCardViewModelFactory` 和对应 EditMode 测试已落地；下一步按 `phase-7-ui-vertical-slice-technical-design-v0.1.md` 制作共享 `PF_Card`，再接入正式商店纵向切片。完整人工体验平衡转入 UI 可用后的 Phase 6B。
 
 ## 已完成：阶段 0 项目准备
 
@@ -325,8 +325,14 @@
   - 普通天穹契约者验证银黑公共框架、星契种族皮肤、两项能力标签和可选刷新进度，见 `ui-concepts/card-ui-sky-covenant-normal-v0.2.png`；
   - 金色天穹契约者验证金色框架、流光和高稀有度表现，见 `ui-concepts/card-ui-sky-covenant-golden-style-v0.2.png`；该图只作为金色风格参考，正式数据必须使用 8/16、每 3 次刷新和对应的三段进度；
   - 万蹄奔潮验证荒灵种族皮肤、三项能力标签、无进度模块和 64 字长文案，见 `ui-concepts/card-ui-ten-thousand-hoof-normal-v0.2.png`。
-- [ ] 补齐卡牌 UI 契约：固定费用、等级、名称、种族、标签、描述和攻防徽章的几何规格；定义完整/紧凑模式、随从/法术变体，以及普通、金色、成长、护盾、下场护盾、临时、选中、合法目标和不可操作状态。
-- [ ] 实现 `CardViewModel`、`ShopCardViewModelFactory` 和对应 EditMode 测试。
+- [x] 补齐卡牌 UI 契约：固定 `2:3` 比例与完整/紧凑模式几何，定义随从/法术变体、长文案截断，以及普通、金色、成长、永久护盾、下场护盾、临时、选中、合法目标和不可操作状态的叠加优先级，见 `phase-7-ui-vertical-slice-technical-design-v0.1.md` 第 7.3 节。
+- [x] 实现 `CardViewModel`、`ShopCardViewModelFactory` 和 6 个对应 EditMode 测试，覆盖普通/金色、商品/持有、随从/法术、成长、永久/下场护盾、临时状态、固定费用、中文标签和空参数。
+- [x] 冻结正式商店低保真线框图 v0.1，规范副本见 `ui-concepts/shop-ui-wireframe-v0.1.png`；确认顶部状态栏、商品行、战斗区、手牌区和右侧操作/详情栏的信息架构。
+- [x] 定义 `ShopScreenState`、5 格/未来 10 格手牌分页、动态按钮和卡牌详情面板状态，并补充 5 个纯 EditMode 测试；UI 使用 `Hand` 命名，领域层暂时保留 `Bench`。
+- [x] 实现 `ShopScreenStateBuilder` 和 7 个真实领域对象驱动的 EditMode 测试，映射经济、商品、战斗/手牌、分页、选择、详情状态、免费/付费刷新、冻结、满级、出售、满手牌与发现全局阻塞。
+- [x] 实现只读 `ShopTargetingQuery` 并接入 Builder，复用 `ShopEffectEngine` 目标语义映射 `IsLegalTarget`、非法目标和无目标原因；补充 8 个 EditMode 测试，覆盖定向法术、种族/金色/Token 过滤、战吼、无目标战吼例外、模态选择隔离、全局阻塞、领域状态与 RNG 不变。
+- [x] 实现纯 C# `UiTextFormatter` 和 10 个 EditMode 测试，覆盖空白/显式换行、单行文本、3/2 能力标签、描述行数、代理对与组合字符安全截断、完整/紧凑模式和异常布局；内容复核将完整随从真实上限由 64 修正为 66（金色 `old_tower_guide`），法术保持 45，待 Unity 下复验几何。
+- [x] 整理 `PF_Card` Unity 落地任务单与逐项验收矩阵，见 `pf-card-unity-implementation-checklist-v0.1.md`；覆盖进入门、Prefab 层级、两套几何、TextGenerator、四变体、状态优先级、自动化、两分辨率截图和 DoD。
 - [ ] 制作共享 `PF_Card`，支持完整/紧凑模式及普通、金色、成长、护盾、下场护盾、临时和目标状态。
 - [ ] 制作 `PF_ShopScreen`、`PF_ShopSlot` 和统一选择弹窗，接入现有 `ShopTestController` 与 `ShopSession`。
 - [ ] 打通商店购买、出售、刷新、冻结、升级、上阵、换位、发现和进入战斗的正式 UI 闭环。
