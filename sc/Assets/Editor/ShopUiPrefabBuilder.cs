@@ -138,6 +138,8 @@ namespace SpireChess.Editor
                 1920,
                 1080,
                 Path.Combine(outputDirectory, "shop-screen-1920x1080.png"));
+            canvasRect.sizeDelta = new Vector2(1920f, 1200f);
+            view.Render(state);
             Capture(
                 camera,
                 canvasRect,
@@ -145,6 +147,8 @@ namespace SpireChess.Editor
                 1200,
                 Path.Combine(outputDirectory, "shop-screen-1920x1200.png"));
 
+            canvasRect.sizeDelta = new Vector2(1920f, 1080f);
+            view.Render(state);
             view.RenderChoice(CreatePreviewChoice());
             Capture(
                 camera,
@@ -212,7 +216,6 @@ namespace SpireChess.Editor
             var controller = controllerObject.GetComponent<ShopTestController>();
             var serialized = new SerializedObject(controller);
             SetReference(serialized, "screenView", screenView);
-            SetBoolean(serialized, "useLegacyRuntimeUi", false);
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
             var eventSystems = scene.GetRootGameObjects()
@@ -1510,21 +1513,6 @@ namespace SpireChess.Editor
             }
 
             property.objectReferenceValue = value;
-        }
-
-        private static void SetBoolean(
-            SerializedObject serialized,
-            string propertyName,
-            bool value)
-        {
-            var property = serialized.FindProperty(propertyName);
-            if (property == null)
-            {
-                throw new InvalidOperationException(
-                    "Missing serialized boolean: " + propertyName);
-            }
-
-            property.boolValue = value;
         }
 
         private static void SetReferenceArray<T>(

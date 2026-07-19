@@ -364,6 +364,8 @@ namespace SpireChess.UI.Shop
             }
 
             var cardObject = Instantiate(cardPrefab, slot.Content, false);
+            var cardRect = cardObject.GetComponent<RectTransform>();
+            PlaceAtTopLeft(cardRect);
             var cardView = cardObject.GetComponent<CardView>();
             if (cardView == null)
             {
@@ -371,9 +373,6 @@ namespace SpireChess.UI.Shop
                     "The shop card prefab has no CardView component.");
             }
 
-            cardView.Render(model);
-            PlaceAtTopLeft(cardObject.GetComponent<RectTransform>());
-            ApplyCardFeedback(cardView, model);
             if (controller != null)
             {
                 var shopCardView = cardObject.GetComponent<ShopCardView>() ??
@@ -386,7 +385,12 @@ namespace SpireChess.UI.Shop
                     draggable);
             }
 
+            // Bind input and replace the empty state before text fitting. A
+            // single-card presentation failure must not leave a visible card
+            // without its click/drag route.
             slot.ShowCard();
+            cardView.Render(model);
+            ApplyCardFeedback(cardView, model);
             RenderedCardCount++;
         }
 

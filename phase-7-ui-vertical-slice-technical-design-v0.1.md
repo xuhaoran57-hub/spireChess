@@ -815,59 +815,52 @@ shopCardView.Initialize(
 
 ## 11. ShopTestController 迁移
 
-新增序列化字段：
+正式运行时只保留一个序列化字段：
 
 ```csharp
 [SerializeField] private ShopScreenView screenView;
-[SerializeField] private bool useLegacyRuntimeUi;
 ```
 
 初始化流程：
 
 ```csharp
-if (screenView != null)
+if (screenView == null)
 {
-    screenView.Bind(this);
-}
-else if (useLegacyRuntimeUi)
-{
-    BuildUi();
+    Debug.LogError("[ShopTest] Formal ShopScreenView is not configured.");
+    return;
 }
 
+screenView.Bind(this);
 RefreshAll();
 ```
+
+`InitializeForTests()` 允许不绑定 View 的 headless Controller，只用于验证 Controller/领域调用；正常 `Start()` 缺少 `screenView` 时直接报错，不再动态创建回退界面。
 
 `RefreshAll()` 优先渲染正式 View：
 
 ```csharp
 private void RefreshAll()
 {
-    if (!initialized)
+    if (!initialized || screenView == null)
     {
         return;
     }
 
-    if (screenView != null)
-    {
-        var state = ShopScreenStateBuilder.Build(
-            session,
-            runSession,
-            selectedHandIndex: selectedBenchIndex,
-            selectedBattleIndex: selectedBattleIndex,
-            selectedEffectTargetIndex: selectedEffectTargetIndex,
-            statusMessage: StatusMessage);
+    var state = ShopScreenStateBuilder.Build(
+        session,
+        runSession,
+        selectedHandIndex: selectedBenchIndex,
+        selectedBattleIndex: selectedBattleIndex,
+        selectedEffectTargetIndex: selectedEffectTargetIndex,
+        statusMessage: StatusMessage);
 
-        screenView.Render(state);
-        screenView.ShowStatus(StatusMessage);
-        RefreshFormalOverlays();
-        return;
-    }
-
-    RefreshLegacyUi();
+    screenView.Render(state);
+    screenView.ShowStatus(StatusMessage);
+    RefreshFormalOverlays();
 }
 ```
 
-迁移期间保留旧动态 UI。正式场景和新测试全部通过后，单独提交删除 `CreateText`、`CreatePanel`、`CreateButton` 等正式界面不再使用的运行时构建代码。
+迁移对照完成后已删除旧动态 UI；商店不再包含运行时 `CreateText`、`CreatePanel`、`CreateButton` 或自动创建裸 Controller 的回退路径。
 
 ### 11.1 避免重复渲染
 
@@ -982,12 +975,11 @@ public sealed class ChoiceViewModel
 2. 新建 `ShopTestController` GameObject。
 3. 挂载 `ShopTestController`。
 4. 将场景中的 `ShopScreenView` 拖到 Controller 的 `screenView` 字段。
-5. 关闭 `useLegacyRuntimeUi`。
-6. 确认场景中只有一个 `EventSystem`。
-7. 确认 Canvas 使用 1920×1080 和 Match 0.5。
-8. 暂时保留场景名 `ShopTest`，不修改现有跳转字符串。
+5. 确认场景中只有一个 `EventSystem`。
+6. 确认 Canvas 使用 1920×1080 和 Match 0.5。
+7. 暂时保留场景名 `ShopTest`，不修改现有跳转字符串。
 
-现有自动创建逻辑检测到场景已有 Controller 后不会再次创建，可以在迁移期间保留。
+场景必须序列化唯一 Controller；不再提供运行时自动创建逻辑。
 
 ## 16. 实施和提交顺序
 
@@ -1037,6 +1029,12 @@ public sealed class ChoiceViewModel
 
 完成记录（2026-07-17）：发现、效果选择和待领取奖励已接入正式弹窗，四种族选择所需的 4 候选容量已覆盖。`ShopScreenView` 通过 `InstanceId` 快照比较播放成长/下降浮字和新护盾徽章脉冲，冻结切换脉冲操作按钮；Controller 以消息修订号保证成功/错误 Toast 只触发一次，运行时自动淡出。反馈验收图位于 `ui-concepts/unity-validation/pf-shop-screen-v0.1/shop-feedback-1920x1080.png`；全量 EditMode 180 / 180、PlayMode 17 / 17。
 
+首场景修复记录（2026-07-19）：`BeforeSceneLoad` 不再立即检查编辑器当前活动场景，避免直接从 `ShopTest` 进入 Play 时在序列化正式 Controller 恢复前创建 legacy Controller。回退创建统一延后到 `sceneLoaded`，并增加初始化钩子无副作用及正式场景单 Controller 回归；全量 PlayMode 18 / 18。
+
+双分辨率修复记录（2026-07-19）：真实 Session 在 1920×1200 首次渲染时，名称适配抛出 “The ellipsis does not fit the target text area”，导致卡牌只完成部分渲染并停在 Prefab 默认中心锚点。根因包含两层：拉伸文字节点的当帧 Rect 不稳定，以及动态字体 `TextGenerator` 输出使用 `Canvas.scaleFactor` 作为 `pixelsPerUnit`，旧代码却将像素结果直接与逻辑契约尺寸比较。`CardView` 现直接使用 Full/Compact 冻结契约区域，并按 `pixelsPerUnit` 还原生成结果；单行宽度使用 `GetPreferredWidth`，高度使用实际字形范围。商店与选择弹窗先锚定实例再 Render，商店输入组件和空槽显隐也在 Render 前完成；截图工具在每个目标画布尺寸下重新 Render。新增与 1920×1200 Match 0.5 相同的约 1.054 缩放回归，修复前稳定失败、修复后通过；相关 UI EditMode 17 / 17、全量 PlayMode 18 / 18。
+
+迁移对照验证记录（2026-07-19）：正式和 legacy Controller 分别绑定两份同配置、同随机种子的 `ShopSession`，按相同操作脚本逐步比较操作结果及领域快照。快照覆盖经济、商品、牌池、完整手牌/战斗区卡牌状态、待处理候选、阶段统计，并在末尾增加 RNG 消耗刷新以检测正式 Render / Builder 的隐藏副作用。普通经济/阵容/定向法术与三连发现两组差分专项 2 / 2、全量 PlayMode 20 / 20 通过；结合既有正式输入和商店—战斗—返回回归，可进入 legacy 运行时 UI 删除阶段。
+
 ### 16.5 提交 5：测试和清理
 
 - 更新 PlayMode 测试。
@@ -1045,6 +1043,8 @@ public sealed class ChoiceViewModel
 - 只清理本次迁移产生的无用字段和方法。
 
 验收：正式商店不再依赖运行时 `CreateText`、`CreatePanel` 和 `CreateButton` 搭建界面。
+
+完成记录（2026-07-19）：删除 `useLegacyRuntimeUi`、场景回退创建钩子以及动态 Canvas、面板、按钮、卡牌和弹窗代码；`ShopTestController.Start()` 现在要求序列化正式 `ShopScreenView`，测试入口仍可使用 headless Controller。差分回归转为正式 View/headless 副作用对照；正式商店 Prefab EditMode 6 / 6、专项 2 / 2、全量 PlayMode 18 / 18 通过。
 
 ## 17. 自动化测试
 

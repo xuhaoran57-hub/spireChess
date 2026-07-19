@@ -155,6 +155,10 @@ namespace SpireChess.Tests.EditMode
             AssertCardMode(
                 "SafeArea/Content/HandPanel/HandSlots/HandSlot0/Content",
                 CardDisplayMode.Compact);
+            AssertCardAnchoredAtTopLeft(
+                "SafeArea/Content/OfferPanel/OfferSlots/MinionSlot0/Content");
+            AssertCardAnchoredAtTopLeft(
+                "SafeArea/Content/BattlePanel/BattleSlots/BattleSlot0/Content");
             Assert.That(
                 root.Find("SafeArea/Content/BattlePanel/BattleSlots/BattleSlot4/EmptyHint")
                     .gameObject.activeSelf,
@@ -311,6 +315,18 @@ namespace SpireChess.Tests.EditMode
             Assert.That(
                 content.GetChild(0).GetComponent<CardView>().CurrentDisplayMode,
                 Is.EqualTo(mode));
+        }
+
+        private void AssertCardAnchoredAtTopLeft(string path)
+        {
+            var content = ContentAt(path);
+            Assert.That(content.childCount, Is.EqualTo(1));
+            var card = content.GetChild(0) as RectTransform;
+            Assert.That(card, Is.Not.Null);
+            Assert.That(card.anchorMin, Is.EqualTo(new Vector2(0f, 1f)));
+            Assert.That(card.anchorMax, Is.EqualTo(new Vector2(0f, 1f)));
+            Assert.That(card.pivot, Is.EqualTo(new Vector2(0f, 1f)));
+            Assert.That(card.anchoredPosition, Is.EqualTo(Vector2.zero));
         }
 
         private RectTransform ContentAt(string path)

@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R16 工程基线已冻结，正式商店真实 Session、输入级回归和首版操作反馈均已完成，并保留 legacy 对照路径。下一步在 Unity 中完成 1920×1080、1920×1200 正式 Session 实机手工验收；确认新旧路径领域结果一致后，删除 legacy 运行时搭建代码。完整人工体验平衡转入 UI 可用后的 Phase 6B。
+当前目标：R16 工程基线已冻结，阶段 7 正式商店纵向切片、双分辨率验收、legacy 差分验证和旧运行时 UI 清理均已完成。下一步进入 Phase 6B，完成冻结候选的 S1、人工单局和留出集复核。
 
 ## 已完成：阶段 0 项目准备
 
@@ -358,7 +358,24 @@
   - 新获得永久/下场护盾时放大对应徽章，冻结状态切换时脉冲冻结按钮。
   - Controller 为成功与错误状态提供独立 Toast 语义；Toast 使用非阻塞 CanvasGroup，在运行时停留 1.25 秒后淡出，重复 Render 不会重启同一条消息。
   - 新增卡牌反馈和正式商店状态差值 EditMode 测试；反馈验收图位于 `ui-concepts/unity-validation/pf-shop-screen-v0.1/shop-feedback-1920x1080.png`。
-- [ ] 完成 1920×1080、1920×1200 正式 Session 场景实机手工验收。
+- [x] 修复直接从 `ShopTest` 场景进入 Play 时首回合误显示 legacy UI。
+  - `BeforeSceneLoad` 只注册场景回调，回退 Controller 仅在 `sceneLoaded` 后确认场景没有序列化 Controller 时创建，避免场景对象恢复前抢先生成 legacy Canvas。
+  - 新增“注册初始化钩子不得立即创建 legacy Controller”和正式场景单 Controller 断言；全量 PlayMode 18 / 18 通过。
+- [x] 修复真实 Session 在 1920×1200 下卡牌部分渲染并偏离槽位。
+  - `CardView` 的名称、类型和描述适配直接使用 Full/Compact 冻结契约尺寸，不再读取分辨率切换当帧可能过期的 `RectTransform.rect`；`TextGenerator` 的结果按动态字体 `pixelsPerUnit` 还原为逻辑 UI 单位，单行宽度使用 `GetPreferredWidth`，避免 1920×1200、Match 0.5 的约 1.054 Canvas 缩放误判文字溢出。
+  - 商店与选择弹窗均先锚定卡牌再执行 Render；新增 1.054 缩放下 80 字名称省略回归，修复前稳定失败、修复后通过。
+  - 商店卡牌在 Render 前完成点击/拖拽绑定并隐藏空槽提示，单卡展示异常不再让可见卡牌失去交互。
+  - 双分辨率截图工具改为在目标画布尺寸下重新 Render；相关卡牌布局/渲染/商店 Prefab EditMode 17 / 17、全量 PlayMode 18 / 18 通过。
+- [x] 完成 1920×1080、1920×1200 正式 Session 场景实机手工验收。
+  - 两种分辨率下布局均无核心遮挡或裁切，正常游戏交互通过。
+- [x] 确认正式 UI 与 legacy 路径的领域结果一致。
+  - 新增两组同配置、同随机种子的 PlayMode 差分回归，在每个操作节点比较结果、经济、商品、牌池、手牌/战斗区完整卡牌状态、候选项、事件数与选择状态。
+  - 覆盖刷新、冻结、升级、购买、定向法术、上阵、换位、出售、失败操作、三连发现及发现期间阻塞；操作结束后额外刷新，确认正式 Render / Builder 不推进领域 RNG。
+  - 差分专项 2 / 2、全量 PlayMode 20 / 20 通过；奖励领取和商店—战斗—返回流程继续由既有正式输入/跨场景回归覆盖。
+- [x] 删除商店 legacy 运行时 UI 搭建路径。
+  - 移除 `useLegacyRuntimeUi`、场景回退创建钩子、动态 Canvas/面板/按钮/卡牌/弹窗重建代码及对应序列化写入，`ShopTest` 运行时必须使用场景中的正式 `ShopScreenView`。
+  - `InitializeForTests()` 继续允许 headless Controller；原差分用例转为正式 View 与 headless 领域副作用对照，继续检查 Render / Builder 不修改领域状态或 RNG。
+  - 正式商店 Prefab EditMode 6 / 6、正式/headless 专项 2 / 2、全量 PlayMode 18 / 18 通过。
 
 ## 暂缓
 

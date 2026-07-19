@@ -139,6 +139,8 @@ namespace SpireChess.UI.Shop
                     cardPrefab,
                     cardContents[index],
                     false);
+                var cardRect = cardObject.GetComponent<RectTransform>();
+                PlaceAtTopLeft(cardRect);
                 var cardView = cardObject.GetComponent<CardView>();
                 if (cardView == null)
                 {
@@ -147,7 +149,6 @@ namespace SpireChess.UI.Shop
                 }
 
                 cardView.Render(candidate.Card);
-                PlaceAtTopLeft(cardObject.GetComponent<RectTransform>());
             }
 
             cancelButton.gameObject.SetActive(true);

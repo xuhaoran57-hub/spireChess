@@ -235,6 +235,34 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void ScaledCanvas_EllipsizesInLogicalUiUnits()
+        {
+            var canvasObject = new GameObject(
+                "ScaledCanvas",
+                typeof(RectTransform),
+                typeof(Canvas));
+            try
+            {
+                var canvas = canvasObject.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.scaleFactor = Mathf.Sqrt(1200f / 1080f);
+                root.SetParent(canvas.transform, false);
+
+                var model = CreateMinion(CardDisplayMode.Full);
+                model.Name = new string('长', 80);
+
+                Assert.DoesNotThrow(() => view.Render(model));
+                Assert.That(TextAt("NamePlate/Name"),
+                    Does.EndWith(UiTextFormatter.Ellipsis));
+            }
+            finally
+            {
+                root.SetParent(null, false);
+                UnityEngine.Object.DestroyImmediate(canvasObject);
+            }
+        }
+
+        [Test]
         public void CompactLongDescription_EllipsizesAtUnicodeTextElementBoundary()
         {
             var cluster = "e\u0301😀";

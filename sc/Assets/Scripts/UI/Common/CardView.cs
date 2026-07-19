@@ -78,6 +78,10 @@ namespace SpireChess.UI
         [SerializeField] private Text disabledIcon;
         [SerializeField] private Text disabledReasonText;
 
+        private Vector2 nameTextArea;
+        private Vector2 raceTextArea;
+        private Vector2 descriptionTextArea;
+
         public CardDisplayMode CurrentDisplayMode { get; private set; }
 
         public bool HasCompleteBindings =>
@@ -145,12 +149,14 @@ namespace SpireChess.UI
                 nameText,
                 model.Name,
                 model.DisplayMode == CardDisplayMode.Full ? 22 : 16,
-                model.DisplayMode == CardDisplayMode.Full ? 18 : 14);
+                model.DisplayMode == CardDisplayMode.Full ? 18 : 14,
+                nameTextArea);
             ApplySingleLineText(
                 raceOrSpellTypeText,
                 model.RaceText,
                 model.DisplayMode == CardDisplayMode.Full ? 14 : 11,
-                model.DisplayMode == CardDisplayMode.Full ? 12 : 11);
+                model.DisplayMode == CardDisplayMode.Full ? 12 : 11,
+                raceTextArea);
             ApplyAbilityLabels(model.AbilityLabels, model.DisplayMode);
             ApplyDescription(
                 model.Description,
@@ -399,6 +405,17 @@ namespace SpireChess.UI
             LayoutLabels(labels, full ? 3 : 2);
             LayoutStateBadges(state);
             LayoutDisabledContent(root);
+            // Text fitting runs in the same frame as this geometry update.
+            // Keep the frozen contract areas explicitly instead of reading
+            // RectTransform.rect, which can still describe the previous
+            // CanvasScaler pass at a newly selected resolution.
+            nameTextArea = new Vector2(
+                Math.Max(0f, name.Width - 8f),
+                Math.Max(0f, name.Height - 8f));
+            raceTextArea = new Vector2(race.Width, race.Height);
+            descriptionTextArea = new Vector2(
+                description.Width,
+                description.Height);
             CurrentDisplayMode = mode;
         }
 
@@ -467,12 +484,13 @@ namespace SpireChess.UI
             Text target,
             string value,
             int baseSize,
-            int minimumSize)
+            int minimumSize,
+            Vector2 area)
         {
             var normalized = UiTextFormatter.ToSingleLine(value);
             for (var size = baseSize; size >= minimumSize; size--)
             {
-                if (!Fits(target, normalized, size, 1, true))
+                if (!Fits(target, normalized, size, 1, true, area))
                 {
                     continue;
                 }
@@ -485,7 +503,13 @@ namespace SpireChess.UI
             target.fontSize = minimumSize;
             target.text = UiTextFormatter.EllipsizeName(
                 normalized,
-                candidate => Fits(target, candidate, minimumSize, 1, true));
+                candidate => Fits(
+                    target,
+                    candidate,
+                    minimumSize,
+                    1,
+                    true,
+                    area));
         }
 
         private void ApplyDescription(
@@ -508,7 +532,8 @@ namespace SpireChess.UI
                         normalized,
                         size,
                         maximumLines,
-                        false))
+                        false,
+                        descriptionTextArea))
                 {
                     continue;
                 }
@@ -528,18 +553,20 @@ namespace SpireChess.UI
                         normalized,
                         minimumSize,
                         maximumLines,
-                        false));
+                        false,
+                        descriptionTextArea));
             }
 
             descriptionText.text = UiTextFormatter.EllipsizeDescription(
-                normalized,
-                mode,
-                candidate => Fits(
-                    descriptionText,
-                    candidate,
-                    minimumSize,
-                    maximumLines,
-                    false));
+                    normalized,
+                    mode,
+                    candidate => Fits(
+                        descriptionText,
+                        candidate,
+                        minimumSize,
+                        maximumLines,
+                        false,
+                        descriptionTextArea));
         }
 
         private static bool Fits(
@@ -547,14 +574,14 @@ namespace SpireChess.UI
             string value,
             int fontSize,
             int maximumLines,
-            bool singleLine)
+            bool singleLine,
+            Vector2 size)
         {
             if (target.font == null)
             {
                 return false;
             }
 
-            var size = target.rectTransform.rect.size;
             if (size.x <= 0f || size.y <= 0f)
             {
                 return false;
@@ -575,9 +602,16 @@ namespace SpireChess.UI
             }
 
             var rect = generator.rectExtents;
+            var pixelsPerUnit = ResolvePixelsPerUnit(target);
+            var logicalWidth = singleLine
+                ? generator.GetPreferredWidth(
+                    value ?? string.Empty,
+                    settings) / pixelsPerUnit
+                : rect.width / pixelsPerUnit;
+            var logicalHeight = rect.height / pixelsPerUnit;
             return generator.lineCount <= maximumLines &&
-                   rect.width <= size.x + 0.5f &&
-                   rect.height <= size.y + 0.5f;
+                   logicalWidth <= size.x + 0.5f &&
+                   logicalHeight <= size.y + 0.5f;
         }
 
         private static string DescribeFit(
@@ -585,9 +619,9 @@ namespace SpireChess.UI
             string value,
             int fontSize,
             int maximumLines,
-            bool singleLine)
+            bool singleLine,
+            Vector2 size)
         {
-            var size = target.rectTransform.rect.size;
             var settings = target.GetGenerationSettings(size);
             settings.fontSize = fontSize;
             settings.resizeTextForBestFit = false;
@@ -599,11 +633,26 @@ namespace SpireChess.UI
             var generator = new TextGenerator(Math.Max(8, value.Length));
             var populated = generator.Populate(value, settings);
             var rect = generator.rectExtents;
+            var pixelsPerUnit = ResolvePixelsPerUnit(target);
+            var logicalWidth = singleLine
+                ? generator.GetPreferredWidth(value, settings) / pixelsPerUnit
+                : rect.width / pixelsPerUnit;
+            var logicalHeight = rect.height / pixelsPerUnit;
             return $"font={target.font?.name ?? "<null>"}, size={fontSize}, " +
                    $"area={size.x:0.##}x{size.y:0.##}, " +
-                   $"generated={rect.width:0.##}x{rect.height:0.##}, " +
+                   $"generated={logicalWidth:0.##}x" +
+                   $"{logicalHeight:0.##} logical, " +
+                   $"pixelsPerUnit={pixelsPerUnit:0.###}, " +
                    $"lines={generator.lineCount}/{maximumLines}, " +
                    $"populated={populated}.";
+        }
+
+        private static float ResolvePixelsPerUnit(Text target)
+        {
+            var value = target == null ? 1f : target.pixelsPerUnit;
+            return value > 0f && !float.IsNaN(value) && !float.IsInfinity(value)
+                ? value
+                : 1f;
         }
 
         private void LayoutLabels(
