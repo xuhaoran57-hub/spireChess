@@ -77,6 +77,7 @@ namespace SpireChess.UI.Shop
                 actionDisabledReason);
             state.Buttons = BuildButtons(
                 session,
+                runSession,
                 ownsSession,
                 selectedBattleIndex,
                 actionDisabledReason);
@@ -291,6 +292,7 @@ namespace SpireChess.UI.Shop
 
         private static ShopButtonStates BuildButtons(
             ShopSession session,
+            RunSession runSession,
             bool ownsSession,
             int selectedBattleIndex,
             string actionDisabledReason)
@@ -358,7 +360,12 @@ namespace SpireChess.UI.Shop
                 Sell = CreateButton(
                     $"出售（+{ShopEconomyRules.MinionSellValue} 金币）",
                     sellReason),
-                EndShop = CreateButton("进入战斗", endReason)
+                EndShop = CreateButton(
+                    ownsSession &&
+                    runSession.State.CurrentAttempt?.NodeType == RunNodeType.Shop
+                        ? "离开商店"
+                        : "进入战斗",
+                    endReason)
             };
         }
 

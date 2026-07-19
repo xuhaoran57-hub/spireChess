@@ -24,6 +24,7 @@ namespace SpireChess.Run
 
     public enum RunNodeType
     {
+        Shop,
         Normal,
         Elite,
         Enhance,
@@ -321,7 +322,8 @@ namespace SpireChess.Run
         {
             Seed = seed;
             Floor = map?.Floor ?? 1;
-            RunTurn = 0;
+            ShopTurn = 0;
+            MapStep = 0;
             Health = 20;
             MaxHealth = 20;
             Phase = RunPhase.MapSelection;
@@ -333,7 +335,13 @@ namespace SpireChess.Run
 
         public int Seed { get; }
         public int Floor { get; internal set; }
-        public int RunTurn { get; internal set; }
+        public int ShopTurn { get; internal set; }
+        public int RunTurn
+        {
+            get => ShopTurn;
+            internal set => ShopTurn = value;
+        }
+        public int MapStep { get; internal set; }
         public int Health { get; internal set; }
         public int MaxHealth { get; internal set; }
         public RunPhase Phase { get; internal set; }

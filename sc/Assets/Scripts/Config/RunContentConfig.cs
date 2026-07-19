@@ -44,6 +44,9 @@ namespace SpireChess.Config
         [JsonProperty("payloadId")]
         public string PayloadId { get; set; }
 
+        [JsonProperty("combatIndex")]
+        public int CombatIndex { get; set; }
+
         [JsonProperty("nextNodeIds")]
         public List<string> NextNodeIds { get; set; } = new List<string>();
     }

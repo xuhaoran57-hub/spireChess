@@ -1,3 +1,4 @@
+using System;
 using SpireChess.Battle;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,6 +8,11 @@ namespace SpireChess.UI.Battle
 {
     public sealed class BattleCardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
+        private const int StatsBaseFontSize = 20;
+        private const int StatsMinimumFontSize = 10;
+        private const float StatsTextWidth = 76f;
+        private const float StatsTextHeight = 32f;
+
         private BattleTestController controller;
         private Canvas rootCanvas;
         private CanvasGroup canvasGroup;
@@ -37,7 +43,7 @@ namespace SpireChess.UI.Battle
         public void Render(BattleMinionRuntime minion)
         {
             SetText("Name", minion.IsGolden ? $"金色{minion.Name}" : minion.Name);
-            SetText("Stats", $"{minion.CurrentAttack}/{minion.CurrentHealth}");
+            SetStatsText($"{minion.CurrentAttack}/{minion.CurrentHealth}");
             SetText("Tier", $"T{minion.Config.Tier}");
             SetText("Race", ToRaceName(minion.Config.Race));
             SetText("Keywords", minion.BuildKeywordText());
@@ -107,6 +113,68 @@ namespace SpireChess.UI.Battle
             {
                 text.text = value;
             }
+        }
+
+        private void SetStatsText(string value)
+        {
+            var child = transform.Find("Stats");
+            var text = child == null ? null : child.GetComponent<Text>();
+            if (text == null)
+            {
+                return;
+            }
+
+            text.text = value;
+            text.fontSize = ResolveStatsFontSize(text, value);
+        }
+
+        private static int ResolveStatsFontSize(Text target, string value)
+        {
+            if (target.font == null)
+            {
+                return StatsMinimumFontSize;
+            }
+
+            for (var size = StatsBaseFontSize;
+                 size >= StatsMinimumFontSize;
+                 size--)
+            {
+                if (FitsStatsText(target, value, size))
+                {
+                    return size;
+                }
+            }
+
+            return StatsMinimumFontSize;
+        }
+
+        private static bool FitsStatsText(Text target, string value, int fontSize)
+        {
+            var area = new Vector2(StatsTextWidth, StatsTextHeight);
+            var settings = target.GetGenerationSettings(area);
+            settings.fontSize = fontSize;
+            settings.resizeTextForBestFit = false;
+            settings.horizontalOverflow = HorizontalWrapMode.Overflow;
+            settings.verticalOverflow = VerticalWrapMode.Overflow;
+            settings.generateOutOfBounds = true;
+            var textValue = value ?? string.Empty;
+            var generator = new TextGenerator(Math.Max(8, textValue.Length));
+            if (!generator.Populate(textValue, settings))
+            {
+                return false;
+            }
+
+            var pixelsPerUnit = target.pixelsPerUnit;
+            if (pixelsPerUnit <= 0f || float.IsNaN(pixelsPerUnit) ||
+                float.IsInfinity(pixelsPerUnit))
+            {
+                pixelsPerUnit = 1f;
+            }
+            var width = generator.GetPreferredWidth(textValue, settings) /
+                        pixelsPerUnit;
+            var height = generator.rectExtents.height / pixelsPerUnit;
+            return width <= StatsTextWidth + 0.5f &&
+                   height <= StatsTextHeight + 0.5f;
         }
 
         private static string ToRaceName(string race)

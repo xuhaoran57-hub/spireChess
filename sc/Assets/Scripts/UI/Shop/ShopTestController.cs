@@ -228,15 +228,13 @@ namespace SpireChess.UI.Shop
                     false);
             }
 
-            var returnScene = runSession.State.Phase == RunPhase.Shop &&
-                              runSession.State.CurrentAttempt != null
-                ? "RunTest"
-                : "ShopTest";
-            var result = runSession.EndShopAndPrepareBattle(returnScene);
-            ApplyOperation(result, "阵容已锁定，进入战斗", true);
+            var mapShop = runSession.State.Phase == RunPhase.Shop &&
+                          runSession.State.CurrentAttempt?.NodeType == RunNodeType.Shop;
+            var result = runSession.EndShopAndPrepareBattle(mapShop ? "RunTest" : "ShopTest");
+            ApplyOperation(result, mapShop ? "商店已结束，返回地图" : "阵容已锁定，进入战斗", true);
             if (result.Success)
             {
-                SceneManager.LoadScene("BattleTest");
+                SceneManager.LoadScene(mapShop ? "RunTest" : "BattleTest");
             }
 
             return result;

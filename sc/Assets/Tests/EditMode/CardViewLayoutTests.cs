@@ -31,6 +31,7 @@ namespace SpireChess.Tests.EditMode
             "InfoPanel/Description",
             "InfoPanel/Progress/ProgressFill",
             "InfoPanel/Progress/ProgressText",
+            "StateBadgeRow/GoldenBadge",
             "StateBadgeRow/ShieldBadge",
             "StateBadgeRow/NextCombatShieldBadge",
             "StateBadgeRow/TemporaryBadge",

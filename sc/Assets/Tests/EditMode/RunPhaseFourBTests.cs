@@ -34,14 +34,12 @@ namespace SpireChess.Tests
             var finalState = new BattleBoardState();
             finalState.Enemy[0] = new BattleMinionRuntime(
                 CreateConfigs().MinionsById["copper_ring_apprentice"]);
-            Assert.That(lossRun.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             ResolveBattle(lossRun, new BattleSimulationResult(
                 finalState, BattleSide.Enemy, BattleOutcomeReason.Victory,
                 new List<string>(), new List<BattleStep>()));
-            Assert.That(lossRun.State.Health, Is.EqualTo(16), "1 survivor + tier 1 + elite bonus 2");
+            Assert.That(lossRun.State.Health, Is.EqualTo(17), "1 survivor + tier 1 + elite bonus 1");
 
             var drawRun = ReachElite(42);
-            Assert.That(drawRun.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             ResolveBattle(drawRun, new BattleSimulationResult(
                 new BattleBoardState(), null, BattleOutcomeReason.RoundLimit,
                 new List<string>(), new List<BattleStep>()));
@@ -60,6 +58,7 @@ namespace SpireChess.Tests
                 target = SeedBattleMinion(run, "target");
                 ResolvePlayerWin(run);
                 Assert.That(run.ContinueAfterBattle().Success, Is.True);
+                CompleteShop(run, "f1_shop_2");
                 Assert.That(run.EnterNode("f1_elite_wall").Success, Is.True);
                 ResolvePlayerWin(run);
                 selectedCandidate = run.State.PendingRewardChoice.Candidates
@@ -83,6 +82,7 @@ namespace SpireChess.Tests
             var target = SeedBattleMinion(run, "forge_target");
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
+            CompleteShop(run, "f1_shop_2");
             Assert.That(run.EnterNode("f1_elite_wall").Success, Is.True);
             ResolvePlayerLoss(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
@@ -109,11 +109,11 @@ namespace SpireChess.Tests
             Assert.That(run.State.DelayedShopResources.GoldBonus, Is.EqualTo(gold.Amount));
 
             Assert.That(run.EnterNode("f1_enhance").Success, Is.True);
-            Assert.That(run.State.RunTurn, Is.EqualTo(3));
+            Assert.That(run.State.ShopTurn, Is.EqualTo(2));
             Assert.That(run.State.DelayedShopResources.GoldBonus, Is.EqualTo(gold.Amount));
             Assert.That(run.SkipEnhancement().Success, Is.True);
-            Assert.That(run.EnterNode("f1_boss").Success, Is.True);
-            Assert.That(run.Shop.Gold, Is.EqualTo(6 + gold.Amount));
+            Assert.That(run.EnterNode("f1_shop_3").Success, Is.True);
+            Assert.That(run.Shop.Gold, Is.EqualTo(5 + gold.Amount));
             Assert.That(run.State.DelayedShopResources.GoldBonus, Is.Zero);
         }
 
@@ -210,9 +210,13 @@ namespace SpireChess.Tests
         private static RunSession ReachElite(int seed)
         {
             var run = CreateRun(seed);
+            Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
+            Assert.That(run.EnterNode("f1_shop_2").Success, Is.True);
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             Assert.That(run.EnterNode("f1_elite_wall").Success, Is.True);
             return run;
         }
@@ -220,10 +224,14 @@ namespace SpireChess.Tests
         private static RunSession ReachEvent(int seed, int refreshes)
         {
             var run = CreateRun(seed);
-            Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
+            Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
             for (var i = 0; i < refreshes; i++) Assert.That(run.Shop.Refresh().Success, Is.True);
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
+            Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
+            Assert.That(run.EnterNode("f1_shop_2").Success, Is.True);
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             Assert.That(run.EnterNode("f1_safe_normal").Success, Is.True);
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
@@ -234,9 +242,13 @@ namespace SpireChess.Tests
         private static RunSession ReachRest(int seed)
         {
             var run = CreateRun(seed);
+            Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
+            Assert.That(run.EnterNode("f1_shop_2").Success, Is.True);
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             Assert.That(run.EnterNode("f1_safe_normal").Success, Is.True);
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
@@ -246,17 +258,32 @@ namespace SpireChess.Tests
 
         private static ShopCardInstance SeedBattleMinion(RunSession run, string instanceId)
         {
-            Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
+            Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
             var config = CreateConfigs().MinionsById["copper_ring_apprentice"];
             var card = ShopCardInstance.CreateMinion(instanceId, config);
             Assert.That(run.Shop.Collection.TryAddToBench(card, out var bench), Is.True);
             Assert.That(run.Shop.PlayMinion(bench, 0).Success, Is.True);
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
+            Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
             return card;
+        }
+
+        private static void CompleteShop(RunSession run, string nodeId)
+        {
+            Assert.That(run.EnterNode(nodeId).Success, Is.True);
+            while (run.State.PendingCardRewards.Count > 0)
+            {
+                var result = run.ClaimNextCardReward();
+                if (result.Success)
+                    continue;
+                Assert.That(result.Error, Is.EqualTo(RunOperationError.BenchFull));
+                Assert.That(run.SkipNextCardReward().Success, Is.True);
+            }
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
         }
 
         private static void ResolvePlayerWin(RunSession run)
         {
-            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             ResolveBattle(run, new BattleSimulationResult(
                 new BattleBoardState(), BattleSide.Player, BattleOutcomeReason.Victory,
                 new List<string>(), new List<BattleStep>()));
@@ -264,7 +291,6 @@ namespace SpireChess.Tests
 
         private static void ResolvePlayerLoss(RunSession run)
         {
-            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
             ResolveBattle(run, new BattleSimulationResult(
                 new BattleBoardState(), BattleSide.Enemy, BattleOutcomeReason.Victory,
                 new List<string>(), new List<BattleStep>()));

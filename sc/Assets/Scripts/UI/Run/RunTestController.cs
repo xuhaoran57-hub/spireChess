@@ -89,6 +89,10 @@ namespace SpireChess.UI.Run
             {
                 SceneManager.LoadScene("ShopTest");
             }
+            else if (run.State.Phase == RunPhase.Battle)
+            {
+                SceneManager.LoadScene("BattleTest");
+            }
             else
             {
                 SetStatus("请选择节点选项");
@@ -149,7 +153,7 @@ namespace SpireChess.UI.Run
             var result = run.RetryBoss();
             if (result.Success)
             {
-                SceneManager.LoadScene("ShopTest");
+                SceneManager.LoadScene("BattleTest");
             }
             else
             {
@@ -223,7 +227,7 @@ namespace SpireChess.UI.Run
             mapRoot = CreatePanel("Map", root, new Color(0.08f, 0.105f, 0.13f, 1f));
             Anchor(mapRoot, new Vector2(0.04f, 0.25f), new Vector2(0.96f, 0.84f));
             var route = CreateText("Route", mapRoot,
-                "首战 → 精英 / 安全战斗 → 锻造 / 事件 / 恢复 → Boss", 22, TextAnchor.UpperCenter);
+                "商店与战斗交替 · 每层 5 战 · 分支路线商店数一致", 22, TextAnchor.UpperCenter);
             Anchor(route.rectTransform, new Vector2(0f, 0.88f), Vector2.one,
                 new Vector2(20f, 0f), new Vector2(-20f, -10f));
 
@@ -259,7 +263,9 @@ namespace SpireChess.UI.Run
                 var center = GetNodeCenter(node, maximumColumn);
                 rect.anchorMin = center;
                 rect.anchorMax = center;
-                rect.sizeDelta = new Vector2(220f, 88f);
+                rect.sizeDelta = new Vector2(
+                    Mathf.Clamp(1250f / (maximumColumn + 1f) - 8f, 96f, 180f),
+                    78f);
                 rect.anchoredPosition = Vector2.zero;
                 nodeButtons.Add(node.Id, button);
             }
@@ -273,7 +279,8 @@ namespace SpireChess.UI.Run
             }
 
             var state = run.State;
-            resourcesText.text = $"生命 {state.Health}/{state.MaxHealth}   RunTurn {state.RunTurn}   " +
+            resourcesText.text = $"生命 {state.Health}/{state.MaxHealth}   商店回合 {state.ShopTurn}   " +
+                                 $"地图步数 {state.MapStep}   " +
                                  $"楼层 {state.Floor}/3   战绩 {state.Statistics.BattlesWon}胜/{state.Statistics.BattlesNotWon}未胜";
             statusText.text = StatusMessage ?? string.Empty;
             foreach (var pair in nodeButtons)
@@ -446,10 +453,14 @@ namespace SpireChess.UI.Run
         private string BuildNodeLabel(MapNodeDefinition node)
         {
             var type = ToNodeTypeText(node.Type);
+            if (node.Type == RunNodeType.Shop)
+            {
+                return $"{type}\n补给与整备";
+            }
             if (GameApp.Instance?.Configs != null &&
                 GameApp.Instance.Configs.TryGetEncounter(node.PayloadId, out EncounterConfig encounter))
             {
-                return $"{type}\n{encounter.Name}";
+                return $"第 {node.CombatIndex} 战 · {type}\n{encounter.Name}";
             }
 
             return $"{type}\n{node.Id}";
@@ -458,7 +469,7 @@ namespace SpireChess.UI.Run
         private static Vector2 GetNodeCenter(MapNodeDefinition node, int maximumColumn)
         {
             var progress = Mathf.Clamp01((float)node.Column / Math.Max(1, maximumColumn));
-            var x = Mathf.Lerp(0.12f, 0.88f, progress);
+            var x = Mathf.Lerp(0.06f, 0.94f, progress);
             var y = node.Row < 0 ? 0.68f : node.Row > 0 ? 0.28f : 0.48f;
             return new Vector2(x, y);
         }
@@ -473,6 +484,7 @@ namespace SpireChess.UI.Run
         {
             switch (type)
             {
+                case RunNodeType.Shop: return "商店";
                 case RunNodeType.Normal: return "普通战斗";
                 case RunNodeType.Elite: return "精英战斗";
                 case RunNodeType.Enhance: return "锻造";

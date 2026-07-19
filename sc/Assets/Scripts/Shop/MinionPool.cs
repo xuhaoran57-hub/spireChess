@@ -119,7 +119,8 @@ namespace SpireChess.Shop
             int maximumTier,
             string race,
             int count,
-            Random random)
+            Random random,
+            string excludedMinionId = null)
         {
             if (random == null)
             {
@@ -137,6 +138,10 @@ namespace SpireChess.Shop
             {
                 if (minion.Tier >= minimumTier && minion.Tier <= maximumTier &&
                     (string.IsNullOrWhiteSpace(race) || minion.Race == race) &&
+                    !string.Equals(
+                        minion.Id,
+                        excludedMinionId,
+                        StringComparison.Ordinal) &&
                     remainingCopies[minion.Id] > 0)
                 {
                     eligible.Add(minion);

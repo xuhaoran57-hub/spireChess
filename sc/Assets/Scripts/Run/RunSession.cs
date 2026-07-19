@@ -70,7 +70,9 @@ namespace SpireChess.Run
             {
                 seed = State.Seed,
                 floor = State.Floor,
-                runTurn = State.RunTurn,
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep,
                 coreClassifierVersion = CoreBuildClassifier.Version
             });
         }
@@ -87,7 +89,7 @@ namespace SpireChess.Run
                 return RunOperationResult.Fail(RunOperationError.InvalidNode);
             }
 
-            if (Shop.IsShopOpen || Shop.LastEconomyTurn != State.RunTurn)
+            if (Shop.IsShopOpen || Shop.LastEconomyTurn != State.ShopTurn)
             {
                 return RunOperationResult.Fail(RunOperationError.InvalidTiming);
             }
@@ -116,15 +118,20 @@ namespace SpireChess.Run
                 nodeType = node.Type.ToString(),
                 contentId = node.PayloadId,
                 floor = State.Floor,
-                runTurn = State.RunTurn
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep,
+                combatIndex = node.CombatIndex
             });
 
             switch (node.Type)
             {
+                case RunNodeType.Shop:
+                    return StartShopNode();
                 case RunNodeType.Normal:
                 case RunNodeType.Elite:
                 case RunNodeType.Boss:
-                    return StartAttemptShop();
+                    return StartCombatNode(node, "RunTest");
                 case RunNodeType.Event:
                 case RunNodeType.Enhance:
                 case RunNodeType.Rest:
@@ -148,14 +155,14 @@ namespace SpireChess.Run
             }
 
             if (!configs.TryGetEncounter(node.PayloadId, out _) ||
-                Shop.IsShopOpen || Shop.LastEconomyTurn != State.RunTurn)
+                Shop.IsShopOpen || Shop.LastEconomyTurn != State.ShopTurn)
             {
                 return RunOperationResult.Fail(RunOperationError.InvalidTiming);
             }
 
             State.Phase = RunPhase.EnteringNode;
-            CreateAttempt(node, node.PayloadId);
-            return StartAttemptShop();
+            CreateAttempt(node, node.PayloadId, false);
+            return StartCombatNode(node, "RunTest");
         }
 
         public RunOperationResult ContinueAfterBattle()
@@ -438,7 +445,7 @@ namespace SpireChess.Run
         {
             if (State.Phase == RunPhase.Shop && State.CurrentAttempt != null)
             {
-                return Shop.StartRound(State.RunTurn);
+                return Shop.StartRound(State.ShopTurn);
             }
 
             return Shop.IsShopOpen
@@ -450,7 +457,9 @@ namespace SpireChess.Run
         {
             if (State.Phase == RunPhase.Shop && State.CurrentAttempt != null)
             {
-                return EndStageFourShopAndPrepareBattle(returnSceneName);
+                return State.CurrentAttempt.NodeType == RunNodeType.Shop
+                    ? EndMapShop()
+                    : ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
             }
 
             return EndLegacyShopAndPrepareBattle(returnSceneName);
@@ -558,17 +567,22 @@ namespace SpireChess.Run
             LastBattleContext = PendingBattle;
             LastBattleResult = result;
             PendingBattle = null;
-            Shop.ApplyPostCombatSurvivorBuffs(result);
-            ApplyBattlePermanentDeltas(result);
-            Shop.ApplyFlourish(result.Diagnostics.Player.FlourishGained);
-            QueuePostCombatRewards(result);
-            AccumulateBattleCoreEvidence(result.Diagnostics);
-            UpdateCoreProgress();
+            if (ShouldCommitBattleProgression(result))
+            {
+                Shop.ApplyPostCombatSurvivorBuffs(result);
+                ApplyBattlePermanentDeltas(result);
+                Shop.ApplyFlourish(result.Diagnostics.Player.FlourishGained);
+                QueuePostCombatRewards(result);
+                AccumulateBattleCoreEvidence(result.Diagnostics);
+                UpdateCoreProgress();
+            }
             Telemetry?.Record("BattleCompleted", new
             {
                 encounterId = LastBattleContext.EncounterId,
                 floor = State.Floor,
-                runTurn = State.RunTurn,
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep,
                 winner = result.Winner?.ToString() ?? "Draw",
                 reason = result.OutcomeReason.ToString(),
                 playerStartInstanceIds = LastBattleContext.BoardState.Player
@@ -602,6 +616,18 @@ namespace SpireChess.Run
             }
 
             return true;
+        }
+
+        private bool ShouldCommitBattleProgression(BattleSimulationResult result)
+        {
+            if (State.CurrentAttempt == null ||
+                State.CurrentAttempt.NodeType != RunNodeType.Boss ||
+                !configs.TryGetEncounter(State.CurrentAttempt.EncounterId, out var encounter))
+            {
+                return true;
+            }
+
+            return BattleSettlementCalculator.Calculate(result, encounter).PlayerWon;
         }
 
         private void ApplyBattlePermanentDeltas(BattleSimulationResult result)
@@ -679,6 +705,8 @@ namespace SpireChess.Run
         {
             switch (node.Type)
             {
+                case RunNodeType.Shop:
+                    return true;
                 case RunNodeType.Normal:
                 case RunNodeType.Elite:
                 case RunNodeType.Boss:
@@ -694,16 +722,26 @@ namespace SpireChess.Run
             }
         }
 
-        private void CreateAttempt(MapNodeDefinition node, string contentId)
+        private void CreateAttempt(
+            MapNodeDefinition node,
+            string contentId,
+            bool advanceMapStep = true)
         {
-            State.RunTurn++;
+            if (advanceMapStep)
+            {
+                State.MapStep++;
+            }
+            if (node.Type == RunNodeType.Shop)
+            {
+                State.ShopTurn++;
+            }
             attemptSequence++;
             State.CurrentAttempt = new NodeAttemptState(
                 $"attempt_{attemptSequence:D6}",
                 node.Id,
                 node.Type,
                 contentId,
-                State.RunTurn);
+                State.ShopTurn);
             State.LastSettlement = null;
             State.LastRewardSummary = string.Empty;
             LastBattleContext = null;
@@ -718,9 +756,9 @@ namespace SpireChess.Run
             }
         }
 
-        private RunOperationResult StartAttemptShop()
+        private RunOperationResult StartShopNode()
         {
-            var result = Shop.StartRound(State.RunTurn);
+            var result = Shop.StartRound(State.ShopTurn);
             if (!result.Success)
             {
                 return RunOperationResult.Fail(RunOperationError.InvalidTiming);
@@ -733,15 +771,34 @@ namespace SpireChess.Run
             return RunOperationResult.Succeed();
         }
 
-        private RunOperationResult StartNonCombatNode(MapNodeDefinition node)
+        private RunOperationResult StartCombatNode(
+            MapNodeDefinition node,
+            string returnSceneName)
         {
-            var result = Shop.AdvanceSkippedRound(State.RunTurn);
-            if (!result.Success)
+            if (!configs.TryGetEncounter(node.PayloadId, out var encounter) ||
+                State.PendingCardRewards.Count > 0 ||
+                PendingBattle != null ||
+                Shop.IsShopOpen)
             {
                 return RunOperationResult.Fail(RunOperationError.InvalidTiming);
             }
 
-            State.CurrentAttempt.EconomyTurnCommitted = true;
+            var board = Shop.CreateBattleSnapshot();
+            FillEncounterEnemy(board.Enemy, encounter);
+            PendingBattle = new BattleContext(
+                board,
+                encounter.Name,
+                string.IsNullOrWhiteSpace(returnSceneName) ? "RunTest" : returnSceneName,
+                State.CurrentAttempt.NodeAttemptId,
+                encounter.Id,
+                SeedDeriver.Combine(State.Seed, node.Id));
+            State.CurrentAttempt.ContentGenerated = true;
+            State.Phase = RunPhase.Battle;
+            return RunOperationResult.Succeed();
+        }
+
+        private RunOperationResult StartNonCombatNode(MapNodeDefinition node)
+        {
             switch (node.Type)
             {
                 case RunNodeType.Event:
@@ -894,7 +951,7 @@ namespace SpireChess.Run
         private void ApplyDelayedShopResources()
         {
             var resources = State.DelayedShopResources;
-            if (resources.LastAppliedRunTurn == State.RunTurn)
+            if (resources.LastAppliedRunTurn == State.ShopTurn)
             {
                 return;
             }
@@ -902,11 +959,11 @@ namespace SpireChess.Run
             Shop.GrantGold(resources.GoldBonus);
             Shop.GrantFreeRefreshes(resources.FreeRefreshes);
             Shop.GrantUpgradeDiscount(resources.UpgradeDiscount);
-            resources.LastAppliedRunTurn = State.RunTurn;
+            resources.LastAppliedRunTurn = State.ShopTurn;
             resources.Clear();
         }
 
-        private ShopOperationResult EndStageFourShopAndPrepareBattle(string returnSceneName)
+        private ShopOperationResult EndMapShop()
         {
             if (State.PendingCardRewards.Count > 0 || PendingBattle != null)
             {
@@ -919,20 +976,7 @@ namespace SpireChess.Run
                 return result;
             }
 
-            if (!configs.TryGetEncounter(State.CurrentAttempt.EncounterId, out var encounter))
-            {
-                return ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
-            }
-
-            var board = Shop.CreateBattleSnapshot();
-            FillEncounterEnemy(board.Enemy, encounter);
-            PendingBattle = new BattleContext(
-                board,
-                encounter.Name,
-                string.IsNullOrWhiteSpace(returnSceneName) ? "RunTest" : returnSceneName,
-                State.CurrentAttempt.NodeAttemptId,
-                encounter.Id);
-            State.Phase = RunPhase.Battle;
+            ResolveCurrentNodeToMap();
             return result;
         }
 
@@ -1351,7 +1395,9 @@ namespace SpireChess.Run
                     : Shop.Gold,
                 freeRefreshes = Shop.FreeRefreshes,
                 discoverCandidateIds = GetPendingDiscoverCandidateIds(),
-                runTurn = State.RunTurn
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep
             });
 
             if (eventData.Type == ShopEventType.OnShopPhaseStart ||
@@ -1373,7 +1419,9 @@ namespace SpireChess.Run
             {
                 trigger,
                 floor = State.Floor,
-                runTurn = State.RunTurn,
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep,
                 gold,
                 tavernTier = Shop.TavernTier,
                 refreshCount = Shop.RefreshCount,
@@ -1396,7 +1444,7 @@ namespace SpireChess.Run
 
         private void RecordTurnTenSnapshotIfNeeded(string trigger)
         {
-            if (turnTenSnapshotRecorded || State.RunTurn != 10)
+            if (turnTenSnapshotRecorded || State.ShopTurn != 10)
             {
                 return;
             }
@@ -1406,7 +1454,9 @@ namespace SpireChess.Run
             {
                 trigger,
                 floor = State.Floor,
-                runTurn = State.RunTurn,
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep,
                 health = State.Health,
                 tavernTier = Shop.TavernTier,
                 buildId = CoreBuildClassifier.ClassifyFinalBuild(
@@ -1481,7 +1531,7 @@ namespace SpireChess.Run
             if (!State.Statistics.FirstCoreTurn.HasValue &&
                 CoreBuildClassifier.ContainsAnyCore(owned))
             {
-                State.Statistics.FirstCoreTurn = State.RunTurn;
+                State.Statistics.FirstCoreTurn = State.ShopTurn;
                 firstChanged = true;
             }
 
@@ -1490,7 +1540,7 @@ namespace SpireChess.Run
                     Shop.Collection.Battle,
                     coreEvidence).Count > 0)
             {
-                State.Statistics.SecondCoreTurn = State.RunTurn;
+                State.Statistics.SecondCoreTurn = State.ShopTurn;
                 secondChanged = true;
             }
 
@@ -1498,7 +1548,9 @@ namespace SpireChess.Run
             {
                 Telemetry?.Record("CoreProgress", new
                 {
-                    runTurn = State.RunTurn,
+                    runTurn = State.ShopTurn,
+                    shopTurn = State.ShopTurn,
+                    mapStep = State.MapStep,
                     firstCoreTurn = State.Statistics.FirstCoreTurn,
                     secondCoreTurn = State.Statistics.SecondCoreTurn,
                     activatedBuilds = CoreBuildClassifier.MatchActivatedBuilds(
@@ -1537,7 +1589,9 @@ namespace SpireChess.Run
             {
                 result,
                 floorReached = State.Floor,
-                runTurn = State.RunTurn,
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep,
                 elapsedMinutes = statistics.Elapsed.TotalMinutes,
                 healthRemaining = State.Health,
                 statistics.BattlesWon,

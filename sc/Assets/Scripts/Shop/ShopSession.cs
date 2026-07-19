@@ -1254,12 +1254,17 @@ namespace SpireChess.Shop
                                        RefreshCount >= 3
                         ? "Starbound"
                         : ResolveDiscoverRace(discover.Race);
+                    var excludedMinionId =
+                        sourceCard.CardType == ShopCardType.Minion
+                            ? sourceCard.ConfigId
+                            : null;
                     var reserved = MinionPool.ReserveDistinct(
                         minimumTier,
                         maximumTier,
                         discoverRace,
                         count,
-                        random);
+                        random,
+                        excludedMinionId);
                     candidates.AddRange(reserved.Select(minion =>
                         new EffectChoiceCandidate(minion.Id, minion.Name, minion: minion)));
                     choiceType = EffectChoiceType.MinionCard;

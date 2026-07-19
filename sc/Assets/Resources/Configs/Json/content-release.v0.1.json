@@ -1,5 +1,5 @@
 {
-  "contentVersion": "5.1.0",
+  "contentVersion": "5.2.2",
   "minimumRulesVersion": "5A.1",
   "minionIds": [
     "forge_soul_shield_squire", "hearth_core_spark", "copper_ring_apprentice",
@@ -35,9 +35,12 @@
   ],
   "encounterIds": [
     "f1_opening_encounter", "f1_safe_normal_encounter", "f1_elite_wall_encounter",
-    "f1_boss_encounter", "f2_normal_encounter", "f2_elite_encounter",
-    "f2_boss_encounter", "f3_normal_encounter", "f3_elite_encounter",
-    "f3_boss_encounter", "stage5b_f1_mechanic_encounter",
+    "f1_mid_mechanic_encounter", "f1_late_shield_encounter", "f1_late_summon_encounter", "f1_boss_encounter",
+    "f2_opening_encounter", "f2_normal_encounter", "f2_elite_encounter",
+    "f2_mid_mechanic_encounter", "f2_late_break_encounter", "f2_late_spell_encounter", "f2_boss_encounter",
+    "f3_opening_encounter", "f3_normal_encounter", "f3_elite_encounter",
+    "f3_mid_mechanic_encounter", "f3_late_forge_encounter", "f3_late_wild_encounter", "f3_boss_encounter",
+    "stage5b_f1_mechanic_encounter",
     "stage5b_f2_mechanic_encounter", "stage5b_f3_mechanic_encounter"
   ],
   "eventIds": [

@@ -293,6 +293,60 @@ namespace SpireChess.Tests
         }
 
         [Test]
+        public void MinionDiscover_ExcludesSourceCardBeforePoolReservation()
+        {
+            var fateShuffler = CreateMinion("fate_shuffler");
+            fateShuffler.Race = "Starbound";
+            fateShuffler.Keywords.Add("Battlecry");
+            fateShuffler.Effects.Add(new EffectConfig
+            {
+                Id = "fate_shuffler_play",
+                Trigger = "OnPlay",
+                Action = "DiscoverMinion",
+                Discover = new DiscoverConfig
+                {
+                    CardType = "Minion",
+                    TierMode = "ExactCurrentTavernTier",
+                    Count = 3,
+                    Pick = 1
+                }
+            });
+            var firstStarbound = CreateMinion("starbound_a");
+            firstStarbound.Race = "Starbound";
+            var secondStarbound = CreateMinion("starbound_b");
+            secondStarbound.Race = "Starbound";
+            var wayfarer = CreateMinion("wayfarer");
+            var session = CreateSession(new[]
+            {
+                fateShuffler,
+                firstStarbound,
+                secondStarbound,
+                wayfarer
+            });
+            session.StartNextRound();
+            var reward = session.ClaimRewardMinion(fateShuffler);
+            Assert.That(reward.Success, Is.True);
+            for (var refresh = 0; refresh < 3; refresh++)
+            {
+                Assert.That(session.Refresh().Success, Is.True);
+            }
+            var sourceCopiesBefore =
+                session.MinionPool.GetRemainingCopies(fateShuffler.Id);
+
+            var play = session.PlayMinion(reward.BenchIndex, 0);
+
+            Assert.That(play.Success, Is.True);
+            Assert.That(session.PendingChoice, Is.Not.Null);
+            Assert.That(session.PendingChoice.Candidates.Select(value => value.Id),
+                Is.EquivalentTo(new[] { "starbound_a", "starbound_b" }));
+            Assert.That(session.PendingChoice.Candidates,
+                Has.None.Matches<EffectChoiceCandidate>(value =>
+                    value.Id == fateShuffler.Id));
+            Assert.That(session.MinionPool.GetRemainingCopies(fateShuffler.Id),
+                Is.EqualTo(sourceCopiesBefore));
+        }
+
+        [Test]
         public void Discover_InvalidSelectionKeepsPendingStateAndReservations()
         {
             var minions = new[]

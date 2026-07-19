@@ -83,7 +83,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void R16EngineeringBaseline_ConfigAndFixtureIdentityAreFrozen()
+        public void ExplicitShopFlow_ConfigAndR16FixtureIdentityAreVersioned()
         {
             var configRoot = Path.Combine(
                 Application.dataPath,
@@ -99,7 +99,7 @@ namespace SpireChess.Tests.EditMode
                 "content-release.v0.1.json"
             }.Select(file => File.ReadAllText(Path.Combine(configRoot, file))).ToArray());
             Assert.That(configHash, Is.EqualTo(
-                "6c1651db1ffe5f9033c7cde15f3f33f50b25320584a7ed035c6dbd9c493db7f9"));
+                "339fe1a1a9d011c25489675a00e99effc09f022d54101cd825ce007e627327d5"));
 
             var serializer = new NewtonsoftJsonSerializer();
             var document = serializer.FromJson<BalanceFixtureFile>(

@@ -11,7 +11,9 @@ namespace SpireChess.UI
         private static readonly Color NormalFrameColor =
             new Color(0.72f, 0.78f, 0.84f, 0.28f);
         private static readonly Color GoldenFrameColor =
-            new Color(1f, 0.78f, 0.20f, 0.42f);
+            new Color(1f, 0.72f, 0.08f, 0.92f);
+        private static readonly Color GoldenTextColor =
+            new Color32(0xFF, 0xD2, 0x58, 0xFF);
         private static readonly Color SelectionColor =
             new Color(0.35f, 0.85f, 1f, 0.34f);
         private static readonly Color LegalTargetColor =
@@ -59,6 +61,7 @@ namespace SpireChess.UI
 
         [Header("States")]
         [SerializeField] private RectTransform stateBadgeRow;
+        [SerializeField] private Text goldenBadge;
         [SerializeField] private Text shieldBadge;
         [SerializeField] private Text nextCombatShieldBadge;
         [SerializeField] private Text temporaryBadge;
@@ -98,7 +101,7 @@ namespace SpireChess.UI
             Array.TrueForAll(abilityLabelTexts, value => value != null) &&
             descriptionText != null && progressRoot != null &&
             progressFill != null && progressText != null &&
-            stateBadgeRow != null && shieldBadge != null &&
+            stateBadgeRow != null && goldenBadge != null && shieldBadge != null &&
             nextCombatShieldBadge != null && temporaryBadge != null &&
             attackBadge != null && attackText != null &&
             healthBadge != null && healthText != null &&
@@ -151,6 +154,7 @@ namespace SpireChess.UI
                 model.DisplayMode == CardDisplayMode.Full ? 22 : 16,
                 model.DisplayMode == CardDisplayMode.Full ? 18 : 14,
                 nameTextArea);
+            nameText.color = isGolden ? GoldenTextColor : NormalTextColor;
             ApplySingleLineText(
                 raceOrSpellTypeText,
                 model.RaceText,
@@ -192,14 +196,17 @@ namespace SpireChess.UI
             var showShield = isMinion && model.HasShield;
             var showNextShield = isMinion && model.HasNextCombatShield;
             var showTemporary = model.IsTemporary;
+            goldenBadge.gameObject.SetActive(isGolden);
             shieldBadge.gameObject.SetActive(showShield);
             nextCombatShieldBadge.gameObject.SetActive(showNextShield);
             temporaryBadge.gameObject.SetActive(showTemporary);
+            goldenBadge.text = "金色";
+            goldenBadge.fontSize = model.DisplayMode == CardDisplayMode.Full ? 11 : 10;
             shieldBadge.text = "护盾";
             nextCombatShieldBadge.text = "下战";
             temporaryBadge.text = "临时";
             stateBadgeRow.gameObject.SetActive(
-                showShield || showNextShield || showTemporary);
+                isGolden || showShield || showNextShield || showTemporary);
 
             selectionFrame.gameObject.SetActive(model.IsSelected);
             selectionFrame.color = new Color(
@@ -437,6 +444,7 @@ namespace SpireChess.UI
             spellFooter.text = string.Empty;
             disabledIcon.text = string.Empty;
             disabledReasonText.text = string.Empty;
+            goldenBadge.text = string.Empty;
             foreach (var label in abilityLabelTexts)
             {
                 label.text = string.Empty;
@@ -445,6 +453,7 @@ namespace SpireChess.UI
 
             progressRoot.gameObject.SetActive(false);
             goldenFrame.gameObject.SetActive(false);
+            goldenBadge.gameObject.SetActive(false);
             shieldBadge.gameObject.SetActive(false);
             nextCombatShieldBadge.gameObject.SetActive(false);
             temporaryBadge.gameObject.SetActive(false);
@@ -459,6 +468,7 @@ namespace SpireChess.UI
             nextCombatShieldBadge.rectTransform.localScale = Vector3.one;
             attackText.color = NormalTextColor;
             healthText.color = NormalTextColor;
+            nameText.color = NormalTextColor;
         }
 
         private void ApplyAbilityLabels(
@@ -676,6 +686,7 @@ namespace SpireChess.UI
         {
             var badges = new[]
             {
+                goldenBadge,
                 shieldBadge,
                 nextCombatShieldBadge,
                 temporaryBadge

@@ -7,7 +7,7 @@ namespace SpireChess.Config
     public static class RunContentValidator
     {
         private static readonly HashSet<string> ValidNodeTypes = new HashSet<string>(
-            new[] { "Normal", "Elite", "Enhance", "Event", "Rest", "Boss" },
+            new[] { "Shop", "Normal", "Elite", "Enhance", "Event", "Rest", "Boss" },
             StringComparer.OrdinalIgnoreCase);
 
         private static readonly HashSet<string> ValidEncounterCategories = new HashSet<string>(
@@ -113,11 +113,24 @@ namespace SpireChess.Config
 
                 if ((string.Equals(node.Type, "Normal", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(node.Type, "Elite", StringComparison.OrdinalIgnoreCase) ||
-                     string.Equals(node.Type, "Boss", StringComparison.OrdinalIgnoreCase)) &&
-                    !encounterIds.Contains(node.PayloadId ?? string.Empty))
+                     string.Equals(node.Type, "Boss", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (!encounterIds.Contains(node.PayloadId ?? string.Empty))
+                    {
+                        result.AddError(
+                            $"Map {map.Id} node {node.Id} references missing encounter {node.PayloadId}.");
+                    }
+
+                    if (node.CombatIndex < 1 || node.CombatIndex > 5)
+                    {
+                        result.AddError(
+                            $"Map {map.Id} combat node {node.Id} has invalid combatIndex {node.CombatIndex}.");
+                    }
+                }
+                else if (node.CombatIndex != 0)
                 {
                     result.AddError(
-                        $"Map {map.Id} node {node.Id} references missing encounter {node.PayloadId}.");
+                        $"Map {map.Id} non-combat node {node.Id} must not set combatIndex {node.CombatIndex}.");
                 }
 
                 if (string.Equals(node.Type, "Event", StringComparison.OrdinalIgnoreCase) &&

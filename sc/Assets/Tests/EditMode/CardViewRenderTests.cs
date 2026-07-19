@@ -2,8 +2,10 @@ using System;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
+using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.UI;
+using SpireChess.UI.Battle;
 using SpireChess.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -56,6 +58,8 @@ namespace SpireChess.Tests.EditMode
             golden.Health = 20;
             view.Render(golden);
             Assert.That(Active("GoldenFrame"), Is.True);
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.True);
+            Assert.That(TextAt("StateBadgeRow/GoldenBadge"), Is.EqualTo("金色"));
             Assert.That(Active("StateBadgeRow/ShieldBadge"), Is.True);
             Assert.That(Active("SelectionFrame"), Is.True);
             Assert.That(Active("LegalTargetFrame"), Is.True);
@@ -68,6 +72,7 @@ namespace SpireChess.Tests.EditMode
             Assert.That(Active("HealthBadge"), Is.False);
             Assert.That(Active("SpellFooter"), Is.True);
             Assert.That(Active("StateBadgeRow/ShieldBadge"), Is.False);
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
             Assert.That(Active("StateBadgeRow/NextCombatShieldBadge"), Is.False);
             Assert.That(Active("SelectionFrame"), Is.False);
             Assert.That(Active("LegalTargetFrame"), Is.False);
@@ -87,6 +92,87 @@ namespace SpireChess.Tests.EditMode
             Assert.That(Active("CostBadge"), Is.False);
             Assert.That(Active("SpellFooter"), Is.True);
             Assert.That(Active("StateBadgeRow/TemporaryBadge"), Is.True);
+        }
+
+        [Test]
+        public void CompactOwnedGoldenMinion_HasPersistentTextAndFrameIdentification()
+        {
+            var model = CreateMinion(CardDisplayMode.Compact);
+            model.ShowCost = false;
+            model.IsGolden = true;
+
+            view.Render(model);
+
+            Assert.That(Active("GoldenFrame"), Is.True);
+            Assert.That(Active("NormalFrame"), Is.False);
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.True);
+            Assert.That(TextAt("StateBadgeRow/GoldenBadge"), Is.EqualTo("金色"));
+            Assert.That(TextComponentAt("NamePlate/Name").color,
+                Is.EqualTo((Color)new Color32(0xFF, 0xD2, 0x58, 0xFF)));
+
+            model.IsGolden = false;
+            view.Render(model);
+            Assert.That(Active("GoldenFrame"), Is.False);
+            Assert.That(Active("NormalFrame"), Is.True);
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+        }
+
+        [Test]
+        public void BattleCardStats_FitLargeValuesAndRestoreBaseFontSize()
+        {
+            var cardObject = new GameObject(
+                "BattleCard",
+                typeof(RectTransform),
+                typeof(BattleCardView));
+            var statsObject = new GameObject(
+                "Stats",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Text));
+            statsObject.transform.SetParent(cardObject.transform, false);
+            var statsRect = statsObject.GetComponent<RectTransform>();
+            statsRect.sizeDelta = new Vector2(84f, 32f);
+            var statsText = statsObject.GetComponent<Text>();
+            statsText.font = TextComponentAt("HealthBadge/Health").font;
+            statsText.fontSize = 20;
+            statsText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            statsText.verticalOverflow = VerticalWrapMode.Overflow;
+            var battleView = cardObject.GetComponent<BattleCardView>();
+            var config = new MinionConfig
+            {
+                Id = "large_stats",
+                Name = "大数值随从",
+                Tier = 5,
+                Race = "Starbound",
+                Attack = 1,
+                Health = 1,
+                GoldenAttack = 2,
+                GoldenHealth = 2
+            };
+
+            try
+            {
+                battleView.Render(new BattleMinionRuntime(
+                    config,
+                    initialAttack: 999,
+                    initialHealth: 1200));
+
+                Assert.That(statsText.text, Is.EqualTo("999/1200"));
+                Assert.That(statsText.fontSize, Is.LessThan(20));
+                Assert.That(statsText.fontSize, Is.GreaterThanOrEqualTo(10));
+                Assert.That(statsText.preferredWidth, Is.LessThanOrEqualTo(76.5f));
+
+                battleView.Render(new BattleMinionRuntime(
+                    config,
+                    initialAttack: 8,
+                    initialHealth: 9));
+                Assert.That(statsText.text, Is.EqualTo("8/9"));
+                Assert.That(statsText.fontSize, Is.EqualTo(20));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(cardObject);
+            }
         }
 
         [Test]

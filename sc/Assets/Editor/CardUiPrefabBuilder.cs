@@ -81,7 +81,7 @@ namespace SpireChess.Editor
                 var goldenFrame = CreateImage(
                     "GoldenFrame",
                     root.transform,
-                    new Color(1f, 0.78f, 0.20f, 0.42f));
+                    new Color(1f, 0.72f, 0.08f, 0.92f));
                 ConfigureFrame(goldenFrame);
 
                 var costBadge = CreateImage(
@@ -174,6 +174,15 @@ namespace SpireChess.Editor
                     infoPanel.transform.GetSiblingIndex() + 1);
 
                 var stateBadgeRow = CreateRect("StateBadgeRow", root.transform);
+                var goldenBadge = CreateText(
+                    "GoldenBadge",
+                    stateBadgeRow,
+                    font,
+                    11,
+                    TextAnchor.MiddleCenter,
+                    HorizontalWrapMode.Overflow);
+                goldenBadge.color = new Color32(0xFF, 0xD2, 0x58, 0xFF);
+                goldenBadge.fontStyle = FontStyle.Bold;
                 var shieldBadge = CreateText(
                     "ShieldBadge",
                     stateBadgeRow,
@@ -277,6 +286,7 @@ namespace SpireChess.Editor
 
                 goldenFrame.gameObject.SetActive(false);
                 stateBadgeRow.gameObject.SetActive(false);
+                goldenBadge.gameObject.SetActive(false);
                 shieldBadge.gameObject.SetActive(false);
                 nextCombatShieldBadge.gameObject.SetActive(false);
                 temporaryBadge.gameObject.SetActive(false);
@@ -316,6 +326,7 @@ namespace SpireChess.Editor
                 SetReference(serialized, "progressFill", progressFill);
                 SetReference(serialized, "progressText", progressText);
                 SetReference(serialized, "stateBadgeRow", stateBadgeRow);
+                SetReference(serialized, "goldenBadge", goldenBadge);
                 SetReference(serialized, "shieldBadge", shieldBadge);
                 SetReference(
                     serialized,

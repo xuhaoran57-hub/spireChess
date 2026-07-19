@@ -1,42 +1,64 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "maps": [
     {
-      "id": "phase4c_floor1", "floor": 1, "startNodeIds": ["f1_opening_normal"],
+      "id": "phase4d_floor1", "floor": 1, "startNodeIds": ["f1_shop_start"],
       "nodes": [
-        { "id": "f1_opening_normal", "type": "Normal", "column": 0, "row": 0, "payloadId": "f1_opening_encounter", "nextNodeIds": ["f1_elite_wall", "f1_safe_normal"] },
-        { "id": "f1_elite_wall", "type": "Elite", "column": 1, "row": -1, "payloadId": "f1_elite_wall_encounter", "nextNodeIds": ["f1_enhance"] },
-        { "id": "f1_safe_normal", "type": "Normal", "column": 1, "row": 1, "payloadId": "f1_safe_normal_encounter", "nextNodeIds": ["f1_event", "f1_rest"] },
-        { "id": "f1_enhance", "type": "Enhance", "column": 2, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f1_boss"] },
-        { "id": "f1_event", "type": "Event", "column": 2, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f1_boss"] },
-        { "id": "f1_rest", "type": "Rest", "column": 2, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f1_boss"] },
-        { "id": "f1_boss", "type": "Boss", "column": 3, "row": 0, "payloadId": "f1_boss_encounter", "nextNodeIds": [] }
+        { "id": "f1_shop_start", "type": "Shop", "column": 0, "row": 0, "payloadId": "", "nextNodeIds": ["f1_opening_normal"] },
+        { "id": "f1_opening_normal", "type": "Normal", "combatIndex": 1, "column": 1, "row": 0, "payloadId": "f1_opening_encounter", "nextNodeIds": ["f1_shop_2"] },
+        { "id": "f1_shop_2", "type": "Shop", "column": 2, "row": 0, "payloadId": "", "nextNodeIds": ["f1_elite_wall", "f1_safe_normal"] },
+        { "id": "f1_elite_wall", "type": "Elite", "combatIndex": 2, "column": 3, "row": -1, "payloadId": "f1_elite_wall_encounter", "nextNodeIds": ["f1_enhance"] },
+        { "id": "f1_safe_normal", "type": "Normal", "combatIndex": 2, "column": 3, "row": 1, "payloadId": "f1_safe_normal_encounter", "nextNodeIds": ["f1_event", "f1_rest"] },
+        { "id": "f1_enhance", "type": "Enhance", "column": 4, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f1_shop_3"] },
+        { "id": "f1_event", "type": "Event", "column": 4, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f1_shop_3"] },
+        { "id": "f1_rest", "type": "Rest", "column": 4, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f1_shop_3"] },
+        { "id": "f1_shop_3", "type": "Shop", "column": 5, "row": 0, "payloadId": "", "nextNodeIds": ["f1_mid_mechanic"] },
+        { "id": "f1_mid_mechanic", "type": "Normal", "combatIndex": 3, "column": 6, "row": 0, "payloadId": "f1_mid_mechanic_encounter", "nextNodeIds": ["f1_shop_4"] },
+        { "id": "f1_shop_4", "type": "Shop", "column": 7, "row": 0, "payloadId": "", "nextNodeIds": ["f1_late_shield", "f1_late_summon"] },
+        { "id": "f1_late_shield", "type": "Normal", "combatIndex": 4, "column": 8, "row": -1, "payloadId": "f1_late_shield_encounter", "nextNodeIds": ["f1_shop_boss"] },
+        { "id": "f1_late_summon", "type": "Normal", "combatIndex": 4, "column": 8, "row": 1, "payloadId": "f1_late_summon_encounter", "nextNodeIds": ["f1_shop_boss"] },
+        { "id": "f1_shop_boss", "type": "Shop", "column": 9, "row": 0, "payloadId": "", "nextNodeIds": ["f1_boss"] },
+        { "id": "f1_boss", "type": "Boss", "combatIndex": 5, "column": 10, "row": 0, "payloadId": "f1_boss_encounter", "nextNodeIds": [] }
       ]
     },
     {
-      "id": "phase4c_floor2", "floor": 2, "startNodeIds": ["f2_elite", "f2_normal"],
+      "id": "phase4d_floor2", "floor": 2, "startNodeIds": ["f2_shop_start"],
       "nodes": [
-        { "id": "f2_elite", "type": "Elite", "column": 0, "row": -1, "payloadId": "f2_elite_encounter", "nextNodeIds": ["f2_enhance"] },
-        { "id": "f2_normal", "type": "Normal", "column": 0, "row": 1, "payloadId": "f2_normal_encounter", "nextNodeIds": ["f2_event", "f2_rest"] },
-        { "id": "f2_enhance", "type": "Enhance", "column": 1, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f2_mid_normal"] },
-        { "id": "f2_event", "type": "Event", "column": 1, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f2_mid_normal"] },
-        { "id": "f2_rest", "type": "Rest", "column": 1, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f2_mid_normal"] },
-        { "id": "f2_mid_normal", "type": "Normal", "column": 2, "row": 0, "payloadId": "stage5b_f2_mechanic_encounter", "nextNodeIds": ["f2_late_normal"] },
-        { "id": "f2_late_normal", "type": "Normal", "column": 3, "row": 0, "payloadId": "f2_normal_encounter", "nextNodeIds": ["f2_boss"] },
-        { "id": "f2_boss", "type": "Boss", "column": 4, "row": 0, "payloadId": "f2_boss_encounter", "nextNodeIds": [] }
+        { "id": "f2_shop_start", "type": "Shop", "column": 0, "row": 0, "payloadId": "", "nextNodeIds": ["f2_opening_normal"] },
+        { "id": "f2_opening_normal", "type": "Normal", "combatIndex": 1, "column": 1, "row": 0, "payloadId": "f2_opening_encounter", "nextNodeIds": ["f2_shop_2"] },
+        { "id": "f2_shop_2", "type": "Shop", "column": 2, "row": 0, "payloadId": "", "nextNodeIds": ["f2_elite", "f2_normal"] },
+        { "id": "f2_elite", "type": "Elite", "combatIndex": 2, "column": 3, "row": -1, "payloadId": "f2_elite_encounter", "nextNodeIds": ["f2_enhance"] },
+        { "id": "f2_normal", "type": "Normal", "combatIndex": 2, "column": 3, "row": 1, "payloadId": "f2_normal_encounter", "nextNodeIds": ["f2_event", "f2_rest"] },
+        { "id": "f2_enhance", "type": "Enhance", "column": 4, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f2_shop_3"] },
+        { "id": "f2_event", "type": "Event", "column": 4, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f2_shop_3"] },
+        { "id": "f2_rest", "type": "Rest", "column": 4, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f2_shop_3"] },
+        { "id": "f2_shop_3", "type": "Shop", "column": 5, "row": 0, "payloadId": "", "nextNodeIds": ["f2_mid_mechanic"] },
+        { "id": "f2_mid_mechanic", "type": "Normal", "combatIndex": 3, "column": 6, "row": 0, "payloadId": "f2_mid_mechanic_encounter", "nextNodeIds": ["f2_shop_4"] },
+        { "id": "f2_shop_4", "type": "Shop", "column": 7, "row": 0, "payloadId": "", "nextNodeIds": ["f2_late_break", "f2_late_spell"] },
+        { "id": "f2_late_break", "type": "Normal", "combatIndex": 4, "column": 8, "row": -1, "payloadId": "f2_late_break_encounter", "nextNodeIds": ["f2_shop_boss"] },
+        { "id": "f2_late_spell", "type": "Normal", "combatIndex": 4, "column": 8, "row": 1, "payloadId": "f2_late_spell_encounter", "nextNodeIds": ["f2_shop_boss"] },
+        { "id": "f2_shop_boss", "type": "Shop", "column": 9, "row": 0, "payloadId": "", "nextNodeIds": ["f2_boss"] },
+        { "id": "f2_boss", "type": "Boss", "combatIndex": 5, "column": 10, "row": 0, "payloadId": "f2_boss_encounter", "nextNodeIds": [] }
       ]
     },
     {
-      "id": "phase4c_floor3", "floor": 3, "startNodeIds": ["f3_elite", "f3_normal"],
+      "id": "phase4d_floor3", "floor": 3, "startNodeIds": ["f3_shop_start"],
       "nodes": [
-        { "id": "f3_elite", "type": "Elite", "column": 0, "row": -1, "payloadId": "f3_elite_encounter", "nextNodeIds": ["f3_enhance"] },
-        { "id": "f3_normal", "type": "Normal", "column": 0, "row": 1, "payloadId": "f3_normal_encounter", "nextNodeIds": ["f3_event", "f3_rest"] },
-        { "id": "f3_enhance", "type": "Enhance", "column": 1, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f3_mid_normal"] },
-        { "id": "f3_event", "type": "Event", "column": 1, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f3_mid_normal"] },
-        { "id": "f3_rest", "type": "Rest", "column": 1, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f3_mid_normal"] },
-        { "id": "f3_mid_normal", "type": "Normal", "column": 2, "row": 0, "payloadId": "stage5b_f3_mechanic_encounter", "nextNodeIds": ["f3_late_normal"] },
-        { "id": "f3_late_normal", "type": "Normal", "column": 3, "row": 0, "payloadId": "f3_normal_encounter", "nextNodeIds": ["f3_boss"] },
-        { "id": "f3_boss", "type": "Boss", "column": 4, "row": 0, "payloadId": "f3_boss_encounter", "nextNodeIds": [] }
+        { "id": "f3_shop_start", "type": "Shop", "column": 0, "row": 0, "payloadId": "", "nextNodeIds": ["f3_opening_normal"] },
+        { "id": "f3_opening_normal", "type": "Normal", "combatIndex": 1, "column": 1, "row": 0, "payloadId": "f3_opening_encounter", "nextNodeIds": ["f3_shop_2"] },
+        { "id": "f3_shop_2", "type": "Shop", "column": 2, "row": 0, "payloadId": "", "nextNodeIds": ["f3_elite", "f3_normal"] },
+        { "id": "f3_elite", "type": "Elite", "combatIndex": 2, "column": 3, "row": -1, "payloadId": "f3_elite_encounter", "nextNodeIds": ["f3_enhance"] },
+        { "id": "f3_normal", "type": "Normal", "combatIndex": 2, "column": 3, "row": 1, "payloadId": "f3_normal_encounter", "nextNodeIds": ["f3_event", "f3_rest"] },
+        { "id": "f3_enhance", "type": "Enhance", "column": 4, "row": -1, "payloadId": "f1_enhance_basic", "nextNodeIds": ["f3_shop_3"] },
+        { "id": "f3_event", "type": "Event", "column": 4, "row": 0, "payloadId": "f1_event_pool", "nextNodeIds": ["f3_shop_3"] },
+        { "id": "f3_rest", "type": "Rest", "column": 4, "row": 1, "payloadId": "f1_rest_basic", "nextNodeIds": ["f3_shop_3"] },
+        { "id": "f3_shop_3", "type": "Shop", "column": 5, "row": 0, "payloadId": "", "nextNodeIds": ["f3_mid_mechanic"] },
+        { "id": "f3_mid_mechanic", "type": "Normal", "combatIndex": 3, "column": 6, "row": 0, "payloadId": "f3_mid_mechanic_encounter", "nextNodeIds": ["f3_shop_4"] },
+        { "id": "f3_shop_4", "type": "Shop", "column": 7, "row": 0, "payloadId": "", "nextNodeIds": ["f3_late_forge", "f3_late_wild"] },
+        { "id": "f3_late_forge", "type": "Normal", "combatIndex": 4, "column": 8, "row": -1, "payloadId": "f3_late_forge_encounter", "nextNodeIds": ["f3_shop_boss"] },
+        { "id": "f3_late_wild", "type": "Normal", "combatIndex": 4, "column": 8, "row": 1, "payloadId": "f3_late_wild_encounter", "nextNodeIds": ["f3_shop_boss"] },
+        { "id": "f3_shop_boss", "type": "Shop", "column": 9, "row": 0, "payloadId": "", "nextNodeIds": ["f3_boss"] },
+        { "id": "f3_boss", "type": "Boss", "combatIndex": 5, "column": 10, "row": 0, "payloadId": "f3_boss_encounter", "nextNodeIds": [] }
       ]
     }
   ]

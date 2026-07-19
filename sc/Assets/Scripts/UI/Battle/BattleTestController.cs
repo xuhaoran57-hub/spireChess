@@ -249,14 +249,6 @@ namespace SpireChess.UI.Battle
             }
 
             var configs = GameApp.Instance.Configs;
-            simulator = new BattleSimulator(
-                new System.Random(),
-                id =>
-                {
-                    MinionConfig config;
-                    return configs.TryGetMinion(id, out config) ? config : null;
-                });
-
             var activeRun = GameApp.Instance.Run;
             var context = activeRun?.PendingBattle;
             BattleSimulationResult restoredResult = null;
@@ -270,6 +262,16 @@ namespace SpireChess.UI.Battle
                 context = activeRun.LastBattleContext;
                 restoredResult = activeRun.LastBattleResult;
             }
+
+            simulator = new BattleSimulator(
+                context?.BattleSeed.HasValue == true
+                    ? new System.Random(context.BattleSeed.Value)
+                    : new System.Random(),
+                id =>
+                {
+                    MinionConfig config;
+                    return configs.TryGetMinion(id, out config) ? config : null;
+                });
 
             if (context != null)
             {

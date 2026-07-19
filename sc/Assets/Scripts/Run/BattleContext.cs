@@ -9,7 +9,7 @@ namespace SpireChess.Run
             BattleBoardState boardState,
             string encounterName,
             string returnSceneName)
-            : this(boardState, encounterName, returnSceneName, null, null)
+            : this(boardState, encounterName, returnSceneName, null, null, null)
         {
         }
 
@@ -18,7 +18,8 @@ namespace SpireChess.Run
             string encounterName,
             string returnSceneName,
             string nodeAttemptId,
-            string encounterId)
+            string encounterId,
+            int? battleSeed = null)
         {
             BoardState = (boardState ?? throw new ArgumentNullException(nameof(boardState))).Clone();
             EncounterName = string.IsNullOrWhiteSpace(encounterName)
@@ -29,6 +30,7 @@ namespace SpireChess.Run
                 : returnSceneName;
             NodeAttemptId = nodeAttemptId;
             EncounterId = encounterId;
+            BattleSeed = battleSeed;
         }
 
         public BattleBoardState BoardState { get; }
@@ -36,5 +38,6 @@ namespace SpireChess.Run
         public string ReturnSceneName { get; }
         public string NodeAttemptId { get; }
         public string EncounterId { get; }
+        public int? BattleSeed { get; }
     }
 }

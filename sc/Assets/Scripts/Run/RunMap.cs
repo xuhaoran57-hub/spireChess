@@ -25,6 +25,7 @@ namespace SpireChess.Run
             int column,
             int row,
             string payloadId,
+            int combatIndex,
             IEnumerable<string> nextNodeIds)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
@@ -32,6 +33,7 @@ namespace SpireChess.Run
             Column = column;
             Row = row;
             PayloadId = payloadId;
+            CombatIndex = combatIndex;
             NextNodeIds = new List<string>(nextNodeIds ?? Array.Empty<string>()).AsReadOnly();
         }
 
@@ -40,6 +42,7 @@ namespace SpireChess.Run
         public int Column { get; }
         public int Row { get; }
         public string PayloadId { get; }
+        public int CombatIndex { get; }
         public IReadOnlyList<string> NextNodeIds { get; }
     }
 
@@ -116,6 +119,7 @@ namespace SpireChess.Run
                     node.Column,
                     node.Row,
                     node.PayloadId,
+                    node.CombatIndex,
                     node.NextNodeIds);
             });
 
@@ -180,6 +184,14 @@ namespace SpireChess.Run
                 result.AddError($"Map {map.Id} has no start node.");
             }
 
+            foreach (var startId in map.StartNodeIds)
+            {
+                if (map.TryGetNode(startId, out var start) && start.Type != RunNodeType.Shop)
+                {
+                    result.AddError($"Map {map.Id} must start at a Shop node, got {start.Type} ({startId}).");
+                }
+            }
+
             var bosses = map.Nodes.Where(node => node?.Type == RunNodeType.Boss).ToList();
             if (bosses.Count != 1)
             {
@@ -206,9 +218,126 @@ namespace SpireChess.Run
                         result.AddError($"Start node {startId} cannot reach Boss {bosses[0].Id}.");
                     }
                 }
+
+                foreach (var path in EnumerateBossPaths(map, bosses[0].Id))
+                {
+                    ValidateShopCombatCadence(map, path, result);
+                }
             }
 
             return result;
+        }
+
+        private static IEnumerable<IReadOnlyList<MapNodeDefinition>> EnumerateBossPaths(
+            MapDefinition map,
+            string bossId)
+        {
+            foreach (var startId in map.StartNodeIds)
+            {
+                foreach (var path in EnumerateBossPaths(
+                             map,
+                             startId,
+                             bossId,
+                             new List<MapNodeDefinition>()))
+                {
+                    yield return path;
+                }
+            }
+        }
+
+        private static IEnumerable<IReadOnlyList<MapNodeDefinition>> EnumerateBossPaths(
+            MapDefinition map,
+            string nodeId,
+            string bossId,
+            List<MapNodeDefinition> prefix)
+        {
+            if (!map.TryGetNode(nodeId, out var node))
+            {
+                yield break;
+            }
+
+            if (prefix.Any(value => value.Id == nodeId))
+            {
+                yield break;
+            }
+
+            prefix.Add(node);
+            if (nodeId == bossId)
+            {
+                yield return prefix.ToArray();
+            }
+            else
+            {
+                foreach (var nextId in node.NextNodeIds)
+                {
+                    foreach (var path in EnumerateBossPaths(
+                                 map,
+                                 nextId,
+                                 bossId,
+                                 new List<MapNodeDefinition>(prefix)))
+                    {
+                        yield return path;
+                    }
+                }
+            }
+        }
+
+        private static void ValidateShopCombatCadence(
+            MapDefinition map,
+            IReadOnlyList<MapNodeDefinition> path,
+            ConfigValidationResult result)
+        {
+            var significant = path.Where(node =>
+                    node.Type == RunNodeType.Shop || IsCombat(node.Type))
+                .ToArray();
+            if (significant.Length != 10)
+            {
+                result.AddError(
+                    $"Map {map.Id} path {PathText(path)} must contain exactly 5 Shops and 5 combats.");
+                return;
+            }
+
+            for (var index = 0; index < significant.Length; index++)
+            {
+                var expectedShop = index % 2 == 0;
+                var node = significant[index];
+                if (expectedShop && node.Type != RunNodeType.Shop)
+                {
+                    result.AddError(
+                        $"Map {map.Id} path {PathText(path)} must alternate Shop and combat nodes.");
+                    return;
+                }
+
+                if (!expectedShop && !IsCombat(node.Type))
+                {
+                    result.AddError(
+                        $"Map {map.Id} path {PathText(path)} must alternate Shop and combat nodes.");
+                    return;
+                }
+
+                if (!expectedShop && node.CombatIndex != (index + 1) / 2)
+                {
+                    result.AddError(
+                        $"Map {map.Id} combat {node.Id} must use combatIndex {(index + 1) / 2}, got {node.CombatIndex}.");
+                }
+            }
+
+            if (significant[significant.Length - 1].Type != RunNodeType.Boss)
+            {
+                result.AddError($"Map {map.Id} path {PathText(path)} must end at a Boss.");
+            }
+        }
+
+        private static bool IsCombat(RunNodeType type)
+        {
+            return type == RunNodeType.Normal ||
+                   type == RunNodeType.Elite ||
+                   type == RunNodeType.Boss;
+        }
+
+        private static string PathText(IEnumerable<MapNodeDefinition> path)
+        {
+            return string.Join(" -> ", path.Select(node => node.Id));
         }
 
         private static void DetectCycle(
