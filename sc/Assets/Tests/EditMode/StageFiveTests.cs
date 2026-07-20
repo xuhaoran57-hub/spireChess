@@ -329,6 +329,109 @@ namespace SpireChess.Tests.EditMode
             Assert.That(goldenSoulEaterGrowth.Limit.PerCombat, Is.EqualTo(1));
         }
 
+        [TestCase(false, 1)]
+        [TestCase(true, 2)]
+        public void SwiftwingForestHawk_GrowsAfterTokenDeathWithoutOpeningAttack(
+            bool golden,
+            int expectedAttackGrowth)
+        {
+            var hawkConfig = configs.MinionsById["swiftwing_forest_hawk"];
+            Assert.That(hawkConfig.Health, Is.EqualTo(4));
+            Assert.That(hawkConfig.GoldenHealth, Is.EqualTo(8));
+            Assert.That(hawkConfig.Effects.Concat(hawkConfig.GoldenEffects),
+                Has.None.Matches<EffectConfig>(effect =>
+                    effect.Action == "ImmediateAttack"));
+
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["token_young_spirit"],
+                initialAttack: 0,
+                initialHealth: 1,
+                sourceInstanceId: "young-spirit");
+            state.Player[1] = new BattleMinionRuntime(
+                hawkConfig,
+                golden,
+                sourceInstanceId: "hawk");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 0,
+                initialHealth: 500);
+
+            var result = new BattleSimulator(new Random(17), ResolveMinion).Simulate(state);
+            var hawk = result.FinalState.Player.Single(value =>
+                value?.SourceInstanceId == "hawk");
+
+            Assert.That(result.Diagnostics.Player.TokenDeaths, Is.EqualTo(1));
+            Assert.That(result.Diagnostics.Player.ImmediateAttacks, Is.Zero);
+            Assert.That(result.Diagnostics.Player.TemporaryAttackGained,
+                Is.EqualTo(expectedAttackGrowth));
+            Assert.That(hawk.CurrentAttack,
+                Is.EqualTo((golden ? hawkConfig.GoldenAttack : hawkConfig.Attack) +
+                           expectedAttackGrowth));
+        }
+
+        [TestCase(false, 2)]
+        [TestCase(true, 4)]
+        public void RotleafHeir_DeathrattleBuffsOneSurvivingNonTokenWildSpiritForCombat(
+            bool golden,
+            int expectedBuff)
+        {
+            var rotleafConfig = configs.MinionsById["rotleaf_heir"];
+            var effect = (golden ? rotleafConfig.GoldenEffects : rotleafConfig.Effects)
+                .Single();
+            Assert.That(new BattleMinionRuntime(rotleafConfig, golden).HasTaunt, Is.True);
+            Assert.That(effect.Trigger, Is.EqualTo("OnDeath"));
+            Assert.That(effect.Target.Selector, Is.EqualTo("Random"));
+            Assert.That(effect.Target.Race, Is.EqualTo("WildSpirit"));
+            Assert.That(effect.Target.IncludeToken, Is.False);
+            Assert.That(effect.Value.Duration, Is.EqualTo("Combat"));
+
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["token_young_spirit"],
+                initialAttack: 10,
+                initialHealth: 100,
+                sourceInstanceId: "token");
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["swiftwing_forest_hawk"],
+                initialAttack: 10,
+                initialHealth: 100,
+                sourceInstanceId: "hawk-target");
+            state.Player[2] = new BattleMinionRuntime(
+                configs.MinionsById["many_branch_invoker"],
+                initialAttack: 10,
+                initialHealth: 100,
+                sourceInstanceId: "branch-target");
+            state.Player[3] = new BattleMinionRuntime(
+                rotleafConfig,
+                golden,
+                initialHealth: 1,
+                sourceInstanceId: "rotleaf");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["royal_bounty_hunter"],
+                initialAttack: 0,
+                initialHealth: 500);
+
+            var result = new BattleSimulator(new Random(19), ResolveMinion).Simulate(state);
+            var survivingTargets = result.FinalState.Player
+                .Where(value => value?.SourceInstanceId == "hawk-target" ||
+                                value?.SourceInstanceId == "branch-target")
+                .ToList();
+            var token = result.FinalState.Player.Single(value =>
+                value?.SourceInstanceId == "token");
+
+            Assert.That(result.FinalState.Player.Any(value =>
+                value?.SourceInstanceId == "rotleaf"), Is.False);
+            Assert.That(survivingTargets.Select(value => value.CurrentAttack),
+                Is.EquivalentTo(new[] { 10, 10 + expectedBuff }));
+            Assert.That(token.CurrentAttack, Is.EqualTo(10));
+            Assert.That(result.Diagnostics.Player.TemporaryAttackGained,
+                Is.EqualTo(expectedBuff));
+            Assert.That(result.Diagnostics.Player.TemporaryHealthGained,
+                Is.EqualTo(expectedBuff));
+            Assert.That(result.PermanentDeltas, Is.Empty);
+        }
+
         [Test]
         public void MountainBellySoulEater_TokenDeathAddsHealthBeforeAttackCheck()
         {

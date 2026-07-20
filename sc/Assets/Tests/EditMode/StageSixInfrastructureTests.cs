@@ -83,7 +83,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void ExplicitShopFlow_ConfigAndR16FixtureIdentityAreVersioned()
+        public void CurrentContentConfigAndR16SourceFixtureIdentityAreVersioned()
         {
             var configRoot = Path.Combine(
                 Application.dataPath,
@@ -99,7 +99,8 @@ namespace SpireChess.Tests.EditMode
                 "content-release.v0.1.json"
             }.Select(file => File.ReadAllText(Path.Combine(configRoot, file))).ToArray());
             Assert.That(configHash, Is.EqualTo(
-                "339fe1a1a9d011c25489675a00e99effc09f022d54101cd825ce007e627327d5"));
+                "df8034664c76abe03a9aa9ad024da7ebcb57f9addcf5948e53308e8c50b6622c"));
+            Assert.That(configs.ContentRelease.ContentVersion, Is.EqualTo("5.3.1"));
 
             var serializer = new NewtonsoftJsonSerializer();
             var document = serializer.FromJson<BalanceFixtureFile>(

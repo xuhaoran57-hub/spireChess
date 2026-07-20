@@ -442,29 +442,27 @@
       "id": "swiftwing_forest_hawk",
       "name": "疾羽林隼",
       "title": "",
-      "description": "战斗开始：立即攻击一次。每当一个友方召唤物死亡，本场获得 +1 攻击。",
-      "goldenDescription": "战斗开始：立即攻击一次。每当一个友方召唤物死亡，本场获得 +2 攻击。",
+      "description": "每当一个友方召唤物死亡，本场获得 +1 攻击。",
+      "goldenDescription": "每当一个友方召唤物死亡，本场获得 +2 攻击。",
       "tier": 2,
       "race": "WildSpirit",
       "archetypes": ["SummonTempo"],
       "keywords": [],
       "isToken": false,
       "attack": 2,
-      "health": 2,
+      "health": 4,
       "goldenAttack": 4,
-      "goldenHealth": 4,
+      "goldenHealth": 8,
       "artId": "placeholder_card_swiftwing_forest_hawk",
       "iconId": "icon_wild_spirit",
       "audioId": "",
       "effects": [
-        { "id": "swiftwing_forest_hawk_start", "trigger": "OnBattleStart", "action": "ImmediateAttack" },
         { "id": "swiftwing_forest_hawk_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 0, "duration": "Combat" } }
       ],
       "goldenEffects": [
-        { "id": "golden_swiftwing_forest_hawk_start", "trigger": "OnBattleStart", "action": "ImmediateAttack" },
         { "id": "golden_swiftwing_forest_hawk_token_death", "trigger": "OnSummonedUnitDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "health": 0, "duration": "Combat" } }
       ],
-      "tags": ["immediate_attack", "summon_death"],
+      "tags": ["summon_death"],
       "enabled": true,
       "devNote": ""
     },
@@ -1613,20 +1611,18 @@
       "id": "rotleaf_heir",
       "name": "腐叶承嗣",
       "title": "",
-      "description": "非召唤物友方荒灵死亡时，本场获得 +1 攻击；每场第一次额外永久获得 +1/+1。",
-      "goldenDescription": "非召唤物友方荒灵死亡时，本场获得 +2 攻击；每场前两次额外永久获得 +1/+1。",
-      "tier": 2, "race": "WildSpirit", "keywords": [], "isToken": false,
+      "description": "嘲讽。亡语：使一个随机存活的其他非召唤物友方荒灵本场获得 +2/+2。",
+      "goldenDescription": "嘲讽。亡语：使一个随机存活的其他非召唤物友方荒灵本场获得 +4/+4。",
+      "tier": 2, "race": "WildSpirit", "keywords": ["Taunt", "Deathrattle"], "isToken": false,
       "attack": 2, "health": 4, "goldenAttack": 4, "goldenHealth": 8,
       "artId": "placeholder_card_rotleaf_heir", "iconId": "icon_wild_spirit", "audioId": "",
       "effects": [
-        { "id": "rotleaf_heir_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "duration": "Combat" } },
-        { "id": "rotleaf_heir_growth", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 1 } }
+        { "id": "rotleaf_heir_death", "trigger": "OnDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 2, "health": 2, "duration": "Combat" } }
       ],
       "goldenEffects": [
-        { "id": "golden_rotleaf_heir_death", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 2, "duration": "Combat" } },
-        { "id": "golden_rotleaf_heir_growth", "trigger": "OnFriendlyDeath", "action": "ModifyStats", "condition": { "type": "SubjectIsNonToken", "race": "WildSpirit" }, "target": { "side": "Ally", "scope": "Self", "includeSelf": true }, "value": { "attack": 1, "health": 1, "duration": "Permanent" }, "limit": { "perCombat": 2 } }
+        { "id": "golden_rotleaf_heir_death", "trigger": "OnDeath", "action": "ModifyStats", "target": { "side": "Ally", "scope": "Single", "race": "WildSpirit", "includeSelf": false, "includeToken": false, "maxTargets": 1, "selector": "Random" }, "value": { "attack": 4, "health": 4, "duration": "Combat" } }
       ],
-      "tags": ["death_growth", "permanent_growth"], "enabled": true, "devNote": ""
+      "tags": ["deathrattle", "death_buff", "taunt"], "enabled": true, "devNote": ""
     },
     {
       "id": "rootbound_soul_guide",
