@@ -216,7 +216,7 @@
     {
       "id": "starlight_rebate",
       "name": "星辉回款",
-      "description": "本商店阶段每刷新 2 次，获得 1 金币，最多获得 3 金币。",
+      "description": "使用后，本商店阶段每再刷新 2 次，获得 1 金币，最多获得 3 金币。",
       "tier": 3,
       "spellType": "Economy",
       "useTiming": ["Shop"],
@@ -248,7 +248,7 @@
     {
       "id": "prototype_copy",
       "name": "复制雏形",
-      "description": "选择一个 1-2 级随从，获得一个它的复制。",
+      "description": "选择一个己方 1–2 级随从，获得它的一张复制。",
       "tier": 3,
       "spellType": "Copy",
       "useTiming": ["Shop"],
@@ -273,7 +273,7 @@
     {
       "id": "bloodline_awakening",
       "name": "血脉觉醒",
-      "description": "选择一个随从，使其永久获得 +4/+4；若它是你场上数量最多主种族，额外获得 +2/+2。",
+      "description": "使一个随从永久获得 +4/+4；若其属于你场上数量最多的主种族，再永久获得 +2/+2。",
       "tier": 4,
       "spellType": "Growth",
       "useTiming": ["Shop"],
@@ -340,7 +340,7 @@
     {
       "id": "advanced_discovery",
       "name": "高阶发现",
-      "description": "发现一个等级不高于当前酒馆等级的随从；若你本商店阶段刷新过 3 次，发现结果提高 1 级。",
+      "description": "发现一个不高于当前酒馆等级的随从；若本商店阶段刷新过 3 次，发现的最高等级提高 1 级。",
       "tier": 4,
       "spellType": "Discover",
       "useTiming": ["Shop"],
@@ -425,7 +425,7 @@
     {
       "id": "legendary_recruitment",
       "name": "传说招募",
-      "description": "展示 3 个 5 级随从并选择一个；若你已有金色随从，额外展示一个候选。",
+      "description": "从 3 个 5 级随从中发现一个；若你已有金色随从，改为从 4 个中发现一个。",
       "tier": 5,
       "spellType": "Discover",
       "useTiming": ["Shop"],
@@ -450,7 +450,7 @@
     {
       "id": "triple_discovery_reward",
       "name": "三连发现",
-      "description": "发现一个使用时当前酒馆等级的随从。",
+      "description": "发现一个与你当前酒馆等级相同的随从。",
       "tier": 1,
       "spellType": "Discover",
       "useTiming": ["Shop"],

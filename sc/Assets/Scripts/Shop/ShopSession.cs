@@ -452,8 +452,12 @@ namespace SpireChess.Shop
             }
 
             var effects = GetTriggeredEffects(card, "OnPlay");
-            var blockingEffect = effects.FirstOrDefault(RequiresBlockingChoice);
-            if (blockingEffect != null && effects.Count(effect => RequiresBlockingChoice(effect)) > 1)
+            var blockingEffects = effects
+                .Where(effect => RequiresBlockingChoice(effect) &&
+                                 MeetsShopCondition(effect.Condition))
+                .ToList();
+            var blockingEffect = blockingEffects.FirstOrDefault();
+            if (blockingEffects.Count > 1)
             {
                 return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
             }
@@ -476,7 +480,8 @@ namespace SpireChess.Shop
                     -1,
                     card,
                     blockingEffect,
-                    false);
+                    false,
+                    grantsTripleReward ? 1 : 0);
                 if (!choiceResult.Success)
                 {
                     return choiceResult;
@@ -844,11 +849,45 @@ namespace SpireChess.Shop
             }
 
             PendingChoice = null;
+            var triples = ResolveAllTriples();
+            var remainingChoices = state.RemainingChoices - 1;
+            if (remainingChoices > 0)
+            {
+                var nextError = BuildEffectChoiceCandidates(
+                    state.SourceCard,
+                    state.Effect,
+                    out var nextChoiceType,
+                    out var nextCandidates);
+                if (nextError == ShopOperationError.None &&
+                    nextChoiceType == state.ChoiceType)
+                {
+                    RaiseEvent(new ShopEventData(
+                        ShopEventType.OnDiscoverResolved,
+                        state.SourceCard,
+                        tavernTier: TavernTier,
+                        targetCard: grantedCard ?? candidate.Target));
+                    RaiseTripleEvents(triples);
+                    PendingChoice = new PendingEffectChoice(
+                        nextChoiceType,
+                        state.SourceCard,
+                        state.BenchIndex,
+                        state.Effect,
+                        nextCandidates,
+                        false,
+                        remainingChoices,
+                        state.TotalChoices);
+                    RaiseEvent(new ShopEventData(
+                        ShopEventType.OnDiscoverStarted,
+                        state.SourceCard,
+                        tavernTier: TavernTier));
+                    return ShopOperationResult.Succeed(state.BenchIndex);
+                }
+            }
+
             if (state.SourceCard.CardType == ShopCardType.Spell)
             {
                 PhaseStats.SpellUsedCount++;
             }
-            var triples = ResolveAllTriples();
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnSpellUsed,
                 state.SourceCard,
@@ -1204,10 +1243,57 @@ namespace SpireChess.Shop
             int benchIndex,
             ShopCardInstance sourceCard,
             EffectConfig effect,
-            bool replaceSourceCard = true)
+            bool replaceSourceCard = true,
+            int additionalBenchSlotsRequired = 0)
         {
-            var candidates = new List<EffectChoiceCandidate>();
-            EffectChoiceType choiceType;
+            var error = BuildEffectChoiceCandidates(
+                sourceCard,
+                effect,
+                out var choiceType,
+                out var candidates);
+            if (error != ShopOperationError.None)
+            {
+                return ShopOperationResult.Fail(error);
+            }
+
+            var totalChoices =
+                choiceType == EffectChoiceType.MinionCard ||
+                choiceType == EffectChoiceType.SpellCard
+                    ? Math.Max(1, effect.Discover?.Pick ?? 1)
+                    : 1;
+            if ((choiceType == EffectChoiceType.MinionCard ||
+                 choiceType == EffectChoiceType.SpellCard) &&
+                Collection.EmptyBenchSlotCount() + 1 <
+                totalChoices + Math.Max(0, additionalBenchSlotsRequired))
+            {
+                ReturnReservedMinionCandidates(candidates);
+                return ShopOperationResult.Fail(ShopOperationError.BenchFull);
+            }
+
+            PendingChoice = new PendingEffectChoice(
+                choiceType,
+                sourceCard,
+                benchIndex,
+                effect,
+                candidates,
+                replaceSourceCard,
+                totalChoices,
+                totalChoices);
+            RaiseEvent(new ShopEventData(
+                ShopEventType.OnDiscoverStarted,
+                sourceCard,
+                tavernTier: TavernTier));
+            return ShopOperationResult.Succeed(benchIndex);
+        }
+
+        private ShopOperationError BuildEffectChoiceCandidates(
+            ShopCardInstance sourceCard,
+            EffectConfig effect,
+            out EffectChoiceType choiceType,
+            out List<EffectChoiceCandidate> candidates)
+        {
+            candidates = new List<EffectChoiceCandidate>();
+            choiceType = EffectChoiceType.MinionCard;
             switch (effect.Action)
             {
                 case "DiscoverMinion":
@@ -1215,7 +1301,7 @@ namespace SpireChess.Shop
                     var discover = effect.Discover;
                     if (discover == null)
                     {
-                        return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+                        return ShopOperationError.UnsupportedEffect;
                     }
 
                     var minimumTier = discover.MinTier > 0 ? discover.MinTier : 1;
@@ -1308,26 +1394,24 @@ namespace SpireChess.Shop
                     choiceType = EffectChoiceType.Race;
                     break;
                 default:
-                    return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
+                    return ShopOperationError.UnsupportedEffect;
             }
 
-            if (candidates.Count == 0)
+            return candidates.Count == 0
+                ? ShopOperationError.NoBenefit
+                : ShopOperationError.None;
+        }
+
+        private void ReturnReservedMinionCandidates(
+            IEnumerable<EffectChoiceCandidate> candidates)
+        {
+            foreach (var candidate in candidates ?? Enumerable.Empty<EffectChoiceCandidate>())
             {
-                return ShopOperationResult.Fail(ShopOperationError.NoBenefit);
+                if (candidate.Minion != null)
+                {
+                    MinionPool.Return(candidate.Minion.Id);
+                }
             }
-
-            PendingChoice = new PendingEffectChoice(
-                choiceType,
-                sourceCard,
-                benchIndex,
-                effect,
-                candidates,
-                replaceSourceCard);
-            RaiseEvent(new ShopEventData(
-                ShopEventType.OnDiscoverStarted,
-                sourceCard,
-                tavernTier: TavernTier));
-            return ShopOperationResult.Succeed(benchIndex);
         }
 
         private static bool RequiresBlockingChoice(EffectConfig effect)

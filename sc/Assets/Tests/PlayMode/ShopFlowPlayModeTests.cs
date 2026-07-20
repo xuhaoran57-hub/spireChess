@@ -832,6 +832,8 @@ namespace SpireChess.Tests
                     .Append(choice.BenchIndex).Append(',')
                     .Append(choice.Effect.Id).Append(',')
                     .Append(choice.ReplaceSourceCard).Append(',')
+                    .Append(choice.RemainingChoices).Append(',')
+                    .Append(choice.TotalChoices).Append(',')
                     .Append(string.Join(",", choice.Candidates.Select(candidate =>
                         candidate.Id + ":" +
                         (candidate.Minion?.Id ??

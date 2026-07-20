@@ -815,6 +815,9 @@ namespace SpireChess.Battle
                         Math.Abs(subjectIndex - pending.SourceIndex) == 1;
                 case "AttackBelowHealth":
                     return pending.Source.CurrentAttack < pending.Source.CurrentHealth;
+                case "SubjectRaceAndSourceAttackBelowHealth":
+                    return pending.Subject?.Config.Race == condition.Race &&
+                           pending.Source.CurrentAttack < pending.Source.CurrentHealth;
                 case "SubjectIsSelf":
                     return ReferenceEquals(pending.Source, pending.Subject);
                 case "HasAdjacentNonRace":

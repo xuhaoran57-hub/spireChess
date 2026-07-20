@@ -69,6 +69,36 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void UpdatedDiscoverMinions_HaveExpectedConditionsAndPickCounts()
+        {
+            var broker = configs.MinionsById["star_map_broker"];
+            var brokerEffect = broker.Effects.Single();
+            var goldenBrokerEffect = broker.GoldenEffects.Single();
+            Assert.That(brokerEffect.Condition.Type, Is.EqualTo("PhaseStatAtLeast"));
+            Assert.That(brokerEffect.Condition.PhaseStat, Is.EqualTo("RefreshCount"));
+            Assert.That(brokerEffect.Condition.Threshold, Is.EqualTo(2));
+            Assert.That(brokerEffect.Discover.Pick, Is.EqualTo(1));
+            Assert.That(goldenBrokerEffect.Discover.Pick, Is.EqualTo(2));
+
+            var guide = configs.MinionsById["old_tower_guide"];
+            var guideEffect = guide.Effects.Single();
+            Assert.That(guideEffect.Discover.Race, Is.EqualTo("MostCommonMainRace"));
+            Assert.That(guideEffect.Discover.MaxTierMode,
+                Is.EqualTo("CurrentTavernTierPlusOffset"));
+            Assert.That(guideEffect.Discover.MaxTierOffset, Is.EqualTo(-1));
+            Assert.That(guide.GoldenEffects.Single().Discover.Pick, Is.EqualTo(2));
+            Assert.That(guide.GoldenEffects,
+                Has.None.Matches<EffectConfig>(effect =>
+                    effect.Action == "ModifyStats"));
+
+            var lecturer = configs.MinionsById["stargate_lecturer"];
+            var goldenLecturerDiscover = lecturer.GoldenEffects.Single(effect =>
+                effect.Action == "DiscoverSpell").Discover;
+            Assert.That(goldenLecturerDiscover.Count, Is.EqualTo(3));
+            Assert.That(goldenLecturerDiscover.Pick, Is.EqualTo(2));
+        }
+
+        [Test]
         public void CardTierPalette_UsesFiveDistinctReadableBackgrounds()
         {
             var colors = Enumerable.Range(1, 5)
@@ -109,6 +139,29 @@ namespace SpireChess.Tests.EditMode
             Assert.That(shop.Collection.Battle[0].HasPendingCombatShield, Is.True);
             Assert.That(shop.CreateBattleSnapshot().Player[0].HasShield, Is.True);
             Assert.That(shop.CreateBattleSnapshot().Player[0].HasShield, Is.False);
+        }
+
+        [Test]
+        public void TemperingMender_RepeatedNextCombatShieldPermanentlyAddsHealth()
+        {
+            var shop = CreateShop();
+            Assert.That(shop.StartRound(1).Success, Is.True);
+            var target = configs.MinionsById["stargazing_apprentice"];
+            var mender = configs.MinionsById["tempering_mender"];
+            Assert.That(shop.ClaimRewardMinion(target).Success, Is.True);
+            Assert.That(shop.PlayMinion(FindBench(shop, target.Id), 0).Success, Is.True);
+
+            Assert.That(shop.ClaimRewardMinion(mender).Success, Is.True);
+            Assert.That(shop.PlayMinion(
+                FindBench(shop, mender.Id), 1, 0).Success, Is.True);
+            Assert.That(shop.Collection.Battle[0].HasPendingCombatShield, Is.True);
+            Assert.That(shop.Collection.Battle[0].PermanentHealthBonus, Is.Zero);
+
+            Assert.That(shop.ClaimRewardMinion(mender).Success, Is.True);
+            Assert.That(shop.PlayMinion(
+                FindBench(shop, mender.Id), 2, 0).Success, Is.True);
+            Assert.That(shop.Collection.Battle[0].HasPendingCombatShield, Is.True);
+            Assert.That(shop.Collection.Battle[0].PermanentHealthBonus, Is.EqualTo(2));
         }
 
         [Test]
@@ -253,11 +306,59 @@ namespace SpireChess.Tests.EditMode
             Assert.That(goldenVinecrownGrowth.Limit, Is.Null);
 
             var soulEater = configs.MinionsById["mountain_belly_soul_eater"];
+            var soulEaterHealth = soulEater.Effects.Single(
+                effect => effect.Id == "mountain_belly_soul_eater_health");
+            var soulEaterAttack = soulEater.Effects.Single(
+                effect => effect.Id == "mountain_belly_soul_eater_attack");
             var soulEaterGrowth = soulEater.Effects.Single(
                 effect => effect.Id == "mountain_belly_soul_eater_win");
+            Assert.That(soulEaterHealth.Condition.Type, Is.EqualTo("SubjectRace"));
+            Assert.That(soulEaterHealth.Condition.Race, Is.EqualTo("WildSpirit"));
+            Assert.That(soulEaterAttack.Condition.Type,
+                Is.EqualTo("SubjectRaceAndSourceAttackBelowHealth"));
+            Assert.That(soulEaterAttack.Condition.Race, Is.EqualTo("WildSpirit"));
             Assert.That(soulEaterGrowth.Condition.Type, Is.EqualTo("CombatWon"));
-            Assert.That(soulEaterGrowth.Value.Health, Is.EqualTo(1));
+            Assert.That(soulEaterGrowth.Value.Attack, Is.EqualTo(1));
+            Assert.That(soulEaterGrowth.Value.Health, Is.EqualTo(2));
             Assert.That(soulEaterGrowth.Limit.PerCombat, Is.EqualTo(1));
+
+            var goldenSoulEaterGrowth = soulEater.GoldenEffects.Single(
+                effect => effect.Id == "golden_mountain_belly_soul_eater_win");
+            Assert.That(goldenSoulEaterGrowth.Value.Attack, Is.EqualTo(2));
+            Assert.That(goldenSoulEaterGrowth.Value.Health, Is.EqualTo(4));
+            Assert.That(goldenSoulEaterGrowth.Limit.PerCombat, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void MountainBellySoulEater_TokenDeathAddsHealthBeforeAttackCheck()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = new BattleMinionRuntime(
+                configs.MinionsById["token_young_spirit"],
+                initialAttack: 0,
+                initialHealth: 1,
+                sourceInstanceId: "wild-token");
+            state.Player[1] = new BattleMinionRuntime(
+                configs.MinionsById["mountain_belly_soul_eater"],
+                initialAttack: 101,
+                initialHealth: 100,
+                sourceInstanceId: "soul-eater");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["wandering_swordsman"],
+                initialAttack: 1,
+                initialHealth: 500);
+
+            var result = new BattleSimulator(new Random(19), ResolveMinion)
+                .Simulate(state);
+
+            Assert.That(result.Diagnostics.Player.TokenDeaths, Is.EqualTo(1));
+            Assert.That(result.Diagnostics.Player.TemporaryHealthGained, Is.EqualTo(2));
+            Assert.That(result.Diagnostics.Player.TemporaryAttackGained, Is.EqualTo(1),
+                "101 attack is not below 100 health until the +2 health resolves.");
+            var delta = result.PermanentDeltas.Single(value =>
+                value.SourceInstanceId == "soul-eater");
+            Assert.That(delta.Attack, Is.EqualTo(1));
+            Assert.That(delta.Health, Is.EqualTo(2));
         }
 
         [Test]

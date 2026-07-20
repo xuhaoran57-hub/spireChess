@@ -103,7 +103,9 @@ namespace SpireChess.Shop
             int benchIndex,
             EffectConfig effect,
             IEnumerable<EffectChoiceCandidate> candidates,
-            bool replaceSourceCard = true)
+            bool replaceSourceCard = true,
+            int remainingChoices = 1,
+            int totalChoices = 1)
         {
             ChoiceType = choiceType;
             SourceCard = sourceCard ?? throw new ArgumentNullException(nameof(sourceCard));
@@ -112,6 +114,8 @@ namespace SpireChess.Shop
             Candidates = new List<EffectChoiceCandidate>(
                 candidates ?? throw new ArgumentNullException(nameof(candidates))).AsReadOnly();
             ReplaceSourceCard = replaceSourceCard;
+            RemainingChoices = Math.Max(1, remainingChoices);
+            TotalChoices = Math.Max(RemainingChoices, totalChoices);
         }
 
         public EffectChoiceType ChoiceType { get; }
@@ -120,5 +124,8 @@ namespace SpireChess.Shop
         public EffectConfig Effect { get; }
         public IReadOnlyList<EffectChoiceCandidate> Candidates { get; }
         public bool ReplaceSourceCard { get; }
+        public int RemainingChoices { get; }
+        public int TotalChoices { get; }
+        public int CurrentChoice => TotalChoices - RemainingChoices + 1;
     }
 }

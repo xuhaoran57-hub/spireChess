@@ -304,7 +304,7 @@ Owned instances    Battle runtime clones
 - `None`；
 - `HasKeyword`、`HasShield`、`TargetAlreadyHasShield`；
 - `IsGolden`；
-- `SubjectIsToken`、`SubjectIsNonToken`、`SubjectRace`；
+- `SubjectIsToken`、`SubjectIsNonToken`、`SubjectRace`、`SubjectRaceAndSourceAttackBelowHealth`；
 - `RaceCountAtLeast`；
 - `PhaseStatAtLeast`；
 - `IsMostCommonMainRace`；
@@ -313,6 +313,8 @@ Owned instances    Battle runtime clones
 - `NoBoardSpace` 仅供召唤失败 fallback 使用。
 
 条件只读，不得在判断时抽随机数或改变计数。
+
+`SubjectRaceAndSourceAttackBelowHealth` 在同一触发队列中读取前序效果结算后的来源随从属性，用于山腹吞灵者先增加生命、再判断攻击力是否低于生命。
 
 ### 8.2 目标稳定排序
 

@@ -556,8 +556,15 @@ namespace SpireChess.UI.Shop
 
             return new ChoiceViewModel
             {
-                Title = ToChoiceTitle(effectChoice.ChoiceType),
-                Description = "请选择一个效果结果后继续商店操作。",
+                Title = effectChoice.TotalChoices > 1
+                    ? $"{ToChoiceTitle(effectChoice.ChoiceType)}" +
+                      $"（{effectChoice.CurrentChoice}/{effectChoice.TotalChoices}）"
+                    : ToChoiceTitle(effectChoice.ChoiceType),
+                Description = effectChoice.TotalChoices > 1
+                    ? effectChoice.CurrentChoice < effectChoice.TotalChoices
+                        ? "完成本次选择后继续下一次发现。"
+                        : "完成本次选择后继续商店操作。"
+                    : "请选择一个效果结果后继续商店操作。",
                 CanCancel = true,
                 Candidates = effectChoice.Candidates
                     .Select(ToChoiceCandidate)

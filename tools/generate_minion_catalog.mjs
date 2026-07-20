@@ -93,7 +93,7 @@ function countFor(race, token) {
 const lines = [
   `# 全随从身材与效果图鉴（内容版本 ${release.contentVersion}）`,
   "",
-  `生成日期：2026-07-15`,
+  `生成日期：2026-07-20`,
   `配置版本：${config.version}`,
   `规则最低版本：${release.minimumRulesVersion}`,
   `随从配置 SHA256：\`${hash}\``,

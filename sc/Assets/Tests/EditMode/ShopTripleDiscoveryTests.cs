@@ -347,6 +347,250 @@ namespace SpireChess.Tests
         }
 
         [Test]
+        public void StarMapBroker_RequiresTwoRefreshesAndGoldenDiscoversTwice()
+        {
+            var broker = CreateStarMapBroker();
+            var candidates = new[]
+            {
+                CreateMinion("starbound_a"),
+                CreateMinion("starbound_b"),
+                CreateMinion("starbound_c")
+            };
+            foreach (var candidate in candidates)
+            {
+                candidate.Race = "Starbound";
+            }
+
+            var inactive = CreateSession(new[] { broker }.Concat(candidates));
+            inactive.StartNextRound();
+            inactive.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion("normal-broker", broker),
+                out var inactiveBenchIndex);
+
+            Assert.That(inactive.PlayMinion(inactiveBenchIndex, 0).Success, Is.True);
+            Assert.That(inactive.PendingChoice, Is.Null);
+
+            var session = CreateSession(new[] { broker }.Concat(candidates));
+            session.StartNextRound();
+            Assert.That(session.Refresh().Success, Is.True);
+            Assert.That(session.Refresh().Success, Is.True);
+            session.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion(
+                    "golden-broker", broker, isGolden: true),
+                out var benchIndex);
+            var before = candidates.ToDictionary(
+                candidate => candidate.Id,
+                candidate => session.MinionPool.GetRemainingCopies(candidate.Id));
+            var events = new List<ShopEventData>();
+            session.EventRaised += events.Add;
+
+            Assert.That(session.PlayMinion(benchIndex, 0).Success, Is.True);
+            Assert.That(session.PendingChoice.TotalChoices, Is.EqualTo(2));
+            Assert.That(session.PendingChoice.RemainingChoices, Is.EqualTo(2));
+            Assert.That(session.PendingChoice.CurrentChoice, Is.EqualTo(1));
+            var firstId = session.PendingChoice.Candidates[0].Id;
+
+            Assert.That(session.SelectEffectChoice(0).Success, Is.True);
+            Assert.That(session.PendingChoice, Is.Not.Null);
+            Assert.That(session.PendingChoice.RemainingChoices, Is.EqualTo(1));
+            Assert.That(session.PendingChoice.CurrentChoice, Is.EqualTo(2));
+            var secondId = session.PendingChoice.Candidates[0].Id;
+
+            Assert.That(session.SelectEffectChoice(0).Success, Is.True);
+            Assert.That(session.PendingChoice, Is.Null);
+            Assert.That(session.Collection.Bench.Count(card =>
+                card?.CardType == ShopCardType.Minion), Is.EqualTo(2));
+            var selectedCounts = new[] { firstId, secondId }
+                .GroupBy(id => id)
+                .ToDictionary(group => group.Key, group => group.Count());
+            foreach (var candidate in candidates)
+            {
+                var selected = selectedCounts.TryGetValue(
+                    candidate.Id, out var count) ? count : 0;
+                Assert.That(session.MinionPool.GetRemainingCopies(candidate.Id),
+                    Is.EqualTo(before[candidate.Id] - selected));
+            }
+            Assert.That(events.Count(value =>
+                value.Type == ShopEventType.OnDiscoverResolved), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void GoldenDiscover_WithOnlyFreedSourceSlotFailsBeforePlaying()
+        {
+            var broker = CreateStarMapBroker();
+            var candidates = new[]
+            {
+                CreateMinion("starbound_a"),
+                CreateMinion("starbound_b"),
+                CreateMinion("starbound_c")
+            };
+            foreach (var candidate in candidates)
+            {
+                candidate.Race = "Starbound";
+            }
+
+            var session = CreateSession(new[] { broker }.Concat(candidates));
+            session.StartNextRound();
+            Assert.That(session.Refresh().Success, Is.True);
+            Assert.That(session.Refresh().Success, Is.True);
+            var source = ShopCardInstance.CreateMinion(
+                "golden-broker", broker, isGolden: true);
+            session.Collection.TryAddToBench(source, out var benchIndex);
+            for (var i = 0; i < ShopEconomyRules.BenchSlotCount - 1; i++)
+            {
+                session.Collection.TryAddToBench(
+                    ShopCardInstance.CreateSpell(
+                        $"filler-{i}", CreateResourceSpell($"filler-{i}")),
+                    out _);
+            }
+            var before = candidates.ToDictionary(
+                candidate => candidate.Id,
+                candidate => session.MinionPool.GetRemainingCopies(candidate.Id));
+
+            var result = session.PlayMinion(benchIndex, 0);
+
+            Assert.That(result.Error, Is.EqualTo(ShopOperationError.BenchFull));
+            Assert.That(session.PendingChoice, Is.Null);
+            Assert.That(session.Collection.Bench[benchIndex], Is.SameAs(source));
+            Assert.That(session.Collection.Battle[0], Is.Null);
+            foreach (var candidate in candidates)
+            {
+                Assert.That(session.MinionPool.GetRemainingCopies(candidate.Id),
+                    Is.EqualTo(before[candidate.Id]));
+            }
+        }
+
+        [Test]
+        public void GoldenDiscover_WithTripleRewardAlsoReservesRewardSpellSlot()
+        {
+            var broker = CreateStarMapBroker();
+            var candidates = new[]
+            {
+                CreateMinion("starbound_a"),
+                CreateMinion("starbound_b"),
+                CreateMinion("starbound_c")
+            };
+            foreach (var candidate in candidates)
+            {
+                candidate.Race = "Starbound";
+            }
+
+            var session = CreateSession(new[] { broker }.Concat(candidates));
+            session.StartNextRound();
+            Assert.That(session.Refresh().Success, Is.True);
+            Assert.That(session.Refresh().Success, Is.True);
+            var source = ShopCardInstance.CreateMinion(
+                "triple-golden-broker",
+                broker,
+                isGolden: true,
+                tripleDiscoveryPending: true);
+            session.Collection.TryAddToBench(source, out var benchIndex);
+            for (var i = 0; i < ShopEconomyRules.BenchSlotCount - 2; i++)
+            {
+                session.Collection.TryAddToBench(
+                    ShopCardInstance.CreateSpell(
+                        $"filler-{i}", CreateResourceSpell($"filler-{i}")),
+                    out _);
+            }
+
+            var result = session.PlayMinion(benchIndex, 0);
+
+            Assert.That(result.Error, Is.EqualTo(ShopOperationError.BenchFull));
+            Assert.That(session.PendingChoice, Is.Null);
+            Assert.That(session.Collection.Bench[benchIndex], Is.SameAs(source));
+            Assert.That(source.TripleDiscoveryPending, Is.True);
+        }
+
+        [Test]
+        public void OldTowerGuide_UsesMostCommonMainRaceBelowCurrentTier()
+        {
+            var guide = CreateOldTowerGuide();
+            var ally = CreateMinion("forge_ally");
+            ally.Race = "ForgeSoul";
+            var forgeLow = CreateMinion("forge_low");
+            forgeLow.Race = "ForgeSoul";
+            var forgeCurrent = CreateMinion("forge_current", 2);
+            forgeCurrent.Race = "ForgeSoul";
+            var wildLow = CreateMinion("wild_low");
+            wildLow.Race = "WildSpirit";
+            var session = CreateSession(new[]
+            {
+                guide, ally, forgeLow, forgeCurrent, wildLow
+            });
+            session.StartNextRound();
+            session.GrantGold(5);
+            Assert.That(session.UpgradeTavern().Success, Is.True);
+            session.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion("ally", ally),
+                out var allyBenchIndex);
+            Assert.That(session.PlayMinion(allyBenchIndex, 0).Success, Is.True);
+            session.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion("guide", guide),
+                out var guideBenchIndex);
+
+            Assert.That(session.PlayMinion(guideBenchIndex, 1).Success, Is.True);
+
+            Assert.That(session.PendingChoice, Is.Not.Null);
+            Assert.That(session.PendingChoice.Candidates,
+                Has.All.Matches<EffectChoiceCandidate>(candidate =>
+                    candidate.Minion.Race == "ForgeSoul" &&
+                    candidate.Minion.Tier < session.TavernTier));
+            Assert.That(session.PendingChoice.Candidates,
+                Has.None.Matches<EffectChoiceCandidate>(candidate =>
+                    candidate.Id == guide.Id));
+        }
+
+        [Test]
+        public void GoldenStargateLecturer_DiscoversSpellInTwoRounds()
+        {
+            var lecturer = CreateMinion("stargate_lecturer");
+            lecturer.Race = "Starbound";
+            lecturer.Keywords.Add("Battlecry");
+            lecturer.GoldenEffects.Add(new EffectConfig
+            {
+                Id = "golden_stargate_lecturer_play",
+                Trigger = "OnPlay",
+                Action = "DiscoverSpell",
+                Discover = new DiscoverConfig
+                {
+                    CardType = "Spell",
+                    TierMode = "Range",
+                    MinTier = 1,
+                    MaxTierMode = "CurrentTavernTier",
+                    Count = 3,
+                    Pick = 2
+                }
+            });
+            var spells = new[]
+            {
+                CreateResourceSpell("spell_a"),
+                CreateResourceSpell("spell_b"),
+                CreateResourceSpell("spell_c")
+            };
+            var session = new ShopSession(
+                new[] { lecturer },
+                new[] { CreateTripleRewardSpell() }.Concat(spells),
+                new SequenceRandom());
+            session.StartNextRound();
+            session.Collection.TryAddToBench(
+                ShopCardInstance.CreateMinion(
+                    "golden-lecturer", lecturer, isGolden: true),
+                out var benchIndex);
+
+            Assert.That(session.PlayMinion(benchIndex, 0).Success, Is.True);
+            Assert.That(session.PendingChoice.CurrentChoice, Is.EqualTo(1));
+            Assert.That(session.PendingChoice.Candidates.Count, Is.EqualTo(3));
+            Assert.That(session.SelectEffectChoice(0).Success, Is.True);
+            Assert.That(session.PendingChoice.CurrentChoice, Is.EqualTo(2));
+            Assert.That(session.PendingChoice.Candidates.Count, Is.EqualTo(3));
+            Assert.That(session.SelectEffectChoice(0).Success, Is.True);
+
+            Assert.That(session.PendingChoice, Is.Null);
+            Assert.That(session.Collection.Bench.Count(card =>
+                card?.CardType == ShopCardType.Spell), Is.EqualTo(2));
+        }
+
+        [Test]
         public void Discover_InvalidSelectionKeepsPendingStateAndReservations()
         {
             var minions = new[]
@@ -435,6 +679,79 @@ namespace SpireChess.Tests
                 minions,
                 new[] { CreateTripleRewardSpell() },
                 new SequenceRandom());
+        }
+
+        private static MinionConfig CreateStarMapBroker()
+        {
+            var broker = CreateMinion("star_map_broker");
+            broker.Race = "Starbound";
+            broker.Keywords.Add("Battlecry");
+            broker.Effects.Add(CreateMinionDiscoverEffect(
+                "star_map_broker_play",
+                "Starbound",
+                "CurrentTavernTier",
+                0,
+                1,
+                new ConditionConfig
+                {
+                    Type = "PhaseStatAtLeast",
+                    PhaseStat = "RefreshCount",
+                    Threshold = 2
+                }));
+            broker.GoldenEffects.Add(CreateMinionDiscoverEffect(
+                "golden_star_map_broker_play",
+                "Starbound",
+                "CurrentTavernTier",
+                0,
+                2,
+                new ConditionConfig
+                {
+                    Type = "PhaseStatAtLeast",
+                    PhaseStat = "RefreshCount",
+                    Threshold = 2
+                }));
+            return broker;
+        }
+
+        private static MinionConfig CreateOldTowerGuide()
+        {
+            var guide = CreateMinion("old_tower_guide");
+            guide.Keywords.Add("Battlecry");
+            guide.Effects.Add(CreateMinionDiscoverEffect(
+                "old_tower_guide_play",
+                "MostCommonMainRace",
+                "CurrentTavernTierPlusOffset",
+                -1,
+                1));
+            return guide;
+        }
+
+        private static EffectConfig CreateMinionDiscoverEffect(
+            string id,
+            string race,
+            string maxTierMode,
+            int maxTierOffset,
+            int pick,
+            ConditionConfig condition = null)
+        {
+            return new EffectConfig
+            {
+                Id = id,
+                Trigger = "OnPlay",
+                Action = "DiscoverMinion",
+                Condition = condition,
+                Discover = new DiscoverConfig
+                {
+                    CardType = "Minion",
+                    Race = race,
+                    TierMode = "Range",
+                    MinTier = 1,
+                    MaxTierMode = maxTierMode,
+                    MaxTierOffset = maxTierOffset,
+                    Count = 3,
+                    Pick = pick
+                }
+            };
         }
 
         private static MinionConfig CreateMinion(

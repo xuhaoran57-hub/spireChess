@@ -121,7 +121,9 @@ namespace SpireChess.Shop
                         }
 
                         if (effect.Action == "AddShield" &&
-                            targets.All(target => target.HasEffectiveKeyword("Shield")) &&
+                            targets.All(target =>
+                                target.HasEffectiveKeyword("Shield") ||
+                                target.HasPendingCombatShield) &&
                             effect.FallbackEffects != null &&
                             effect.FallbackEffects.Count > 0)
                         {

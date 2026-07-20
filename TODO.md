@@ -330,9 +330,9 @@
 - [x] 完成 R16 工程基线冻结：Unity 2022.3.62f3c1 EditMode 128 / 128、PlayMode 14 / 14；同配置 S0 的 8,400 场首跑与 8,400 场复跑安全门全绿；Unity/.NET 逐场确定性哈希 8,400 / 8,400 一致。当前配置和 fixture v0.3 冻结供阶段 7 使用，完整记录见 `balance-results/phase-6-v0.3/R16-tomb-astrolabe-tuning-unity/R16-engineering-baseline-freeze-report.md`。
 - [ ] Phase 6B：正式 UI 可用后，完成当前冻结候选的 84,000 场 S1、20 局人工单局和未查看留出集复核。
   - [x] 完成改造前 5.1.0 R16 Unity `S1_CALIBRATION`：种子 1000-1999、84 个场景、84,000 场；全部工程安全门通过。结果保留在 `balance-results/phase-6-v0.3/R16-tomb-astrolabe-tuning-unity-phase-6b/`，不与显式商店地图 5.2.2 的 S2 合并。
-  - [ ] 显式商店地图 5.2.2 提交后重新运行 `S1_CALIBRATION`，记录新 Git 提交与配置哈希。
+  - [ ] 内容 5.3.0 完成 Unity EditMode、PlayMode 和独立 S0 后，再运行新的 `S1_CALIBRATION`，记录 Git 提交与配置哈希；不得与 5.2.2 或 R16 结果混用。
 - [ ] Phase 6B：使用种子 2000-2019 完成人工单局，记录流派形成、三连、路线选择、时长和受影响机制体验。
-  - 种子 2000 的 5.1.0 原始记录作为 Boss 重试刷经济的问题证据保留；5.2.2 从同一种子重新开始，不覆盖旧文件。
+  - 种子 2000 的 5.1.0 原始记录作为 Boss 重试刷经济的问题证据保留；5.3.0 从同一种子重新开始，不覆盖 5.1.0/5.2.2 文件。
 - [ ] Phase 6B：每个流派补足至少 10 个第 10 回合可识别成型人工样本；若实机数据要求解冻，基于冻结 manifest 新建候选，不覆盖 R16 基线。
 
 ## P0：阶段 7 UI 纵向切片

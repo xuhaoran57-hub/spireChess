@@ -273,8 +273,21 @@ namespace SpireChess.Tests.EditMode
             var validation = configs.LoadFromResources();
             Assert.That(validation.IsValid, Is.True,
                 string.Join("\n", validation.Errors));
-            var minion = configs.MinionsById["old_tower_guide"];
-            var minionDescription = minion.GetPrototypeDescription(true);
+            var minion = configs.Minions
+                .Where(value => !value.IsToken)
+                .OrderByDescending(value => Math.Max(
+                    UiTextFormatter.CountTextElements(
+                        value.GetPrototypeDescription(false)),
+                    UiTextFormatter.CountTextElements(
+                        value.GetPrototypeDescription(true))))
+                .First();
+            var normalMinionLength = UiTextFormatter.CountTextElements(
+                minion.GetPrototypeDescription(false));
+            var goldenMinionLength = UiTextFormatter.CountTextElements(
+                minion.GetPrototypeDescription(true));
+            var useGoldenDescription = goldenMinionLength >= normalMinionLength;
+            var minionDescription =
+                minion.GetPrototypeDescription(useGoldenDescription);
             var tenThousandHoof =
                 configs.MinionsById["ten_thousand_hoof_surge"];
             var tenThousandHoofDescription =
@@ -284,17 +297,20 @@ namespace SpireChess.Tests.EditMode
                     UiTextFormatter.CountTextElements(value.Description))
                 .First();
             Assert.That(UiTextFormatter.CountTextElements(minionDescription),
-                Is.EqualTo(66));
+                Is.EqualTo(64));
+            Assert.That(UiTextFormatter.CountTextElements(minionDescription),
+                Is.LessThanOrEqualTo(
+                    UiTextFormatter.CurrentMinionDescriptionLimit));
             Assert.That(
                 UiTextFormatter.CountTextElements(tenThousandHoofDescription),
-                Is.EqualTo(64));
+                Is.EqualTo(63));
             Assert.That(UiTextFormatter.CountTextElements(spell.Description),
                 Is.EqualTo(45));
 
             var minionModel = CreateMinion(CardDisplayMode.Full);
             minionModel.Name = minion.Name;
             minionModel.Description = minionDescription;
-            minionModel.IsGolden = true;
+            minionModel.IsGolden = useGoldenDescription;
             view.Render(minionModel);
             Assert.That(TextAt("InfoPanel/Description"),
                 Is.EqualTo(minionDescription));

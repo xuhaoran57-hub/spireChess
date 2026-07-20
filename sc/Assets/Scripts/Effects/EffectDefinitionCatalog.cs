@@ -30,6 +30,7 @@ namespace SpireChess.Effects
             "SubjectIsToken", "SubjectIsNonToken", "SubjectRace", "RaceCountAtLeast",
             "PhaseStatAtLeast", "PhaseStatMultipleOf", "IsMostCommonMainRace", "HasGoldenMinion", "CombatWon",
             "AttackerExists", "NoBoardSpace", "SubjectAdjacent", "AttackBelowHealth",
+            "SubjectRaceAndSourceAttackBelowHealth",
             "SubjectIsSelf", "HasAdjacentNonRace", "TriggerCountAtLeast",
             "TriggerCountEquals", "TriggerCountMultipleOf", "EnemyAttackDifferenceAtLeast",
             "HasUnshieldedRaceTarget"
