@@ -103,6 +103,35 @@ namespace SpireChess.Battle
                 RuntimeInstanceId);
         }
 
+        internal static BattleMinionRuntime Restore(
+            MinionConfig config,
+            bool isGolden,
+            int currentAttack,
+            int currentHealth,
+            int combatMaxHealth,
+            int permanentAttackBonus,
+            int permanentHealthBonus,
+            bool hasShield,
+            IEnumerable<string> keywords,
+            string sourceInstanceId,
+            int summonEffectMultiplier,
+            string runtimeInstanceId)
+        {
+            return new BattleMinionRuntime(
+                config ?? throw new ArgumentNullException(nameof(config)),
+                isGolden,
+                currentAttack,
+                currentHealth,
+                combatMaxHealth,
+                permanentAttackBonus,
+                permanentHealthBonus,
+                hasShield,
+                keywords,
+                sourceInstanceId,
+                Math.Max(1, summonEffectMultiplier),
+                runtimeInstanceId);
+        }
+
         internal void AssignRuntimeInstanceId(string value)
         {
             if (!string.IsNullOrWhiteSpace(RuntimeInstanceId))

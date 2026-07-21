@@ -6,8 +6,8 @@ using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.Simulation;
+using SpireChess.UI.Common;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace SpireChess.UI.Battle
 {
@@ -180,6 +180,7 @@ namespace SpireChess.UI.Battle
         private string currentStatus;
         private float playbackSpeed = 1f;
         private bool skipPlaybackRequested;
+        private bool battleCommitSaved = true;
 
         public bool IsBattleLocked => battleRunning || battleResolved;
         public bool IsRunBattle => runBattle;
@@ -246,6 +247,7 @@ namespace SpireChess.UI.Battle
             initialSetupState = setupState.Clone();
             displayedState = setupState.Clone();
             screenView.Bind(this);
+            RunSystemMenuView.Attach(screenView, () => !battleRunning);
             if (restoredResult != null)
             {
                 lastResult = restoredResult;
@@ -276,6 +278,16 @@ namespace SpireChess.UI.Battle
             row[fromIndex] = row[toIndex];
             row[toIndex] = temp;
             displayedState = setupState.Clone();
+            if (runBattle && GameApp.Instance?.Run?.UpdatePendingBattleBoard(setupState) == true)
+            {
+                if (!GameApp.Instance.Persistence.CommitSuccessful(
+                        GameApp.Instance.Run,
+                        "BattleFormationChanged"))
+                {
+                    SetStatus("站位已更新，但尚未保存");
+                    return;
+                }
+            }
             RenderFormalState();
             SetStatus("已调整站位");
         }
@@ -398,6 +410,13 @@ namespace SpireChess.UI.Battle
             battleResolved = false;
             lastResult = null;
             returnSceneName = null;
+            battleCommitSaved = true;
+            if (runBattle && GameApp.Instance?.Run?.UpdatePendingBattleBoard(setupState) == true)
+            {
+                battleCommitSaved = GameApp.Instance.Persistence.CommitSuccessful(
+                    GameApp.Instance.Run,
+                    "BattleReset");
+            }
             SetLog(new[]
             {
                 runBattle
@@ -538,6 +557,7 @@ namespace SpireChess.UI.Battle
             if (!runBattle)
             {
                 returnSceneName = "ShopTest";
+                battleCommitSaved = true;
                 return;
             }
 
@@ -546,17 +566,46 @@ namespace SpireChess.UI.Battle
                 return;
             }
 
-            GameApp.Instance.Run.TryCompleteBattle(result, out returnSceneName);
+            if (!GameApp.Instance.Run.TryCompleteBattle(result, out returnSceneName))
+            {
+                battleCommitSaved = false;
+                SetStatus("战斗结算未提交，请勿离开当前界面");
+                return;
+            }
+
+            battleCommitSaved = GameApp.Instance.Persistence.CommitSuccessful(
+                GameApp.Instance.Run,
+                "BattleCompleted");
+            if (!battleCommitSaved)
+            {
+                SetStatus("战斗已结算，但尚未保存；请稍后重试");
+            }
         }
 
         public void ReturnToFlow()
         {
-            if (!battleResolved || string.IsNullOrEmpty(returnSceneName))
+            if (!battleResolved || !battleCommitSaved || string.IsNullOrEmpty(returnSceneName))
             {
                 return;
             }
 
-            SceneManager.LoadScene(returnSceneName);
+            if (runBattle)
+            {
+                var run = GameApp.Instance.Run;
+                if (string.IsNullOrWhiteSpace(run.LastBattleContext?.NodeAttemptId) &&
+                    GameSceneNames.TryParse(returnSceneName, out var legacyReturnScene))
+                {
+                    GameApp.Instance.Router.GoTo(legacyReturnScene);
+                }
+                else
+                {
+                    GameApp.Instance.Router.GoToCurrentRunPhase(run);
+                }
+            }
+            else
+            {
+                GameApp.Instance.Router.GoTo(GameSceneId.Shop);
+            }
         }
 
         private sealed class BattlePreset

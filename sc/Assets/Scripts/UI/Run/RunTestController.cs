@@ -1,8 +1,8 @@
 using System;
 using SpireChess.App;
 using SpireChess.Run;
+using SpireChess.UI.Common;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace SpireChess.UI.Run
 {
@@ -75,13 +75,18 @@ namespace SpireChess.UI.Run
                 return result;
             }
 
+            if (!Persist("EnterNode"))
+            {
+                return result;
+            }
+
             if (run.State.Phase == RunPhase.Shop)
             {
-                SceneManager.LoadScene("ShopTest");
+                GameApp.Instance.Router.GoToCurrentRunPhase(run);
             }
             else if (run.State.Phase == RunPhase.Battle)
             {
-                SceneManager.LoadScene("BattleTest");
+                GameApp.Instance.Router.GoToCurrentRunPhase(run);
             }
             else
             {
@@ -95,33 +100,44 @@ namespace SpireChess.UI.Run
             string targetInstanceId = null)
         {
             return CompleteChoice(
-                run.SelectRewardCandidate(candidateId, targetInstanceId));
+                run.SelectRewardCandidate(candidateId, targetInstanceId),
+                "SelectReward");
         }
 
         public RunOperationResult SkipReward()
         {
-            return CompleteChoice(run.SkipRewardChoice());
+            return CompleteChoice(run.SkipRewardChoice(), "SkipReward");
         }
 
         public RunOperationResult SelectRelic(string candidateId)
         {
-            return CompleteChoice(run.SelectRelicCandidate(candidateId));
+            return CompleteChoice(run.SelectRelicCandidate(candidateId), "SelectRelic");
         }
 
         public RunOperationResult SkipRelic()
         {
-            return CompleteChoice(run.SkipRelicChoice());
+            return CompleteChoice(run.SkipRelicChoice(), "SkipRelic");
         }
 
         public RunOperationResult SelectEvent(string eventId, string optionId)
         {
             var result = run.SelectEventOption(eventId, optionId);
-            if (result.Success && run.State.Phase == RunPhase.Battle)
+            if (!result.Success)
             {
-                SceneManager.LoadScene("BattleTest");
+                SetStatus(ToErrorText(result.Error));
                 return result;
             }
-            return CompleteChoice(result);
+
+            SetStatus(result.Message);
+            if (!Persist("SelectEvent"))
+            {
+                return result;
+            }
+            if (run.State.Phase == RunPhase.Battle)
+            {
+                GameApp.Instance.Router.GoToCurrentRunPhase(run);
+            }
+            return result;
         }
 
         public RunOperationResult ApplyEnhancement(
@@ -129,27 +145,28 @@ namespace SpireChess.UI.Run
             string targetInstanceId)
         {
             return CompleteChoice(
-                run.ApplyEnhancement(recipeId, targetInstanceId));
+                run.ApplyEnhancement(recipeId, targetInstanceId),
+                "ApplyEnhancement");
         }
 
         public RunOperationResult SkipEnhancement()
         {
-            return CompleteChoice(run.SkipEnhancement());
+            return CompleteChoice(run.SkipEnhancement(), "SkipEnhancement");
         }
 
         public RunOperationResult SelectRest(string optionId)
         {
-            return CompleteChoice(run.SelectRestOption(optionId));
+            return CompleteChoice(run.SelectRestOption(optionId), "SelectRest");
         }
 
         public RunOperationResult ContinueAfterBattle()
         {
-            return CompleteChoice(run.ContinueAfterBattle());
+            return CompleteChoice(run.ContinueAfterBattle(), "ContinueAfterBattle");
         }
 
         public RunOperationResult ContinueToNextFloor()
         {
-            return CompleteChoice(run.ContinueToNextFloor());
+            return CompleteChoice(run.ContinueToNextFloor(), "ContinueToNextFloor");
         }
 
         public RunOperationResult RetryBoss()
@@ -157,7 +174,10 @@ namespace SpireChess.UI.Run
             var result = run.RetryBoss();
             if (result.Success)
             {
-                SceneManager.LoadScene("BattleTest");
+                if (Persist("RetryBoss"))
+                {
+                    GameApp.Instance.Router.GoToCurrentRunPhase(run);
+                }
             }
             else
             {
@@ -170,7 +190,14 @@ namespace SpireChess.UI.Run
         {
             GameApp.Instance.StartNewRun();
             run = GameApp.Instance.Run;
-            SetStatus("已开始新的 8B 完整地图单局");
+            if (run != null)
+            {
+                SetStatus("已开始新的 8B 完整地图单局");
+            }
+            else
+            {
+                SetStatus("新单局创建失败，原存档未被替换");
+            }
         }
 
         public void ExecuteUiAction(
@@ -225,26 +252,50 @@ namespace SpireChess.UI.Run
             initialized = true;
             if (run.State.Phase == RunPhase.Shop)
             {
-                SceneManager.LoadScene("ShopTest");
+                GameApp.Instance.Router.GoToCurrentRunPhase(run);
                 return;
             }
             if (run.State.Phase == RunPhase.Battle)
             {
-                SceneManager.LoadScene("BattleTest");
+                GameApp.Instance.Router.GoToCurrentRunPhase(run);
                 return;
             }
 
             screenView.Bind(this);
+            RunSystemMenuView.Attach(screenView);
             StatusMessage = IsChoicePhase(run.State.Phase)
                 ? "请完成当前节点选择"
                 : "选择可达节点继续三层单局";
             RefreshAll();
         }
 
-        private RunOperationResult CompleteChoice(RunOperationResult result)
+        private RunOperationResult CompleteChoice(
+            RunOperationResult result,
+            string saveReason)
         {
             SetStatus(result.Success ? result.Message : ToErrorText(result.Error));
+            if (result.Success)
+            {
+                Persist(saveReason);
+            }
             return result;
+        }
+
+        private bool Persist(string reason)
+        {
+            var app = GameApp.Instance;
+            if (app == null || !ReferenceEquals(app.Run, run) || app.Persistence == null)
+            {
+                return true;
+            }
+
+            if (app.Persistence.CommitSuccessful(run, reason))
+            {
+                return true;
+            }
+
+            SetStatus("操作已生效，但尚未保存；请稍后从菜单重试");
+            return false;
         }
 
         private void SetStatus(string message)

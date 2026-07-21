@@ -3,9 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using SpireChess.Battle;
 using SpireChess.Config;
+using SpireChess.Run;
 
 namespace SpireChess.Shop
 {
+    internal sealed class ShopSessionRestoreData
+    {
+        public int Round { get; set; }
+        public int Gold { get; set; }
+        public int TavernTier { get; set; }
+        public int RefreshCount { get; set; }
+        public int FreeRefreshes { get; set; }
+        public bool IsShopOpen { get; set; }
+        public bool IsFrozen { get; set; }
+        public bool UpgradedThisRound { get; set; }
+        public IReadOnlyList<MinionConfig> MinionOffers { get; set; }
+        public SpellConfig SpellOffer { get; set; }
+        public ShopDiscoverState PendingDiscover { get; set; }
+        public PendingEffectChoice PendingChoice { get; set; }
+        public IReadOnlyList<ActiveShopEffect> ActiveShopEffects { get; set; }
+        public IReadOnlyDictionary<string, int> PerShopEffectUsage { get; set; }
+        public IReadOnlyDictionary<string, ValueConfig> PendingPostCombatBuffs { get; set; }
+        public IReadOnlyList<EffectConfig> PendingBattleStartEffects { get; set; }
+        public ShopPhaseStats PhaseStats { get; set; }
+        public int FlourishStacks { get; set; }
+        public int CardInstanceSequence { get; set; }
+        public int RoundsWithoutUpgradeAtCurrentTier { get; set; }
+        public int PendingUpgradeDiscount { get; set; }
+        public int ScheduledGold { get; set; }
+        public ShopRuleModifiers RuleModifiers { get; set; }
+        public bool FirstPurchaseFreeAvailable { get; set; }
+        public bool FirstPaidRefreshFreeAvailable { get; set; }
+        public bool FirstMinionSaleBonusAvailable { get; set; }
+    }
+
     public sealed class ShopSession
     {
         public const string TripleDiscoveryRewardSpellId =
@@ -84,6 +115,20 @@ namespace SpireChess.Shop
         public int ScheduledGold => scheduledGold;
         public int FlourishStacks { get; private set; }
         public ShopRuleModifiers RuleModifiers => ruleModifiers.Clone();
+        internal RecordedRandom RandomStream => random as RecordedRandom;
+        internal IReadOnlyList<ActiveShopEffect> ActiveShopEffects => activeShopEffects;
+        internal IReadOnlyDictionary<string, int> PerShopEffectUsage => perShopEffectUsage;
+        internal IReadOnlyDictionary<string, ValueConfig> PendingPostCombatBuffs =>
+            pendingPostCombatBuffs;
+        internal IReadOnlyList<EffectConfig> PendingBattleStartEffects =>
+            pendingBattleStartEffects;
+        internal int CardInstanceSequence => cardInstanceSequence;
+        internal int RoundsWithoutUpgradeAtCurrentTier =>
+            roundsWithoutUpgradeAtCurrentTier;
+        internal int PendingUpgradeDiscount => pendingUpgradeDiscount;
+        internal bool FirstPurchaseFreeAvailable => firstPurchaseFreeAvailable;
+        internal bool FirstPaidRefreshFreeAvailable => firstPaidRefreshFreeAvailable;
+        internal bool FirstMinionSaleBonusAvailable => firstMinionSaleBonusAvailable;
 
         public int CurrentUpgradeCost
         {
@@ -100,6 +145,61 @@ namespace SpireChess.Shop
                     roundsWithoutUpgradeAtCurrentTier -
                     pendingUpgradeDiscount);
             }
+        }
+
+        internal void Restore(ShopSessionRestoreData data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            Round = data.Round;
+            Gold = data.Gold;
+            TavernTier = data.TavernTier;
+            RefreshCount = data.RefreshCount;
+            FreeRefreshes = data.FreeRefreshes;
+            IsShopOpen = data.IsShopOpen;
+            IsFrozen = data.IsFrozen;
+            UpgradedThisRound = data.UpgradedThisRound;
+            minionOffers.Clear();
+            minionOffers.AddRange(data.MinionOffers ?? Array.Empty<MinionConfig>());
+            SpellOffer = data.SpellOffer;
+            PendingDiscover = data.PendingDiscover;
+            PendingChoice = data.PendingChoice;
+            activeShopEffects.Clear();
+            activeShopEffects.AddRange(data.ActiveShopEffects ??
+                                       Array.Empty<ActiveShopEffect>());
+            perShopEffectUsage.Clear();
+            foreach (var pair in data.PerShopEffectUsage ??
+                     new Dictionary<string, int>())
+            {
+                perShopEffectUsage[pair.Key] = pair.Value;
+            }
+
+            pendingPostCombatBuffs.Clear();
+            foreach (var pair in data.PendingPostCombatBuffs ??
+                     new Dictionary<string, ValueConfig>())
+            {
+                pendingPostCombatBuffs[pair.Key] = pair.Value;
+            }
+
+            pendingBattleStartEffects.Clear();
+            pendingBattleStartEffects.AddRange(data.PendingBattleStartEffects ??
+                                               Array.Empty<EffectConfig>());
+            PhaseStats.RefreshCount = data.PhaseStats?.RefreshCount ?? 0;
+            PhaseStats.SpellUsedCount = data.PhaseStats?.SpellUsedCount ?? 0;
+            PhaseStats.SpellBoughtCount = data.PhaseStats?.SpellBoughtCount ?? 0;
+            PhaseStats.MinionBoughtCount = data.PhaseStats?.MinionBoughtCount ?? 0;
+            FlourishStacks = data.FlourishStacks;
+            cardInstanceSequence = data.CardInstanceSequence;
+            roundsWithoutUpgradeAtCurrentTier = data.RoundsWithoutUpgradeAtCurrentTier;
+            pendingUpgradeDiscount = data.PendingUpgradeDiscount;
+            scheduledGold = data.ScheduledGold;
+            ruleModifiers = data.RuleModifiers?.Clone() ?? new ShopRuleModifiers();
+            firstPurchaseFreeAvailable = data.FirstPurchaseFreeAvailable;
+            firstPaidRefreshFreeAvailable = data.FirstPaidRefreshFreeAvailable;
+            firstMinionSaleBonusAvailable = data.FirstMinionSaleBonusAvailable;
         }
 
         public ShopOperationResult StartNextRound()

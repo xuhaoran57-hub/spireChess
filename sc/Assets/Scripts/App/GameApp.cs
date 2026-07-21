@@ -4,6 +4,7 @@ using System.Linq;
 using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.Save;
+using SpireChess.UI.MainMenu;
 using SpireChess.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,16 +13,16 @@ namespace SpireChess.App
 {
     public sealed class GameApp : MonoBehaviour
     {
-        private const string TestSaveKey = "save_smoke_test.json";
-        private const string RunTestSceneName = "RunTest";
         private const string BalanceRunSeedArgument = "-balanceRunSeed";
         private const string BalanceRunOutputArgument = "-balanceRunOutput";
         private static GameApp instance;
 
         public static GameApp Instance => instance;
         public ConfigService Configs { get; private set; }
-        public SaveService Saves { get; private set; }
         public RunSession Run { get; private set; }
+        public RunSaveRepository RunSaves { get; private set; }
+        public RunPersistenceCoordinator Persistence { get; private set; }
+        public SceneFlowRouter Router { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -63,30 +64,109 @@ namespace SpireChess.App
         {
             var serializer = new NewtonsoftJsonSerializer();
             Configs = new ConfigService(serializer);
-            Saves = new SaveService(new FileSaveStorage(), serializer);
 
             var validation = Configs.LoadFromResources();
             LogValidation(validation);
             validation.ThrowIfInvalid();
+            RunSaves = new RunSaveRepository(Configs);
+            var persistenceEnabled = ReadIntArgument(BalanceRunSeedArgument) == null &&
+                                     !HasArgument("-runTests");
+            Persistence = new RunPersistenceCoordinator(RunSaves, persistenceEnabled);
+            Router = new SceneFlowRouter();
 
-            StartNewRun();
-
-            RunSaveSmokeTest();
+            if (ReadIntArgument(BalanceRunSeedArgument).HasValue)
+            {
+                StartNewRun(ReadIntArgument(BalanceRunSeedArgument));
+            }
 
             Debug.Log(
                 $"[GameApp] Ready. Loaded {Configs.Minions.Count} minions " +
-                $"({Configs.Minions.Count(minion => minion.IsToken)} tokens) and {Configs.Spells.Count} spells.");
+                $"({Configs.Minions.Count(minion => minion.IsToken)} tokens) and " +
+                $"{Configs.Spells.Count} spells. config={Configs.Identity?.ConfigHash}.");
         }
 
         public void StartNewRun(int? randomSeed = null)
         {
-            Run?.ReleaseOutstandingRewards();
             var seed = randomSeed ?? ReadIntArgument(BalanceRunSeedArgument) ??
                 Environment.TickCount;
-            Run = new RunSession(
-                Configs,
-                seed);
+            var candidate = new RunSession(Configs, seed);
+            if (!Persistence.BeginNewRun(candidate))
+            {
+                candidate.ReleaseOutstandingRewards();
+                return;
+            }
+
+            Run?.ReleaseOutstandingRewards();
+            Run = candidate;
             EnableBalanceRunTelemetryIfRequested(seed);
+        }
+
+        public RunSaveLoadResult InspectRunSave()
+        {
+            return RunSaves.Inspect();
+        }
+
+        public RunSaveLoadResult ContinueRun()
+        {
+            var loaded = RunSaves.Load();
+            if (!loaded.CanContinue || loaded.Session == null)
+            {
+                return loaded;
+            }
+
+            Run?.ReleaseOutstandingRewards();
+            Run = loaded.Session;
+            Persistence.AdoptLoadedRun(loaded.Document);
+            if (loaded.UsedBackup)
+            {
+                try
+                {
+                    RunSaves.RepairMainFromBackup();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogWarning("[Save] Backup loaded but main repair failed: " + exception.Message);
+                }
+            }
+
+            Debug.Log(
+                $"[Save] Run resumed. revision={loaded.Document.Revision}, " +
+                $"phase={Run.State.Phase}.");
+            return loaded;
+        }
+
+        public bool SaveAndReturnToMainMenu()
+        {
+            if (Run == null || !Persistence.RetrySave(Run, "ReturnToMainMenu"))
+            {
+                return false;
+            }
+
+            Run = null;
+            Persistence.Reset();
+            Router.GoToMainMenu();
+            return true;
+        }
+
+        public void AbandonRun()
+        {
+            Run?.ReleaseOutstandingRewards();
+            Run = null;
+            RunSaves.Delete();
+            Persistence.Reset();
+        }
+
+        public void ClearInMemoryRunForAutomatedTests()
+        {
+            if (!HasArgument("-runTests"))
+            {
+                throw new InvalidOperationException(
+                    "In-memory run reset is only available to the Unity test runner.");
+            }
+
+            Run?.ReleaseOutstandingRewards();
+            Run = null;
+            Persistence.Reset();
         }
 
         private void EnableBalanceRunTelemetryIfRequested(int seed)
@@ -140,20 +220,34 @@ namespace SpireChess.App
             return null;
         }
 
+        private static bool HasArgument(string name)
+        {
+            return Environment.GetCommandLineArgs().Any(value =>
+                string.Equals(value, name, StringComparison.OrdinalIgnoreCase));
+        }
+
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (!ShouldAutoOpenRunTest(scene.name))
+            if (instance == null || instance.Router == null)
             {
                 return;
             }
 
-            Debug.Log($"[GameApp] Auto loading {RunTestSceneName} from {scene.name}.");
-            SceneManager.LoadScene(RunTestSceneName);
-        }
-
-        private static bool ShouldAutoOpenRunTest(string sceneName)
-        {
-            return sceneName == "Boot" || sceneName == "SampleScene" || sceneName == "MainMenu";
+            if (scene.name == "Boot" || scene.name == "SampleScene")
+            {
+                if (instance.Run != null && ReadIntArgument(BalanceRunSeedArgument).HasValue)
+                {
+                    instance.Router.GoToCurrentRunPhase(instance.Run);
+                }
+                else
+                {
+                    instance.Router.GoToMainMenu();
+                }
+            }
+            else if (scene.name == GameSceneNames.MainMenu)
+            {
+                MainMenuController.EnsurePresent();
+            }
         }
 
         private static void LogValidation(ConfigValidationResult validation)
@@ -174,25 +268,20 @@ namespace SpireChess.App
             }
         }
 
-        private void RunSaveSmokeTest()
+        private void OnApplicationPause(bool paused)
         {
-            var data = new TestSaveData
+            if (paused && Run != null && Persistence?.HasUnsavedChanges == true)
             {
-                Version = "0.1",
-                Gold = 3,
-                TestMinionIds = Configs.Minions
-                    .Where(minion => !minion.IsToken)
-                    .Take(3)
-                    .Select(minion => minion.Id)
-                    .ToList()
-            };
+                Persistence.RetrySave(Run, "ApplicationPause");
+            }
+        }
 
-            Saves.Save(TestSaveKey, data);
-            var loaded = Saves.Load<TestSaveData>(TestSaveKey);
-
-            Debug.Log(
-                $"[Save] Smoke test passed. gold={loaded.Gold}, " +
-                $"minions={loaded.TestMinionIds.Count}, path={Application.persistentDataPath}/{TestSaveKey}");
+        private void OnApplicationQuit()
+        {
+            if (Run != null && Persistence?.HasUnsavedChanges == true)
+            {
+                Persistence.RetrySave(Run, "ApplicationQuit");
+            }
         }
     }
 }

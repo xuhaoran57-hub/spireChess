@@ -245,6 +245,37 @@ namespace SpireChess.Shop
             pendingCombatModifiers.Clear();
             return consumed;
         }
+
+        internal static ShopCardInstance Restore(
+            string instanceId,
+            ShopCardType cardType,
+            MinionConfig minion,
+            SpellConfig spell,
+            bool isGolden,
+            int permanentAttackBonus,
+            int permanentHealthBonus,
+            int flourishAttackBonus,
+            IEnumerable<string> permanentKeywords,
+            bool tripleDiscoveryPending,
+            bool expiresAtShopEnd,
+            IEnumerable<PendingCombatModifier> pendingModifiers)
+        {
+            var restored = new ShopCardInstance(
+                instanceId,
+                cardType,
+                minion,
+                spell,
+                isGolden,
+                permanentAttackBonus,
+                permanentHealthBonus,
+                permanentKeywords,
+                tripleDiscoveryPending,
+                expiresAtShopEnd);
+            restored.SetFlourishAttackBonus(flourishAttackBonus);
+            restored.pendingCombatModifiers.AddRange(
+                pendingModifiers ?? Array.Empty<PendingCombatModifier>());
+            return restored;
+        }
     }
 
     public sealed class ShopEventData
@@ -524,6 +555,27 @@ namespace SpireChess.Shop
             return card != null &&
                 card.CardType == ShopCardType.Minion &&
                 !card.Minion.IsToken;
+        }
+
+        internal void RestoreSlots(
+            IReadOnlyList<ShopCardInstance> restoredBench,
+            IReadOnlyList<ShopCardInstance> restoredBattle)
+        {
+            if (restoredBench == null || restoredBench.Count != bench.Length ||
+                restoredBattle == null || restoredBattle.Count != battle.Length)
+            {
+                throw new InvalidOperationException("Player collection snapshot has invalid slots.");
+            }
+
+            for (var index = 0; index < bench.Length; index++)
+            {
+                bench[index] = restoredBench[index];
+            }
+
+            for (var index = 0; index < battle.Length; index++)
+            {
+                battle[index] = restoredBattle[index];
+            }
         }
     }
 }

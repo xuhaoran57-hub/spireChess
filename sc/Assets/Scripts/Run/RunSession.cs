@@ -22,8 +22,8 @@ namespace SpireChess.Run
         private const int RelicStreamId = 404;
 
         private readonly ConfigService configs;
-        private readonly Random rewardRandom;
-        private readonly Random eventRandom;
+        private readonly RecordedRandom rewardRandom;
+        private readonly RecordedRandom eventRandom;
         private readonly IMapProvider mapProvider;
         private readonly CoreActivationEvidence coreEvidence = new CoreActivationEvidence();
         private int attemptSequence;
@@ -50,10 +50,10 @@ namespace SpireChess.Run
             Shop = new ShopSession(
                 configs.Minions,
                 configs.Spells,
-                new Random(SeedDeriver.Combine(seed, ShopStreamId)));
+                new RecordedRandom(SeedDeriver.Combine(seed, ShopStreamId)));
             Shop.EventRaised += OnShopEvent;
-            rewardRandom = new Random(SeedDeriver.Combine(seed, RewardStreamId));
-            eventRandom = new Random(SeedDeriver.Combine(seed, EventStreamId));
+            rewardRandom = new RecordedRandom(SeedDeriver.Combine(seed, RewardStreamId));
+            eventRandom = new RecordedRandom(SeedDeriver.Combine(seed, EventStreamId));
             this.mapProvider = mapProvider ?? (configs.RunMaps.Count == 0
                 ? null
                 : new FixedMapProvider(configs.RunMaps, configs.MapRuleProfilesById));
@@ -63,7 +63,33 @@ namespace SpireChess.Run
                 configs,
                 State,
                 Shop,
-                new Random(SeedDeriver.Combine(seed, RelicStreamId)));
+                new RecordedRandom(SeedDeriver.Combine(seed, RelicStreamId)));
+            Relics.Activated += OnRelicActivated;
+        }
+
+        private RunSession(
+            ConfigService configs,
+            IMapProvider mapProvider,
+            RunState state,
+            ShopSession shop,
+            RecordedRandom rewardRandom,
+            RecordedRandom eventRandom,
+            RecordedRandom relicRandom)
+        {
+            this.configs = configs ?? throw new ArgumentNullException(nameof(configs));
+            this.mapProvider = mapProvider;
+            State = state ?? throw new ArgumentNullException(nameof(state));
+            Shop = shop ?? throw new ArgumentNullException(nameof(shop));
+            this.rewardRandom = rewardRandom ??
+                throw new ArgumentNullException(nameof(rewardRandom));
+            this.eventRandom = eventRandom ??
+                throw new ArgumentNullException(nameof(eventRandom));
+            Relics = new RelicService(
+                configs,
+                state,
+                shop,
+                relicRandom ?? throw new ArgumentNullException(nameof(relicRandom)));
+            Shop.EventRaised += OnShopEvent;
             Relics.Activated += OnRelicActivated;
         }
 
@@ -75,6 +101,69 @@ namespace SpireChess.Run
         public BattleSimulationResult LastBattleResult { get; private set; }
         public RunTelemetry Telemetry { get; private set; }
         public bool HasStageFourMap => State.CurrentMap != null;
+        internal RecordedRandom ShopRandom => Shop.RandomStream;
+        internal RecordedRandom RewardRandom => rewardRandom;
+        internal RecordedRandom EventRandom => eventRandom;
+        internal RecordedRandom RelicRandom => Relics.RandomStream;
+        internal int AttemptSequence => attemptSequence;
+        internal int RewardSequence => rewardSequence;
+        internal int ChoiceSequence => choiceSequence;
+        internal CoreActivationEvidence CoreEvidence => coreEvidence;
+        internal bool TurnTenSnapshotRecorded => turnTenSnapshotRecorded;
+        internal bool RunEndedRecorded => runEndedRecorded;
+
+        internal static RunSession Restore(
+            ConfigService configs,
+            IMapProvider mapProvider,
+            RunState state,
+            ShopSession shop,
+            RecordedRandom rewardRandom,
+            RecordedRandom eventRandom,
+            RecordedRandom relicRandom,
+            BattleContext pendingBattle,
+            BattleContext lastBattleContext,
+            BattleSimulationResult lastBattleResult,
+            int attemptSequence,
+            int rewardSequence,
+            int choiceSequence,
+            int relicChoiceSequence,
+            int relicCandidateSequence,
+            CoreActivationEvidence evidence,
+            bool turnTenSnapshotRecorded,
+            bool runEndedRecorded)
+        {
+            var restored = new RunSession(
+                configs,
+                mapProvider,
+                state,
+                shop,
+                rewardRandom,
+                eventRandom,
+                relicRandom)
+            {
+                PendingBattle = pendingBattle,
+                LastBattleContext = lastBattleContext,
+                LastBattleResult = lastBattleResult,
+                attemptSequence = attemptSequence,
+                rewardSequence = rewardSequence,
+                choiceSequence = choiceSequence,
+                turnTenSnapshotRecorded = turnTenSnapshotRecorded,
+                runEndedRecorded = runEndedRecorded
+            };
+            restored.Relics.RestoreSequences(relicChoiceSequence, relicCandidateSequence);
+            if (evidence != null)
+            {
+                restored.coreEvidence.ShieldEvents = evidence.ShieldEvents;
+                restored.coreEvidence.ShieldBenefitEvents = evidence.ShieldBenefitEvents;
+                restored.coreEvidence.SummonSuccesses = evidence.SummonSuccesses;
+                restored.coreEvidence.NonTokenDeathBenefitEvents =
+                    evidence.NonTokenDeathBenefitEvents;
+                restored.coreEvidence.SpellsUsed = evidence.SpellsUsed;
+                restored.coreEvidence.Refreshes = evidence.Refreshes;
+            }
+
+            return restored;
+        }
 
         public void EnableTelemetry(RunTelemetry telemetry)
         {
@@ -685,6 +774,23 @@ namespace SpireChess.Run
             PendingBattle = context ?? throw new ArgumentNullException(nameof(context));
             LastBattleContext = null;
             LastBattleResult = null;
+        }
+
+        public bool UpdatePendingBattleBoard(BattleBoardState board)
+        {
+            if (PendingBattle == null || board == null || State.Phase != RunPhase.Battle)
+            {
+                return false;
+            }
+
+            PendingBattle = new BattleContext(
+                board,
+                PendingBattle.EncounterName,
+                PendingBattle.ReturnSceneName,
+                PendingBattle.NodeAttemptId,
+                PendingBattle.EncounterId,
+                PendingBattle.BattleSeed);
+            return true;
         }
 
         public bool TryCompleteBattle(BattleSimulationResult result, out string returnSceneName)

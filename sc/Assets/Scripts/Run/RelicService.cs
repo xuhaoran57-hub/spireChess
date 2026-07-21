@@ -35,6 +35,15 @@ namespace SpireChess.Run
         public event Action<RelicActivationData> Activated;
 
         public bool Enabled => configs.Relics.Count > 0;
+        internal RecordedRandom RandomStream => random as RecordedRandom;
+        internal int ChoiceSequence => choiceSequence;
+        internal int CandidateSequence => candidateSequence;
+
+        internal void RestoreSequences(int restoredChoiceSequence, int restoredCandidateSequence)
+        {
+            choiceSequence = restoredChoiceSequence;
+            candidateSequence = restoredCandidateSequence;
+        }
 
         public bool HasAvailable(string grade)
         {

@@ -60,6 +60,7 @@ namespace SpireChess.Config
         public IReadOnlyList<RelicConfig> Relics { get; private set; } = Array.Empty<RelicConfig>();
         public IReadOnlyDictionary<string, RelicConfig> RelicsById => relicsById;
         public ContentReleaseConfig ContentRelease { get; private set; }
+        public ConfigIdentity Identity { get; private set; }
 
         public ConfigValidationResult LoadFromResources(
             string minionResourcePath = "Configs/Json/minions.v0.1",
@@ -123,6 +124,22 @@ namespace SpireChess.Config
 
             ContentRelease = serializer.FromJson<ContentReleaseConfig>(contentReleaseAsset.text);
             ValidateAndApplyContentRelease(result);
+            if (ContentRelease != null)
+            {
+                Identity = ConfigIdentity.Create(ContentRelease, new[]
+                {
+                    minionAsset.text,
+                    spellAsset.text,
+                    encounterAsset.text,
+                    rewardAsset.text,
+                    eventAsset.text,
+                    relicAsset?.text,
+                    contentReleaseAsset.text,
+                    mapAsset.text,
+                    enhancementAsset.text,
+                    restAsset.text
+                });
+            }
             return result;
         }
 
@@ -198,6 +215,7 @@ namespace SpireChess.Config
 
             Version = minionFile.Version;
             ContentRelease = null;
+            Identity = null;
             Minions = minionFile.Minions ?? new List<MinionConfig>();
             Spells = spellFile.Spells ?? new List<SpellConfig>();
 
@@ -355,6 +373,96 @@ namespace SpireChess.Config
         public bool TryGetRelic(string id, out RelicConfig config)
         {
             return relicsById.TryGetValue(id ?? string.Empty, out config);
+        }
+
+        public bool TryGetEffect(
+            string ownerConfigId,
+            string effectId,
+            out EffectConfig effect)
+        {
+            effect = null;
+            if (string.IsNullOrWhiteSpace(effectId))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(ownerConfigId))
+            {
+                if (minionsById.TryGetValue(ownerConfigId, out var minion))
+                {
+                    effect = EnumerateEffects(minion.Effects)
+                        .Concat(EnumerateEffects(minion.GoldenEffects))
+                        .FirstOrDefault(value => value.Id == effectId);
+                    return effect != null;
+                }
+
+                if (spellsById.TryGetValue(ownerConfigId, out var spell))
+                {
+                    effect = EnumerateEffects(spell.Effects)
+                        .FirstOrDefault(value => value.Id == effectId);
+                    return effect != null;
+                }
+            }
+
+            effect = Minions.SelectMany(value => EnumerateEffects(value.Effects)
+                    .Concat(EnumerateEffects(value.GoldenEffects)))
+                .Concat(Spells.SelectMany(value => EnumerateEffects(value.Effects)))
+                .FirstOrDefault(value => value.Id == effectId);
+            return effect != null;
+        }
+
+        public bool TryGetEffectReference(
+            EffectConfig effect,
+            out string ownerConfigId,
+            out string effectId)
+        {
+            ownerConfigId = null;
+            effectId = effect?.Id;
+            if (effect == null || string.IsNullOrWhiteSpace(effect.Id))
+            {
+                return false;
+            }
+
+            foreach (var minion in Minions)
+            {
+                if (EnumerateEffects(minion.Effects)
+                        .Concat(EnumerateEffects(minion.GoldenEffects))
+                        .Any(value => ReferenceEquals(value, effect)))
+                {
+                    ownerConfigId = minion.Id;
+                    return true;
+                }
+            }
+
+            foreach (var spell in Spells)
+            {
+                if (EnumerateEffects(spell.Effects)
+                    .Any(value => ReferenceEquals(value, effect)))
+                {
+                    ownerConfigId = spell.Id;
+                    return true;
+                }
+            }
+
+            return TryGetEffect(null, effect.Id, out _);
+        }
+
+        private static IEnumerable<EffectConfig> EnumerateEffects(
+            IEnumerable<EffectConfig> effects)
+        {
+            foreach (var effect in effects ?? Enumerable.Empty<EffectConfig>())
+            {
+                if (effect == null)
+                {
+                    continue;
+                }
+
+                yield return effect;
+                foreach (var fallback in EnumerateEffects(effect.FallbackEffects))
+                {
+                    yield return fallback;
+                }
+            }
         }
 
         private static Dictionary<string, T> ToDictionary<T>(

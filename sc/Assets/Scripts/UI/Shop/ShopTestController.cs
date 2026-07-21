@@ -6,8 +6,8 @@ using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.Shop;
 using SpireChess.UI;
+using SpireChess.UI.Common;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace SpireChess.UI.Shop
 {
@@ -25,6 +25,7 @@ namespace SpireChess.UI.Shop
         private bool statusIsError;
         private int statusRevision;
         private int renderedFormalStatusRevision = -1;
+        private bool lastPersistenceSucceeded = true;
 
         public ShopSession Session => session;
         public bool IsInitialized => initialized;
@@ -119,6 +120,7 @@ namespace SpireChess.UI.Shop
             {
                 screenView.gameObject.SetActive(true);
                 screenView.Bind(this);
+                RunSystemMenuView.Attach(screenView);
             }
             SetStatus($"第 {session.Round} 回合商店已开启");
             RefreshAll();
@@ -232,9 +234,16 @@ namespace SpireChess.UI.Shop
                           runSession.State.CurrentAttempt?.NodeType == RunNodeType.Shop;
             var result = runSession.EndShopAndPrepareBattle(mapShop ? "RunTest" : "ShopTest");
             ApplyOperation(result, mapShop ? "商店已结束，返回地图" : "阵容已锁定，进入战斗", true);
-            if (result.Success)
+            if (result.Success && lastPersistenceSucceeded)
             {
-                SceneManager.LoadScene(mapShop ? "RunTest" : "BattleTest");
+                if (mapShop)
+                {
+                    GameApp.Instance.Router.GoToCurrentRunPhase(runSession);
+                }
+                else
+                {
+                    GameApp.Instance.Router.GoTo(GameSceneId.Battle);
+                }
             }
 
             return result;
@@ -251,6 +260,10 @@ namespace SpireChess.UI.Shop
             SetStatus(
                 result.Success ? result.Message : BuildRunErrorMessage(result.Error),
                 !result.Success);
+            if (result.Success)
+            {
+                Persist("ClaimPendingReward");
+            }
             RefreshAll();
             return result;
         }
@@ -266,6 +279,10 @@ namespace SpireChess.UI.Shop
             SetStatus(
                 result.Success ? result.Message : BuildRunErrorMessage(result.Error),
                 !result.Success);
+            if (result.Success)
+            {
+                Persist("SkipPendingReward");
+            }
             RefreshAll();
             return result;
         }
@@ -445,6 +462,7 @@ namespace SpireChess.UI.Shop
             bool clearSelection)
         {
             LastOperationResult = result;
+            lastPersistenceSucceeded = true;
             if (result.Success)
             {
                 if (clearSelection)
@@ -453,6 +471,7 @@ namespace SpireChess.UI.Shop
                 }
 
                 SetStatus(successMessage ?? "操作成功");
+                lastPersistenceSucceeded = Persist(successMessage ?? "ShopOperation");
             }
             else
             {
@@ -461,6 +480,24 @@ namespace SpireChess.UI.Shop
 
             RefreshAll();
             return result;
+        }
+
+        private bool Persist(string reason)
+        {
+            var app = GameApp.Instance;
+            if (runSession == null || app == null ||
+                !ReferenceEquals(app.Run, runSession) || app.Persistence == null)
+            {
+                return true;
+            }
+
+            if (app.Persistence.CommitSuccessful(runSession, reason))
+            {
+                return true;
+            }
+
+            SetStatus("操作已生效，但尚未保存；请稍后从菜单重试", true);
+            return false;
         }
 
         private void Subscribe()

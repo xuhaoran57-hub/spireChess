@@ -185,17 +185,7 @@ namespace SpireChess.Editor
         private static string ComputeConfigHash(string dataPath)
         {
             var configRoot = Path.Combine(dataPath, "Resources", "Configs", "Json");
-            var files = new[]
-            {
-                "minions.v0.1.json",
-                "spells.v0.1.json",
-                "encounters.v0.1.json",
-                "rewards.v0.1.json",
-                "events.v0.1.json",
-                "relics.v0.1.json",
-                "content-release.v0.1.json"
-            };
-            return BalanceConfigHasher.Compute(files
+            return BalanceConfigHasher.Compute(ConfigIdentity.ResourceFileNames
                 .Select(file => File.ReadAllText(Path.Combine(configRoot, file)))
                 .ToArray());
         }

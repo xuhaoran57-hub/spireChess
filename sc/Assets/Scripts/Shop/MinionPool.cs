@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SpireChess.Config;
 
 namespace SpireChess.Shop
@@ -212,6 +213,28 @@ namespace SpireChess.Shop
         public int GetRemainingCopies(string minionId)
         {
             return remainingCopies.TryGetValue(minionId, out var count) ? count : 0;
+        }
+
+        internal IReadOnlyDictionary<string, int> RemainingCopies => remainingCopies;
+
+        internal void RestoreRemainingCopies(IReadOnlyDictionary<string, int> restored)
+        {
+            if (restored == null || restored.Count != remainingCopies.Count ||
+                restored.Keys.Any(id => !remainingCopies.ContainsKey(id)))
+            {
+                throw new InvalidOperationException("Minion pool snapshot does not match content.");
+            }
+
+            foreach (var pair in restored)
+            {
+                if (pair.Value < 0 || pair.Value > initialCopies[pair.Key])
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid remaining pool copies for {pair.Key}: {pair.Value}.");
+                }
+
+                remainingCopies[pair.Key] = pair.Value;
+            }
         }
     }
 }

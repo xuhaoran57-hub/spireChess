@@ -402,6 +402,16 @@ namespace SpireChess.Run
             pendingCardRewards.RemoveAt(0);
             return reward;
         }
+
+        internal void RestoreCollections(
+            IEnumerable<PendingCardReward> rewards,
+            IEnumerable<OwnedRelicState> relics)
+        {
+            pendingCardRewards.Clear();
+            pendingCardRewards.AddRange(rewards ?? Array.Empty<PendingCardReward>());
+            ownedRelics.Clear();
+            ownedRelics.AddRange(relics ?? Array.Empty<OwnedRelicState>());
+        }
     }
 
     public sealed class RunStatistics
@@ -411,7 +421,7 @@ namespace SpireChess.Run
             StartedAtUtc = DateTime.UtcNow;
         }
 
-        public DateTime StartedAtUtc { get; }
+        public DateTime StartedAtUtc { get; internal set; }
         public DateTime? CompletedAtUtc { get; internal set; }
         public int BattlesWon { get; internal set; }
         public int BattlesNotWon { get; internal set; }

@@ -600,6 +600,23 @@ namespace SpireChess.Run
                 : RunNodeStatus.Locked;
         }
 
+        internal IReadOnlyDictionary<string, RunNodeStatus> Statuses => statusById;
+
+        internal void RestoreStatuses(
+            IReadOnlyDictionary<string, RunNodeStatus> restoredStatuses)
+        {
+            if (restoredStatuses == null || restoredStatuses.Count != statusById.Count ||
+                restoredStatuses.Keys.Any(id => !statusById.ContainsKey(id)))
+            {
+                throw new InvalidOperationException("Map progress snapshot does not match the map.");
+            }
+
+            foreach (var pair in restoredStatuses)
+            {
+                statusById[pair.Key] = pair.Value;
+            }
+        }
+
         internal bool TryEnter(string nodeId)
         {
             if (GetStatus(nodeId) != RunNodeStatus.Reachable)

@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 7B、8A、8B 的正式 Unity UI、全量自动化、双分辨率截图和交互式人工验收已完成，当前改动冻结为新的正式运行时候选。
+当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 正式启动流程与单局存档恢复已完成代码、EditMode 264/264、PlayMode 22/22 和双分辨率 UI 截图，待执行真实进程退出、主备损坏及战斗中断人工验收后建立候选。
 
 ## 已完成：阶段 0 项目准备
 
@@ -445,6 +445,19 @@
 - [x] 完成 `PF_RunMapNode`、`PF_RunMapEdge`、`PF_RunRelicEntry`、`PF_RunChoiceOption`、`PF_RunScreen`、`RunUiPreview` 和 `RunTest` 序列化接线；全量 EditMode 229 / 229、PlayMode 20 / 20 通过。
 - [x] 完成 1920×1080、1920×1200 地图及 1920×1080 遗珍选择截图检查；响应式主体、横向滚动、连线层级、遗珍长文案和三选一布局无核心裁切。
 - [x] 人工完成三条 C4 路线、事件额外战斗和三层流程验收，地图、遗珍与战斗正式 UI 均无阻塞问题；纳入新候选，旧 R17 S1/S2 不继续补跑。
+
+## P0：阶段 9A 正式启动流程与单局存档恢复
+
+- [x] 完成阶段 9A 技术方案，见 `phase-9a-save-resume-technical-design-v0.1.md`。
+- [x] 集中生成运行时配置身份，确保内容版本、规则版本和完整配置哈希与平衡门禁共用同一算法。
+- [x] 实现保持现有 `System.Random` 输出不变的四条可重放随机流，并补齐 golden/恢复延续测试。
+- [x] 定义 v1 存档 DTO、完整领域快照、无副作用恢复构造和领域不变量验证。
+- [x] 实现 `.tmp` / 主档 / `.bak` 原子存储、SHA-256 校验、损坏回退和严格版本兼容。
+- [x] 实现 `RunPersistenceCoordinator` 和 `SceneFlowRouter`，将 Run/Shop/Battle 成功操作、保存和场景跳转收口。
+- [x] 修改 `GameApp`：Boot 进入正式 MainMenu，不再启动即新建单局或运行写盘烟测。
+- [x] 制作 `PF_MainMenuScreen`、确认弹窗和 Run/Shop/Battle 共用系统菜单。
+- [x] 覆盖全部稳定 `RunPhase` 的 EditMode/PlayMode 保存恢复回归；全量 EditMode 264 / 264、PlayMode 22 / 22 通过。
+- [ ] 完成主档损坏、备份恢复、真实进程退出、战斗中断和双分辨率人工验收，并建立新候选。
 
 ## 暂缓
 

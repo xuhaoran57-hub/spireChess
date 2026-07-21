@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SpireChess.Battle;
+using SpireChess.Utils;
 
 namespace SpireChess.Simulation
 {
@@ -283,41 +281,7 @@ namespace SpireChess.Simulation
     {
         public static string Compute(params string[] jsonDocuments)
         {
-            if (jsonDocuments == null || jsonDocuments.Length == 0)
-            {
-                throw new ArgumentException("At least one JSON document is required.", nameof(jsonDocuments));
-            }
-
-            var canonical = string.Join("\n", jsonDocuments.Select(document =>
-                Canonicalize(JToken.Parse(document)).ToString(Formatting.None)));
-            using (var sha = SHA256.Create())
-            {
-                return BitConverter.ToString(
-                        sha.ComputeHash(Encoding.UTF8.GetBytes(canonical)))
-                    .Replace("-", string.Empty).ToLowerInvariant();
-            }
-        }
-
-        private static JToken Canonicalize(JToken token)
-        {
-            var obj = token as JObject;
-            if (obj != null)
-            {
-                var sorted = new JObject();
-                foreach (var property in obj.Properties().OrderBy(value => value.Name, StringComparer.Ordinal))
-                {
-                    sorted.Add(property.Name, Canonicalize(property.Value));
-                }
-                return sorted;
-            }
-
-            var array = token as JArray;
-            if (array != null)
-            {
-                return new JArray(array.Select(Canonicalize));
-            }
-
-            return token.DeepClone();
+            return CanonicalJson.ComputeSha256(jsonDocuments);
         }
     }
 }
