@@ -232,6 +232,9 @@ namespace SpireChess.Config
 
         [JsonProperty("followupRewardTableId")]
         public string FollowupRewardTableId { get; set; }
+
+        [JsonProperty("followupRelicGrade")]
+        public string FollowupRelicGrade { get; set; }
     }
 
     public sealed class RunEffectConfig

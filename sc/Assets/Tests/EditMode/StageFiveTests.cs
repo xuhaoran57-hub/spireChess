@@ -28,7 +28,8 @@ namespace SpireChess.Tests.EditMode
             Assert.That(configs.ContentRelease, Is.Not.Null);
             Assert.That(configs.ContentRelease.MinionIds, Has.Count.EqualTo(67));
             Assert.That(configs.ContentRelease.SpellIds, Has.Count.EqualTo(16));
-            Assert.That(configs.EventsById, Has.Count.EqualTo(10));
+            Assert.That(configs.EventsById, Has.Count.EqualTo(11));
+            Assert.That(configs.Relics, Has.Count.EqualTo(15));
             Assert.That(configs.Encounters.Count(value => value.Category == "Normal"),
                 Is.GreaterThanOrEqualTo(6));
             Assert.That(configs.Minions.Where(value => !value.IsToken),

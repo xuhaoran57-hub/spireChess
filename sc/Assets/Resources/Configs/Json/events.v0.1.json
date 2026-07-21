@@ -13,7 +13,8 @@
         { "eventId": "tranquil_grove", "weight": 1 },
         { "eventId": "merchant_cache", "weight": 1 },
         { "eventId": "risky_map", "weight": 1 },
-        { "eventId": "starlit_wager", "weight": 1 }
+        { "eventId": "starlit_wager", "weight": 1 },
+        { "eventId": "sealed_reliquary", "weight": 1 }
       ]
     }
   ],
@@ -86,6 +87,13 @@
       "options": [
         { "id": "wager", "label": "失去 4 点生命；下个商店 +5 金币", "effects": [{ "type": "LoseHealth", "amount": 4 }, { "type": "NextShopGold", "amount": 5 }] },
         { "id": "decline", "label": "恢复 1 点生命", "effects": [{ "type": "HealHealth", "amount": 1 }] }
+      ]
+    },
+    {
+      "id": "sealed_reliquary", "name": "密封珍库", "description": "库门后的遗珍以生命为价。查看候选不会立刻付出代价。",
+      "options": [
+        { "id": "inspect", "label": "查看三件奇物级遗珍", "effects": [], "followupRelicGrade": "Curio" },
+        { "id": "leave", "label": "离开", "effects": [] }
       ]
     }
   ]

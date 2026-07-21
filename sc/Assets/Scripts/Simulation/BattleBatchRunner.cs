@@ -205,6 +205,15 @@ namespace SpireChess.Simulation
             builder.Append("F:")
                 .Append(result.FinalState.PlayerFlourishStacks).Append(':')
                 .Append(result.FinalState.EnemyFlourishStacks).Append('|');
+            var rules = result.FinalState.RuleModifiers;
+            builder.Append("M:")
+                .Append(rules.PlayerExtraDeathrattleTriggers).Append(':')
+                .Append(rules.PlayerFirstNonTokenDeathSummonCount).Append(':')
+                .Append(rules.PlayerFirstNonTokenDeathTokenId ?? string.Empty).Append(':')
+                .Append(rules.PlayerFirstNonTokenDeathTokenAttack).Append(':')
+                .Append(rules.PlayerFirstNonTokenDeathTokenHealth).Append(':')
+                .Append(rules.PlayerBattleStartShieldTargets).Append(':')
+                .Append(rules.PlayerDistinctRaceStatBonus).Append('|');
             foreach (var delta in result.PermanentDeltas
                          .OrderBy(value => value.SourceInstanceId))
             {

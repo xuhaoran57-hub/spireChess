@@ -25,5 +25,8 @@ namespace SpireChess.Config
 
         [JsonProperty("rewardTableIds")]
         public List<string> RewardTableIds { get; set; } = new List<string>();
+
+        [JsonProperty("relicIds")]
+        public List<string> RelicIds { get; set; } = new List<string>();
     }
 }

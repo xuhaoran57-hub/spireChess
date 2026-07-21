@@ -322,6 +322,12 @@ namespace SpireChess.Config
                     if (!string.IsNullOrWhiteSpace(option.FollowupRewardTableId) &&
                         !rewardIds.Contains(option.FollowupRewardTableId))
                         result.AddError($"Event {eventConfig.Id} references missing reward table {option.FollowupRewardTableId}.");
+                    if (!string.IsNullOrWhiteSpace(option.FollowupRelicGrade) &&
+                        option.FollowupRelicGrade != "Curio")
+                        result.AddError($"Event {eventConfig.Id} has invalid relic grade {option.FollowupRelicGrade}.");
+                    if (!string.IsNullOrWhiteSpace(option.FollowupRewardTableId) &&
+                        !string.IsNullOrWhiteSpace(option.FollowupRelicGrade))
+                        result.AddError($"Event {eventConfig.Id} cannot open reward and relic choices together.");
                     foreach (var effect in option.Effects ?? new List<RunEffectConfig>())
                     {
                         if (!ValidEventEffectTypes.Contains(effect.Type ?? string.Empty))

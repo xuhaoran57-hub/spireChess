@@ -191,6 +191,8 @@ namespace SpireChess.Editor
                 "spells.v0.1.json",
                 "encounters.v0.1.json",
                 "rewards.v0.1.json",
+                "events.v0.1.json",
+                "relics.v0.1.json",
                 "content-release.v0.1.json"
             };
             return BalanceConfigHasher.Compute(files

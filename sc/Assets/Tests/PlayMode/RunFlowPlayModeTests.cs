@@ -110,7 +110,8 @@ namespace SpireChess.Tests
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
             Assert.That(map.ChoiceOverlayVisible, Is.True);
-            Assert.That(map.SkipReward().Success, Is.True);
+            Assert.That(map.SelectRelic(
+                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
             Assert.That(map.ContinueAfterBattle().Success, Is.True);
             Assert.That(map.EnterNode("f1_enhance").Success, Is.True);
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.EnhanceChoice));
@@ -189,10 +190,10 @@ namespace SpireChess.Tests
             GameApp.Instance.StartNewRun(808);
             var run = GameApp.Instance.Run;
             CompleteFloor(run, 1, "f1_safe_normal", "f1_rest", "f1_late_shield");
-            Assert.That(run.SkipRewardChoice().Success, Is.True);
+            SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
             CompleteFloor(run, 2, "f2_normal", "f2_rest", "f2_late_break");
-            Assert.That(run.SkipRewardChoice().Success, Is.True);
+            SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
             CompleteFloor(run, 3, "f3_normal", "f3_rest", "f3_late_wild");
 
@@ -242,6 +243,13 @@ namespace SpireChess.Tests
             Assert.That(run.EnterNode(nodeId).Success, Is.True, nodeId);
             ClaimAllRewards(run);
             Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
+        }
+
+        private static void SelectFirstRelic(RunSession run)
+        {
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RelicChoice));
+            Assert.That(run.SelectRelicCandidate(
+                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
         }
 
         private static void CompleteCombatAndContinue(RunSession run, string nodeId)

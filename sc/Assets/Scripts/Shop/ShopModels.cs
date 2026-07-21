@@ -75,6 +75,25 @@ namespace SpireChess.Shop
         }
     }
 
+    public sealed class ShopRuleModifiers
+    {
+        public bool FirstPurchaseFree { get; set; }
+        public bool FirstPaidRefreshFree { get; set; }
+        public int FirstMinionSaleBonusGold { get; set; }
+        public int ExtraBattlecryTriggers { get; set; }
+
+        public ShopRuleModifiers Clone()
+        {
+            return new ShopRuleModifiers
+            {
+                FirstPurchaseFree = FirstPurchaseFree,
+                FirstPaidRefreshFree = FirstPaidRefreshFree,
+                FirstMinionSaleBonusGold = FirstMinionSaleBonusGold,
+                ExtraBattlecryTriggers = ExtraBattlecryTriggers
+            };
+        }
+    }
+
     public sealed class ShopCardInstance
     {
         private ShopCardInstance(

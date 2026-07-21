@@ -76,19 +76,21 @@ namespace SpireChess.Tests
         }
 
         [Test]
-        public void FirstBossReward_BlocksThenAdvancesFloorWithoutResettingRunState()
+        public void FirstBossRelic_BlocksThenAdvancesFloorWithoutResettingRunState()
         {
             var run = ReachFirstBossVictory(801);
-            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RewardChoice));
-            Assert.That(run.State.PendingRewardChoice.CompletionMode,
-                Is.EqualTo(RewardCompletionMode.FloorComplete));
-            Assert.That(run.State.PendingRewardChoice.Candidates.Count, Is.EqualTo(3));
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RelicChoice));
+            Assert.That(run.State.PendingRelicChoice.CompletionMode,
+                Is.EqualTo(RelicCompletionMode.FloorComplete));
+            Assert.That(run.State.PendingRelicChoice.Candidates.Count, Is.EqualTo(3));
             var health = run.State.Health;
             var shopTurn = run.State.ShopTurn;
             var mapStep = run.State.MapStep;
             var shop = run.Shop;
 
-            Assert.That(run.SkipRewardChoice().Success, Is.True);
+            Assert.That(run.SkipRelicChoice().Error, Is.EqualTo(RunOperationError.InvalidChoice));
+            Assert.That(run.SelectRelicCandidate(
+                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
             Assert.That(run.State.Floor, Is.EqualTo(2));
             Assert.That(run.State.CurrentMap.Id, Is.EqualTo("phase4d_floor2"));
@@ -101,26 +103,17 @@ namespace SpireChess.Tests
         }
 
         [Test]
-        public void BossMinionCandidate_DoesNotExceedCurrentTavernTierPlusOne()
+        public void BossRelicCandidates_AreDistinctCrownRelics()
         {
-            RunSession selected = null;
-            RewardCandidate candidate = null;
-            for (var seed = 1; seed <= 300 && selected == null; seed++)
-            {
-                var run = ReachFirstBossVictory(seed);
-                candidate = run.State.PendingRewardChoice.Candidates
-                    .FirstOrDefault(value => value.Type == "Minion");
-                if (candidate != null) selected = run;
-                else Assert.That(run.SkipRewardChoice().Success, Is.True);
-            }
+            var run = ReachFirstBossVictory(802);
+            var candidates = run.State.PendingRelicChoice.Candidates;
 
-            Assert.That(selected, Is.Not.Null);
-            var config = CreateConfigs().MinionsById[candidate.CardId];
-            Assert.That(config.Tier, Is.LessThanOrEqualTo(selected.Shop.TavernTier + 1));
-            var remaining = selected.Shop.MinionPool.GetRemainingCopies(candidate.CardId);
-            Assert.That(selected.SkipRewardChoice().Success, Is.True);
-            Assert.That(selected.Shop.MinionPool.GetRemainingCopies(candidate.CardId),
-                Is.EqualTo(remaining + 1));
+            Assert.That(candidates.Select(value => value.RelicId).Distinct().Count(),
+                Is.EqualTo(3));
+            Assert.That(candidates.Select(value => value.Category).Distinct().Count(),
+                Is.EqualTo(3));
+            Assert.That(candidates, Has.All.Matches<RelicCandidate>(
+                value => value.Grade == "Crown"));
         }
 
         [Test]
@@ -128,10 +121,10 @@ namespace SpireChess.Tests
         {
             var run = new RunSession(CreateConfigs(), 901);
             CompleteFloor(run, 1, "f1_safe_normal", "f1_rest", "f1_late_shield");
-            Assert.That(run.SkipRewardChoice().Success, Is.True);
+            SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
             CompleteFloor(run, 2, "f2_normal", "f2_rest", "f2_late_break");
-            Assert.That(run.SkipRewardChoice().Success, Is.True);
+            SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
             CompleteFloor(run, 3, "f3_normal", "f3_rest", "f3_late_wild");
 
@@ -150,6 +143,13 @@ namespace SpireChess.Tests
             var run = new RunSession(CreateConfigs(), seed);
             CompleteFloor(run, 1, "f1_safe_normal", "f1_rest", "f1_late_shield");
             return run;
+        }
+
+        private static void SelectFirstRelic(RunSession run)
+        {
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RelicChoice));
+            Assert.That(run.SelectRelicCandidate(
+                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
         }
 
         private static void CompleteFloor(

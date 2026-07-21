@@ -27,6 +27,7 @@ namespace SpireChess.Battle
         private BattleDiagnostics diagnostics;
         private List<BattlePlaybackEvent> playbackEvents;
         private BattleBoardState playbackState;
+        private bool playerFirstNonTokenDeathRelicTriggered;
         private const int MaxEffectEvents = 2048;
 
         public BattleSimulator()
@@ -72,6 +73,7 @@ namespace SpireChess.Battle
             nextSummonEventId = 0;
             isDrainingEffects = false;
             currentRound = 0;
+            playerFirstNonTokenDeathRelicTriggered = false;
             diagnostics = new BattleDiagnostics();
 
             AddStep(state, steps, log, new[] { "战斗开始。" });
@@ -595,6 +597,14 @@ namespace SpireChess.Battle
             var materialized = deaths.ToList();
             foreach (var death in materialized)
             {
+                var deathrattleTriggerCount = 1;
+                if (death.Side == BattleSide.Player &&
+                    death.Minion.Keywords.Contains("Deathrattle"))
+                {
+                    deathrattleTriggerCount += Math.Max(
+                        0,
+                        state.RuleModifiers.PlayerExtraDeathrattleTriggers);
+                }
                 EnqueueSourceEffects(
                     death.Minion,
                     death.Side,
@@ -602,7 +612,9 @@ namespace SpireChess.Battle
                     death.Minion,
                     null,
                     death.OriginalIndex,
-                    death);
+                    death,
+                    repeatCount: deathrattleTriggerCount);
+                EnqueueFirstNonTokenDeathRelic(state, death);
                 EnqueueObservedEffects(
                     state,
                     death.Side,
@@ -745,7 +757,8 @@ namespace SpireChess.Battle
             int sourceIndex,
             DeathRecord death = null,
             BattleSide? winner = null,
-            long summonEventId = 0)
+            long summonEventId = 0,
+            int repeatCount = 1)
         {
             var triggerKey = BuildTriggerCountKey(source, trigger);
             var triggerCount = GetTriggerCount(source, trigger) + 1;
@@ -753,25 +766,66 @@ namespace SpireChess.Battle
             var effects = source.IsGolden
                 ? source.Config.GoldenEffects
                 : source.Config.Effects;
-            foreach (var effect in effects ?? Enumerable.Empty<EffectConfig>())
+            var triggeredEffects = (effects ?? Enumerable.Empty<EffectConfig>())
+                .Where(effect => effect != null && effect.Trigger == trigger)
+                .ToList();
+            for (var repeat = 0; repeat < Math.Max(1, repeatCount); repeat++)
             {
-                if (effect == null || effect.Trigger != trigger)
+                foreach (var effect in triggeredEffects)
                 {
-                    continue;
+                    effectQueue.Enqueue(new PendingBattleEffect(
+                        source,
+                        side,
+                        sourceIndex,
+                        subject,
+                        related,
+                        effect,
+                        death,
+                        winner,
+                        summonEventId,
+                        triggerCount: triggerCount));
                 }
-
-                effectQueue.Enqueue(new PendingBattleEffect(
-                    source,
-                    side,
-                    sourceIndex,
-                    subject,
-                    related,
-                    effect,
-                    death,
-                    winner,
-                    summonEventId,
-                    triggerCount: triggerCount));
             }
+        }
+
+        private void EnqueueFirstNonTokenDeathRelic(
+            BattleBoardState state,
+            DeathRecord death)
+        {
+            var rules = state.RuleModifiers;
+            if (playerFirstNonTokenDeathRelicTriggered ||
+                death.Side != BattleSide.Player ||
+                death.Minion.Config.IsToken ||
+                rules.PlayerFirstNonTokenDeathSummonCount <= 0 ||
+                string.IsNullOrWhiteSpace(rules.PlayerFirstNonTokenDeathTokenId))
+            {
+                return;
+            }
+
+            playerFirstNonTokenDeathRelicTriggered = true;
+            effectQueue.Enqueue(new PendingBattleEffect(
+                death.Minion,
+                BattleSide.Player,
+                death.OriginalIndex,
+                death.Minion,
+                null,
+                new EffectConfig
+                {
+                    Id = "relic_wild_brood",
+                    Trigger = "OnDeath",
+                    Action = "SummonToken",
+                    Value = new ValueConfig
+                    {
+                        Resource = rules.PlayerFirstNonTokenDeathTokenId,
+                        Amount = rules.PlayerFirstNonTokenDeathSummonCount,
+                        Attack = rules.PlayerFirstNonTokenDeathTokenAttack,
+                        Health = rules.PlayerFirstNonTokenDeathTokenHealth
+                    }
+                },
+                death,
+                null,
+                0,
+                true));
         }
 
         private void DrainEffectQueue(
@@ -1250,7 +1304,8 @@ namespace SpireChess.Battle
                      entry.value.IsAlive && entry.value.Config.Race == resolvedSpecialRace &&
                      (target.IncludeToken || !entry.value.Config.IsToken))))
                 .ToList();
-            if (target.Selector == "NoShieldRandom")
+            if (target.Selector == "NoShieldRandom" ||
+                target.Selector == "NoShieldLowestHealth")
             {
                 indexed = indexed.Where(entry => !entry.value.HasShield).ToList();
             }
@@ -1304,8 +1359,11 @@ namespace SpireChess.Battle
                         .Take(target.MaxTargets > 0 ? target.MaxTargets : 1)
                         .Select(entry => entry.value).ToList();
                 case "LowestHealth":
-                    return new[] { indexed.OrderBy(entry => entry.value.CurrentHealth)
-                        .ThenBy(entry => entry.index).First().value };
+                case "NoShieldLowestHealth":
+                    return indexed.OrderBy(entry => entry.value.CurrentHealth)
+                        .ThenBy(entry => entry.index)
+                        .Take(target.MaxTargets > 0 ? target.MaxTargets : 1)
+                        .Select(entry => entry.value).ToList();
                 case "Leftmost":
                     return new[] { indexed.OrderBy(entry => entry.index).First().value };
                 case "Rightmost":

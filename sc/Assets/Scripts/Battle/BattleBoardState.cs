@@ -4,6 +4,31 @@ using SpireChess.Config;
 
 namespace SpireChess.Battle
 {
+    public sealed class BattleRuleModifiers
+    {
+        public int PlayerExtraDeathrattleTriggers { get; set; }
+        public int PlayerFirstNonTokenDeathSummonCount { get; set; }
+        public string PlayerFirstNonTokenDeathTokenId { get; set; }
+        public int PlayerFirstNonTokenDeathTokenAttack { get; set; }
+        public int PlayerFirstNonTokenDeathTokenHealth { get; set; }
+        public int PlayerBattleStartShieldTargets { get; set; }
+        public int PlayerDistinctRaceStatBonus { get; set; }
+
+        public BattleRuleModifiers Clone()
+        {
+            return new BattleRuleModifiers
+            {
+                PlayerExtraDeathrattleTriggers = PlayerExtraDeathrattleTriggers,
+                PlayerFirstNonTokenDeathSummonCount = PlayerFirstNonTokenDeathSummonCount,
+                PlayerFirstNonTokenDeathTokenId = PlayerFirstNonTokenDeathTokenId,
+                PlayerFirstNonTokenDeathTokenAttack = PlayerFirstNonTokenDeathTokenAttack,
+                PlayerFirstNonTokenDeathTokenHealth = PlayerFirstNonTokenDeathTokenHealth,
+                PlayerBattleStartShieldTargets = PlayerBattleStartShieldTargets,
+                PlayerDistinctRaceStatBonus = PlayerDistinctRaceStatBonus
+            };
+        }
+    }
+
     public sealed class BattleStartEffectState
     {
         public BattleStartEffectState(BattleSide side, EffectConfig effect)
@@ -25,11 +50,13 @@ namespace SpireChess.Battle
             Player = new List<BattleMinionRuntime>(new BattleMinionRuntime[SlotCount]);
             Enemy = new List<BattleMinionRuntime>(new BattleMinionRuntime[SlotCount]);
             BattleStartEffects = new List<BattleStartEffectState>();
+            RuleModifiers = new BattleRuleModifiers();
         }
 
         public List<BattleMinionRuntime> Player { get; }
         public List<BattleMinionRuntime> Enemy { get; }
         public List<BattleStartEffectState> BattleStartEffects { get; }
+        public BattleRuleModifiers RuleModifiers { get; private set; }
         public int PlayerFlourishStacks { get; set; }
         public int EnemyFlourishStacks { get; set; }
 
@@ -80,6 +107,7 @@ namespace SpireChess.Battle
             clone.PlayerFlourishStacks = PlayerFlourishStacks;
             clone.EnemyFlourishStacks = EnemyFlourishStacks;
             clone.BattleStartEffects.AddRange(BattleStartEffects);
+            clone.RuleModifiers = RuleModifiers.Clone();
             return clone;
         }
 

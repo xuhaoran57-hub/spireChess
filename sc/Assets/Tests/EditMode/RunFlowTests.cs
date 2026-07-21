@@ -63,8 +63,10 @@ namespace SpireChess.Tests
             Assert.That(run.State.CurrentMap.TryGetNode("f1_boss", out var boss), Is.True);
             Assert.That(boss.CombatIndex, Is.EqualTo(5));
             ResolvePlayerWin(run);
-            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RewardChoice));
-            Assert.That(run.SkipRewardChoice().Success, Is.True);
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RelicChoice));
+            Assert.That(run.SkipRelicChoice().Error, Is.EqualTo(RunOperationError.InvalidChoice));
+            Assert.That(run.SelectRelicCandidate(
+                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.FloorComplete));
             Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(5));
         }

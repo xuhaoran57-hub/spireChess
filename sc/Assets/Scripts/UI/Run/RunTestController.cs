@@ -112,6 +112,16 @@ namespace SpireChess.UI.Run
             return CompleteChoice(run.SkipRewardChoice());
         }
 
+        public RunOperationResult SelectRelic(string candidateId)
+        {
+            return CompleteChoice(run.SelectRelicCandidate(candidateId));
+        }
+
+        public RunOperationResult SkipRelic()
+        {
+            return CompleteChoice(run.SkipRelicChoice());
+        }
+
         public RunOperationResult SelectEvent(string eventId, string optionId)
         {
             return CompleteChoice(run.SelectEventOption(eventId, optionId));
@@ -282,6 +292,7 @@ namespace SpireChess.UI.Run
             resourcesText.text = $"生命 {state.Health}/{state.MaxHealth}   商店回合 {state.ShopTurn}   " +
                                  $"地图步数 {state.MapStep}   " +
                                  $"楼层 {state.Floor}/3   战绩 {state.Statistics.BattlesWon}胜/{state.Statistics.BattlesNotWon}未胜";
+            resourcesText.text += $"   遗珍 {state.OwnedRelics.Count}";
             statusText.text = StatusMessage ?? string.Empty;
             foreach (var pair in nodeButtons)
             {
@@ -380,6 +391,24 @@ namespace SpireChess.UI.Run
                 if (state.PendingRewardChoice.AllowSkip)
                     actions.Add(Tuple.Create("跳过奖励", (UnityEngine.Events.UnityAction)(() => SkipReward())));
             }
+            else if (state.Phase == RunPhase.RelicChoice && state.PendingRelicChoice != null)
+            {
+                var pending = state.PendingRelicChoice;
+                title = pending.HealthCost > 0
+                    ? $"选择一件遗珍（选择时失去 {pending.HealthCost} 点生命）"
+                    : "选择一件 Boss 遗珍";
+                foreach (var candidate in pending.Candidates)
+                {
+                    var captured = candidate;
+                    actions.Add(Tuple.Create(
+                        candidate.DisplayText,
+                        (UnityEngine.Events.UnityAction)(() => SelectRelic(captured.CandidateId))));
+                }
+
+                if (pending.AllowSkip)
+                    actions.Add(Tuple.Create("离开，不失去生命",
+                        (UnityEngine.Events.UnityAction)(() => SkipRelic())));
+            }
             else if (state.Phase == RunPhase.EventChoice && state.PendingEventChoice != null)
             {
                 var pending = state.PendingEventChoice;
@@ -477,7 +506,8 @@ namespace SpireChess.UI.Run
         private static bool IsChoicePhase(RunPhase phase)
         {
             return phase == RunPhase.RewardChoice || phase == RunPhase.EventChoice ||
-                   phase == RunPhase.EnhanceChoice || phase == RunPhase.RestChoice;
+                   phase == RunPhase.RelicChoice || phase == RunPhase.EnhanceChoice ||
+                   phase == RunPhase.RestChoice;
         }
 
         private static string ToNodeTypeText(RunNodeType type)

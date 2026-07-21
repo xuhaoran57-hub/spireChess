@@ -28,6 +28,10 @@ namespace SpireChess.Shop
         private int roundsWithoutUpgradeAtCurrentTier;
         private int pendingUpgradeDiscount;
         private int scheduledGold;
+        private ShopRuleModifiers ruleModifiers = new ShopRuleModifiers();
+        private bool firstPurchaseFreeAvailable;
+        private bool firstPaidRefreshFreeAvailable;
+        private bool firstMinionSaleBonusAvailable;
 
         public ShopSession(
             IEnumerable<MinionConfig> minions,
@@ -79,6 +83,7 @@ namespace SpireChess.Shop
         public ShopPhaseStats PhaseStats { get; }
         public int ScheduledGold => scheduledGold;
         public int FlourishStacks { get; private set; }
+        public ShopRuleModifiers RuleModifiers => ruleModifiers.Clone();
 
         public int CurrentUpgradeCost
         {
@@ -103,6 +108,11 @@ namespace SpireChess.Shop
         }
 
         public ShopOperationResult StartRound(int runTurn)
+        {
+            return StartRound(runTurn, null);
+        }
+
+        public ShopOperationResult StartRound(int runTurn, Action beforeStartEffects)
         {
             if (runTurn < 1)
             {
@@ -134,10 +144,14 @@ namespace SpireChess.Shop
             FreeRefreshes = 0;
             UpgradedThisRound = false;
             IsShopOpen = true;
+            firstPurchaseFreeAvailable = ruleModifiers.FirstPurchaseFree;
+            firstPaidRefreshFreeAvailable = ruleModifiers.FirstPaidRefreshFree;
+            firstMinionSaleBonusAvailable = ruleModifiers.FirstMinionSaleBonusGold > 0;
 
             EnsureMinionOfferCapacity();
             FillEmptyOffers();
             IsFrozen = false;
+            beforeStartEffects?.Invoke();
             var triples = ResolveAllTriples();
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnShopPhaseStart,
@@ -226,15 +240,23 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
 
-            var cost = FreeRefreshes > 0 ? 0 : ShopEconomyRules.RefreshCost;
+            var usesGrantedFreeRefresh = FreeRefreshes > 0;
+            var usesRelicFreeRefresh = !usesGrantedFreeRefresh && firstPaidRefreshFreeAvailable;
+            var cost = usesGrantedFreeRefresh || usesRelicFreeRefresh
+                ? 0
+                : ShopEconomyRules.RefreshCost;
             if (Gold < cost)
             {
                 return ShopOperationResult.Fail(ShopOperationError.InsufficientGold);
             }
 
-            if (FreeRefreshes > 0)
+            if (usesGrantedFreeRefresh)
             {
                 FreeRefreshes--;
+            }
+            else if (usesRelicFreeRefresh)
+            {
+                firstPaidRefreshFreeAvailable = false;
             }
             else
             {
@@ -286,7 +308,10 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.BenchFull);
             }
 
-            if (Gold < ShopEconomyRules.MinionPurchaseCost)
+            var cost = firstPurchaseFreeAvailable
+                ? 0
+                : ShopEconomyRules.MinionPurchaseCost;
+            if (Gold < cost)
             {
                 return ShopOperationResult.Fail(ShopOperationError.InsufficientGold);
             }
@@ -294,14 +319,18 @@ namespace SpireChess.Shop
             var card = ShopCardInstance.CreateMinion(NextCardInstanceId(), config);
             ApplyFlourishAttackBonus(card);
             Collection.TryAddToBench(card, out var benchIndex);
-            Gold -= ShopEconomyRules.MinionPurchaseCost;
+            Gold -= cost;
+            if (firstPurchaseFreeAvailable)
+            {
+                firstPurchaseFreeAvailable = false;
+            }
             PhaseStats.MinionBoughtCount++;
             minionOffers[offerIndex] = null;
             var triples = ResolveAllTriples();
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnBuy,
                 card,
-                ShopEconomyRules.MinionPurchaseCost,
+                cost,
                 RefreshCount,
                 tavernTier: TavernTier));
             RaiseTripleEvents(triples);
@@ -330,20 +359,27 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.BenchFull);
             }
 
-            if (Gold < ShopEconomyRules.SpellPurchaseCost)
+            var cost = firstPurchaseFreeAvailable
+                ? 0
+                : ShopEconomyRules.SpellPurchaseCost;
+            if (Gold < cost)
             {
                 return ShopOperationResult.Fail(ShopOperationError.InsufficientGold);
             }
 
             var card = ShopCardInstance.CreateSpell(NextCardInstanceId(), SpellOffer);
             Collection.TryAddToBench(card, out var benchIndex);
-            Gold -= ShopEconomyRules.SpellPurchaseCost;
+            Gold -= cost;
+            if (firstPurchaseFreeAvailable)
+            {
+                firstPurchaseFreeAvailable = false;
+            }
             PhaseStats.SpellBoughtCount++;
             SpellOffer = null;
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnBuy,
                 card,
-                ShopEconomyRules.SpellPurchaseCost,
+                cost,
                 RefreshCount,
                 tavernTier: TavernTier));
             return ShopOperationResult.Succeed(benchIndex);
@@ -452,6 +488,9 @@ namespace SpireChess.Shop
             }
 
             var effects = GetTriggeredEffects(card, "OnPlay");
+            var battlecryTriggerCount = card.HasEffectiveKeyword("Battlecry")
+                ? 1 + Math.Max(0, ruleModifiers.ExtraBattlecryTriggers)
+                : 1;
             var blockingEffects = effects
                 .Where(effect => RequiresBlockingChoice(effect) &&
                                  MeetsShopCondition(effect.Condition))
@@ -462,8 +501,11 @@ namespace SpireChess.Shop
                 return ShopOperationResult.Fail(ShopOperationError.UnsupportedEffect);
             }
             var immediateEffects = effects.Where(effect => !RequiresBlockingChoice(effect)).ToList();
+            var repeatedImmediateEffects = Enumerable.Range(0, battlecryTriggerCount)
+                .SelectMany(_ => immediateEffects)
+                .ToList();
             if (!effectEngine.TryBuildPlan(
-                    immediateEffects,
+                    repeatedImmediateEffects,
                     card,
                     battleIndex,
                     effectTargetBattleIndex,
@@ -481,7 +523,8 @@ namespace SpireChess.Shop
                     card,
                     blockingEffect,
                     false,
-                    grantsTripleReward ? 1 : 0);
+                    grantsTripleReward ? 1 : 0,
+                    battlecryTriggerCount);
                 if (!choiceResult.Success)
                 {
                     return choiceResult;
@@ -1100,6 +1143,11 @@ namespace SpireChess.Shop
             }
         }
 
+        public void ConfigureRuleModifiers(ShopRuleModifiers modifiers)
+        {
+            ruleModifiers = (modifiers ?? new ShopRuleModifiers()).Clone();
+        }
+
         public ShopOperationResult ClaimRewardMinion(MinionConfig config)
         {
             if (!IsShopOpen)
@@ -1196,12 +1244,17 @@ namespace SpireChess.Shop
 
         private void ResolveMinionSale(ShopCardInstance card)
         {
-            Gold += ShopEconomyRules.MinionSellValue;
+            var bonus = firstMinionSaleBonusAvailable
+                ? Math.Max(0, ruleModifiers.FirstMinionSaleBonusGold)
+                : 0;
+            var totalGold = ShopEconomyRules.MinionSellValue + bonus;
+            Gold += totalGold;
+            firstMinionSaleBonusAvailable = false;
             MinionPool.ReturnCopies(card.ConfigId, card.PoolCopiesHeld);
             RaiseEvent(new ShopEventData(
                 ShopEventType.OnSell,
                 card,
-                cost: -ShopEconomyRules.MinionSellValue,
+                cost: -totalGold,
                 refreshCount: RefreshCount,
                 tavernTier: TavernTier));
             ResolveCardTrigger(card, "OnSell", -1);
@@ -1244,7 +1297,8 @@ namespace SpireChess.Shop
             ShopCardInstance sourceCard,
             EffectConfig effect,
             bool replaceSourceCard = true,
-            int additionalBenchSlotsRequired = 0)
+            int additionalBenchSlotsRequired = 0,
+            int choiceCountMultiplier = 1)
         {
             var error = BuildEffectChoiceCandidates(
                 sourceCard,
@@ -1259,7 +1313,8 @@ namespace SpireChess.Shop
             var totalChoices =
                 choiceType == EffectChoiceType.MinionCard ||
                 choiceType == EffectChoiceType.SpellCard
-                    ? Math.Max(1, effect.Discover?.Pick ?? 1)
+                    ? Math.Max(1, effect.Discover?.Pick ?? 1) *
+                      Math.Max(1, choiceCountMultiplier)
                     : 1;
             if ((choiceType == EffectChoiceType.MinionCard ||
                  choiceType == EffectChoiceType.SpellCard) &&

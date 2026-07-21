@@ -1,6 +1,6 @@
 {
-  "contentVersion": "5.3.1",
-  "minimumRulesVersion": "5A.1",
+  "contentVersion": "5.4.0",
+  "minimumRulesVersion": "8A.1",
   "minionIds": [
     "forge_soul_shield_squire", "hearth_core_spark", "copper_ring_apprentice",
     "young_deer_spirit", "rending_cub", "moss_mark_seedling",
@@ -46,11 +46,19 @@
   "eventIds": [
     "blood_contract", "old_tavern_ledger", "lost_supply_cart", "star_spring",
     "dangerous_recruit", "forge_bargain", "tranquil_grove", "merchant_cache",
-    "risky_map", "starlit_wager"
+    "risky_map", "starlit_wager", "sealed_reliquary"
   ],
   "rewardTableIds": [
     "f1_opening_reward", "f1_safe_reward", "f1_elite_reward",
     "dangerous_recruit_reward", "f2_normal_reward", "f3_normal_reward",
     "f1_boss_reward", "f2_boss_reward"
+  ],
+  "relicIds": [
+    "crown_echo_bell", "crown_twin_horn", "crown_zero_price_writ",
+    "crown_star_satchel", "crown_tier_five_decree", "crown_thousand_shields",
+    "crown_wild_brood", "crown_manyfold_banner",
+    "curio_refresh_gear", "curio_merchant_pouch", "curio_salvage_hook",
+    "curio_field_medicine", "curio_cracked_ward", "curio_ink_bottle",
+    "curio_recruit_badge"
   ]
 }

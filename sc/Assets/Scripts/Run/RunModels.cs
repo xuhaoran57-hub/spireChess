@@ -14,6 +14,7 @@ namespace SpireChess.Run
         Battle,
         BattleResult,
         RewardChoice,
+        RelicChoice,
         EventChoice,
         EnhanceChoice,
         RestChoice,
@@ -126,6 +127,8 @@ namespace SpireChess.Run
         public bool BattleSettled { get; internal set; }
         public bool HealthDamageApplied { get; internal set; }
         public bool RewardGenerated { get; internal set; }
+        public bool RelicGenerated { get; internal set; }
+        public bool RelicVictoryEffectsApplied { get; internal set; }
         public bool NodeResolved { get; internal set; }
     }
 
@@ -317,6 +320,8 @@ namespace SpireChess.Run
     {
         private readonly List<PendingCardReward> pendingCardRewards =
             new List<PendingCardReward>();
+        private readonly List<OwnedRelicState> ownedRelics =
+            new List<OwnedRelicState>();
 
         internal RunState(int seed, MapDefinition map)
         {
@@ -354,10 +359,27 @@ namespace SpireChess.Run
         public DelayedShopResources DelayedShopResources { get; }
         public IReadOnlyList<PendingCardReward> PendingCardRewards => pendingCardRewards;
         public PendingRewardChoice PendingRewardChoice { get; internal set; }
+        public PendingRelicChoice PendingRelicChoice { get; internal set; }
         public PendingEventChoice PendingEventChoice { get; internal set; }
         public PendingEnhanceChoice PendingEnhanceChoice { get; internal set; }
         public PendingRestChoice PendingRestChoice { get; internal set; }
         public RunStatistics Statistics { get; }
+        public IReadOnlyList<OwnedRelicState> OwnedRelics => ownedRelics;
+
+        internal void AddOwnedRelic(OwnedRelicState relic)
+        {
+            if (relic == null)
+            {
+                throw new ArgumentNullException(nameof(relic));
+            }
+
+            if (ownedRelics.Exists(value => value.RelicId == relic.RelicId))
+            {
+                throw new InvalidOperationException($"Relic {relic.RelicId} is already owned.");
+            }
+
+            ownedRelics.Add(relic);
+        }
 
         internal void EnqueueCardReward(PendingCardReward reward)
         {

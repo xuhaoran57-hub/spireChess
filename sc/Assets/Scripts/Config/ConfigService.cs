@@ -25,6 +25,8 @@ namespace SpireChess.Config
             new Dictionary<string, EnhanceNodeConfig>();
         private Dictionary<string, RestNodeConfig> restNodesById =
             new Dictionary<string, RestNodeConfig>();
+        private Dictionary<string, RelicConfig> relicsById =
+            new Dictionary<string, RelicConfig>();
 
         public ConfigService(IJsonSerializer serializer)
         {
@@ -49,6 +51,8 @@ namespace SpireChess.Config
             enhancementRecipesById;
         public IReadOnlyDictionary<string, EnhanceNodeConfig> EnhanceNodesById => enhanceNodesById;
         public IReadOnlyDictionary<string, RestNodeConfig> RestNodesById => restNodesById;
+        public IReadOnlyList<RelicConfig> Relics { get; private set; } = Array.Empty<RelicConfig>();
+        public IReadOnlyDictionary<string, RelicConfig> RelicsById => relicsById;
         public ContentReleaseConfig ContentRelease { get; private set; }
 
         public ConfigValidationResult LoadFromResources(
@@ -60,7 +64,8 @@ namespace SpireChess.Config
             string eventResourcePath = "Configs/Json/events.v0.1",
             string enhancementResourcePath = "Configs/Json/enhancements.v0.1",
             string restResourcePath = "Configs/Json/rests.v0.1",
-            string contentReleaseResourcePath = "Configs/Json/content-release.v0.1")
+            string contentReleaseResourcePath = "Configs/Json/content-release.v0.1",
+            string relicResourcePath = "Configs/Json/relics.v0.1")
         {
             var minionAsset = Resources.Load<TextAsset>(minionResourcePath);
             var spellAsset = Resources.Load<TextAsset>(spellResourcePath);
@@ -71,6 +76,7 @@ namespace SpireChess.Config
             var enhancementAsset = Resources.Load<TextAsset>(enhancementResourcePath);
             var restAsset = Resources.Load<TextAsset>(restResourcePath);
             var contentReleaseAsset = Resources.Load<TextAsset>(contentReleaseResourcePath);
+            var relicAsset = Resources.Load<TextAsset>(relicResourcePath);
 
             if (minionAsset == null)
             {
@@ -97,7 +103,12 @@ namespace SpireChess.Config
                 rewardAsset.text,
                 eventAsset.text,
                 enhancementAsset.text,
-                restAsset.text);
+                restAsset.text,
+                relicAsset?.text);
+            if (relicAsset == null)
+            {
+                result.AddError($"Missing relic config resource: {relicResourcePath}.");
+            }
             if (contentReleaseAsset == null)
             {
                 result.AddError($"Missing content release config resource: {contentReleaseResourcePath}.");
@@ -111,7 +122,7 @@ namespace SpireChess.Config
 
         public ConfigValidationResult LoadFromJson(string minionsJson, string spellsJson)
         {
-            return LoadFromJson(minionsJson, spellsJson, null, null, null, null, null, null);
+            return LoadFromJson(minionsJson, spellsJson, null, null, null, null, null, null, null);
         }
 
         public ConfigValidationResult LoadFromJson(
@@ -129,6 +140,7 @@ namespace SpireChess.Config
                 rewardsJson,
                 null,
                 null,
+                null,
                 null);
         }
 
@@ -141,6 +153,29 @@ namespace SpireChess.Config
             string eventsJson,
             string enhancementsJson,
             string restsJson)
+        {
+            return LoadFromJson(
+                minionsJson,
+                spellsJson,
+                mapsJson,
+                encountersJson,
+                rewardsJson,
+                eventsJson,
+                enhancementsJson,
+                restsJson,
+                null);
+        }
+
+        public ConfigValidationResult LoadFromJson(
+            string minionsJson,
+            string spellsJson,
+            string mapsJson,
+            string encountersJson,
+            string rewardsJson,
+            string eventsJson,
+            string enhancementsJson,
+            string restsJson,
+            string relicsJson)
         {
             var minionFile = serializer.FromJson<MinionConfigFile>(minionsJson);
             var spellFile = serializer.FromJson<SpellConfigFile>(spellsJson);
@@ -171,6 +206,23 @@ namespace SpireChess.Config
                 .ToDictionary(group => group.Key, group => group.First());
 
             var validation = ConfigValidator.Validate(Minions, Spells);
+            Relics = Array.Empty<RelicConfig>();
+            relicsById.Clear();
+            if (!string.IsNullOrWhiteSpace(relicsJson))
+            {
+                var relicFile = serializer.FromJson<RelicConfigFile>(relicsJson);
+                if (relicFile == null)
+                {
+                    throw new InvalidOperationException("Relic config JSON could not be parsed.");
+                }
+
+                Relics = relicFile.Relics ?? new List<RelicConfig>();
+                relicsById = Relics
+                    .Where(value => value != null && !string.IsNullOrWhiteSpace(value.Id))
+                    .GroupBy(value => value.Id)
+                    .ToDictionary(group => group.Key, group => group.First());
+                Merge(validation, RelicConfigValidator.Validate(Relics, MinionsById));
+            }
             if (string.IsNullOrWhiteSpace(mapsJson) ||
                 string.IsNullOrWhiteSpace(encountersJson) ||
                 string.IsNullOrWhiteSpace(rewardsJson))
@@ -289,6 +341,11 @@ namespace SpireChess.Config
             return restNodesById.TryGetValue(id ?? string.Empty, out config);
         }
 
+        public bool TryGetRelic(string id, out RelicConfig config)
+        {
+            return relicsById.TryGetValue(id ?? string.Empty, out config);
+        }
+
         private static Dictionary<string, T> ToDictionary<T>(
             IEnumerable<T> values,
             Func<T, string> getId)
@@ -353,6 +410,13 @@ namespace SpireChess.Config
                 result.AddError($"Content release references missing reward table: {id}.");
             }
 
+            var releasedRelics = new HashSet<string>(ContentRelease.RelicIds ??
+                new List<string>());
+            foreach (var id in releasedRelics.Where(id => !relicsById.ContainsKey(id)))
+            {
+                result.AddError($"Content release references missing relic: {id}.");
+            }
+
             foreach (var minion in Minions)
             {
                 if (!releasedMinions.Contains(minion.Id))
@@ -369,6 +433,14 @@ namespace SpireChess.Config
                 }
             }
 
+            foreach (var relic in Relics)
+            {
+                if (!releasedRelics.Contains(relic.Id))
+                {
+                    relic.ImplementationStatus = "Disabled";
+                }
+            }
+
             if (releasedMinions.Count != 67)
             {
                 result.AddError($"Content release should contain 67 minions, got {releasedMinions.Count}.");
@@ -377,6 +449,11 @@ namespace SpireChess.Config
             if (releasedSpells.Count != 16)
             {
                 result.AddError($"Content release should contain 16 spells, got {releasedSpells.Count}.");
+            }
+
+            if (Relics.Count > 0 && releasedRelics.Count != 15)
+            {
+                result.AddError($"Content release should contain 15 relics, got {releasedRelics.Count}.");
             }
 
             if ((ContentRelease.EventIds?.Distinct().Count() ?? 0) < 10)

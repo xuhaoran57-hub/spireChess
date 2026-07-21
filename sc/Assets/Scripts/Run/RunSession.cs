@@ -19,6 +19,7 @@ namespace SpireChess.Run
         private const int ShopStreamId = 101;
         private const int RewardStreamId = 202;
         private const int EventStreamId = 303;
+        private const int RelicStreamId = 404;
 
         private readonly ConfigService configs;
         private readonly Random rewardRandom;
@@ -53,10 +54,17 @@ namespace SpireChess.Run
                 : new FixedMapProvider(configs.RunMaps);
             var map = mapProvider?.CreateMap(new MapRequest(seed, 1));
             State = new RunState(seed, map);
+            Relics = new RelicService(
+                configs,
+                State,
+                Shop,
+                new Random(SeedDeriver.Combine(seed, RelicStreamId)));
+            Relics.Activated += OnRelicActivated;
         }
 
         public ShopSession Shop { get; }
         public RunState State { get; }
+        public RelicService Relics { get; }
         public BattleContext PendingBattle { get; private set; }
         public BattleContext LastBattleContext { get; private set; }
         public BattleSimulationResult LastBattleResult { get; private set; }
@@ -297,6 +305,73 @@ namespace SpireChess.Run
             return RunOperationResult.Succeed("已跳过奖励");
         }
 
+        public RunOperationResult SelectRelicCandidate(string candidateId)
+        {
+            var choice = State.PendingRelicChoice;
+            if (State.Phase != RunPhase.RelicChoice || choice == null)
+            {
+                return RunOperationResult.Fail(
+                    State.CurrentAttempt?.ChoiceCommitted == true
+                        ? RunOperationError.ChoiceAlreadyResolved
+                        : RunOperationError.InvalidPhase);
+            }
+
+            var result = Relics.Acquire(choice, candidateId, out var acquired);
+            if (!result.Success)
+            {
+                return result;
+            }
+
+            State.PendingRelicChoice = null;
+            State.CurrentAttempt.ChoiceCommitted = true;
+            State.CurrentAttempt.EffectApplied = true;
+            State.LastRewardSummary = $"获得遗珍：{acquired.Name}";
+            Shop.ConfigureRuleModifiers(Relics.BuildShopRuleModifiers());
+            Telemetry?.Record("RelicChoiceResolved", new
+            {
+                choiceId = choice.ChoiceId,
+                relicId = acquired.Id,
+                grade = acquired.Grade,
+                healthCost = choice.HealthCost,
+                skipped = false,
+                ownedRelicCount = State.OwnedRelics.Count,
+                candidates = choice.Candidates.Select(value => value.RelicId).ToArray()
+            });
+            CompleteRelicChoice(choice.CompletionMode);
+            return RunOperationResult.Succeed(State.LastRewardSummary);
+        }
+
+        public RunOperationResult SkipRelicChoice()
+        {
+            var choice = State.PendingRelicChoice;
+            if (State.Phase != RunPhase.RelicChoice || choice == null)
+            {
+                return RunOperationResult.Fail(RunOperationError.InvalidPhase);
+            }
+
+            if (!choice.AllowSkip)
+            {
+                return RunOperationResult.Fail(RunOperationError.InvalidChoice);
+            }
+
+            State.PendingRelicChoice = null;
+            State.CurrentAttempt.ChoiceCommitted = true;
+            State.CurrentAttempt.EffectApplied = true;
+            State.LastRewardSummary = "已离开遗珍选择";
+            Telemetry?.Record("RelicChoiceResolved", new
+            {
+                choiceId = choice.ChoiceId,
+                relicId = (string)null,
+                grade = choice.Grade,
+                healthCost = 0,
+                skipped = true,
+                ownedRelicCount = State.OwnedRelics.Count,
+                candidates = choice.Candidates.Select(value => value.RelicId).ToArray()
+            });
+            CompleteRelicChoice(choice.CompletionMode);
+            return RunOperationResult.Succeed(State.LastRewardSummary);
+        }
+
         public RunOperationResult SelectEventOption(string eventId, string optionId)
         {
             var pending = State.PendingEventChoice;
@@ -323,6 +398,7 @@ namespace SpireChess.Run
             }
 
             PendingRewardChoice followup = null;
+            PendingRelicChoice relicFollowup = null;
             if (!string.IsNullOrWhiteSpace(option.FollowupRewardTableId))
             {
                 if (!configs.TryGetRewardTable(option.FollowupRewardTableId, out var table))
@@ -337,24 +413,56 @@ namespace SpireChess.Run
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(option.FollowupRelicGrade))
+            {
+                relicFollowup = Relics.CreateChoice(
+                    option.FollowupRelicGrade,
+                    State.CurrentAttempt.NodeAttemptId,
+                    RelicCompletionMode.ResolveNodeToMap,
+                    GetEventRelicHealthCost(),
+                    true);
+                if (relicFollowup == null)
+                {
+                    return RunOperationResult.Fail(RunOperationError.InsufficientPool);
+                }
+            }
+
             ApplyEventEffects(option.Effects);
             Telemetry?.Record("EventChoiceResolved", new
             {
                 eventId,
                 optionId,
                 option.Label,
-                followupRewardTableId = option.FollowupRewardTableId
+                followupRewardTableId = option.FollowupRewardTableId,
+                followupRelicGrade = option.FollowupRelicGrade
             });
             State.PendingEventChoice = null;
-            State.CurrentAttempt.ChoiceCommitted = true;
-            State.CurrentAttempt.EffectApplied = true;
-            if (followup != null)
+            if (relicFollowup != null)
             {
+                State.PendingRelicChoice = relicFollowup;
+                State.Phase = RunPhase.RelicChoice;
+                Telemetry?.Record("RelicChoiceGenerated", new
+                {
+                    choiceId = relicFollowup.ChoiceId,
+                    sourceAttemptId = relicFollowup.SourceAttemptId,
+                    grade = relicFollowup.Grade,
+                    allowSkip = relicFollowup.AllowSkip,
+                    healthCost = relicFollowup.HealthCost,
+                    candidates = relicFollowup.Candidates
+                        .Select(value => value.RelicId).ToArray()
+                });
+            }
+            else if (followup != null)
+            {
+                State.CurrentAttempt.ChoiceCommitted = true;
+                State.CurrentAttempt.EffectApplied = true;
                 State.PendingRewardChoice = followup;
                 State.Phase = RunPhase.RewardChoice;
             }
             else
             {
+                State.CurrentAttempt.ChoiceCommitted = true;
+                State.CurrentAttempt.EffectApplied = true;
                 ResolveCurrentNodeToMap();
             }
 
@@ -684,6 +792,7 @@ namespace SpireChess.Run
 
         public void ReleaseOutstandingRewards()
         {
+            State.PendingRelicChoice = null;
             if (State.PendingRewardChoice != null)
             {
                 foreach (var candidate in State.PendingRewardChoice.Candidates)
@@ -758,7 +867,8 @@ namespace SpireChess.Run
 
         private RunOperationResult StartShopNode()
         {
-            var result = Shop.StartRound(State.ShopTurn);
+            Shop.ConfigureRuleModifiers(Relics.BuildShopRuleModifiers());
+            var result = Shop.StartRound(State.ShopTurn, ApplyShopStartResources);
             if (!result.Success)
             {
                 return RunOperationResult.Fail(RunOperationError.InvalidTiming);
@@ -766,7 +876,6 @@ namespace SpireChess.Run
 
             State.CurrentAttempt.EconomyTurnCommitted = true;
             State.CurrentAttempt.ContentGenerated = true;
-            ApplyDelayedShopResources();
             State.Phase = RunPhase.Shop;
             return RunOperationResult.Succeed();
         }
@@ -784,6 +893,7 @@ namespace SpireChess.Run
             }
 
             var board = Shop.CreateBattleSnapshot();
+            Relics.ApplyBattleRules(board);
             FillEncounterEnemy(board.Enemy, encounter);
             PendingBattle = new BattleContext(
                 board,
@@ -841,7 +951,19 @@ namespace SpireChess.Run
                 return false;
             }
 
-            var total = pool.Entries.Sum(value => Math.Max(0, value.Weight));
+            var entries = pool.Entries.Where(value =>
+            {
+                if (!configs.TryGetEvent(value.EventId, out var eventConfig))
+                {
+                    return false;
+                }
+
+                var relicGrade = eventConfig.Options
+                    .Select(option => option.FollowupRelicGrade)
+                    .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+                return string.IsNullOrWhiteSpace(relicGrade) || Relics.HasAvailable(relicGrade);
+            }).ToList();
+            var total = entries.Sum(value => Math.Max(0, value.Weight));
             if (total <= 0)
             {
                 return false;
@@ -849,7 +971,7 @@ namespace SpireChess.Run
 
             var roll = eventRandom.Next(total);
             EventConfig selected = null;
-            foreach (var entry in pool.Entries)
+            foreach (var entry in entries)
             {
                 var weight = Math.Max(0, entry.Weight);
                 if (roll >= weight)
@@ -919,6 +1041,19 @@ namespace SpireChess.Run
             return RunOperationError.None;
         }
 
+        private int GetEventRelicHealthCost()
+        {
+            switch (State.Floor)
+            {
+                case 1:
+                    return 5;
+                case 2:
+                    return 4;
+                default:
+                    return 3;
+            }
+        }
+
         private void ApplyEventEffects(IEnumerable<RunEffectConfig> effects)
         {
             foreach (var effect in effects ?? Array.Empty<RunEffectConfig>())
@@ -945,6 +1080,20 @@ namespace SpireChess.Run
                         QueueSpellReward(null);
                         break;
                 }
+            }
+        }
+
+        private void ApplyShopStartResources()
+        {
+            ApplyDelayedShopResources();
+            foreach (var grant in Relics.ApplyShopStartEffects())
+            {
+                rewardSequence++;
+                State.EnqueueCardReward(new PendingCardReward(
+                    $"reward_{rewardSequence:D6}",
+                    grant.CardType,
+                    grant.ConfigId,
+                    grant.ReservedPoolCopies));
             }
         }
 
@@ -994,6 +1143,7 @@ namespace SpireChess.Run
             }
 
             var board = Shop.CreateBattleSnapshot();
+            Relics.ApplyBattleRules(board);
             FillDefaultEnemy(board.Enemy);
             PendingBattle = new BattleContext(board, $"第 {Shop.Round} 回合遭遇", returnSceneName);
             LastBattleContext = null;
@@ -1040,6 +1190,18 @@ namespace SpireChess.Run
 
             if (settlement.PlayerWon)
             {
+                if (!attempt.RelicVictoryEffectsApplied)
+                {
+                    Relics.ApplyVictoryHealing(node.Type);
+                    attempt.RelicVictoryEffectsApplied = true;
+                }
+
+                if (node.Type == RunNodeType.Boss && State.Floor < 3 && Relics.Enabled &&
+                    TryGenerateBossRelic(attempt))
+                {
+                    return;
+                }
+
                 if (TryGenerateReward(encounter, attempt, node))
                 {
                     return;
@@ -1067,6 +1229,41 @@ namespace SpireChess.Run
 
             ResolveNode(node, attempt);
             State.Phase = RunPhase.BattleResult;
+        }
+
+        private bool TryGenerateBossRelic(NodeAttemptState attempt)
+        {
+            if (attempt.RelicGenerated)
+            {
+                return State.PendingRelicChoice != null;
+            }
+
+            attempt.RelicGenerated = true;
+            attempt.RewardGenerated = true;
+            var choice = Relics.CreateChoice(
+                "Crown",
+                attempt.NodeAttemptId,
+                RelicCompletionMode.FloorComplete,
+                0,
+                false);
+            if (choice == null)
+            {
+                State.LastRewardSummary = "没有可获得的冠冕级遗珍";
+                return false;
+            }
+
+            State.PendingRelicChoice = choice;
+            State.Phase = RunPhase.RelicChoice;
+            Telemetry?.Record("RelicChoiceGenerated", new
+            {
+                choiceId = choice.ChoiceId,
+                sourceAttemptId = choice.SourceAttemptId,
+                grade = choice.Grade,
+                allowSkip = choice.AllowSkip,
+                healthCost = choice.HealthCost,
+                candidates = choice.Candidates.Select(value => value.RelicId).ToArray()
+            });
+            return true;
         }
 
         private bool TryGenerateReward(
@@ -1321,6 +1518,14 @@ namespace SpireChess.Run
             }
         }
 
+        private void CompleteRelicChoice(RelicCompletionMode completionMode)
+        {
+            ResolveNodeForCurrentAttempt();
+            State.Phase = completionMode == RelicCompletionMode.FloorComplete
+                ? RunPhase.FloorComplete
+                : RunPhase.MapSelection;
+        }
+
         private void CompleteRewardChoice(RewardCompletionMode completionMode)
         {
             ResolveNodeForCurrentAttempt();
@@ -1336,6 +1541,25 @@ namespace SpireChess.Run
                     State.Phase = RunPhase.MapSelection;
                     break;
             }
+        }
+
+        private void OnRelicActivated(RelicActivationData activation)
+        {
+            if (activation == null)
+            {
+                return;
+            }
+
+            Telemetry?.Record("RelicActivated", new
+            {
+                activation.RelicId,
+                activation.Trigger,
+                activation.Amount,
+                activation.CardId,
+                floor = State.Floor,
+                shopTurn = State.ShopTurn,
+                mapStep = State.MapStep
+            });
         }
 
         private void OnShopEvent(ShopEventData eventData)
@@ -1611,6 +1835,16 @@ namespace SpireChess.Run
                 statistics.TargetedDiscoversUsed,
                 statistics.FirstCoreTurn,
                 statistics.SecondCoreTurn,
+                ownedRelics = State.OwnedRelics.Select(value => new
+                {
+                    value.RelicId,
+                    value.Grade,
+                    value.SourceType,
+                    value.SourceId,
+                    value.AcquiredFloor,
+                    value.AcquiredShopTurn,
+                    value.ActivationCount
+                }).ToArray(),
                 finalBuildId = CoreBuildClassifier.ClassifyFinalBuild(
                     Shop.Collection.Battle,
                     coreEvidence),
