@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using SpireChess.Battle;
 using SpireChess.Config;
+using SpireChess.Simulation;
 
 namespace SpireChess.Tests
 {
@@ -344,6 +345,92 @@ namespace SpireChess.Tests
 
             Assert.That(deathStep.BoardState.Player[0].CurrentHealth, Is.EqualTo(110));
             Assert.That(deathStep.BoardState.Player[0].CombatMaxHealth, Is.EqualTo(110));
+        }
+
+        [Test]
+        public void Simulate_DoesNotCapturePresentationEvents()
+        {
+            var state = CreateState();
+            state.Player[0] = CreateMinion("player", 2, 3);
+            state.Enemy[0] = CreateMinion("enemy", 1, 3);
+
+            var result = new BattleSimulator(new SequenceRandom()).Simulate(state);
+
+            Assert.That(result.PlaybackEvents, Is.Empty);
+        }
+
+        [Test]
+        public void PlaybackCapture_DoesNotChangeDeterministicBattleResult()
+        {
+            var state = CreateState();
+            state.Player[0] = CreateMinion("player", 4, 8, "Shield");
+            state.Enemy[0] = CreateMinion("enemy", 3, 9, "Taunt");
+
+            var normal = new BattleSimulator(new Random(42)).Simulate(state);
+            var playback = new BattleSimulator(new Random(42))
+                .SimulatePlayback(state);
+
+            Assert.That(
+                BattleDeterminismHasher.Compute(playback),
+                Is.EqualTo(BattleDeterminismHasher.Compute(normal)));
+            Assert.That(playback.Log, Is.EqualTo(normal.Log));
+        }
+
+        [Test]
+        public void PlaybackEvents_RecordShieldDamageDeathAndSummonInOrder()
+        {
+            var tokenConfig = CreateConfig("token", 1, 1, true);
+            var summonerConfig = CreateConfig("summoner", 1, 1);
+            summonerConfig.Effects.Add(CreateSummonEffect("token", 1));
+            var state = CreateState();
+            state.Player[0] = new BattleMinionRuntime(summonerConfig);
+            state.Enemy[0] = CreateMinion("shielded_enemy", 2, 100, "Shield");
+
+            var result = CreateSimulator(tokenConfig).SimulatePlayback(state);
+            var kinds = result.PlaybackEvents
+                .Select(value => value.Kind)
+                .ToList();
+
+            Assert.That(kinds, Does.Contain(BattlePlaybackEventKind.AttackStarted));
+            Assert.That(kinds, Does.Contain(BattlePlaybackEventKind.ShieldLost));
+            Assert.That(kinds, Does.Contain(BattlePlaybackEventKind.DamageApplied));
+            Assert.That(kinds, Does.Contain(BattlePlaybackEventKind.UnitDied));
+            Assert.That(kinds, Does.Contain(BattlePlaybackEventKind.UnitSummoned));
+            Assert.That(
+                kinds.IndexOf(BattlePlaybackEventKind.AttackStarted),
+                Is.LessThan(kinds.IndexOf(BattlePlaybackEventKind.UnitDied)));
+            Assert.That(
+                kinds.IndexOf(BattlePlaybackEventKind.UnitDied),
+                Is.LessThan(kinds.IndexOf(BattlePlaybackEventKind.UnitSummoned)));
+
+            var summoned = result.PlaybackEvents.First(value =>
+                value.Kind == BattlePlaybackEventKind.UnitSummoned);
+            Assert.That(summoned.TargetInstanceId, Does.StartWith("summon:Player:"));
+            Assert.That(
+                summoned.BoardState.Player[0].RuntimeInstanceId,
+                Is.EqualTo(summoned.TargetInstanceId));
+        }
+
+        [Test]
+        public void RuntimeInstanceId_IsStableAcrossPlaybackSnapshotsAndClones()
+        {
+            var state = CreateState();
+            state.Player[2] = CreateMinion("stable", 3, 7);
+            state.Enemy[0] = CreateMinion("enemy", 0, 100);
+
+            var result = new BattleSimulator(new SequenceRandom())
+                .SimulatePlayback(state);
+            var instanceIds = result.PlaybackEvents
+                .Select(value => value.BoardState.Player[2])
+                .Where(value => value != null)
+                .Select(value => value.RuntimeInstanceId)
+                .Distinct()
+                .ToArray();
+
+            Assert.That(instanceIds, Is.EqualTo(new[] { "Player:2:stable" }));
+            Assert.That(
+                result.FinalState.Player[2].Clone().RuntimeInstanceId,
+                Is.EqualTo("Player:2:stable"));
         }
 
         private static BattleBoardState CreateCleaveState(bool golden)

@@ -1,12 +1,17 @@
 using System;
 using SpireChess.Battle;
+using SpireChess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SpireChess.UI.Battle
 {
-    public sealed class BattleCardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    [DisallowMultipleComponent]
+    public sealed class BattleCardView : MonoBehaviour,
+        IBeginDragHandler,
+        IDragHandler,
+        IEndDragHandler
     {
         private const int StatsBaseFontSize = 20;
         private const int StatsMinimumFontSize = 10;
@@ -20,49 +25,81 @@ namespace SpireChess.UI.Battle
         private Transform originalParent;
         private Vector2 originalAnchoredPosition;
         private bool draggable;
+        private bool dropHandled;
+        private CardView cardView;
 
         public BattleSide Side { get; private set; }
         public int Index { get; private set; }
+        public string InstanceId { get; private set; }
+        public RectTransform RectTransform => rectTransform;
+        public CardView CardView => cardView;
 
         public void Initialize(
-            BattleTestController controller,
-            Canvas rootCanvas,
+            BattleTestController value,
+            Canvas canvas,
             BattleSide side,
             int index,
-            bool draggable)
+            bool canDrag)
         {
-            this.controller = controller;
-            this.rootCanvas = rootCanvas;
+            controller = value;
+            rootCanvas = canvas;
             Side = side;
             Index = index;
-            this.draggable = draggable;
+            draggable = canDrag;
             rectTransform = GetComponent<RectTransform>();
             canvasGroup = GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+            {
+                canvasGroup = gameObject.AddComponent<CanvasGroup>();
+            }
+            cardView = GetComponent<CardView>();
+        }
+
+        public void Render(CardViewModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            InstanceId = model.InstanceId;
+            if (cardView != null)
+            {
+                cardView.Render(model);
+                return;
+            }
+
+            SetText("Name", model.IsGolden ? $"金色{model.Name}" : model.Name);
+            SetText("Tier", $"T{model.Tier}");
+            SetText("Race", model.RaceText);
+            SetText("Keywords", string.Join(" / ", model.Keywords));
+            SetText("Description", model.Description);
+            SetStatsText($"{model.Attack}/{model.Health}");
+            var shield = transform.Find("Shield");
+            if (shield != null)
+            {
+                shield.gameObject.SetActive(model.HasShield);
+            }
         }
 
         public void Render(BattleMinionRuntime minion)
         {
-            SetText("Name", minion.IsGolden ? $"金色{minion.Name}" : minion.Name);
-            SetStatsText($"{minion.CurrentAttack}/{minion.CurrentHealth}");
-            SetText("Tier", $"T{minion.Config.Tier}");
-            SetText("Race", ToRaceName(minion.Config.Race));
-            SetText("Keywords", minion.BuildKeywordText());
-            SetText("Description", minion.Config.GetPrototypeDescription(minion.IsGolden));
+            Render(BattleCardViewModelFactory.FromRuntime(minion, Side, Index));
+        }
 
-            var shield = transform.Find("Shield");
-            if (shield != null)
-            {
-                shield.gameObject.SetActive(minion.HasShield);
-            }
+        public void MarkDropHandled()
+        {
+            dropHandled = true;
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (!draggable || controller.IsBattleLocked)
+            if (!draggable || controller == null || controller.IsBattleLocked)
             {
                 return;
             }
 
+            dropHandled = false;
             originalParent = transform.parent;
             originalAnchoredPosition = rectTransform.anchoredPosition;
             transform.SetParent(rootCanvas.transform, true);
@@ -73,7 +110,8 @@ namespace SpireChess.UI.Battle
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!draggable || controller.IsBattleLocked || originalParent == null)
+            if (!draggable || controller == null ||
+                controller.IsBattleLocked || originalParent == null)
             {
                 return;
             }
@@ -90,28 +128,23 @@ namespace SpireChess.UI.Battle
 
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1f;
-
-            if (transform.parent == rootCanvas.transform)
+            if (!dropHandled && transform.parent == rootCanvas.transform)
             {
                 transform.SetParent(originalParent, false);
                 rectTransform.anchoredPosition = originalAnchoredPosition;
             }
 
             originalParent = null;
+            dropHandled = false;
         }
 
         private void SetText(string childName, string value)
         {
             var child = transform.Find(childName);
-            if (child == null)
-            {
-                return;
-            }
-
-            var text = child.GetComponent<Text>();
+            var text = child == null ? null : child.GetComponent<Text>();
             if (text != null)
             {
-                text.text = value;
+                text.text = value ?? string.Empty;
             }
         }
 
@@ -134,7 +167,6 @@ namespace SpireChess.UI.Battle
             {
                 return StatsMinimumFontSize;
             }
-
             for (var size = StatsBaseFontSize;
                  size >= StatsMinimumFontSize;
                  size--)
@@ -144,7 +176,6 @@ namespace SpireChess.UI.Battle
                     return size;
                 }
             }
-
             return StatsMinimumFontSize;
         }
 
@@ -163,7 +194,6 @@ namespace SpireChess.UI.Battle
             {
                 return false;
             }
-
             var pixelsPerUnit = target.pixelsPerUnit;
             if (pixelsPerUnit <= 0f || float.IsNaN(pixelsPerUnit) ||
                 float.IsInfinity(pixelsPerUnit))
@@ -175,23 +205,6 @@ namespace SpireChess.UI.Battle
             var height = generator.rectExtents.height / pixelsPerUnit;
             return width <= StatsTextWidth + 0.5f &&
                    height <= StatsTextHeight + 0.5f;
-        }
-
-        private static string ToRaceName(string race)
-        {
-            switch (race)
-            {
-                case "ForgeSoul":
-                    return "铸魂";
-                case "WildSpirit":
-                    return "荒灵";
-                case "Starbound":
-                    return "星契";
-                case "Wayfarer":
-                    return "旅团";
-                default:
-                    return race;
-            }
         }
     }
 }

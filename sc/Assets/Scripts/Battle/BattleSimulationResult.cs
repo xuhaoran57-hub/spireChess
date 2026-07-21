@@ -10,6 +10,68 @@ namespace SpireChess.Battle
         RoundLimit
     }
 
+    public enum BattlePlaybackEventKind
+    {
+        CombatStarted,
+        RoundStarted,
+        AttackStarted,
+        DamageApplied,
+        ShieldGained,
+        ShieldLost,
+        StatsChanged,
+        UnitDied,
+        UnitSummoned,
+        CombatEnded
+    }
+
+    public sealed class BattlePlaybackEvent
+    {
+        public BattlePlaybackEvent(
+            BattlePlaybackEventKind kind,
+            BattleBoardState boardState,
+            string message,
+            BattleSide? sourceSide = null,
+            int sourceIndex = -1,
+            string sourceInstanceId = null,
+            BattleSide? targetSide = null,
+            int targetIndex = -1,
+            string targetInstanceId = null,
+            int amount = 0,
+            int attackDelta = 0,
+            int healthDelta = 0,
+            bool wasBlocked = false)
+        {
+            Kind = kind;
+            BoardState = (boardState ??
+                throw new System.ArgumentNullException(nameof(boardState))).Clone();
+            Message = message ?? string.Empty;
+            SourceSide = sourceSide;
+            SourceIndex = sourceIndex;
+            SourceInstanceId = sourceInstanceId;
+            TargetSide = targetSide;
+            TargetIndex = targetIndex;
+            TargetInstanceId = targetInstanceId;
+            Amount = amount;
+            AttackDelta = attackDelta;
+            HealthDelta = healthDelta;
+            WasBlocked = wasBlocked;
+        }
+
+        public BattlePlaybackEventKind Kind { get; }
+        public BattleBoardState BoardState { get; }
+        public string Message { get; }
+        public BattleSide? SourceSide { get; }
+        public int SourceIndex { get; }
+        public string SourceInstanceId { get; }
+        public BattleSide? TargetSide { get; }
+        public int TargetIndex { get; }
+        public string TargetInstanceId { get; }
+        public int Amount { get; }
+        public int AttackDelta { get; }
+        public int HealthDelta { get; }
+        public bool WasBlocked { get; }
+    }
+
     public sealed class BattleSideDiagnostics
     {
         public int OpeningRawDamage { get; internal set; }
@@ -105,7 +167,8 @@ namespace SpireChess.Battle
             List<BattleStep> steps,
             IEnumerable<BattlePermanentDelta> permanentDeltas = null,
             BattleDiagnostics diagnostics = null,
-            IEnumerable<BattlePostCombatRewardRequest> postCombatRewardRequests = null)
+            IEnumerable<BattlePostCombatRewardRequest> postCombatRewardRequests = null,
+            IEnumerable<BattlePlaybackEvent> playbackEvents = null)
         {
             FinalState = finalState;
             Winner = winner;
@@ -118,6 +181,9 @@ namespace SpireChess.Battle
             PostCombatRewardRequests = (postCombatRewardRequests ??
                     Enumerable.Empty<BattlePostCombatRewardRequest>())
                 .ToList().AsReadOnly();
+            PlaybackEvents = (playbackEvents ??
+                    Enumerable.Empty<BattlePlaybackEvent>())
+                .ToList().AsReadOnly();
         }
 
         public BattleBoardState FinalState { get; }
@@ -128,6 +194,7 @@ namespace SpireChess.Battle
         public IReadOnlyList<BattlePermanentDelta> PermanentDeltas { get; }
         public BattleDiagnostics Diagnostics { get; }
         public IReadOnlyList<BattlePostCombatRewardRequest> PostCombatRewardRequests { get; }
+        public IReadOnlyList<BattlePlaybackEvent> PlaybackEvents { get; }
     }
 
     public sealed class BattleStep

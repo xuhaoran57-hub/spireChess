@@ -25,6 +25,8 @@ namespace SpireChess.Battle
         private bool isDrainingEffects;
         private int currentRound;
         private BattleDiagnostics diagnostics;
+        private List<BattlePlaybackEvent> playbackEvents;
+        private BattleBoardState playbackState;
         private const int MaxEffectEvents = 2048;
 
         public BattleSimulator()
@@ -56,8 +58,11 @@ namespace SpireChess.Battle
         private BattleSimulationResult SimulateInternal(BattleBoardState initialState, bool captureSteps)
         {
             var state = initialState.Clone();
+            EnsureRuntimeInstanceIds(state);
             var log = new List<string>();
             var steps = captureSteps ? new List<BattleStep>() : null;
+            playbackEvents = captureSteps ? new List<BattlePlaybackEvent>() : null;
+            playbackState = state;
             effectQueue.Clear();
             effectUsage.Clear();
             permanentDeltas.Clear();
@@ -70,6 +75,9 @@ namespace SpireChess.Battle
             diagnostics = new BattleDiagnostics();
 
             AddStep(state, steps, log, new[] { "战斗开始。" });
+            RecordPlaybackEvent(
+                BattlePlaybackEventKind.CombatStarted,
+                "战斗开始。");
 
             var startActions = new PendingBattleActions();
             EnqueueBattleStartEffects(state);
@@ -86,6 +94,9 @@ namespace SpireChess.Battle
             {
                 currentRound = round;
                 AddStep(state, steps, log, new[] { $"第 {round} 轮。" });
+                RecordPlaybackEvent(
+                    BattlePlaybackEventKind.RoundStarted,
+                    $"第 {round} 轮。");
 
                 var playerActorsThatActed = new HashSet<BattleMinionRuntime>();
                 var enemyActorsThatActed = new HashSet<BattleMinionRuntime>();
@@ -171,6 +182,13 @@ namespace SpireChess.Battle
             DrainEffectQueue(state, combatEndLog, combatEndActions);
             AddStep(state, steps, log, combatEndLog);
             ResolvePendingActions(state, combatEndActions, log, steps);
+            RecordPlaybackEvent(
+                BattlePlaybackEventKind.CombatEnded,
+                winner == BattleSide.Player
+                    ? "玩家胜利。"
+                    : winner == BattleSide.Enemy
+                        ? "敌方胜利。"
+                        : "战斗平局。");
             diagnostics.RoundCount = Math.Min(round - 1, MaxRounds);
             diagnostics.ProcessedEffectCount = processedEffectCount;
             return new BattleSimulationResult(
@@ -181,7 +199,8 @@ namespace SpireChess.Battle
                 steps ?? new List<BattleStep>(),
                 permanentDeltas.Values.OrderBy(value => value.SourceInstanceId),
                 diagnostics,
-                postCombatRewardRequests);
+                postCombatRewardRequests,
+                playbackEvents);
         }
 
         private void ResolveAttackStep(
@@ -293,6 +312,11 @@ namespace SpireChess.Battle
             log.Add(isImmediateAttack
                 ? $"{BuildSideName(attackerSide)} {attacker.Name} 立即攻击 {target.Name}。"
                 : $"{BuildSideName(attackerSide)} {attacker.Name} 攻击 {target.Name}。");
+            RecordPlaybackEvent(
+                BattlePlaybackEventKind.AttackStarted,
+                log[log.Count - 1],
+                attacker,
+                target);
             if (isImmediateAttack)
             {
                 diagnostics.For(attackerSide).ImmediateAttacks++;
@@ -522,6 +546,25 @@ namespace SpireChess.Battle
             var effectiveDamage = hadShield
                 ? 0
                 : Math.Min(amount, Math.Max(0, healthBefore));
+            if (hadShield && !target.HasShield)
+            {
+                RecordPlaybackEvent(
+                    BattlePlaybackEventKind.ShieldLost,
+                    $"{target.Name} 的护盾破裂。",
+                    target: target,
+                    explicitTargetSide: targetSide,
+                    wasBlocked: true);
+            }
+            RecordPlaybackEvent(
+                BattlePlaybackEventKind.DamageApplied,
+                hadShield
+                    ? $"{target.Name} 的护盾抵挡了 {amount} 点伤害。"
+                    : $"{target.Name} 受到 {amount} 点伤害。",
+                target: target,
+                explicitTargetSide: targetSide,
+                amount: amount,
+                healthDelta: target.CurrentHealth - healthBefore,
+                wasBlocked: hadShield);
 
             if (currentRound == 0)
             {
@@ -920,7 +963,16 @@ namespace SpireChess.Battle
                     log);
                 if (gainedAttack >= Math.Max(1, effect.Value?.Count ?? int.MaxValue))
                 {
-                    pending.Source.TryAddKeyword(effect.Value?.Keyword, log);
+                    if (pending.Source.TryAddKeyword(effect.Value?.Keyword, log) &&
+                        effect.Value?.Keyword == "Shield")
+                    {
+                        RecordPlaybackEvent(
+                            BattlePlaybackEventKind.ShieldGained,
+                            $"{pending.Source.Name} 获得护盾。",
+                            pending.Source,
+                            pending.Source,
+                            explicitTargetSide: pending.Side);
+                    }
                 }
                 return;
             }
@@ -959,10 +1011,13 @@ namespace SpireChess.Battle
                 var selected = ResolveBattleTargets(state, pending).ToList();
                 foreach (var target in selected)
                 {
-                    target.AddTemporaryStats(
+                    AddTemporaryStats(
+                        pending.Side,
+                        target,
                         effect.Value?.PermanentAttack ?? 0,
                         effect.Value?.PermanentHealth ?? 0,
-                        log);
+                        log,
+                        false);
                     AddPermanentDelta(
                         pending.Side,
                         target,
@@ -1005,7 +1060,13 @@ namespace SpireChess.Battle
                         }
                         if (effect.Value?.Duration == "Permanent")
                         {
-                            target.AddTemporaryStats(attack, health, log);
+                            AddTemporaryStats(
+                                GetRuntimeSide(state, target, pending.Side),
+                                target,
+                                attack,
+                                health,
+                                log,
+                                false);
                             AddPermanentDelta(
                                 pending.Side,
                                 target,
@@ -1039,6 +1100,12 @@ namespace SpireChess.Battle
                                 "OnShieldGained",
                                 target,
                                 pending.Source);
+                            RecordPlaybackEvent(
+                                BattlePlaybackEventKind.ShieldGained,
+                                $"{target.Name} 获得护盾。",
+                                pending.Source,
+                                target,
+                                explicitTargetSide: side);
                         }
                         break;
                     case "RemoveShield":
@@ -1052,6 +1119,12 @@ namespace SpireChess.Battle
                                 "OnShieldLost",
                                 target,
                                 pending.Source);
+                            RecordPlaybackEvent(
+                                BattlePlaybackEventKind.ShieldLost,
+                                $"{target.Name} 失去护盾。",
+                                pending.Source,
+                                target,
+                                explicitTargetSide: side);
                         }
                         break;
                     case "AddKeyword":
@@ -1059,8 +1132,14 @@ namespace SpireChess.Battle
                         {
                             if (effect.Value?.Keyword == "Shield")
                             {
-                                diagnostics.For(GetRuntimeSide(state, target, pending.Side))
-                                    .ShieldsGranted++;
+                                var side = GetRuntimeSide(state, target, pending.Side);
+                                diagnostics.For(side).ShieldsGranted++;
+                                RecordPlaybackEvent(
+                                    BattlePlaybackEventKind.ShieldGained,
+                                    $"{target.Name} 获得护盾。",
+                                    pending.Source,
+                                    target,
+                                    explicitTargetSide: side);
                             }
                             if (effect.Value?.Duration == "Permanent")
                             {
@@ -1241,7 +1320,8 @@ namespace SpireChess.Battle
             BattleMinionRuntime target,
             int attack,
             int health,
-            IList<string> log)
+            IList<string> log,
+            bool countDiagnostics = true)
         {
             if (target == null || !target.IsAlive || (attack == 0 && health == 0))
             {
@@ -1249,8 +1329,18 @@ namespace SpireChess.Battle
             }
 
             target.AddTemporaryStats(attack, health, log);
-            diagnostics.For(side).TemporaryAttackGained += Math.Max(0, attack);
-            diagnostics.For(side).TemporaryHealthGained += Math.Max(0, health);
+            if (countDiagnostics)
+            {
+                diagnostics.For(side).TemporaryAttackGained += Math.Max(0, attack);
+                diagnostics.For(side).TemporaryHealthGained += Math.Max(0, health);
+            }
+            RecordPlaybackEvent(
+                BattlePlaybackEventKind.StatsChanged,
+                $"{target.Name} 的属性发生变化。",
+                target: target,
+                explicitTargetSide: side,
+                attackDelta: attack,
+                healthDelta: health);
         }
 
         private void ApplyEffectDamage(
@@ -1409,6 +1499,7 @@ namespace SpireChess.Battle
                     ? state.GetFlourishStacks(death.Side)
                     : 0;
                 var summonedAttack = attackOverride ?? tokenConfig.Attack;
+                var summonEventId = ++nextSummonEventId;
                 var token = new BattleMinionRuntime(
                     tokenConfig,
                     false,
@@ -1416,16 +1507,24 @@ namespace SpireChess.Battle
                     healthOverride,
                     summonEffectMultiplier: Math.Max(
                         1,
-                        effect.Value?.SummonEffectMultiplier ?? 1));
+                        effect.Value?.SummonEffectMultiplier ?? 1),
+                    runtimeInstanceId:
+                        $"summon:{death.Side}:{summonEventId}:{tokenConfig.Id}");
                 row[slotIndex] = token;
                 log.Add($"{death.Minion.Name} 在 {slotIndex + 1} 号位召唤了 {token.Name}。");
+                RecordPlaybackEvent(
+                    BattlePlaybackEventKind.UnitSummoned,
+                    log[log.Count - 1],
+                    death.Minion,
+                    token,
+                    explicitTargetSide: death.Side,
+                    explicitTargetIndex: slotIndex);
                 AddTemporaryStats(
                     death.Side,
                     token,
                     flourishAttack,
                     0,
                     log);
-                var summonEventId = ++nextSummonEventId;
                 EnqueueSourceEffects(
                     token,
                     death.Side,
@@ -1546,6 +1645,12 @@ namespace SpireChess.Battle
                 if (pending.Source.TryAddKeyword(keyword, log) && keyword == "Shield")
                 {
                     diagnostics.For(pending.Side).ShieldsGranted++;
+                    RecordPlaybackEvent(
+                        BattlePlaybackEventKind.ShieldGained,
+                        $"{pending.Source.Name} 获得护盾。",
+                        pending.Source,
+                        pending.Source,
+                        explicitTargetSide: pending.Side);
                 }
             }
         }
@@ -1624,6 +1729,12 @@ namespace SpireChess.Battle
                 log.Add($"{minion.Name} 从 {i + 1} 号位移除。");
                 deaths.Add(new DeathRecord(side, i, minion));
                 row[i] = null;
+                RecordPlaybackEvent(
+                    BattlePlaybackEventKind.UnitDied,
+                    $"{minion.Name} 死亡。",
+                    target: minion,
+                    explicitTargetSide: side,
+                    explicitTargetIndex: i);
             }
 
             return deaths;
@@ -1685,6 +1796,97 @@ namespace SpireChess.Battle
 
             winner = null;
             return true;
+        }
+
+        private static void EnsureRuntimeInstanceIds(BattleBoardState state)
+        {
+            EnsureRuntimeInstanceIds(state.Player, BattleSide.Player);
+            EnsureRuntimeInstanceIds(state.Enemy, BattleSide.Enemy);
+        }
+
+        private static void EnsureRuntimeInstanceIds(
+            IReadOnlyList<BattleMinionRuntime> row,
+            BattleSide side)
+        {
+            for (var index = 0; index < row.Count; index++)
+            {
+                var minion = row[index];
+                if (minion == null)
+                {
+                    continue;
+                }
+
+                minion.AssignRuntimeInstanceId(
+                    $"{side}:{index}:{minion.Id}");
+            }
+        }
+
+        private void RecordPlaybackEvent(
+            BattlePlaybackEventKind kind,
+            string message,
+            BattleMinionRuntime source = null,
+            BattleMinionRuntime target = null,
+            BattleSide? explicitTargetSide = null,
+            int explicitTargetIndex = -1,
+            int amount = 0,
+            int attackDelta = 0,
+            int healthDelta = 0,
+            bool wasBlocked = false)
+        {
+            if (playbackEvents == null || playbackState == null)
+            {
+                return;
+            }
+
+            var sourceSide = FindRuntimeLocation(
+                playbackState,
+                source,
+                out var sourceIndex);
+            var locatedTargetSide = FindRuntimeLocation(
+                playbackState,
+                target,
+                out var targetIndex);
+            var targetSide = locatedTargetSide ?? explicitTargetSide;
+            if (targetIndex < 0)
+            {
+                targetIndex = explicitTargetIndex;
+            }
+
+            playbackEvents.Add(new BattlePlaybackEvent(
+                kind,
+                playbackState,
+                message,
+                sourceSide,
+                sourceIndex,
+                source?.RuntimeInstanceId,
+                targetSide,
+                targetIndex,
+                target?.RuntimeInstanceId,
+                amount,
+                attackDelta,
+                healthDelta,
+                wasBlocked));
+        }
+
+        private static BattleSide? FindRuntimeLocation(
+            BattleBoardState state,
+            BattleMinionRuntime runtime,
+            out int index)
+        {
+            index = -1;
+            if (runtime == null)
+            {
+                return null;
+            }
+
+            index = FindRuntimeIndex(state.Player, runtime);
+            if (index >= 0)
+            {
+                return BattleSide.Player;
+            }
+
+            index = FindRuntimeIndex(state.Enemy, runtime);
+            return index >= 0 ? BattleSide.Enemy : (BattleSide?)null;
         }
 
         private static void AddStep(

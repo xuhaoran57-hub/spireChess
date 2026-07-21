@@ -18,7 +18,8 @@ namespace SpireChess.Battle
             int permanentAttackBonus = 0,
             int permanentHealthBonus = 0,
             IEnumerable<string> permanentKeywords = null,
-            int summonEffectMultiplier = 1)
+            int summonEffectMultiplier = 1,
+            string runtimeInstanceId = null)
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             IsGolden = isGolden;
@@ -32,6 +33,9 @@ namespace SpireChess.Battle
             CombatMaxHealth = CurrentHealth;
             HasShield = keywords.Contains("Shield");
             SummonEffectMultiplier = Math.Max(1, summonEffectMultiplier);
+            RuntimeInstanceId = string.IsNullOrWhiteSpace(runtimeInstanceId)
+                ? sourceInstanceId
+                : runtimeInstanceId;
         }
 
         private BattleMinionRuntime(
@@ -45,7 +49,8 @@ namespace SpireChess.Battle
             bool hasShield,
             IEnumerable<string> keywords,
             string sourceInstanceId,
-            int summonEffectMultiplier)
+            int summonEffectMultiplier,
+            string runtimeInstanceId)
         {
             Config = config;
             IsGolden = isGolden;
@@ -58,10 +63,12 @@ namespace SpireChess.Battle
             SourceInstanceId = sourceInstanceId;
             this.keywords = new HashSet<string>(keywords ?? Enumerable.Empty<string>());
             SummonEffectMultiplier = summonEffectMultiplier;
+            RuntimeInstanceId = runtimeInstanceId;
         }
 
         public MinionConfig Config { get; }
         public string SourceInstanceId { get; }
+        public string RuntimeInstanceId { get; private set; }
         public string Id => Config.Id;
         public string Name => Config.Name;
         public int BaseAttack => IsGolden ? Config.GoldenAttack : Config.Attack;
@@ -92,7 +99,18 @@ namespace SpireChess.Battle
                 HasShield,
                 keywords,
                 SourceInstanceId,
-                SummonEffectMultiplier);
+                SummonEffectMultiplier,
+                RuntimeInstanceId);
+        }
+
+        internal void AssignRuntimeInstanceId(string value)
+        {
+            if (!string.IsNullOrWhiteSpace(RuntimeInstanceId))
+            {
+                return;
+            }
+
+            RuntimeInstanceId = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public bool TakeDamage(int damage, IList<string> log)
