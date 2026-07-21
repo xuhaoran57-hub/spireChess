@@ -338,7 +338,8 @@ namespace SpireChess.Editor
                     "LogPanel",
                     safeArea,
                     Panel).rectTransform;
-                SetRect(logPanel, 1530f, 120f, 370f, 930f);
+                SetRect(logPanel, 1530f, 120f, 370f, 838f);
+                logPanel.GetComponent<Image>().raycastTarget = false;
                 var logTitle = CreateText(
                     "LogTitle",
                     logPanel,
@@ -346,7 +347,7 @@ namespace SpireChess.Editor
                     "战斗日志",
                     22,
                     TextAnchor.MiddleLeft);
-                SetRect(logTitle.rectTransform, 16f, 860f, 338f, 50f);
+                SetRect(logTitle.rectTransform, 16f, 768f, 338f, 50f);
                 var scrollRect = BuildLogScroll(logPanel, font, out var logText);
 
                 var feedbackRoot = CreateRect("FeedbackLayer", safeArea);
@@ -445,7 +446,7 @@ namespace SpireChess.Editor
             out Text contentText)
         {
             var scroll = CreateRect("LogScroll", parent);
-            SetRect(scroll, 16f, 18f, 338f, 830f);
+            SetRect(scroll, 16f, 18f, 338f, 738f);
             var scrollRect = scroll.gameObject.AddComponent<ScrollRect>();
             scrollRect.horizontal = false;
             scrollRect.vertical = true;

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using SpireChess.App;
 using SpireChess.Battle;
@@ -8,8 +9,10 @@ using SpireChess.UI.Battle;
 using SpireChess.UI.Run;
 using SpireChess.UI.Shop;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace SpireChess.Tests
 {
@@ -26,7 +29,13 @@ namespace SpireChess.Tests
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
             Assert.That(map.NodeButtonCount, Is.EqualTo(19));
-            Assert.That(map.EnterNode("f1_shop_start").Success, Is.True);
+            Assert.That(map.IsUsingFormalView, Is.True);
+            Assert.That(map.FormalScreenView.RenderedEdgeCount,
+                Is.EqualTo(run.State.CurrentMap.Nodes.Sum(node => node.NextNodeIds.Count)));
+            var startNode = map.FormalScreenView.FindNode("f1_shop_start");
+            Assert.That(startNode, Is.Not.Null);
+            Assert.That(startNode.GetComponent<Button>().interactable, Is.True);
+            startNode.GetComponent<Button>().onClick.Invoke();
             yield return null;
 
             Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("ShopTest"));
@@ -114,8 +123,7 @@ namespace SpireChess.Tests
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
             Assert.That(map.ChoiceOverlayVisible, Is.True);
-            Assert.That(map.SelectRelic(
-                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
+            Assert.That(map.SkipReward().Success, Is.True);
             Assert.That(map.ContinueAfterBattle().Success, Is.True);
             Assert.That(map.EnterNode("f1_enhance").Success, Is.True);
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.EnhanceChoice));
@@ -141,9 +149,16 @@ namespace SpireChess.Tests
             Assert.That(map.ChoiceOverlayVisible, Is.True);
             var pending = run.State.PendingEventChoice;
             var safeOption = pending.Config.Options[pending.Config.Options.Count - 1];
-            Assert.That(map.SelectEvent(pending.Config.Id, safeOption.Id).Success, Is.True);
+            var choiceContent = map.FormalScreenView.transform.Find(
+                "SafeArea/ChoiceOverlay/Dialog/OptionsScroll/Viewport/Content");
+            Assert.That(choiceContent, Is.Not.Null);
+            Assert.That(choiceContent.childCount,
+                Is.EqualTo(pending.Config.Options.Count));
+            choiceContent.GetChild(choiceContent.childCount - 1)
+                .GetComponent<Button>().onClick.Invoke();
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.MapSelection));
             Assert.That(map.ChoiceOverlayVisible, Is.False);
+            Assert.That(safeOption.Id, Is.Not.Empty);
         }
 
         [UnityTest]
@@ -164,6 +179,9 @@ namespace SpireChess.Tests
             var controllers = Object.FindObjectsOfType<RunTestController>();
             Assert.That(controllers.Length, Is.EqualTo(1));
             Assert.That(controllers[0].ChoiceOverlayVisible, Is.True);
+            Assert.That(Object.FindObjectsOfType<RunScreenView>(), Has.Length.EqualTo(1));
+            Assert.That(Object.FindObjectsOfType<Canvas>(), Has.Length.EqualTo(1));
+            Assert.That(Object.FindObjectsOfType<EventSystem>(), Has.Length.EqualTo(1));
             Assert.That(run.State.CurrentAttempt.NodeAttemptId, Is.EqualTo(attemptId));
             Assert.That(run.State.ShopTurn, Is.EqualTo(shopTurn));
         }
@@ -180,11 +198,23 @@ namespace SpireChess.Tests
             SceneManager.LoadScene("RunTest");
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
-            Assert.That(map.SelectRelic(
-                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
-            Assert.That(map.ContinueToNextFloor().Success, Is.True);
+            var choiceContent = map.FormalScreenView.transform.Find(
+                "SafeArea/ChoiceOverlay/Dialog/OptionsScroll/Viewport/Content");
+            Assert.That(choiceContent.childCount,
+                Is.EqualTo(run.State.PendingRelicChoice.Candidates.Count));
+            choiceContent.GetChild(0).GetComponent<Button>().onClick.Invoke();
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.FloorComplete));
+            var continueButton = map.FormalScreenView.transform.Find(
+                    "SafeArea/SummaryPanel/ActionButton")
+                .GetComponent<Button>();
+            Assert.That(continueButton.gameObject.activeSelf, Is.True);
+            continueButton.onClick.Invoke();
             Assert.That(run.State.Floor, Is.EqualTo(2));
             Assert.That(map.NodeButtonCount, Is.EqualTo(19));
+            Assert.That(map.FormalScreenView.RenderedEdgeCount,
+                Is.EqualTo(run.State.CurrentMap.Nodes.Sum(node => node.NextNodeIds.Count)));
+            Assert.That(map.FormalScreenView.FindNode("f1_shop_start"), Is.Null);
+            Assert.That(map.FormalScreenView.FindNode("f2_shop_start"), Is.Not.Null);
             Assert.That(run.State.MapProgress.GetStatus("f2_shop_start"),
                 Is.EqualTo(RunNodeStatus.Reachable));
         }

@@ -1,7 +1,7 @@
 # 阶段 8B 完整地图与路线预算技术方案 v0.1
 
 日期：2026-07-21
-状态：纯 C#/JSON、固定地图、遭遇曲线和无 Unity 自动化已实施；待 Unity 正式 UI、全量回归与人工验收
+状态：固定地图、遭遇曲线、正式 Unity UI、全量自动化、静态截图与交互式路线验收已完成；已纳入新运行时候选
 实施版本：内容版本 5.5.0，最低规则版本 8B.1
 完整配置哈希：818596be90de4e2ddf6c4b7f9ba0b6e1fee994fcc31ec9893652e02f49ef4311
 前置实现：`phase-4d-explicit-shop-map-technical-design-v0.1.md`、`phase-8a-relic-system-technical-design-v0.1.md`
@@ -558,7 +558,7 @@ ownedRelicIds / relicActivationCounts
 - 第三层事件获取的周期遗珍不会伪造过去进度。
 - FIFO 奖励在事件战斗、跨场景和切层时保持顺序与牌池守恒。
 
-### 17.2 PlayMode（Unity 可用后）
+### 17.2 PlayMode
 
 - 正式地图渲染 19 个节点及正确连线，可达状态与领域一致。
 - C2、C4、C5 分支在选择后正确锁定兄弟分支。
@@ -578,7 +578,7 @@ ownedRelicIds / relicActivationCounts
 - 事件战斗、Boss 重试、遗珍节奏专项烟测；
 - `git diff --check`。
 
-Unity 全量 EditMode/PlayMode 结果不能由无 Unity 验证替代，必须在候选发布前补跑。
+无 Unity 验证不能替代 Unity 全量 EditMode/PlayMode；当前已补跑并达到 EditMode 229 / 229、PlayMode 20 / 20。
 
 ## 18. 实施顺序
 
@@ -591,7 +591,9 @@ Unity 全量 EditMode/PlayMode 结果不能由无 Unity 验证替代，必须在
 7. 更新三层流程、Boss 重试、事件战斗和遗珍节奏测试。
 8. 运行无 Unity 全量验证，生成路线预算与配置哈希。
 9. 建立新的内容版本和候选身份；旧 R17 S1/S2 不继续补跑。
-10. Unity 可用后生成正式地图 UI，执行全量测试、双分辨率截图和人工验收。
+10. 生成正式地图 UI，执行全量测试、双分辨率截图和交互式人工验收。
+
+第 10 步的正式 UI、全量测试、静态截图以及三路线、事件额外战斗和完整单局交互验收均已完成。
 
 已按内容 5.5.0、最低规则 8B.1 实施；完整配置哈希同时覆盖卡牌、地图、遭遇、奖励、事件、遗珍、强化、恢复和发布清单。
 
@@ -640,7 +642,7 @@ Unity 全量 EditMode/PlayMode 结果不能由无 Unity 验证替代，必须在
 
 ## 21. 实施结果
 
-阶段 8B 无 Unity 范围已落地：
+阶段 8B 领域与 Unity 表现范围已落地：
 
 - 新增 `full_map_6x6_v1` 规则档案，显式配置 6 商店、6 固定战斗、C6 Boss、C4 精英下限、每路线 1 个功能节点、19 节点和 12 路线。
 - `MapDefinition` 持有只读规则档案；`FixedMapProvider` 与可注入的 `IMapProvider` 共用同一领域入口。
@@ -651,8 +653,10 @@ Unity 全量 EditMode/PlayMode 结果不能由无 Unity 验证替代，必须在
 - 保守路线使用独立 `conservative_route_reward`，只提供 1 次免费刷新，再进入恢复节点；不再与奇遇路线共享完整普通法术奖励。
 - C4 精英原始总身材为 10/15、31/36、98/104；C5 两选为 12/16 与 11/16、34/38 与 32/40、105/110 与 105/110；C6 Boss 为 15/29、44/50、120/125。
 - 每层事件池过滤后包含 11 个通用事件和 1 个本层遇怪事件；选择奇遇路线时，物化遇怪事件的基础概率为 1/12，是否开战仍由玩家决定。
-- `RunTestController` 已更新为 Phase 8B 文案，并显示本层商店和固定战斗进度；正式连线与滚动地图留待 Unity 环境。
+- `RunScreenStateBuilder` 统一提供 Phase 8B 顶栏、19 节点、领域连线、遗珍、选择层和结算操作状态；`RunTestController` 只路由正式 View 输入，不在展示层重算领域规则。
+- 已生成 `PF_RunMapNode`、`PF_RunMapEdge`、`PF_RunRelicEntry`、`PF_RunChoiceOption`、`PF_RunScreen` 和 `RunUiPreview`，并完成 `RunTest` 序列化接线；运行时 legacy 动态 UI 已删除。
+- 正式地图使用横向滚动容器，连线位于节点后方；1920×1080、1920×1200 地图及 1920×1080 遗珍选择截图通过静态检查，主体会随高度响应式拉伸。
 - 完整三层保守路线烟测达到 `ShopTurn = 18`、`MapStep = 39`、固定战斗胜利 18；事件额外战斗不占固定序号。
-- 当前无 Unity 验证已通过：97 个 C# 文件语法检查；核心与 EditMode 测试子集编译 0 警告、0 错误；10 个 JSON 解析与配置加载；遗珍、事件战斗和完整三层专项烟测；`git diff --check`。
+- Unity 2022.3.62f3c1 全量结果为 EditMode 229 / 229、PlayMode 20 / 20；覆盖正式节点按钮、事件/遗珍选项按钮、场景重载单例、19 节点与正确连线以及跨层重建。
 
-Unity EditMode/PlayMode 全量结果、正式地图 Prefab、双分辨率截图、路线手感和单局时长尚未验收，不能用上述无 Unity 结果替代。
+正式地图 Prefab、全量自动化、双分辨率静态截图、三条 C4 路线、事件额外战斗、遗珍体验和完整单局均已通过交互式人工验收，并纳入本次新运行时候选。

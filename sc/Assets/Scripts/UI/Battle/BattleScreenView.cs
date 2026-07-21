@@ -218,9 +218,9 @@ namespace SpireChess.UI.Battle
                 card.gameObject.SetActive(true);
                 card.transform.SetParent(slot.Content, false);
                 var rect = card.GetComponent<RectTransform>();
-                rect.anchorMin = new Vector2(0.5f, 0.5f);
-                rect.anchorMax = new Vector2(0.5f, 0.5f);
-                rect.pivot = new Vector2(0.5f, 0.5f);
+                rect.anchorMin = new Vector2(0f, 1f);
+                rect.anchorMax = new Vector2(0f, 1f);
+                rect.pivot = new Vector2(0f, 1f);
                 rect.anchoredPosition = Vector2.zero;
                 rect.localScale = Vector3.one;
                 card.Initialize(
@@ -242,7 +242,15 @@ namespace SpireChess.UI.Battle
                 if (pair.Value != null)
                 {
                     pair.Value.gameObject.SetActive(false);
-                    Destroy(pair.Value.gameObject);
+                    if (Application.isPlaying)
+                    {
+                        pair.Value.transform.SetParent(null, false);
+                        Destroy(pair.Value.gameObject);
+                    }
+                    else
+                    {
+                        DestroyImmediate(pair.Value.gameObject);
+                    }
                 }
                 cardsById.Remove(pair.Key);
             }

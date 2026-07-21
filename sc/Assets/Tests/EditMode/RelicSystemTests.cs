@@ -345,18 +345,26 @@ namespace SpireChess.Tests
 
         private static RunSession FindSealedReliquaryRun(ConfigService configs)
         {
-            var run = new RunSession(configs, 21);
-            CompleteShop(run, "f1_shop_start");
-            CompleteCombat(run, "f1_opening_normal");
-            CompleteShop(run, "f1_shop_2");
-            CompleteCombat(run, "f1_safe_normal");
-            CompleteShop(run, "f1_shop_3");
-            CompleteCombat(run, "f1_mid_mechanic");
-            CompleteShop(run, "f1_shop_4");
-            CompleteCombat(run, "f1_route_normal");
-            Assert.That(run.EnterNode("f1_event").Success, Is.True);
-            Assert.That(run.State.PendingEventChoice.Config.Id, Is.EqualTo("sealed_reliquary"));
-            return run;
+            for (var seed = 1; seed <= 256; seed++)
+            {
+                var run = new RunSession(configs, seed);
+                CompleteShop(run, "f1_shop_start");
+                CompleteCombat(run, "f1_opening_normal");
+                CompleteShop(run, "f1_shop_2");
+                CompleteCombat(run, "f1_safe_normal");
+                CompleteShop(run, "f1_shop_3");
+                CompleteCombat(run, "f1_mid_mechanic");
+                CompleteShop(run, "f1_shop_4");
+                CompleteCombat(run, "f1_route_normal");
+                Assert.That(run.EnterNode("f1_event").Success, Is.True);
+                if (run.State.PendingEventChoice.Config.Id == "sealed_reliquary")
+                {
+                    return run;
+                }
+            }
+
+            Assert.Fail("Unable to find a deterministic sealed reliquary seed.");
+            return null;
         }
 
         private static RunSession ReachFirstBoss(ConfigService configs, int seed)
