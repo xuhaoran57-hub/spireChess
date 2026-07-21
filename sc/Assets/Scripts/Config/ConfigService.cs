@@ -25,6 +25,8 @@ namespace SpireChess.Config
             new Dictionary<string, EnhanceNodeConfig>();
         private Dictionary<string, RestNodeConfig> restNodesById =
             new Dictionary<string, RestNodeConfig>();
+        private Dictionary<string, RunMapRuleProfileConfig> mapRuleProfilesById =
+            new Dictionary<string, RunMapRuleProfileConfig>();
         private Dictionary<string, RelicConfig> relicsById =
             new Dictionary<string, RelicConfig>();
 
@@ -39,6 +41,10 @@ namespace SpireChess.Config
         public IReadOnlyDictionary<string, MinionConfig> MinionsById => minionsById;
         public IReadOnlyDictionary<string, SpellConfig> SpellsById => spellsById;
         public IReadOnlyList<RunMapConfig> RunMaps { get; private set; } = Array.Empty<RunMapConfig>();
+        public IReadOnlyList<RunMapRuleProfileConfig> MapRuleProfiles { get; private set; } =
+            Array.Empty<RunMapRuleProfileConfig>();
+        public IReadOnlyDictionary<string, RunMapRuleProfileConfig> MapRuleProfilesById =>
+            mapRuleProfilesById;
         public IReadOnlyList<EncounterConfig> Encounters { get; private set; } =
             Array.Empty<EncounterConfig>();
         public IReadOnlyList<RewardTableConfig> RewardTables { get; private set; } =
@@ -228,6 +234,8 @@ namespace SpireChess.Config
                 string.IsNullOrWhiteSpace(rewardsJson))
             {
                 RunMaps = Array.Empty<RunMapConfig>();
+                MapRuleProfiles = Array.Empty<RunMapRuleProfileConfig>();
+                mapRuleProfilesById.Clear();
                 Encounters = Array.Empty<EncounterConfig>();
                 RewardTables = Array.Empty<RewardTableConfig>();
                 encountersById.Clear();
@@ -249,6 +257,8 @@ namespace SpireChess.Config
             }
 
             RunMaps = mapFile.Maps ?? new List<RunMapConfig>();
+            MapRuleProfiles = mapFile.RuleProfiles ?? new List<RunMapRuleProfileConfig>();
+            mapRuleProfilesById = ToDictionary(MapRuleProfiles, value => value.Id);
             Encounters = encounterFile.Encounters ?? new List<EncounterConfig>();
             RewardTables = rewardFile.RewardTables ?? new List<RewardTableConfig>();
             encountersById = Encounters
@@ -283,6 +293,7 @@ namespace SpireChess.Config
 
             var runValidation = RunContentValidator.Validate(
                 RunMaps,
+                MapRuleProfiles,
                 Encounters,
                 RewardTables,
                 MinionsById,

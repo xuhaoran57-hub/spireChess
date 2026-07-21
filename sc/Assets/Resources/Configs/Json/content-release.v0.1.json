@@ -1,6 +1,6 @@
 {
-  "contentVersion": "5.4.0",
-  "minimumRulesVersion": "8A.1",
+  "contentVersion": "5.5.0",
+  "minimumRulesVersion": "8B.1",
   "minionIds": [
     "forge_soul_shield_squire", "hearth_core_spark", "copper_ring_apprentice",
     "young_deer_spirit", "rending_cub", "moss_mark_seedling",
@@ -34,22 +34,32 @@
     "legendary_recruitment", "triple_discovery_reward"
   ],
   "encounterIds": [
-    "f1_opening_encounter", "f1_safe_normal_encounter", "f1_elite_wall_encounter",
-    "f1_mid_mechanic_encounter", "f1_late_shield_encounter", "f1_late_summon_encounter", "f1_boss_encounter",
-    "f2_opening_encounter", "f2_normal_encounter", "f2_elite_encounter",
-    "f2_mid_mechanic_encounter", "f2_late_break_encounter", "f2_late_spell_encounter", "f2_boss_encounter",
-    "f3_opening_encounter", "f3_normal_encounter", "f3_elite_encounter",
-    "f3_mid_mechanic_encounter", "f3_late_forge_encounter", "f3_late_wild_encounter", "f3_boss_encounter",
+    "f1_opening_encounter", "f1_safe_normal_encounter", "f1_event_ambush_encounter",
+    "f1_mid_mechanic_encounter", "f1_late_shield_encounter", "f1_late_summon_encounter",
+    "f2_opening_encounter", "f2_normal_encounter", "f2_event_ambush_encounter",
+    "f2_mid_mechanic_encounter", "f2_late_break_encounter", "f2_late_spell_encounter",
+    "f3_opening_encounter", "f3_normal_encounter", "f3_event_ambush_encounter",
+    "f3_mid_mechanic_encounter", "f3_late_forge_encounter", "f3_late_wild_encounter",
+    "f1_early_summon_encounter", "f1_route_normal_encounter", "f1_route_safe_encounter",
+    "f1_c4_elite_encounter", "f1_c5_shield_encounter", "f1_c5_summon_encounter",
+    "f1_c6_boss_encounter", "f1_c4_event_ambush_encounter",
+    "f2_early_spell_encounter", "f2_route_normal_encounter", "f2_route_safe_encounter",
+    "f2_c4_elite_encounter", "f2_c5_break_encounter", "f2_c5_spell_encounter",
+    "f2_c6_boss_encounter", "f2_c4_event_ambush_encounter",
+    "f3_early_summon_encounter", "f3_route_normal_encounter", "f3_route_safe_encounter",
+    "f3_c4_elite_encounter", "f3_c5_forge_encounter", "f3_c5_wild_encounter",
+    "f3_c6_boss_encounter", "f3_c4_event_ambush_encounter",
     "stage5b_f1_mechanic_encounter",
     "stage5b_f2_mechanic_encounter", "stage5b_f3_mechanic_encounter"
   ],
   "eventIds": [
     "blood_contract", "old_tavern_ledger", "lost_supply_cart", "star_spring",
     "dangerous_recruit", "forge_bargain", "tranquil_grove", "merchant_cache",
-    "risky_map", "starlit_wager", "sealed_reliquary"
+    "risky_map", "starlit_wager", "sealed_reliquary",
+    "roadside_ambush_f1", "ravine_ambush_f2", "final_hunt_f3"
   ],
   "rewardTableIds": [
-    "f1_opening_reward", "f1_safe_reward", "f1_elite_reward",
+    "f1_opening_reward", "f1_safe_reward", "conservative_route_reward", "f1_elite_reward",
     "dangerous_recruit_reward", "f2_normal_reward", "f3_normal_reward",
     "f1_boss_reward", "f2_boss_reward"
   ],

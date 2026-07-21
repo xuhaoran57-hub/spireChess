@@ -15,8 +15,8 @@ namespace SpireChess.Tests
         {
             var run = CreateRun(11);
 
-            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("phase4d_floor1"));
-            Assert.That(run.State.CurrentMap.Nodes.Count, Is.EqualTo(15));
+            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("phase8b_floor1"));
+            Assert.That(run.State.CurrentMap.Nodes.Count, Is.EqualTo(19));
             Assert.That(run.State.ShopTurn, Is.Zero);
             Assert.That(run.State.MapStep, Is.Zero);
             Assert.That(run.State.Health, Is.EqualTo(20));
@@ -40,7 +40,7 @@ namespace SpireChess.Tests
         }
 
         [Test]
-        public void SafeRoute_UsesFiveExplicitShopsAndFiveCombatNodes()
+        public void SafeRoute_UsesSixExplicitShopsAndSixCombatNodes()
         {
             var run = CreateRun(17);
 
@@ -48,27 +48,29 @@ namespace SpireChess.Tests
             CompleteCombat(run, "f1_opening_normal");
             CompleteShop(run, "f1_shop_2", 5);
             CompleteCombat(run, "f1_safe_normal");
-            CompleteRest(run, "f1_rest");
             CompleteShop(run, "f1_shop_3", 5);
             CompleteCombat(run, "f1_mid_mechanic");
             CompleteShop(run, "f1_shop_4", 6);
+            CompleteCombat(run, "f1_route_safe");
+            CompleteRest(run, "f1_rest");
+            CompleteShop(run, "f1_shop_5", 7);
             CompleteCombat(run, "f1_late_shield");
-            CompleteShop(run, "f1_shop_boss", 7);
+            CompleteShop(run, "f1_shop_boss", 8);
 
-            Assert.That(run.State.ShopTurn, Is.EqualTo(5));
-            Assert.That(run.Shop.Round, Is.EqualTo(5));
-            Assert.That(run.State.MapStep, Is.EqualTo(10));
+            Assert.That(run.State.ShopTurn, Is.EqualTo(6));
+            Assert.That(run.Shop.Round, Is.EqualTo(6));
+            Assert.That(run.State.MapStep, Is.EqualTo(12));
             Assert.That(run.EnterNode("f1_boss").Success, Is.True);
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.Battle));
             Assert.That(run.State.CurrentMap.TryGetNode("f1_boss", out var boss), Is.True);
-            Assert.That(boss.CombatIndex, Is.EqualTo(5));
+            Assert.That(boss.CombatIndex, Is.EqualTo(6));
             ResolvePlayerWin(run);
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RelicChoice));
             Assert.That(run.SkipRelicChoice().Error, Is.EqualTo(RunOperationError.InvalidChoice));
             Assert.That(run.SelectRelicCandidate(
                 run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.FloorComplete));
-            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(5));
+            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(6));
         }
 
         [Test]
@@ -152,12 +154,14 @@ namespace SpireChess.Tests
             CompleteCombat(run, "f1_opening_normal");
             CompleteShop(run, "f1_shop_2", 5);
             CompleteCombat(run, "f1_safe_normal");
-            CompleteRest(run, "f1_rest");
             CompleteShop(run, "f1_shop_3", 5);
             CompleteCombat(run, "f1_mid_mechanic");
             CompleteShop(run, "f1_shop_4", 6);
+            CompleteCombat(run, "f1_route_safe");
+            CompleteRest(run, "f1_rest");
+            CompleteShop(run, "f1_shop_5", 7);
             CompleteCombat(run, "f1_late_shield");
-            CompleteShop(run, "f1_shop_boss", 7);
+            CompleteShop(run, "f1_shop_boss", 8);
             Assert.That(run.EnterNode("f1_boss").Success, Is.True);
             return run;
         }

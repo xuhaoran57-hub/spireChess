@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "eventPools": [
     {
       "id": "f1_event_pool",
@@ -14,7 +14,10 @@
         { "eventId": "merchant_cache", "weight": 1 },
         { "eventId": "risky_map", "weight": 1 },
         { "eventId": "starlit_wager", "weight": 1 },
-        { "eventId": "sealed_reliquary", "weight": 1 }
+        { "eventId": "sealed_reliquary", "weight": 1 },
+        { "eventId": "roadside_ambush_f1", "weight": 1 },
+        { "eventId": "ravine_ambush_f2", "weight": 1 },
+        { "eventId": "final_hunt_f3", "weight": 1 }
       ]
     }
   ],
@@ -50,7 +53,7 @@
     {
       "id": "dangerous_recruit", "name": "危险招募", "description": "以生命为代价挑选当前等级随从。",
       "options": [
-        { "id": "recruit", "label": "失去 2 点生命；当前酒馆等级随从三选一", "effects": [{ "type": "LoseHealth", "amount": 2 }], "followupRewardTableId": "dangerous_recruit_reward" },
+        { "id": "recruit", "label": "失去 3 点生命；当前酒馆等级随从三选一", "effects": [{ "type": "LoseHealth", "amount": 3 }], "followupRewardTableId": "dangerous_recruit_reward" },
         { "id": "leave", "label": "离开", "effects": [] }
       ]
     },
@@ -64,8 +67,8 @@
     {
       "id": "tranquil_grove", "name": "静谧林地", "description": "短暂休整，或为下一次招募保留灵感。",
       "options": [
-        { "id": "heal", "label": "恢复 2 点生命", "effects": [{ "type": "HealHealth", "amount": 2 }] },
-        { "id": "refresh", "label": "下个商店获得 1 次免费刷新", "effects": [{ "type": "FreeRefresh", "amount": 1 }] }
+        { "id": "heal", "label": "恢复 3 点生命", "effects": [{ "type": "HealHealth", "amount": 3 }] },
+        { "id": "refresh", "label": "下个商店获得 2 次免费刷新", "effects": [{ "type": "FreeRefresh", "amount": 2 }] }
       ]
     },
     {
@@ -78,7 +81,7 @@
     {
       "id": "risky_map", "name": "残缺星图", "description": "沿危险捷径前进可换来更多刷新机会。",
       "options": [
-        { "id": "risk", "label": "失去 1 点生命；下个商店获得 3 次免费刷新", "effects": [{ "type": "LoseHealth", "amount": 1 }, { "type": "FreeRefresh", "amount": 3 }] },
+        { "id": "risk", "label": "失去 2 点生命；下个商店获得 3 次免费刷新", "effects": [{ "type": "LoseHealth", "amount": 2 }, { "type": "FreeRefresh", "amount": 3 }] },
         { "id": "safe", "label": "下个商店 +1 金币", "effects": [{ "type": "NextShopGold", "amount": 1 }] }
       ]
     },
@@ -94,6 +97,27 @@
       "options": [
         { "id": "inspect", "label": "查看三件奇物级遗珍", "effects": [], "followupRelicGrade": "Curio" },
         { "id": "leave", "label": "离开", "effects": [] }
+      ]
+    },
+    {
+      "id": "roadside_ambush_f1", "name": "荒径伏击", "description": "一支临时拼凑的队伍封住了前路。",
+      "options": [
+        { "id": "fight", "label": "迎战；胜利后获得小型锻体", "effects": [], "followupEncounterId": "f1_c4_event_ambush_encounter" },
+        { "id": "avoid", "label": "绕行", "effects": [] }
+      ]
+    },
+    {
+      "id": "ravine_ambush_f2", "name": "裂谷伏兵", "description": "破阵斥候埋伏在裂谷出口，等待松懈的队伍。",
+      "options": [
+        { "id": "fight", "label": "迎战；胜利后获得精准训练", "effects": [], "followupEncounterId": "f2_c4_event_ambush_encounter" },
+        { "id": "avoid", "label": "避开伏兵", "effects": [] }
+      ]
+    },
+    {
+      "id": "final_hunt_f3", "name": "终阶猎杀", "description": "终层猎群循着战斗痕迹追了上来。",
+      "options": [
+        { "id": "fight", "label": "迎战；胜利后获得厚皮药剂", "effects": [], "followupEncounterId": "f3_c4_event_ambush_encounter" },
+        { "id": "avoid", "label": "隐蔽撤离", "effects": [] }
       ]
     }
   ]

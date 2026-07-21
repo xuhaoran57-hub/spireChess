@@ -58,7 +58,7 @@ namespace SpireChess.Tests
                 target = SeedBattleMinion(run, "target");
                 ResolvePlayerWin(run);
                 Assert.That(run.ContinueAfterBattle().Success, Is.True);
-                CompleteShop(run, "f1_shop_2");
+                AdvanceToRouteChoice(run);
                 Assert.That(run.EnterNode("f1_elite_wall").Success, Is.True);
                 ResolvePlayerWin(run);
                 selectedCandidate = run.State.PendingRewardChoice.Candidates
@@ -82,7 +82,7 @@ namespace SpireChess.Tests
             var target = SeedBattleMinion(run, "forge_target");
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
-            CompleteShop(run, "f1_shop_2");
+            AdvanceToRouteChoice(run);
             Assert.That(run.EnterNode("f1_elite_wall").Success, Is.True);
             ResolvePlayerLoss(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
@@ -109,11 +109,11 @@ namespace SpireChess.Tests
             Assert.That(run.State.DelayedShopResources.GoldBonus, Is.EqualTo(gold.Amount));
 
             Assert.That(run.EnterNode("f1_enhance").Success, Is.True);
-            Assert.That(run.State.ShopTurn, Is.EqualTo(2));
+            Assert.That(run.State.ShopTurn, Is.EqualTo(4));
             Assert.That(run.State.DelayedShopResources.GoldBonus, Is.EqualTo(gold.Amount));
             Assert.That(run.SkipEnhancement().Success, Is.True);
-            Assert.That(run.EnterNode("f1_shop_3").Success, Is.True);
-            Assert.That(run.Shop.Gold, Is.EqualTo(5 + gold.Amount));
+            Assert.That(run.EnterNode("f1_shop_5").Success, Is.True);
+            Assert.That(run.Shop.Gold, Is.EqualTo(7 + gold.Amount));
             Assert.That(run.State.DelayedShopResources.GoldBonus, Is.Zero);
         }
 
@@ -137,6 +137,77 @@ namespace SpireChess.Tests
             Assert.That(invalid.State.Health, Is.EqualTo(3));
             Assert.That(invalid.State.DelayedShopResources.GoldBonus, Is.EqualTo(beforeGold));
             Assert.That(invalid.State.PendingEventChoice, Is.Not.Null);
+        }
+
+        [Test]
+        public void EventBalanceAdjustments_MatchTheReviewedValues()
+        {
+            var configs = CreateConfigs();
+            var recruit = configs.EventsById["dangerous_recruit"].Options
+                .Single(value => value.Id == "recruit");
+            Assert.That(recruit.Effects.Single(value => value.Type == "LoseHealth").Amount,
+                Is.EqualTo(3));
+
+            var risky = configs.EventsById["risky_map"].Options
+                .Single(value => value.Id == "risk");
+            Assert.That(risky.Effects.Single(value => value.Type == "LoseHealth").Amount,
+                Is.EqualTo(2));
+            Assert.That(risky.Effects.Single(value => value.Type == "FreeRefresh").Amount,
+                Is.EqualTo(3));
+
+            var grove = configs.EventsById["tranquil_grove"];
+            Assert.That(grove.Options.Single(value => value.Id == "heal")
+                .Effects.Single().Amount, Is.EqualTo(3));
+            Assert.That(grove.Options.Single(value => value.Id == "refresh")
+                .Effects.Single().Amount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void UpgradeEvents_RejectZeroEffectiveDiscountWithoutChargingHealth()
+        {
+            var ledger = FindEvent("old_tavern_ledger");
+            SetRoundsWithoutUpgrade(ledger, 4);
+            Assert.That(ledger.Shop.CurrentUpgradeCost, Is.EqualTo(1));
+            Assert.That(ledger.SelectEventOption("old_tavern_ledger", "discount").Error,
+                Is.EqualTo(RunOperationError.NoBenefit));
+            Assert.That(ledger.State.PendingEventChoice, Is.Not.Null);
+            Assert.That(ledger.SelectEventOption("old_tavern_ledger", "refresh").Success,
+                Is.True);
+
+            var bargain = FindEvent("forge_bargain");
+            SetTavernTier(bargain, ShopEconomyRules.MaximumTavernTier);
+            var health = bargain.State.Health;
+            Assert.That(bargain.SelectEventOption("forge_bargain", "accept").Error,
+                Is.EqualTo(RunOperationError.NoBenefit));
+            Assert.That(bargain.State.Health, Is.EqualTo(health));
+            Assert.That(bargain.State.PendingEventChoice, Is.Not.Null);
+            Assert.That(bargain.SelectEventOption("forge_bargain", "small").Success,
+                Is.True);
+        }
+
+        [Test]
+        public void EncounterEvent_StartsBattleAndResolvesTheEventNode()
+        {
+            var run = FindEvent("roadside_ambush_f1");
+            var result = run.SelectEventOption("roadside_ambush_f1", "fight");
+
+            Assert.That(result.Success, Is.True);
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.Battle));
+            Assert.That(run.State.CurrentAttempt.NodeType, Is.EqualTo(RunNodeType.Event));
+            Assert.That(run.State.CurrentAttempt.EncounterId,
+                Is.EqualTo("f1_c4_event_ambush_encounter"));
+            Assert.That(run.PendingBattle.EncounterId,
+                Is.EqualTo("f1_c4_event_ambush_encounter"));
+
+            ResolvePlayerWin(run);
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.BattleResult));
+            Assert.That(run.State.CurrentAttempt.NodeResolved, Is.True);
+            Assert.That(run.State.PendingCardRewards.Count, Is.EqualTo(2));
+            Assert.That(run.State.PendingCardRewards,
+                Has.All.Matches<PendingCardReward>(value =>
+                    value.ConfigId == "minor_tempering"));
+            Assert.That(run.ContinueAfterBattle().Success, Is.True);
+            Assert.That(run.State.Phase, Is.EqualTo(RunPhase.MapSelection));
         }
 
         [Test]
@@ -209,19 +280,28 @@ namespace SpireChess.Tests
 
         private static RunSession ReachElite(int seed)
         {
-            var run = CreateRun(seed);
-            Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
-            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
-            Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
-            ResolvePlayerWin(run);
-            Assert.That(run.ContinueAfterBattle().Success, Is.True);
-            Assert.That(run.EnterNode("f1_shop_2").Success, Is.True);
-            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
+            var run = ReachRouteChoice(seed, 0);
             Assert.That(run.EnterNode("f1_elite_wall").Success, Is.True);
             return run;
         }
 
         private static RunSession ReachEvent(int seed, int refreshes)
+        {
+            var run = ReachRouteChoice(seed, refreshes);
+            CompleteCombat(run, "f1_route_normal");
+            Assert.That(run.EnterNode("f1_event").Success, Is.True);
+            return run;
+        }
+
+        private static RunSession ReachRest(int seed)
+        {
+            var run = ReachRouteChoice(seed, 0);
+            CompleteCombat(run, "f1_route_safe");
+            Assert.That(run.EnterNode("f1_rest").Success, Is.True);
+            return run;
+        }
+
+        private static RunSession ReachRouteChoice(int seed, int refreshes)
         {
             var run = CreateRun(seed);
             Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
@@ -230,30 +310,40 @@ namespace SpireChess.Tests
             Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
-            Assert.That(run.EnterNode("f1_shop_2").Success, Is.True);
-            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
-            Assert.That(run.EnterNode("f1_safe_normal").Success, Is.True);
-            ResolvePlayerWin(run);
-            Assert.That(run.ContinueAfterBattle().Success, Is.True);
-            Assert.That(run.EnterNode("f1_event").Success, Is.True);
+            AdvanceToRouteChoice(run);
             return run;
         }
 
-        private static RunSession ReachRest(int seed)
+        private static void AdvanceToRouteChoice(RunSession run)
         {
-            var run = CreateRun(seed);
-            Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
-            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
-            Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
+            CompleteShop(run, "f1_shop_2");
+            CompleteCombat(run, "f1_safe_normal");
+            CompleteShop(run, "f1_shop_3");
+            CompleteCombat(run, "f1_mid_mechanic");
+            CompleteShop(run, "f1_shop_4");
+        }
+
+        private static void CompleteCombat(RunSession run, string nodeId)
+        {
+            Assert.That(run.EnterNode(nodeId).Success, Is.True, nodeId);
             ResolvePlayerWin(run);
             Assert.That(run.ContinueAfterBattle().Success, Is.True);
-            Assert.That(run.EnterNode("f1_shop_2").Success, Is.True);
-            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
-            Assert.That(run.EnterNode("f1_safe_normal").Success, Is.True);
-            ResolvePlayerWin(run);
-            Assert.That(run.ContinueAfterBattle().Success, Is.True);
-            Assert.That(run.EnterNode("f1_rest").Success, Is.True);
-            return run;
+        }
+
+        private static void SetTavernTier(RunSession run, int tier)
+        {
+            typeof(ShopSession).GetProperty(
+                    nameof(ShopSession.TavernTier),
+                    BindingFlags.Instance | BindingFlags.Public)
+                .SetValue(run.Shop, tier);
+        }
+
+        private static void SetRoundsWithoutUpgrade(RunSession run, int rounds)
+        {
+            typeof(ShopSession).GetField(
+                    "roundsWithoutUpgradeAtCurrentTier",
+                    BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(run.Shop, rounds);
         }
 
         private static ShopCardInstance SeedBattleMinion(RunSession run, string instanceId)

@@ -17,6 +17,35 @@ namespace SpireChess.Run
         public int Floor { get; }
     }
 
+    public sealed class MapRuleProfile
+    {
+        public MapRuleProfile(RunMapRuleProfileConfig config)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            Id = config.Id;
+            ShopCount = config.ShopCount;
+            CombatCount = config.CombatCount;
+            BossCombatIndex = config.BossCombatIndex;
+            EliteMinCombatIndex = config.EliteMinCombatIndex;
+            UtilityCountPerPath = config.UtilityCountPerPath;
+            ExpectedNodeCount = config.ExpectedNodeCount;
+            ExpectedPathCount = config.ExpectedPathCount;
+        }
+
+        public string Id { get; }
+        public int ShopCount { get; }
+        public int CombatCount { get; }
+        public int BossCombatIndex { get; }
+        public int EliteMinCombatIndex { get; }
+        public int UtilityCountPerPath { get; }
+        public int ExpectedNodeCount { get; }
+        public int ExpectedPathCount { get; }
+    }
+
     public sealed class MapNodeDefinition
     {
         public MapNodeDefinition(
@@ -26,6 +55,7 @@ namespace SpireChess.Run
             int row,
             string payloadId,
             int combatIndex,
+            string routeTag,
             IEnumerable<string> nextNodeIds)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
@@ -34,6 +64,7 @@ namespace SpireChess.Run
             Row = row;
             PayloadId = payloadId;
             CombatIndex = combatIndex;
+            RouteTag = routeTag;
             NextNodeIds = new List<string>(nextNodeIds ?? Array.Empty<string>()).AsReadOnly();
         }
 
@@ -43,6 +74,7 @@ namespace SpireChess.Run
         public int Row { get; }
         public string PayloadId { get; }
         public int CombatIndex { get; }
+        public string RouteTag { get; }
         public IReadOnlyList<string> NextNodeIds { get; }
     }
 
@@ -53,11 +85,13 @@ namespace SpireChess.Run
         public MapDefinition(
             string id,
             int floor,
+            MapRuleProfile ruleProfile,
             IEnumerable<MapNodeDefinition> nodes,
             IEnumerable<string> startNodeIds)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
             Floor = floor;
+            RuleProfile = ruleProfile ?? throw new ArgumentNullException(nameof(ruleProfile));
             Nodes = new List<MapNodeDefinition>(nodes ?? throw new ArgumentNullException(nameof(nodes)))
                 .AsReadOnly();
             StartNodeIds = new List<string>(startNodeIds ?? Array.Empty<string>()).AsReadOnly();
@@ -69,6 +103,7 @@ namespace SpireChess.Run
 
         public string Id { get; }
         public int Floor { get; }
+        public MapRuleProfile RuleProfile { get; }
         public IReadOnlyList<MapNodeDefinition> Nodes { get; }
         public IReadOnlyList<string> StartNodeIds { get; }
 
@@ -86,10 +121,15 @@ namespace SpireChess.Run
     public sealed class FixedMapProvider : IMapProvider
     {
         private readonly IReadOnlyList<RunMapConfig> configs;
+        private readonly IReadOnlyDictionary<string, RunMapRuleProfileConfig> ruleProfiles;
 
-        public FixedMapProvider(IReadOnlyList<RunMapConfig> configs)
+        public FixedMapProvider(
+            IReadOnlyList<RunMapConfig> configs,
+            IReadOnlyDictionary<string, RunMapRuleProfileConfig> ruleProfiles)
         {
             this.configs = configs ?? throw new ArgumentNullException(nameof(configs));
+            this.ruleProfiles = ruleProfiles ??
+                throw new ArgumentNullException(nameof(ruleProfiles));
         }
 
         public MapDefinition CreateMap(MapRequest request)
@@ -103,6 +143,12 @@ namespace SpireChess.Run
             if (config == null)
             {
                 throw new InvalidOperationException($"Missing fixed map for floor {request.Floor}.");
+            }
+
+            if (!ruleProfiles.TryGetValue(config.RuleProfileId ?? string.Empty, out var ruleConfig))
+            {
+                throw new InvalidOperationException(
+                    $"Missing map rule profile {config.RuleProfileId} for map {config.Id}.");
             }
 
             var nodes = (config.Nodes ?? new List<RunMapNodeConfig>()).Select(node =>
@@ -120,12 +166,14 @@ namespace SpireChess.Run
                     node.Row,
                     node.PayloadId,
                     node.CombatIndex,
+                    node.RouteTag,
                     node.NextNodeIds);
             });
 
             var definition = new MapDefinition(
                 config.Id,
                 config.Floor,
+                new MapRuleProfile(ruleConfig),
                 nodes,
                 config.StartNodeIds);
             var validation = MapValidator.Validate(definition);
@@ -136,6 +184,8 @@ namespace SpireChess.Run
 
     public static class MapValidator
     {
+        private const int MaximumEnumeratedPathCount = 1024;
+
         public static ConfigValidationResult Validate(MapDefinition map)
         {
             var result = new ConfigValidationResult();
@@ -201,6 +251,17 @@ namespace SpireChess.Run
             {
                 result.AddError($"Boss node {bosses[0].Id} must not have a successor.");
             }
+            else if (bosses[0].CombatIndex != map.RuleProfile.BossCombatIndex)
+            {
+                result.AddError(
+                    $"Boss node {bosses[0].Id} must use combatIndex {map.RuleProfile.BossCombatIndex}.");
+            }
+
+            if (map.Nodes.Count != map.RuleProfile.ExpectedNodeCount)
+            {
+                result.AddError(
+                    $"Map {map.Id} must contain exactly {map.RuleProfile.ExpectedNodeCount} nodes, got {map.Nodes.Count}.");
+            }
 
             var visiting = new HashSet<string>();
             var visited = new HashSet<string>();
@@ -209,43 +270,74 @@ namespace SpireChess.Run
                 DetectCycle(map, startId, visiting, visited, result);
             }
 
+            foreach (var node in map.Nodes.Where(node => node != null && !visited.Contains(node.Id)))
+            {
+                result.AddError($"Map {map.Id} node {node.Id} is unreachable from every start node.");
+            }
+
             if (bosses.Count == 1)
             {
-                foreach (var startId in map.StartNodeIds)
+                foreach (var node in map.Nodes.Where(node => node != null))
                 {
-                    if (!CanReach(map, startId, bosses[0].Id, new HashSet<string>()))
+                    if (!CanReach(map, node.Id, bosses[0].Id, new HashSet<string>()))
                     {
-                        result.AddError($"Start node {startId} cannot reach Boss {bosses[0].Id}.");
+                        result.AddError($"Node {node.Id} cannot reach Boss {bosses[0].Id}.");
                     }
                 }
 
-                foreach (var path in EnumerateBossPaths(map, bosses[0].Id))
+                var paths = EnumerateBossPaths(map);
+                if (paths.Count != map.RuleProfile.ExpectedPathCount)
+                {
+                    result.AddError(
+                        $"Map {map.Id} must contain exactly {map.RuleProfile.ExpectedPathCount} Boss paths, got {paths.Count}.");
+                }
+
+                foreach (var path in paths)
                 {
                     ValidateShopCombatCadence(map, path, result);
                 }
+
+                ValidateRouteBudget(map, paths, result);
             }
 
             return result;
         }
 
-        private static IEnumerable<IReadOnlyList<MapNodeDefinition>> EnumerateBossPaths(
-            MapDefinition map,
-            string bossId)
+        public static IReadOnlyList<IReadOnlyList<MapNodeDefinition>> EnumerateBossPaths(
+            MapDefinition map)
         {
+            if (map == null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
+            var boss = map.Nodes.FirstOrDefault(node => node?.Type == RunNodeType.Boss);
+            if (boss == null)
+            {
+                return Array.Empty<IReadOnlyList<MapNodeDefinition>>();
+            }
+
+            var paths = new List<IReadOnlyList<MapNodeDefinition>>();
             foreach (var startId in map.StartNodeIds)
             {
-                foreach (var path in EnumerateBossPaths(
+                foreach (var path in EnumerateBossPathsFrom(
                              map,
                              startId,
-                             bossId,
+                             boss.Id,
                              new List<MapNodeDefinition>()))
                 {
-                    yield return path;
+                    paths.Add(path);
+                    if (paths.Count > MaximumEnumeratedPathCount)
+                    {
+                        return paths.AsReadOnly();
+                    }
                 }
             }
+
+            return paths.AsReadOnly();
         }
 
-        private static IEnumerable<IReadOnlyList<MapNodeDefinition>> EnumerateBossPaths(
+        private static IEnumerable<IReadOnlyList<MapNodeDefinition>> EnumerateBossPathsFrom(
             MapDefinition map,
             string nodeId,
             string bossId,
@@ -270,7 +362,7 @@ namespace SpireChess.Run
             {
                 foreach (var nextId in node.NextNodeIds)
                 {
-                    foreach (var path in EnumerateBossPaths(
+                    foreach (var path in EnumerateBossPathsFrom(
                                  map,
                                  nextId,
                                  bossId,
@@ -290,10 +382,12 @@ namespace SpireChess.Run
             var significant = path.Where(node =>
                     node.Type == RunNodeType.Shop || IsCombat(node.Type))
                 .ToArray();
-            if (significant.Length != 10)
+            var expectedLength = map.RuleProfile.ShopCount + map.RuleProfile.CombatCount;
+            if (significant.Length != expectedLength)
             {
                 result.AddError(
-                    $"Map {map.Id} path {PathText(path)} must contain exactly 5 Shops and 5 combats.");
+                    $"Map {map.Id} path {PathText(path)} must contain exactly " +
+                    $"{map.RuleProfile.ShopCount} Shops and {map.RuleProfile.CombatCount} combats.");
                 return;
             }
 
@@ -326,6 +420,96 @@ namespace SpireChess.Run
             {
                 result.AddError($"Map {map.Id} path {PathText(path)} must end at a Boss.");
             }
+
+            var utilityCount = path.Count(node => IsUtility(node.Type));
+            if (utilityCount != map.RuleProfile.UtilityCountPerPath)
+            {
+                result.AddError(
+                    $"Map {map.Id} path {PathText(path)} must contain exactly " +
+                    $"{map.RuleProfile.UtilityCountPerPath} utility nodes.");
+            }
+
+            var elites = path.Where(node => node.Type == RunNodeType.Elite).ToList();
+            if (elites.Count > 1)
+            {
+                result.AddError($"Map {map.Id} path {PathText(path)} contains multiple Elites.");
+            }
+
+            foreach (var elite in elites.Where(node =>
+                         node.CombatIndex < map.RuleProfile.EliteMinCombatIndex))
+            {
+                result.AddError(
+                    $"Map {map.Id} Elite {elite.Id} appears before combat " +
+                    $"{map.RuleProfile.EliteMinCombatIndex}.");
+            }
+        }
+
+        private static void ValidateRouteBudget(
+            MapDefinition map,
+            IReadOnlyList<IReadOnlyList<MapNodeDefinition>> paths,
+            ConfigValidationResult result)
+        {
+            var foundTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var path in paths)
+            {
+                var routeNodes = path.Where(node => !string.IsNullOrWhiteSpace(node.RouteTag))
+                    .ToList();
+                if (routeNodes.Count != 1)
+                {
+                    result.AddError(
+                        $"Map {map.Id} path {PathText(path)} must contain exactly one route tag.");
+                    continue;
+                }
+
+                var routeNode = routeNodes[0];
+                foundTags.Add(routeNode.RouteTag);
+                var utility = path.FirstOrDefault(node => IsUtility(node.Type));
+                if (routeNode.CombatIndex != map.RuleProfile.EliteMinCombatIndex)
+                {
+                    result.AddError(
+                        $"Map {map.Id} route node {routeNode.Id} must use combatIndex " +
+                        $"{map.RuleProfile.EliteMinCombatIndex}.");
+                    continue;
+                }
+
+                if (string.Equals(routeNode.RouteTag, "Aggressive", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (routeNode.Type != RunNodeType.Elite || utility?.Type != RunNodeType.Enhance)
+                    {
+                        result.AddError(
+                            $"Map {map.Id} aggressive path must use Elite then Enhance.");
+                    }
+                }
+                else if (string.Equals(routeNode.RouteTag, "Adventure", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (routeNode.Type != RunNodeType.Normal || utility?.Type != RunNodeType.Event)
+                    {
+                        result.AddError(
+                            $"Map {map.Id} adventure path must use Normal then Event.");
+                    }
+                }
+                else if (string.Equals(routeNode.RouteTag, "Conservative", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (routeNode.Type != RunNodeType.Normal || utility?.Type != RunNodeType.Rest)
+                    {
+                        result.AddError(
+                            $"Map {map.Id} conservative path must use Normal then Rest.");
+                    }
+                }
+                else
+                {
+                    result.AddError(
+                        $"Map {map.Id} route node {routeNode.Id} has unknown route tag {routeNode.RouteTag}.");
+                }
+            }
+
+            foreach (var expectedTag in new[] { "Aggressive", "Adventure", "Conservative" })
+            {
+                if (!foundTags.Contains(expectedTag))
+                {
+                    result.AddError($"Map {map.Id} is missing route {expectedTag}.");
+                }
+            }
         }
 
         private static bool IsCombat(RunNodeType type)
@@ -333,6 +517,13 @@ namespace SpireChess.Run
             return type == RunNodeType.Normal ||
                    type == RunNodeType.Elite ||
                    type == RunNodeType.Boss;
+        }
+
+        private static bool IsUtility(RunNodeType type)
+        {
+            return type == RunNodeType.Enhance ||
+                   type == RunNodeType.Event ||
+                   type == RunNodeType.Rest;
         }
 
         private static string PathText(IEnumerable<MapNodeDefinition> path)

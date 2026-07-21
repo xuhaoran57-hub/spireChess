@@ -14,6 +14,10 @@ namespace SpireChess.Config
             new[] { "Normal", "Elite", "Boss" },
             StringComparer.OrdinalIgnoreCase);
 
+        private static readonly HashSet<string> ValidRouteTags = new HashSet<string>(
+            new[] { "Aggressive", "Adventure", "Conservative" },
+            StringComparer.OrdinalIgnoreCase);
+
         private static readonly HashSet<string> ValidRewardTypes = new HashSet<string>(
             new[] { "NextShopGold", "FreeRefresh", "UpgradeDiscount", "Spell", "Minion", "PermanentStats" },
             StringComparer.OrdinalIgnoreCase);
@@ -24,6 +28,7 @@ namespace SpireChess.Config
 
         public static ConfigValidationResult Validate(
             IReadOnlyList<RunMapConfig> maps,
+            IReadOnlyList<RunMapRuleProfileConfig> mapRuleProfiles,
             IReadOnlyList<EncounterConfig> encounters,
             IReadOnlyList<RewardTableConfig> rewardTables,
             IReadOnlyDictionary<string, MinionConfig> minions,
@@ -36,23 +41,43 @@ namespace SpireChess.Config
         {
             var result = new ConfigValidationResult();
             maps = maps ?? Array.Empty<RunMapConfig>();
+            mapRuleProfiles = mapRuleProfiles ?? Array.Empty<RunMapRuleProfileConfig>();
             encounters = encounters ?? Array.Empty<EncounterConfig>();
             rewardTables = rewardTables ?? Array.Empty<RewardTableConfig>();
 
             ValidateUniqueIds(maps.Select(map => map?.Id), "run map", result);
+            ValidateUniqueIds(mapRuleProfiles.Select(profile => profile?.Id), "run map rule profile", result);
             ValidateUniqueIds(encounters.Select(encounter => encounter?.Id), "encounter", result);
             ValidateUniqueIds(rewardTables.Select(table => table?.Id), "reward table", result);
 
-            var encounterIds = new HashSet<string>(
-                encounters.Where(value => value != null).Select(value => value.Id));
+            var ruleProfilesById = mapRuleProfiles
+                .Where(value => value != null && !string.IsNullOrWhiteSpace(value.Id))
+                .GroupBy(value => value.Id)
+                .ToDictionary(group => group.Key, group => group.First());
+            foreach (var profile in mapRuleProfiles.Where(value => value != null))
+            {
+                ValidateMapRuleProfile(profile, result);
+            }
+
+            var encountersById = encounters
+                .Where(value => value != null && !string.IsNullOrWhiteSpace(value.Id))
+                .GroupBy(value => value.Id)
+                .ToDictionary(group => group.Key, group => group.First());
             var rewardIds = new HashSet<string>(
                 rewardTables.Where(value => value != null).Select(value => value.Id));
 
             foreach (var map in maps.Where(value => value != null))
             {
+                if (!ruleProfilesById.TryGetValue(map.RuleProfileId ?? string.Empty, out var ruleProfile))
+                {
+                    result.AddError(
+                        $"Map {map.Id} references missing rule profile {map.RuleProfileId}.");
+                }
+
                 ValidateMap(
                     map,
-                    encounterIds,
+                    ruleProfile,
+                    encountersById,
                     new HashSet<string>(eventPools == null ? Array.Empty<string>() : eventPools.Keys),
                     new HashSet<string>(enhanceNodes == null ? Array.Empty<string>() : enhanceNodes.Keys),
                     new HashSet<string>(restNodes == null ? Array.Empty<string>() : restNodes.Keys),
@@ -69,14 +94,23 @@ namespace SpireChess.Config
                 ValidateRewardTable(table, minions, spells, result);
             }
 
-            ValidateFourBContent(eventPools, events, recipes, enhanceNodes, restNodes, rewardIds, result);
+            ValidateFourBContent(
+                eventPools,
+                events,
+                recipes,
+                enhanceNodes,
+                restNodes,
+                rewardIds,
+                encountersById,
+                result);
 
             return result;
         }
 
         private static void ValidateMap(
             RunMapConfig map,
-            ISet<string> encounterIds,
+            RunMapRuleProfileConfig ruleProfile,
+            IReadOnlyDictionary<string, EncounterConfig> encounters,
             ISet<string> eventPoolIds,
             ISet<string> enhanceNodeIds,
             ISet<string> restNodeIds,
@@ -115,22 +149,60 @@ namespace SpireChess.Config
                      string.Equals(node.Type, "Elite", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(node.Type, "Boss", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (!encounterIds.Contains(node.PayloadId ?? string.Empty))
+                    if (!encounters.TryGetValue(node.PayloadId ?? string.Empty, out var encounter))
                     {
                         result.AddError(
                             $"Map {map.Id} node {node.Id} references missing encounter {node.PayloadId}.");
                     }
+                    else
+                    {
+                        if (!string.Equals(encounter.Category, node.Type, StringComparison.OrdinalIgnoreCase))
+                        {
+                            result.AddError(
+                                $"Map {map.Id} node {node.Id} type {node.Type} does not match encounter category {encounter.Category}.");
+                        }
 
-                    if (node.CombatIndex < 1 || node.CombatIndex > 5)
+                        if (encounter.Floor != map.Floor)
+                        {
+                            result.AddError(
+                                $"Map {map.Id} node {node.Id} uses floor {encounter.Floor} encounter {encounter.Id}.");
+                        }
+                    }
+
+                    var maximumCombatIndex = ruleProfile?.CombatCount ?? 0;
+                    if (node.CombatIndex < 1 || node.CombatIndex > maximumCombatIndex)
                     {
                         result.AddError(
                             $"Map {map.Id} combat node {node.Id} has invalid combatIndex {node.CombatIndex}.");
+                    }
+
+                    if (string.Equals(node.Type, "Boss", StringComparison.OrdinalIgnoreCase) &&
+                        ruleProfile != null &&
+                        node.CombatIndex != ruleProfile.BossCombatIndex)
+                    {
+                        result.AddError(
+                            $"Map {map.Id} Boss {node.Id} must use combatIndex {ruleProfile.BossCombatIndex}.");
                     }
                 }
                 else if (node.CombatIndex != 0)
                 {
                     result.AddError(
                         $"Map {map.Id} non-combat node {node.Id} must not set combatIndex {node.CombatIndex}.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(node.RouteTag))
+                {
+                    if (!ValidRouteTags.Contains(node.RouteTag))
+                    {
+                        result.AddError(
+                            $"Map {map.Id} node {node.Id} has invalid routeTag {node.RouteTag}.");
+                    }
+                    else if (ruleProfile == null ||
+                             node.CombatIndex != ruleProfile.EliteMinCombatIndex)
+                    {
+                        result.AddError(
+                            $"Map {map.Id} routeTag must be attached to the route combat index.");
+                    }
                 }
 
                 if (string.Equals(node.Type, "Event", StringComparison.OrdinalIgnoreCase) &&
@@ -163,6 +235,93 @@ namespace SpireChess.Config
             if (bossCount != 1)
             {
                 result.AddError($"Map {map.Id} must contain exactly one Boss, got {bossCount}.");
+            }
+
+            if (ruleProfile != null)
+            {
+                ValidateEqualRewardAlternatives(map, ruleProfile, encounters, result);
+            }
+        }
+
+        private static void ValidateMapRuleProfile(
+            RunMapRuleProfileConfig profile,
+            ConfigValidationResult result)
+        {
+            if (profile.ShopCount < 1 || profile.CombatCount < 1)
+            {
+                result.AddError($"Map rule profile {profile.Id} must have positive shop and combat counts.");
+            }
+
+            if (profile.ShopCount != profile.CombatCount)
+            {
+                result.AddError($"Map rule profile {profile.Id} must use equal shop and combat counts.");
+            }
+
+            if (profile.BossCombatIndex != profile.CombatCount)
+            {
+                result.AddError(
+                    $"Map rule profile {profile.Id} Boss must be the final combat.");
+            }
+
+            if (profile.EliteMinCombatIndex < 1 ||
+                profile.EliteMinCombatIndex > profile.CombatCount)
+            {
+                result.AddError(
+                    $"Map rule profile {profile.Id} has invalid elite minimum index.");
+            }
+
+            if (profile.UtilityCountPerPath < 0 ||
+                profile.ExpectedNodeCount < 1 ||
+                profile.ExpectedPathCount < 1)
+            {
+                result.AddError(
+                    $"Map rule profile {profile.Id} has invalid structural counts.");
+            }
+        }
+
+        private static void ValidateEqualRewardAlternatives(
+            RunMapConfig map,
+            RunMapRuleProfileConfig profile,
+            IReadOnlyDictionary<string, EncounterConfig> encounters,
+            ConfigValidationResult result)
+        {
+            foreach (var combatIndex in new[] { 2, profile.CombatCount - 1 })
+            {
+                var alternativeNodes = (map.Nodes ?? new List<RunMapNodeConfig>())
+                    .Where(node => node != null &&
+                                   node.CombatIndex == combatIndex &&
+                                   string.Equals(node.Type, "Normal", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                if (alternativeNodes.Count != 2)
+                {
+                    result.AddError(
+                        $"Map {map.Id} combat {combatIndex} must contain exactly two Normal alternatives.");
+                }
+
+                var alternatives = alternativeNodes
+                    .Select(node => encounters.TryGetValue(node.PayloadId ?? string.Empty, out var encounter)
+                        ? encounter.RewardTableId
+                        : null)
+                    .Where(value => value != null)
+                    .Distinct()
+                    .ToList();
+                if (alternatives.Count > 1)
+                {
+                    result.AddError(
+                        $"Map {map.Id} combat {combatIndex} alternatives must use the same reward table.");
+                }
+            }
+
+            var routeNodes = (map.Nodes ?? new List<RunMapNodeConfig>())
+                .Where(node => node != null &&
+                               node.CombatIndex == profile.EliteMinCombatIndex &&
+                               !string.IsNullOrWhiteSpace(node.RouteTag))
+                .ToList();
+            if (routeNodes.Count != 3 ||
+                routeNodes.Select(node => node.RouteTag).Distinct(StringComparer.OrdinalIgnoreCase).Count() != 3)
+            {
+                result.AddError(
+                    $"Map {map.Id} must contain three distinct tagged route combats.");
             }
         }
 
@@ -292,6 +451,7 @@ namespace SpireChess.Config
             IReadOnlyDictionary<string, EnhanceNodeConfig> enhanceNodes,
             IReadOnlyDictionary<string, RestNodeConfig> restNodes,
             ISet<string> rewardIds,
+            IReadOnlyDictionary<string, EncounterConfig> encounters,
             ConfigValidationResult result)
         {
             eventPools = eventPools ?? new Dictionary<string, EventPoolConfig>();
@@ -299,6 +459,7 @@ namespace SpireChess.Config
             recipes = recipes ?? new Dictionary<string, EnhancementRecipeConfig>();
             enhanceNodes = enhanceNodes ?? new Dictionary<string, EnhanceNodeConfig>();
             restNodes = restNodes ?? new Dictionary<string, RestNodeConfig>();
+            encounters = encounters ?? new Dictionary<string, EncounterConfig>();
 
             foreach (var pool in eventPools.Values)
             {
@@ -325,15 +486,29 @@ namespace SpireChess.Config
                     if (!string.IsNullOrWhiteSpace(option.FollowupRelicGrade) &&
                         option.FollowupRelicGrade != "Curio")
                         result.AddError($"Event {eventConfig.Id} has invalid relic grade {option.FollowupRelicGrade}.");
-                    if (!string.IsNullOrWhiteSpace(option.FollowupRewardTableId) &&
-                        !string.IsNullOrWhiteSpace(option.FollowupRelicGrade))
-                        result.AddError($"Event {eventConfig.Id} cannot open reward and relic choices together.");
+                    if (!string.IsNullOrWhiteSpace(option.FollowupEncounterId))
+                    {
+                        if (!encounters.TryGetValue(option.FollowupEncounterId, out var encounter))
+                            result.AddError($"Event {eventConfig.Id} references missing encounter {option.FollowupEncounterId}.");
+                        else if (!string.Equals(encounter.Category, "Normal", StringComparison.OrdinalIgnoreCase))
+                            result.AddError($"Event {eventConfig.Id} encounter {option.FollowupEncounterId} must be Normal.");
+                    }
+
+                    var followupCount =
+                        (string.IsNullOrWhiteSpace(option.FollowupRewardTableId) ? 0 : 1) +
+                        (string.IsNullOrWhiteSpace(option.FollowupRelicGrade) ? 0 : 1) +
+                        (string.IsNullOrWhiteSpace(option.FollowupEncounterId) ? 0 : 1);
+                    if (followupCount > 1)
+                        result.AddError($"Event {eventConfig.Id} cannot open multiple followups together.");
                     foreach (var effect in option.Effects ?? new List<RunEffectConfig>())
                     {
                         if (!ValidEventEffectTypes.Contains(effect.Type ?? string.Empty))
                             result.AddError($"Event {eventConfig.Id} has invalid effect {effect.Type}.");
                         if (effect.Amount <= 0)
                             result.AddError($"Event {eventConfig.Id} has non-positive effect amount.");
+                        if (!string.IsNullOrWhiteSpace(option.FollowupEncounterId) &&
+                            effect.Type == "QueueRandomSpell")
+                            result.AddError($"Event {eventConfig.Id} cannot queue a spell before an encounter.");
                     }
                 }
             }

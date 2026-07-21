@@ -124,7 +124,14 @@ namespace SpireChess.UI.Run
 
         public RunOperationResult SelectEvent(string eventId, string optionId)
         {
-            return CompleteChoice(run.SelectEventOption(eventId, optionId));
+            var result = run.SelectEventOption(eventId, optionId);
+            if (result.Success && run.State.Phase == RunPhase.Battle)
+            {
+                SceneManager.LoadScene("BattleTest");
+                return result;
+            }
+
+            return CompleteChoice(result);
         }
 
         public RunOperationResult ApplyEnhancement(string recipeId, string targetInstanceId)
@@ -178,7 +185,7 @@ namespace SpireChess.UI.Run
         {
             GameApp.Instance.StartNewRun();
             run = GameApp.Instance.Run;
-            SetStatus("已开始新的 4C 三层单局");
+            SetStatus("已开始新的 8B 完整地图单局");
             RebuildMap();
             RefreshAll();
         }
@@ -227,7 +234,7 @@ namespace SpireChess.UI.Run
 
             var top = CreatePanel("Top", root, Panel);
             Anchor(top, new Vector2(0f, 0.89f), Vector2.one, new Vector2(20f, 0f), new Vector2(-20f, -14f));
-            var title = CreateText("Title", top, "阶段 4C · 三层完整单局", 30, TextAnchor.MiddleLeft);
+            var title = CreateText("Title", top, "阶段 8B · 三层完整地图", 30, TextAnchor.MiddleLeft);
             Anchor(title.rectTransform, Vector2.zero, new Vector2(0.34f, 1f), new Vector2(18f, 0f));
             resourcesText = CreateText("Resources", top, string.Empty, 20, TextAnchor.MiddleCenter);
             Anchor(resourcesText.rectTransform, new Vector2(0.32f, 0f), new Vector2(0.72f, 1f));
@@ -237,7 +244,9 @@ namespace SpireChess.UI.Run
             mapRoot = CreatePanel("Map", root, new Color(0.08f, 0.105f, 0.13f, 1f));
             Anchor(mapRoot, new Vector2(0.04f, 0.25f), new Vector2(0.96f, 0.84f));
             var route = CreateText("Route", mapRoot,
-                "商店与战斗交替 · 每层 5 战 · 分支路线商店数一致", 22, TextAnchor.UpperCenter);
+                "每层 6 商店 / 6 固定战斗 · C4 路线抉择 · 事件可能触发额外战斗",
+                22,
+                TextAnchor.UpperCenter);
             Anchor(route.rectTransform, new Vector2(0f, 0.88f), Vector2.one,
                 new Vector2(20f, 0f), new Vector2(-20f, -10f));
 
@@ -289,8 +298,14 @@ namespace SpireChess.UI.Run
             }
 
             var state = run.State;
+            var completedShops = state.CurrentMap.Nodes.Count(node =>
+                node.Type == RunNodeType.Shop &&
+                state.MapProgress.GetStatus(node.Id) == RunNodeStatus.Completed);
+            var completedCombats = state.CurrentMap.Nodes.Count(node =>
+                IsCombat(node.Type) &&
+                state.MapProgress.GetStatus(node.Id) == RunNodeStatus.Completed);
             resourcesText.text = $"生命 {state.Health}/{state.MaxHealth}   商店回合 {state.ShopTurn}   " +
-                                 $"地图步数 {state.MapStep}   " +
+                                 $"本层商店 {completedShops}/6   固定战斗 {completedCombats}/6   " +
                                  $"楼层 {state.Floor}/3   战绩 {state.Statistics.BattlesWon}胜/{state.Statistics.BattlesNotWon}未胜";
             resourcesText.text += $"   遗珍 {state.OwnedRelics.Count}";
             statusText.text = StatusMessage ?? string.Empty;
@@ -318,7 +333,7 @@ namespace SpireChess.UI.Run
                 var text = CreateText(
                     "Hint",
                     resultRoot,
-                    "选择高亮节点；第 2、3 层包含额外战斗，可用于验证后期阵容。",
+                    "选择高亮节点；C2/C5 为同奖励机制选择，C4 决定强攻、奇遇或保守路线。",
                     20,
                     TextAnchor.MiddleCenter);
                 Stretch(text.rectTransform);
@@ -489,7 +504,10 @@ namespace SpireChess.UI.Run
             if (GameApp.Instance?.Configs != null &&
                 GameApp.Instance.Configs.TryGetEncounter(node.PayloadId, out EncounterConfig encounter))
             {
-                return $"第 {node.CombatIndex} 战 · {type}\n{encounter.Name}";
+                var route = string.IsNullOrWhiteSpace(node.RouteTag)
+                    ? string.Empty
+                    : $"{ToRouteTagText(node.RouteTag)} · ";
+                return $"{route}第 {node.CombatIndex} 战 · {type}\n{encounter.Name}";
             }
 
             return $"{type}\n{node.Id}";
@@ -501,6 +519,28 @@ namespace SpireChess.UI.Run
             var x = Mathf.Lerp(0.06f, 0.94f, progress);
             var y = node.Row < 0 ? 0.68f : node.Row > 0 ? 0.28f : 0.48f;
             return new Vector2(x, y);
+        }
+
+        private static bool IsCombat(RunNodeType type)
+        {
+            return type == RunNodeType.Normal ||
+                   type == RunNodeType.Elite ||
+                   type == RunNodeType.Boss;
+        }
+
+        private static string ToRouteTagText(string routeTag)
+        {
+            switch (routeTag)
+            {
+                case "Aggressive":
+                    return "强攻";
+                case "Adventure":
+                    return "奇遇";
+                case "Conservative":
+                    return "保守";
+                default:
+                    return routeTag;
+            }
         }
 
         private static bool IsChoicePhase(RunPhase phase)

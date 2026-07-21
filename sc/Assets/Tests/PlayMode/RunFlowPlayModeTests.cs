@@ -25,7 +25,7 @@ namespace SpireChess.Tests
             SceneManager.LoadScene("RunTest");
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
-            Assert.That(map.NodeButtonCount, Is.EqualTo(15));
+            Assert.That(map.NodeButtonCount, Is.EqualTo(19));
             Assert.That(map.EnterNode("f1_shop_start").Success, Is.True);
             yield return null;
 
@@ -102,6 +102,10 @@ namespace SpireChess.Tests
             CompleteShop(run, "f1_shop_start");
             CompleteCombatAndContinue(run, "f1_opening_normal");
             CompleteShop(run, "f1_shop_2");
+            CompleteCombatAndContinue(run, "f1_safe_normal");
+            CompleteShop(run, "f1_shop_3");
+            CompleteCombatAndContinue(run, "f1_mid_mechanic");
+            CompleteShop(run, "f1_shop_4");
             Assert.That(run.EnterNode("f1_elite_wall").Success, Is.True);
             CompletePendingBattleAsWin(run);
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RewardChoice));
@@ -117,7 +121,7 @@ namespace SpireChess.Tests
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.EnhanceChoice));
             Assert.That(map.ChoiceOverlayVisible, Is.True);
             Assert.That(map.SkipEnhancement().Success, Is.True);
-            Assert.That(run.State.MapProgress.GetStatus("f1_shop_3"),
+            Assert.That(run.State.MapProgress.GetStatus("f1_shop_5"),
                 Is.EqualTo(RunNodeStatus.Reachable));
         }
 
@@ -127,7 +131,7 @@ namespace SpireChess.Tests
             yield return EnsureGameApp();
             GameApp.Instance.StartNewRun(505);
             var run = GameApp.Instance.Run;
-            ReachFirstFloorUtility(run, "f1_safe_normal");
+            ReachFirstFloorUtility(run, "f1_safe_normal", "f1_route_normal");
 
             SceneManager.LoadScene("RunTest");
             yield return null;
@@ -148,7 +152,7 @@ namespace SpireChess.Tests
             yield return EnsureGameApp();
             GameApp.Instance.StartNewRun(606);
             var run = GameApp.Instance.Run;
-            ReachFirstFloorUtility(run, "f1_safe_normal");
+            ReachFirstFloorUtility(run, "f1_safe_normal", "f1_route_safe");
             Assert.That(run.EnterNode("f1_rest").Success, Is.True);
             var attemptId = run.State.CurrentAttempt.NodeAttemptId;
             var shopTurn = run.State.ShopTurn;
@@ -170,68 +174,83 @@ namespace SpireChess.Tests
             yield return EnsureGameApp();
             GameApp.Instance.StartNewRun(707);
             var run = GameApp.Instance.Run;
-            CompleteFloor(run, 1, "f1_safe_normal", "f1_rest", "f1_late_shield");
+            CompleteFloor(
+                run, 1, "f1_safe_normal", "f1_route_safe", "f1_rest", "f1_late_shield");
 
             SceneManager.LoadScene("RunTest");
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
-            Assert.That(map.SkipReward().Success, Is.True);
+            Assert.That(map.SelectRelic(
+                run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
             Assert.That(map.ContinueToNextFloor().Success, Is.True);
             Assert.That(run.State.Floor, Is.EqualTo(2));
-            Assert.That(map.NodeButtonCount, Is.EqualTo(15));
+            Assert.That(map.NodeButtonCount, Is.EqualTo(19));
             Assert.That(run.State.MapProgress.GetStatus("f2_shop_start"),
                 Is.EqualTo(RunNodeStatus.Reachable));
         }
 
         [UnityTest]
-        public IEnumerator ThreeFloorDomainFlow_RendersFifteenBattleRunWonResult()
+        public IEnumerator ThreeFloorDomainFlow_RendersEighteenBattleRunWonResult()
         {
             yield return EnsureGameApp();
             GameApp.Instance.StartNewRun(808);
             var run = GameApp.Instance.Run;
-            CompleteFloor(run, 1, "f1_safe_normal", "f1_rest", "f1_late_shield");
+            CompleteFloor(
+                run, 1, "f1_safe_normal", "f1_route_safe", "f1_rest", "f1_late_shield");
             SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
-            CompleteFloor(run, 2, "f2_normal", "f2_rest", "f2_late_break");
+            CompleteFloor(
+                run, 2, "f2_normal", "f2_route_safe", "f2_rest", "f2_late_break");
             SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
-            CompleteFloor(run, 3, "f3_normal", "f3_rest", "f3_late_wild");
+            CompleteFloor(
+                run, 3, "f3_normal", "f3_route_safe", "f3_rest", "f3_late_wild");
 
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RunWon));
-            Assert.That(run.State.ShopTurn, Is.EqualTo(15));
-            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(15));
+            Assert.That(run.State.ShopTurn, Is.EqualTo(18));
+            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(18));
             SceneManager.LoadScene("RunTest");
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
-            Assert.That(map.NodeButtonCount, Is.EqualTo(15));
+            Assert.That(map.NodeButtonCount, Is.EqualTo(19));
             Assert.That(run.State.Statistics.BossesDefeated, Is.EqualTo(3));
             Assert.That(run.State.Statistics.CompletedAtUtc, Is.Not.Null);
         }
 
-        private static void ReachFirstFloorUtility(RunSession run, string branchCombat)
+        private static void ReachFirstFloorUtility(
+            RunSession run,
+            string earlyCombat,
+            string routeCombat)
         {
             CompleteShop(run, "f1_shop_start");
             CompleteCombatAndContinue(run, "f1_opening_normal");
             CompleteShop(run, "f1_shop_2");
-            CompleteCombatAndContinue(run, branchCombat);
+            CompleteCombatAndContinue(run, earlyCombat);
+            CompleteShop(run, "f1_shop_3");
+            CompleteCombatAndContinue(run, "f1_mid_mechanic");
+            CompleteShop(run, "f1_shop_4");
+            CompleteCombatAndContinue(run, routeCombat);
         }
 
         private static void CompleteFloor(
             RunSession run,
             int floor,
-            string branchCombat,
+            string earlyCombat,
+            string routeCombat,
             string restNode,
             string lateCombat)
         {
             CompleteShop(run, $"f{floor}_shop_start");
             CompleteCombatAndContinue(run, $"f{floor}_opening_normal");
             CompleteShop(run, $"f{floor}_shop_2");
-            CompleteCombatAndContinue(run, branchCombat);
-            Assert.That(run.EnterNode(restNode).Success, Is.True);
-            Assert.That(run.SelectRestOption("leave").Success, Is.True);
+            CompleteCombatAndContinue(run, earlyCombat);
             CompleteShop(run, $"f{floor}_shop_3");
             CompleteCombatAndContinue(run, $"f{floor}_mid_mechanic");
             CompleteShop(run, $"f{floor}_shop_4");
+            CompleteCombatAndContinue(run, routeCombat);
+            Assert.That(run.EnterNode(restNode).Success, Is.True);
+            Assert.That(run.SelectRestOption("leave").Success, Is.True);
+            CompleteShop(run, $"f{floor}_shop_5");
             CompleteCombatAndContinue(run, lateCombat);
             CompleteShop(run, $"f{floor}_shop_boss");
             Assert.That(run.EnterNode($"f{floor}_boss").Success, Is.True);

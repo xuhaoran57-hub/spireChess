@@ -8,8 +8,39 @@ namespace SpireChess.Config
         [JsonProperty("version")]
         public string Version { get; set; }
 
+        [JsonProperty("ruleProfiles")]
+        public List<RunMapRuleProfileConfig> RuleProfiles { get; set; } =
+            new List<RunMapRuleProfileConfig>();
+
         [JsonProperty("maps")]
         public List<RunMapConfig> Maps { get; set; } = new List<RunMapConfig>();
+    }
+
+    public sealed class RunMapRuleProfileConfig
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("shopCount")]
+        public int ShopCount { get; set; }
+
+        [JsonProperty("combatCount")]
+        public int CombatCount { get; set; }
+
+        [JsonProperty("bossCombatIndex")]
+        public int BossCombatIndex { get; set; }
+
+        [JsonProperty("eliteMinCombatIndex")]
+        public int EliteMinCombatIndex { get; set; }
+
+        [JsonProperty("utilityCountPerPath")]
+        public int UtilityCountPerPath { get; set; }
+
+        [JsonProperty("expectedNodeCount")]
+        public int ExpectedNodeCount { get; set; }
+
+        [JsonProperty("expectedPathCount")]
+        public int ExpectedPathCount { get; set; }
     }
 
     public sealed class RunMapConfig
@@ -19,6 +50,9 @@ namespace SpireChess.Config
 
         [JsonProperty("floor")]
         public int Floor { get; set; }
+
+        [JsonProperty("ruleProfileId")]
+        public string RuleProfileId { get; set; }
 
         [JsonProperty("startNodeIds")]
         public List<string> StartNodeIds { get; set; } = new List<string>();
@@ -46,6 +80,9 @@ namespace SpireChess.Config
 
         [JsonProperty("combatIndex")]
         public int CombatIndex { get; set; }
+
+        [JsonProperty("routeTag")]
+        public string RouteTag { get; set; }
 
         [JsonProperty("nextNodeIds")]
         public List<string> NextNodeIds { get; set; } = new List<string>();
@@ -235,6 +272,9 @@ namespace SpireChess.Config
 
         [JsonProperty("followupRelicGrade")]
         public string FollowupRelicGrade { get; set; }
+
+        [JsonProperty("followupEncounterId")]
+        public string FollowupEncounterId { get; set; }
     }
 
     public sealed class RunEffectConfig

@@ -350,6 +350,10 @@ namespace SpireChess.Tests
             CompleteCombat(run, "f1_opening_normal");
             CompleteShop(run, "f1_shop_2");
             CompleteCombat(run, "f1_safe_normal");
+            CompleteShop(run, "f1_shop_3");
+            CompleteCombat(run, "f1_mid_mechanic");
+            CompleteShop(run, "f1_shop_4");
+            CompleteCombat(run, "f1_route_normal");
             Assert.That(run.EnterNode("f1_event").Success, Is.True);
             Assert.That(run.State.PendingEventChoice.Config.Id, Is.EqualTo("sealed_reliquary"));
             return run;
@@ -362,11 +366,13 @@ namespace SpireChess.Tests
             CompleteCombat(run, "f1_opening_normal");
             CompleteShop(run, "f1_shop_2");
             CompleteCombat(run, "f1_safe_normal");
-            Assert.That(run.EnterNode("f1_rest").Success, Is.True);
-            Assert.That(run.SelectRestOption("leave").Success, Is.True);
             CompleteShop(run, "f1_shop_3");
             CompleteCombat(run, "f1_mid_mechanic");
             CompleteShop(run, "f1_shop_4");
+            CompleteCombat(run, "f1_route_safe");
+            Assert.That(run.EnterNode("f1_rest").Success, Is.True);
+            Assert.That(run.SelectRestOption("leave").Success, Is.True);
+            CompleteShop(run, "f1_shop_5");
             CompleteCombat(run, "f1_late_shield");
             CompleteShop(run, "f1_shop_boss");
             Assert.That(run.EnterNode("f1_boss").Success, Is.True);

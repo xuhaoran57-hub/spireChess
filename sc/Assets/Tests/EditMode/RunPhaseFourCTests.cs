@@ -11,21 +11,32 @@ namespace SpireChess.Tests
     public sealed class RunPhaseFourCTests
     {
         [Test]
-        public void FixedProvider_LoadsThreeShopFirstMapsWithFiveShopsPerPath()
+        public void FixedProvider_LoadsThreeFullMapsWithSixShopsAndTwelvePaths()
         {
             var configs = CreateConfigs();
-            var provider = new FixedMapProvider(configs.RunMaps);
+            var provider = new FixedMapProvider(
+                configs.RunMaps,
+                configs.MapRuleProfilesById);
 
             for (var floor = 1; floor <= 3; floor++)
             {
                 var map = provider.CreateMap(new MapRequest(1, floor));
-                Assert.That(map.Id, Is.EqualTo($"phase4d_floor{floor}"));
-                Assert.That(map.Nodes.Count, Is.EqualTo(15));
+                Assert.That(map.Id, Is.EqualTo($"phase8b_floor{floor}"));
+                Assert.That(map.Nodes.Count, Is.EqualTo(19));
                 Assert.That(map.StartNodeIds, Is.EqualTo(new[] { $"f{floor}_shop_start" }));
-                Assert.That(map.Nodes.Count(node => node.Type == RunNodeType.Shop), Is.EqualTo(5));
+                Assert.That(map.Nodes.Count(node => node.Type == RunNodeType.Shop), Is.EqualTo(6));
                 Assert.That(map.Nodes.Count(node => node.Type == RunNodeType.Boss), Is.EqualTo(1));
                 Assert.That(map.Nodes.Where(IsCombat),
-                    Has.All.Matches<MapNodeDefinition>(node => node.CombatIndex >= 1 && node.CombatIndex <= 5));
+                    Has.All.Matches<MapNodeDefinition>(
+                        node => node.CombatIndex >= 1 && node.CombatIndex <= 6));
+                var paths = MapValidator.EnumerateBossPaths(map);
+                Assert.That(paths.Count, Is.EqualTo(12));
+                Assert.That(paths, Has.All.Matches<IReadOnlyList<MapNodeDefinition>>(path =>
+                    path.Count == 13 &&
+                    path.Count(node => node.Type == RunNodeType.Shop) == 6 &&
+                    path.Count(IsCombat) == 6 &&
+                    path.Count(IsUtility) == 1 &&
+                    path.Count(node => !string.IsNullOrWhiteSpace(node.RouteTag)) == 1));
             }
         }
 
@@ -37,6 +48,7 @@ namespace SpireChess.Tests
             {
                 ["f1_opening_encounter"] = new[] { 1, 2 },
                 ["f1_safe_normal_encounter"] = new[] { 4, 5 },
+                ["f1_event_ambush_encounter"] = new[] { 5, 7 },
                 ["f1_elite_wall_encounter"] = new[] { 4, 7 },
                 ["f1_mid_mechanic_encounter"] = new[] { 5, 9 },
                 ["f1_late_shield_encounter"] = new[] { 8, 12 },
@@ -44,6 +56,7 @@ namespace SpireChess.Tests
                 ["f1_boss_encounter"] = new[] { 11, 23 },
                 ["f2_opening_encounter"] = new[] { 14, 18 },
                 ["f2_normal_encounter"] = new[] { 18, 22 },
+                ["f2_event_ambush_encounter"] = new[] { 20, 24 },
                 ["f2_elite_encounter"] = new[] { 20, 26 },
                 ["f2_mid_mechanic_encounter"] = new[] { 23, 27 },
                 ["f2_late_break_encounter"] = new[] { 27, 29 },
@@ -51,11 +64,36 @@ namespace SpireChess.Tests
                 ["f2_boss_encounter"] = new[] { 36, 40 },
                 ["f3_opening_encounter"] = new[] { 62, 68 },
                 ["f3_normal_encounter"] = new[] { 70, 76 },
+                ["f3_event_ambush_encounter"] = new[] { 76, 82 },
                 ["f3_elite_encounter"] = new[] { 76, 82 },
                 ["f3_mid_mechanic_encounter"] = new[] { 80, 86 },
                 ["f3_late_forge_encounter"] = new[] { 90, 94 },
                 ["f3_late_wild_encounter"] = new[] { 90, 94 },
-                ["f3_boss_encounter"] = new[] { 100, 100 }
+                ["f3_boss_encounter"] = new[] { 100, 100 },
+                ["f1_early_summon_encounter"] = new[] { 5, 6 },
+                ["f1_route_normal_encounter"] = new[] { 9, 12 },
+                ["f1_route_safe_encounter"] = new[] { 7, 12 },
+                ["f1_c4_elite_encounter"] = new[] { 10, 15 },
+                ["f1_c5_shield_encounter"] = new[] { 12, 16 },
+                ["f1_c5_summon_encounter"] = new[] { 11, 16 },
+                ["f1_c6_boss_encounter"] = new[] { 15, 29 },
+                ["f1_c4_event_ambush_encounter"] = new[] { 9, 13 },
+                ["f2_early_spell_encounter"] = new[] { 19, 23 },
+                ["f2_route_normal_encounter"] = new[] { 28, 32 },
+                ["f2_route_safe_encounter"] = new[] { 25, 29 },
+                ["f2_c4_elite_encounter"] = new[] { 31, 36 },
+                ["f2_c5_break_encounter"] = new[] { 34, 38 },
+                ["f2_c5_spell_encounter"] = new[] { 32, 40 },
+                ["f2_c6_boss_encounter"] = new[] { 44, 50 },
+                ["f2_c4_event_ambush_encounter"] = new[] { 28, 33 },
+                ["f3_early_summon_encounter"] = new[] { 72, 80 },
+                ["f3_route_normal_encounter"] = new[] { 90, 98 },
+                ["f3_route_safe_encounter"] = new[] { 86, 94 },
+                ["f3_c4_elite_encounter"] = new[] { 98, 104 },
+                ["f3_c5_forge_encounter"] = new[] { 105, 110 },
+                ["f3_c5_wild_encounter"] = new[] { 105, 110 },
+                ["f3_c6_boss_encounter"] = new[] { 120, 125 },
+                ["f3_c4_event_ambush_encounter"] = new[] { 92, 100 }
             };
 
             foreach (var pair in expected)
@@ -76,6 +114,20 @@ namespace SpireChess.Tests
         }
 
         [Test]
+        public void FixedProvider_RejectsEliteBeforeConfiguredMinimum()
+        {
+            var configs = CreateConfigs();
+            var floorOne = configs.RunMaps.Single(map => map.Floor == 1);
+            floorOne.Nodes.Single(node => node.Id == "f1_elite_wall").CombatIndex = 2;
+            var provider = new FixedMapProvider(
+                configs.RunMaps,
+                configs.MapRuleProfilesById);
+
+            Assert.Throws<System.InvalidOperationException>(() =>
+                provider.CreateMap(new MapRequest(1, 1)));
+        }
+
+        [Test]
         public void FirstBossRelic_BlocksThenAdvancesFloorWithoutResettingRunState()
         {
             var run = ReachFirstBossVictory(801);
@@ -93,7 +145,7 @@ namespace SpireChess.Tests
                 run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
             Assert.That(run.State.Floor, Is.EqualTo(2));
-            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("phase4d_floor2"));
+            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("phase8b_floor2"));
             Assert.That(run.State.Health, Is.EqualTo(health));
             Assert.That(run.State.ShopTurn, Is.EqualTo(shopTurn));
             Assert.That(run.State.MapStep, Is.EqualTo(mapStep));
@@ -117,22 +169,25 @@ namespace SpireChess.Tests
         }
 
         [Test]
-        public void ThreeFloorSafeRoute_ReachesFinalVictoryWithFifteenBattlesAndShopTurns()
+        public void ThreeFloorSafeRoute_ReachesFinalVictoryWithEighteenBattlesAndShopTurns()
         {
             var run = new RunSession(CreateConfigs(), 901);
-            CompleteFloor(run, 1, "f1_safe_normal", "f1_rest", "f1_late_shield");
+            CompleteFloor(
+                run, 1, "f1_safe_normal", "f1_route_safe", "f1_rest", "f1_late_shield");
             SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
-            CompleteFloor(run, 2, "f2_normal", "f2_rest", "f2_late_break");
+            CompleteFloor(
+                run, 2, "f2_normal", "f2_route_safe", "f2_rest", "f2_late_break");
             SelectFirstRelic(run);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
-            CompleteFloor(run, 3, "f3_normal", "f3_rest", "f3_late_wild");
+            CompleteFloor(
+                run, 3, "f3_normal", "f3_route_safe", "f3_rest", "f3_late_wild");
 
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RunWon));
             Assert.That(run.State.Floor, Is.EqualTo(3));
-            Assert.That(run.State.ShopTurn, Is.EqualTo(15));
-            Assert.That(run.State.MapStep, Is.EqualTo(33));
-            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(15));
+            Assert.That(run.State.ShopTurn, Is.EqualTo(18));
+            Assert.That(run.State.MapStep, Is.EqualTo(39));
+            Assert.That(run.State.Statistics.BattlesWon, Is.EqualTo(18));
             Assert.That(run.State.Statistics.BattlesNotWon, Is.Zero);
             Assert.That(run.State.Statistics.BossesDefeated, Is.EqualTo(3));
             Assert.That(run.State.Statistics.CompletedAtUtc, Is.Not.Null);
@@ -141,7 +196,8 @@ namespace SpireChess.Tests
         private static RunSession ReachFirstBossVictory(int seed)
         {
             var run = new RunSession(CreateConfigs(), seed);
-            CompleteFloor(run, 1, "f1_safe_normal", "f1_rest", "f1_late_shield");
+            CompleteFloor(
+                run, 1, "f1_safe_normal", "f1_route_safe", "f1_rest", "f1_late_shield");
             return run;
         }
 
@@ -155,19 +211,22 @@ namespace SpireChess.Tests
         private static void CompleteFloor(
             RunSession run,
             int floor,
-            string branchCombat,
+            string earlyCombat,
+            string routeCombat,
             string utility,
             string lateCombat)
         {
             CompleteShop(run, $"f{floor}_shop_start");
             CompleteCombat(run, $"f{floor}_opening_normal");
             CompleteShop(run, $"f{floor}_shop_2");
-            CompleteCombat(run, branchCombat);
-            Assert.That(run.EnterNode(utility).Success, Is.True);
-            Assert.That(run.SelectRestOption("leave").Success, Is.True);
+            CompleteCombat(run, earlyCombat);
             CompleteShop(run, $"f{floor}_shop_3");
             CompleteCombat(run, $"f{floor}_mid_mechanic");
             CompleteShop(run, $"f{floor}_shop_4");
+            CompleteCombat(run, routeCombat);
+            Assert.That(run.EnterNode(utility).Success, Is.True);
+            Assert.That(run.SelectRestOption("leave").Success, Is.True);
+            CompleteShop(run, $"f{floor}_shop_5");
             CompleteCombat(run, lateCombat);
             CompleteShop(run, $"f{floor}_shop_boss");
             Assert.That(run.EnterNode($"f{floor}_boss").Success, Is.True);
@@ -214,6 +273,13 @@ namespace SpireChess.Tests
             return node.Type == RunNodeType.Normal ||
                    node.Type == RunNodeType.Elite ||
                    node.Type == RunNodeType.Boss;
+        }
+
+        private static bool IsUtility(MapNodeDefinition node)
+        {
+            return node.Type == RunNodeType.Enhance ||
+                   node.Type == RunNodeType.Event ||
+                   node.Type == RunNodeType.Rest;
         }
 
         private static ConfigService CreateConfigs()

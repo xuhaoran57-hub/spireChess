@@ -14,6 +14,12 @@
       ]
     },
     {
+      "id": "conservative_route_reward", "mode": "AutomaticOne", "candidateCount": 1, "preferDistinctCategories": false, "allowSkip": false,
+      "entries": [
+        { "type": "FreeRefresh", "category": "Refresh", "amount": 1, "cardId": "", "weight": 1 }
+      ]
+    },
+    {
       "id": "f1_elite_reward", "mode": "ChooseOne", "candidateCount": 3, "preferDistinctCategories": true, "allowSkip": true,
       "entries": [
         { "type": "Minion", "category": "Minion", "amount": 1, "cardId": "", "weight": 1 },

@@ -104,6 +104,11 @@ namespace SpireChess.Run
             NodeId = nodeId ?? throw new ArgumentNullException(nameof(nodeId));
             NodeType = nodeType;
             ContentId = contentId;
+            EncounterId = nodeType == RunNodeType.Normal ||
+                          nodeType == RunNodeType.Elite ||
+                          nodeType == RunNodeType.Boss
+                ? contentId
+                : null;
             RunTurn = runTurn;
             RunTurnCommitted = true;
         }
@@ -112,12 +117,7 @@ namespace SpireChess.Run
         public string NodeId { get; }
         public RunNodeType NodeType { get; }
         public string ContentId { get; internal set; }
-        public string EncounterId =>
-            NodeType == RunNodeType.Normal ||
-            NodeType == RunNodeType.Elite ||
-            NodeType == RunNodeType.Boss
-                ? ContentId
-                : null;
+        public string EncounterId { get; internal set; }
         public int RunTurn { get; }
         public bool RunTurnCommitted { get; internal set; }
         public bool EconomyTurnCommitted { get; internal set; }

@@ -40,6 +40,11 @@ namespace SpireChess.Run
         }
 
         public RunSession(ConfigService configs, int seed)
+            : this(configs, seed, null)
+        {
+        }
+
+        public RunSession(ConfigService configs, int seed, IMapProvider mapProvider)
         {
             this.configs = configs ?? throw new ArgumentNullException(nameof(configs));
             Shop = new ShopSession(
@@ -49,10 +54,10 @@ namespace SpireChess.Run
             Shop.EventRaised += OnShopEvent;
             rewardRandom = new Random(SeedDeriver.Combine(seed, RewardStreamId));
             eventRandom = new Random(SeedDeriver.Combine(seed, EventStreamId));
-            mapProvider = configs.RunMaps.Count == 0
+            this.mapProvider = mapProvider ?? (configs.RunMaps.Count == 0
                 ? null
-                : new FixedMapProvider(configs.RunMaps);
-            var map = mapProvider?.CreateMap(new MapRequest(seed, 1));
+                : new FixedMapProvider(configs.RunMaps, configs.MapRuleProfilesById));
+            var map = this.mapProvider?.CreateMap(new MapRequest(seed, 1));
             State = new RunState(seed, map);
             Relics = new RelicService(
                 configs,
@@ -399,6 +404,8 @@ namespace SpireChess.Run
 
             PendingRewardChoice followup = null;
             PendingRelicChoice relicFollowup = null;
+            EncounterConfig encounterFollowup = null;
+            MapNodeDefinition eventNode = null;
             if (!string.IsNullOrWhiteSpace(option.FollowupRewardTableId))
             {
                 if (!configs.TryGetRewardTable(option.FollowupRewardTableId, out var table))
@@ -427,6 +434,20 @@ namespace SpireChess.Run
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(option.FollowupEncounterId))
+            {
+                if (!configs.TryGetEncounter(option.FollowupEncounterId, out encounterFollowup) ||
+                    encounterFollowup.Floor != State.Floor ||
+                    State.CurrentMap == null ||
+                    !State.CurrentMap.TryGetNode(State.CurrentAttempt.NodeId, out eventNode) ||
+                    eventNode.Type != RunNodeType.Event ||
+                    PendingBattle != null ||
+                    Shop.IsShopOpen)
+                {
+                    return RunOperationResult.Fail(RunOperationError.MissingContent);
+                }
+            }
+
             ApplyEventEffects(option.Effects);
             Telemetry?.Record("EventChoiceResolved", new
             {
@@ -434,7 +455,8 @@ namespace SpireChess.Run
                 optionId,
                 option.Label,
                 followupRewardTableId = option.FollowupRewardTableId,
-                followupRelicGrade = option.FollowupRelicGrade
+                followupRelicGrade = option.FollowupRelicGrade,
+                followupEncounterId = option.FollowupEncounterId
             });
             State.PendingEventChoice = null;
             if (relicFollowup != null)
@@ -458,6 +480,15 @@ namespace SpireChess.Run
                 State.CurrentAttempt.EffectApplied = true;
                 State.PendingRewardChoice = followup;
                 State.Phase = RunPhase.RewardChoice;
+            }
+            else if (encounterFollowup != null)
+            {
+                State.CurrentAttempt.ChoiceCommitted = true;
+                State.CurrentAttempt.EffectApplied = true;
+                return StartEncounterBattle(
+                    eventNode,
+                    encounterFollowup.Id,
+                    "RunTest");
             }
             else
             {
@@ -884,8 +915,16 @@ namespace SpireChess.Run
             MapNodeDefinition node,
             string returnSceneName)
         {
-            if (!configs.TryGetEncounter(node.PayloadId, out var encounter) ||
-                State.PendingCardRewards.Count > 0 ||
+            return StartEncounterBattle(node, node.PayloadId, returnSceneName);
+        }
+
+        private RunOperationResult StartEncounterBattle(
+            MapNodeDefinition node,
+            string encounterId,
+            string returnSceneName)
+        {
+            if (!configs.TryGetEncounter(encounterId, out var encounter) ||
+                (node.Type != RunNodeType.Event && State.PendingCardRewards.Count > 0) ||
                 PendingBattle != null ||
                 Shop.IsShopOpen)
             {
@@ -902,6 +941,7 @@ namespace SpireChess.Run
                 State.CurrentAttempt.NodeAttemptId,
                 encounter.Id,
                 SeedDeriver.Combine(State.Seed, node.Id));
+            State.CurrentAttempt.EncounterId = encounter.Id;
             State.CurrentAttempt.ContentGenerated = true;
             State.Phase = RunPhase.Battle;
             return RunOperationResult.Succeed();
@@ -961,7 +1001,19 @@ namespace SpireChess.Run
                 var relicGrade = eventConfig.Options
                     .Select(option => option.FollowupRelicGrade)
                     .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
-                return string.IsNullOrWhiteSpace(relicGrade) || Relics.HasAvailable(relicGrade);
+                if (!string.IsNullOrWhiteSpace(relicGrade) && !Relics.HasAvailable(relicGrade))
+                {
+                    return false;
+                }
+
+                var encounterIds = eventConfig.Options
+                    .Select(option => option.FollowupEncounterId)
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .Distinct()
+                    .ToArray();
+                return encounterIds.Length == 0 || encounterIds.All(id =>
+                    configs.TryGetEncounter(id, out var encounter) &&
+                    encounter.Floor == State.Floor);
             }).ToList();
             var total = entries.Sum(value => Math.Max(0, value.Weight));
             if (total <= 0)
@@ -1038,7 +1090,25 @@ namespace SpireChess.Run
                 return RunOperationError.NoBenefit;
             }
 
+            var upgradeDiscount = option.Effects
+                .Where(effect => effect.Type == "UpgradeDiscount")
+                .Sum(effect => Math.Max(0, effect.Amount));
+            var hasOtherBenefit = option.Effects.Any(effect =>
+                effect.Type != "LoseHealth" && effect.Type != "UpgradeDiscount");
+            if (upgradeDiscount > 0 && !hasOtherBenefit &&
+                GetEffectiveUpgradeDiscount(upgradeDiscount) <= 0)
+            {
+                return RunOperationError.NoBenefit;
+            }
+
             return RunOperationError.None;
+        }
+
+        private int GetEffectiveUpgradeDiscount(int amount)
+        {
+            return Math.Min(
+                Math.Max(0, amount),
+                Math.Max(0, Shop.CurrentUpgradeCost - 1));
         }
 
         private int GetEventRelicHealthCost()
