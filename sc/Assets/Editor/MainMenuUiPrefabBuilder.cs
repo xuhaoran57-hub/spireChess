@@ -34,9 +34,23 @@ namespace SpireChess.Editor
                 Object.DestroyImmediate(eventSystem.gameObject);
             }
 
+            BuildRuntimeScene();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("[UI] Main menu prefabs and scene rebuilt.");
+        }
+
+        public static void BuildFromCommandLine()
+        {
+            Build();
+        }
+
+        private static void BuildRuntimeScene()
+        {
             var scene = EditorSceneManager.NewScene(
                 NewSceneSetup.EmptyScene,
                 NewSceneMode.Single);
+            CreateRuntimeCamera();
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ScreenPrefabPath);
             var instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             if (instance == null)
@@ -53,14 +67,23 @@ namespace SpireChess.Editor
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, ScenePath);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-            Debug.Log("[UI] Main menu prefabs and scene rebuilt.");
         }
 
-        public static void BuildFromCommandLine()
+        private static void CreateRuntimeCamera()
         {
-            Build();
+            var cameraObject = new GameObject("MainMenuCamera");
+            cameraObject.tag = "MainCamera";
+            var camera = cameraObject.AddComponent<Camera>();
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.035f, 0.05f, 0.08f);
+            camera.cullingMask = 0;
+            camera.orthographic = true;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 200f;
+            camera.allowHDR = false;
+            camera.allowMSAA = false;
+            camera.useOcclusionCulling = false;
+            camera.transform.position = new Vector3(0f, 0f, -100f);
         }
 
         public static void CaptureValidationScreenshots()

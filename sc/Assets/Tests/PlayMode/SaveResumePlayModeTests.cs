@@ -29,6 +29,9 @@ namespace SpireChess.Tests
             Assert.That(Object.FindObjectsOfType<MainMenuScreenView>(), Has.Length.EqualTo(1));
             Assert.That(Object.FindObjectsOfType<Canvas>(), Has.Length.EqualTo(1));
             Assert.That(Object.FindObjectsOfType<EventSystem>(), Has.Length.EqualTo(1));
+            Assert.That(Object.FindObjectsOfType<Camera>(), Has.Length.EqualTo(1));
+            Assert.That(Camera.main, Is.Not.Null);
+            Assert.That(Camera.main.name, Is.EqualTo("MainMenuCamera"));
         }
 
         [UnityTest]
