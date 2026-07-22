@@ -459,8 +459,19 @@
 - [x] 覆盖全部稳定 `RunPhase` 的 EditMode/PlayMode 保存恢复回归；当前全量基线为 EditMode 266 / 266、PlayMode 22 / 22 通过（Unity 2022.3.62f3c1，2026-07-22）。
 - [x] 完成主档损坏、备份恢复、真实进程退出、战斗中断和双分辨率人工验收；验收通过并以本次提交建立新候选（2026-07-22）。
 
+## P0：阶段 9B 视听表现纵向切片
+
+- [x] 完成阶段 9B 技术与制作方案、12 张样板范围和资产盘点表，见 `phase-9b-presentation-vertical-slice-technical-design-v0.1.md` 与 `phase-9b-asset-inventory-v0.1.md`。
+- [x] G0：冻结工程候选 `5545a4e`、Unity 2022.3.62f3c1、内容身份 5.5.0 / 8B.1、Windows x64 目标、双分辨率和 266 / 266 EditMode、22 / 22 PlayMode 基线。
+- [x] G0：冻结 9B 交付/非目标、14 张 Before 截图及 SHA-256、字体、运行时导出、分层源文件和 Git LFS 策略，见 `phase-9b-g0-baseline-v0.1.md`。
+- [x] G0：建立 `phase-9b-asset-source-ledger-v0.1.md`；当前生成式插画与卡框仅限内部工程样板，生产许可未确认前不得标记 Runtime Ready 或用于最终发布。
+- [ ] G1：输出两套 Style Tile，以铸魂盾侍、万蹄奔潮、天穹契约者和现有不熄炉王完成共同风格、流派区分、金色表现和生产成本评审。
+- [ ] G2：完成 ArtId → Sprite Catalog → CardView、Theme、回退/诊断资源、12 张样板随从、3 个 Token、4 张法术和 3 件遗珍图标。
+- [ ] G3：完成 MainMenu、Shop、Run/Map、Battle、Choice/System Menu 换肤，接入通用 VFX、AudioMixer、3 套 BGM、P0 音效和音量设置。
+- [ ] G4：完成全量自动化、正式链路双分辨率、存档恢复、跳过/2×、两机性能基线和至少 5 名外部试玩者验收。
+
 ## 暂缓
 
 - [ ] 超出阶段 5 白名单的任意脚本化效果 DSL。
 - [ ] 微信小游戏打包。
-- [ ] 正式美术和动画。
+- [ ] 全量正式美术和动画（暂缓；Phase 9B 样板范围已启用）。

@@ -1,22 +1,24 @@
 # 阶段 9B 视听表现纵向切片技术与制作方案 v0.1
 
 - 日期：2026-07-22
-- 状态：方案已建立，待风格样板评审后实施
-- 实现基线：`275825f feat(save): add formal run save and resume flow`
+- 状态：G0 范围与基线已冻结，待 G1 Style Tile 评审
+- 实现基线：`5545a4e fix(ui): add main menu display camera`
 - 内容版本：5.5.0
 - 最低规则版本：8B.1
 - 完整配置哈希：`818596be90de4e2ddf6c4b7f9ba0b6e1fee994fcc31ec9893652e02f49ef4311`
 - 关联文档：`phase-7-ui-vertical-slice-technical-design-v0.1.md`、`phase-7b-battle-ui-technical-design-v0.1.md`、`phase-8b-full-map-technical-design-v0.1.md`、`phase-9a-save-resume-technical-design-v0.1.md`
 - 资产清单：`phase-9b-asset-inventory-v0.1.md`
+- G0 基线：`phase-9b-g0-baseline-v0.1.md`
+- 来源台账：`phase-9b-asset-source-ledger-v0.1.md`
 
 ## 1. 背景与结论
 
 阶段 7 至 9A 已经完成共享卡牌、商店、战斗、地图、主菜单和存档恢复的工程结构。现有 Prefab、ViewModel、View、Controller、结构化战斗事件和双分辨率布局可以作为正式表现的承载层，但当前视觉仍以纯色、文字和占位图形为主：
 
-- 67 个随从配置全部使用 `placeholder_*` 插画 ID，67 个 `audioId` 均为空；
+- 67 个随从配置全部使用 `placeholder_*` 插画 ID，当前仅不熄炉王映射到工程样板 Sprite；67 个 `audioId` 均为空；
 - 16 张法术全部使用占位插画 ID，16 个 `audioId` 均为空；
 - 15 件遗珍已有语义图标 ID，但项目中尚无对应 Sprite；
-- `sc/Assets/Art` 当前只有字体与空占位目录，没有正式位图、材质、动画、音效或 BGM；
+- `sc/Assets/Art` 当前有正式字体、1 张随从工程样板和普通/金色框工程样板；没有已清生产许可的正式插画、材质、动画、音效或 BGM；
 - `PF_Card`、`PF_ShopScreen`、`PF_BattleScreen`、`PF_RunScreen` 和 `PF_MainMenuScreen` 已具备信息与交互契约，但不代表最终美术品质。
 
 9B 不直接生产全部内容。先以第一层 10–15 分钟体验为纵向切片，冻结美术方向、资产规格、运行时接线、通用反馈和音频管线，再决定是否进入全量资产生产。自动平衡 S0/S1 可以与表现制作并行；依赖体验判断的 S2 人工单局应在 9B 第一版完成后执行。
