@@ -456,8 +456,8 @@
 - [x] 实现 `RunPersistenceCoordinator` 和 `SceneFlowRouter`，将 Run/Shop/Battle 成功操作、保存和场景跳转收口。
 - [x] 修改 `GameApp`：Boot 进入正式 MainMenu，不再启动即新建单局或运行写盘烟测。
 - [x] 制作 `PF_MainMenuScreen`、确认弹窗和 Run/Shop/Battle 共用系统菜单。
-- [x] 覆盖全部稳定 `RunPhase` 的 EditMode/PlayMode 保存恢复回归；全量 EditMode 264 / 264、PlayMode 22 / 22 通过。
-- [ ] 完成主档损坏、备份恢复、真实进程退出、战斗中断和双分辨率人工验收，并建立新候选。
+- [x] 覆盖全部稳定 `RunPhase` 的 EditMode/PlayMode 保存恢复回归；当前全量基线为 EditMode 265 / 265、PlayMode 22 / 22 通过（Unity 2022.3.62f3c1，2026-07-22）。
+- [x] 完成主档损坏、备份恢复、真实进程退出、战斗中断和双分辨率人工验收；验收通过并以本次提交建立新候选（2026-07-22）。
 
 ## 暂缓
 
