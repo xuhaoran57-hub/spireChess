@@ -14,6 +14,7 @@ namespace SpireChess.Tests
             var config = new MinionConfig
             {
                 Id = "presentation",
+                ArtId = "placeholder_card_presentation",
                 Name = "表现测试",
                 Race = "Starbound",
                 Tier = 4,
@@ -47,6 +48,8 @@ namespace SpireChess.Tests
                 0);
 
             Assert.That(model.InstanceId, Is.EqualTo("runtime-1"));
+            Assert.That(model.ArtId,
+                Is.EqualTo("placeholder_card_presentation"));
             Assert.That(model.Name, Is.EqualTo("表现测试"));
             Assert.That(model.Description, Is.EqualTo("金色描述"));
             Assert.That(model.Attack, Is.EqualTo(9));

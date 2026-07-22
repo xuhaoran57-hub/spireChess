@@ -13,6 +13,8 @@ namespace SpireChess.Editor
 {
     public static class CardUiPrefabBuilder
     {
+        public const string SpriteCatalogPath =
+            "Assets/Configs/Presentation/PresentationSpriteCatalog.asset";
         public const string FontPath =
             "Assets/Art/Fonts/NotoSansCJKsc-Regular.otf";
         public const string PrefabPath =
@@ -34,6 +36,20 @@ namespace SpireChess.Editor
             {
                 throw new InvalidOperationException(
                     "Unable to load the pinned card font at " + FontPath);
+            }
+
+            AssetDatabase.ImportAsset(
+                SpriteCatalogPath,
+                ImportAssetOptions.ForceSynchronousImport |
+                ImportAssetOptions.ForceUpdate);
+            var spriteCatalog =
+                AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                    SpriteCatalogPath);
+            if (spriteCatalog == null)
+            {
+                throw new InvalidOperationException(
+                    "Unable to load the presentation sprite catalog at " +
+                    SpriteCatalogPath);
             }
 
             var root = new GameObject(
@@ -284,6 +300,13 @@ namespace SpireChess.Editor
                     13,
                     TextAnchor.MiddleCenter);
 
+                infoPanel.transform.SetSiblingIndex(3);
+                namePlate.transform.SetSiblingIndex(4);
+                normalFrame.transform.SetSiblingIndex(5);
+                goldenFrame.transform.SetSiblingIndex(6);
+                costBadge.transform.SetSiblingIndex(7);
+                tierBadge.transform.SetSiblingIndex(8);
+
                 goldenFrame.gameObject.SetActive(false);
                 stateBadgeRow.gameObject.SetActive(false);
                 goldenBadge.gameObject.SetActive(false);
@@ -311,6 +334,7 @@ namespace SpireChess.Editor
                 SetReference(serialized, "artwork", artwork);
                 SetReference(serialized, "normalFrame", normalFrame);
                 SetReference(serialized, "goldenFrame", goldenFrame);
+                SetReference(serialized, "spriteCatalog", spriteCatalog);
                 SetReference(serialized, "costBadge", costBadge);
                 SetReference(serialized, "costText", costText);
                 SetReference(serialized, "tierBadge", tierBadge);
@@ -423,9 +447,8 @@ namespace SpireChess.Editor
             var validation = configs.LoadFromResources();
             validation.ThrowIfInvalid();
             var sky = configs.MinionsById["sky_covenant_bearer"];
-            var oldTower = configs.MinionsById["old_tower_guide"];
-            var tenThousandHoof =
-                configs.MinionsById["ten_thousand_hoof_surge"];
+            var furnaceKing =
+                configs.MinionsById["undying_furnace_king"];
             var longestSpell = configs.Spells
                 .OrderByDescending(value =>
                     UiTextFormatter.CountTextElements(value.Description))
@@ -472,13 +495,13 @@ namespace SpireChess.Editor
             title.rectTransform.sizeDelta = new Vector2(900f, 42f);
 
             var fullNormal = CreateMinionModel(
-                tenThousandHoof,
+                furnaceKing,
                 false,
                 CardDisplayMode.Full);
             CreatePreviewCard(prefab, canvasRect, fullNormal, 80f, 90f);
 
             var fullGolden = CreateMinionModel(
-                oldTower,
+                furnaceKing,
                 true,
                 CardDisplayMode.Full);
             CreatePreviewCard(prefab, canvasRect, fullGolden, 360f, 90f);
@@ -598,6 +621,7 @@ namespace SpireChess.Editor
             return new CardViewModel
             {
                 InstanceId = "preview_" + config.Id,
+                ArtId = config.ArtId,
                 Name = config.Name,
                 Description = config.GetPrototypeDescription(isGolden),
                 RaceText = ToRaceText(config.Race),
@@ -629,6 +653,7 @@ namespace SpireChess.Editor
             return new CardViewModel
             {
                 InstanceId = "preview_" + config.Id,
+                ArtId = config.ArtId,
                 Name = config.Name,
                 Description = config.Description,
                 RaceText = "商店法术",

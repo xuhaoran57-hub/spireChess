@@ -36,6 +36,7 @@ namespace SpireChess.UI.Battle
             return new CardViewModel
             {
                 InstanceId = ResolveInstanceId(minion, side, slotIndex),
+                ArtId = minion.Config.ArtId,
                 Name = minion.Name,
                 Description = minion.Config.GetPrototypeDescription(minion.IsGolden),
                 RaceText = ToRaceText(minion.Config.Race),

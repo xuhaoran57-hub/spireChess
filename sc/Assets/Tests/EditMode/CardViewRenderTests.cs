@@ -118,6 +118,47 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void FurnaceKing_NormalGoldenSwitchKeepsArtworkAndChangesFrameSprite()
+        {
+            var model = CreateMinion(CardDisplayMode.Full);
+            model.ArtId = "placeholder_card_undying_furnace_king";
+            model.Name = "不熄炉王";
+            model.RaceText = "铸魂";
+            model.Tier = 5;
+            model.Attack = 6;
+            model.Health = 8;
+            model.BaseAttack = 6;
+            model.BaseHealth = 8;
+
+            view.Render(model);
+
+            var artworkSprite = ImageAt("ArtworkMask/Artwork").sprite;
+            Assert.That(artworkSprite, Is.Not.Null);
+            Assert.That(artworkSprite.name,
+                Is.EqualTo("card_minion_undying_furnace_king"));
+            Assert.That(ImageAt("NormalFrame").sprite.name,
+                Is.EqualTo("card_frame_normal"));
+            Assert.That(Active("NormalFrame"), Is.True);
+            Assert.That(Active("GoldenFrame"), Is.False);
+
+            model.IsGolden = true;
+            model.Attack = 12;
+            model.Health = 16;
+            model.BaseAttack = 12;
+            model.BaseHealth = 16;
+            view.Render(model);
+
+            Assert.That(ImageAt("ArtworkMask/Artwork").sprite,
+                Is.SameAs(artworkSprite));
+            Assert.That(ImageAt("GoldenFrame").sprite.name,
+                Is.EqualTo("card_frame_golden"));
+            Assert.That(Active("NormalFrame"), Is.False);
+            Assert.That(Active("GoldenFrame"), Is.True);
+            Assert.That(RectAt("NormalFrame").rect.size,
+                Is.EqualTo(RectAt("GoldenFrame").rect.size));
+        }
+
+        [Test]
         public void BattleCardStats_FitLargeValuesAndRestoreBaseFontSize()
         {
             var cardObject = new GameObject(
@@ -403,6 +444,15 @@ namespace SpireChess.Tests.EditMode
             var text = target.GetComponent<Text>();
             Assert.That(text, Is.Not.Null, "Missing Text component at " + path);
             return text;
+        }
+
+        private Image ImageAt(string path)
+        {
+            var target = root.Find(path);
+            Assert.That(target, Is.Not.Null, "Missing image path " + path);
+            var image = target.GetComponent<Image>();
+            Assert.That(image, Is.Not.Null, "Missing Image component at " + path);
+            return image;
         }
 
         private RectTransform RectAt(string path)

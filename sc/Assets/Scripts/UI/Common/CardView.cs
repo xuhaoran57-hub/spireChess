@@ -40,6 +40,7 @@ namespace SpireChess.UI
         [SerializeField] private Image artwork;
         [SerializeField] private Image normalFrame;
         [SerializeField] private Image goldenFrame;
+        [SerializeField] private PresentationSpriteCatalog spriteCatalog;
 
         [Header("Header")]
         [SerializeField] private Image costBadge;
@@ -92,6 +93,7 @@ namespace SpireChess.UI
             background != null && raceSkin != null && artworkMask != null &&
             artworkMaskComponent != null && artwork != null &&
             normalFrame != null && goldenFrame != null &&
+            spriteCatalog != null &&
             costBadge != null && costText != null &&
             tierBadge != null && tierText != null &&
             namePlate != null && nameText != null &&
@@ -135,11 +137,19 @@ namespace SpireChess.UI
             CurrentDisplayMode = model.DisplayMode;
             background.color = CardTierPalette.GetBackground(model.Tier);
             raceSkin.color = ResolveRaceColor(model.RaceText);
-            artwork.color = ResolveArtworkColor(model.RaceText);
+            var normalFrameSprite = spriteCatalog.NormalCardFrame;
+            var goldenFrameSprite = spriteCatalog.GoldenCardFrame;
+            ApplyFrameSprite(normalFrame, normalFrameSprite);
+            ApplyFrameSprite(goldenFrame, goldenFrameSprite);
+            ApplyArtwork(model);
             normalFrame.gameObject.SetActive(!isGolden);
             goldenFrame.gameObject.SetActive(isGolden);
-            normalFrame.color = NormalFrameColor;
-            goldenFrame.color = GoldenFrameColor;
+            normalFrame.color = normalFrameSprite != null
+                ? Color.white
+                : NormalFrameColor;
+            goldenFrame.color = goldenFrameSprite != null
+                ? Color.white
+                : GoldenFrameColor;
 
             costBadge.gameObject.SetActive(model.ShowCost);
             costText.text = model.Cost.ToString();
@@ -781,6 +791,51 @@ namespace SpireChess.UI
                 Mathf.Clamp01(raceColor.g + 0.14f),
                 Mathf.Clamp01(raceColor.b + 0.18f),
                 0.92f);
+        }
+
+        private static void ApplyFrameSprite(Image target, Sprite sprite)
+        {
+            if (sprite == null)
+            {
+                return;
+            }
+
+            target.sprite = sprite;
+            target.type = Image.Type.Simple;
+            target.preserveAspect = false;
+            target.fillCenter = true;
+        }
+
+        private void ApplyArtwork(CardViewModel model)
+        {
+            if (!spriteCatalog.TryGetArtwork(model.ArtId, out var sprite))
+            {
+                artwork.sprite = null;
+                artwork.color = ResolveArtworkColor(model.RaceText);
+                Stretch(artwork.rectTransform);
+                return;
+            }
+
+            artwork.sprite = sprite;
+            artwork.color = Color.white;
+            artwork.type = Image.Type.Simple;
+            artwork.preserveAspect = false;
+
+            var viewport = model.DisplayMode == CardDisplayMode.Full
+                ? new Vector2(216f, 184f)
+                : new Vector2(144f, 112f);
+            var spriteAspect = sprite.rect.width / sprite.rect.height;
+            var viewportAspect = viewport.x / viewport.y;
+            var size = spriteAspect >= viewportAspect
+                ? new Vector2(viewport.y * spriteAspect, viewport.y)
+                : new Vector2(viewport.x, viewport.x / spriteAspect);
+            var rect = artwork.rectTransform;
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = size;
+            rect.localScale = Vector3.one;
         }
 
         private readonly struct ContractRect

@@ -27,6 +27,8 @@ namespace SpireChess.Tests.EditMode
             SequentialAssert.Run(() =>
             {
                 Assert.That(model.InstanceId, Is.Null);
+                Assert.That(model.ArtId,
+                    Is.EqualTo("placeholder_card_sky_covenant_bearer"));
                 Assert.That(model.Name, Is.EqualTo("天穹契约者"));
                 Assert.That(model.Description, Is.EqualTo("普通描述"));
                 Assert.That(model.RaceText, Is.EqualTo("星契"));
@@ -67,6 +69,8 @@ namespace SpireChess.Tests.EditMode
             SequentialAssert.Run(() =>
             {
                 Assert.That(model.InstanceId, Is.Null);
+                Assert.That(model.ArtId,
+                    Is.EqualTo("placeholder_spell_advanced_discovery"));
                 Assert.That(model.Name, Is.EqualTo("高阶发现"));
                 Assert.That(model.Description, Is.EqualTo("法术描述"));
                 Assert.That(model.RaceText, Is.EqualTo("发现"));
@@ -117,6 +121,8 @@ namespace SpireChess.Tests.EditMode
             SequentialAssert.Run(() =>
             {
                 Assert.That(model.InstanceId, Is.EqualTo("owned_001"));
+                Assert.That(model.ArtId,
+                    Is.EqualTo("placeholder_card_sky_covenant_bearer"));
                 Assert.That(model.Description, Is.EqualTo("金色描述"));
                 Assert.That(model.DisplayMode, Is.EqualTo(CardDisplayMode.Compact));
                 Assert.That(model.IsMinion, Is.True);
@@ -207,6 +213,7 @@ namespace SpireChess.Tests.EditMode
             return new MinionConfig
             {
                 Id = "sky_covenant_bearer",
+                ArtId = "placeholder_card_sky_covenant_bearer",
                 Name = "天穹契约者",
                 Description = "普通描述",
                 GoldenDescription = "金色描述",
@@ -227,6 +234,7 @@ namespace SpireChess.Tests.EditMode
             return new SpellConfig
             {
                 Id = "advanced_discovery",
+                ArtId = "placeholder_spell_advanced_discovery",
                 Name = "高阶发现",
                 Description = "法术描述",
                 Tier = 3,
