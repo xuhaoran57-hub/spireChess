@@ -242,8 +242,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
@@ -262,8 +262,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
@@ -282,7 +282,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &788101126
+--- !u!1 &658589538
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -290,8 +290,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 788101128}
-  - component: {fileID: 788101127}
+  - component: {fileID: 658589540}
+  - component: {fileID: 658589539}
   m_Layer: 0
   m_Name: BattleTestController
   m_TagString: Untagged
@@ -299,26 +299,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &788101127
+--- !u!114 &658589539
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 788101126}
+  m_GameObject: {fileID: 658589538}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b66c31f75be4eddb9a816dced2c4cdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenView: {fileID: 1927059784}
---- !u!4 &788101128
+  screenView: {fileID: 1063035174}
+--- !u!4 &658589540
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 788101126}
+  m_GameObject: {fileID: 658589538}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -327,7 +327,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1927059783
+--- !u!1001 &1063035173
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -424,22 +424,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b66f9169d74f87c42ae5641bf0d95317, type: 3}
---- !u!114 &1927059784 stripped
+--- !u!114 &1063035174 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1525585150431481140, guid: b66f9169d74f87c42ae5641bf0d95317, type: 3}
-  m_PrefabInstance: {fileID: 1927059783}
+  m_PrefabInstance: {fileID: 1063035173}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37d0a8f76e074b2c8fa3e47fa1f833bf, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 616440000}
-  - {fileID: 1927059783}
-  - {fileID: 788101128}
+  - {fileID: 1063035173}
+  - {fileID: 658589540}

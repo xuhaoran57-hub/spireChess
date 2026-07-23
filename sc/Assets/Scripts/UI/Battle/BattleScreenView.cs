@@ -22,7 +22,7 @@ namespace SpireChess.UI.Battle
         [Header("Root")]
         [SerializeField] private Canvas rootCanvas;
         [SerializeField] private RectTransform safeArea;
-        [SerializeField] private GameObject cardPrefab;
+        [SerializeField] private GameObject standeePrefab;
 
         [Header("Top bar")]
         [SerializeField] private Text titleText;
@@ -55,9 +55,17 @@ namespace SpireChess.UI.Battle
         [SerializeField] private CanvasGroup feedbackCanvasGroup;
         [SerializeField] private Text feedbackText;
 
-        private readonly Dictionary<string, BattleCardView> cardsById =
-            new Dictionary<string, BattleCardView>(StringComparer.Ordinal);
+        [Header("Standee detail")]
+        [SerializeField] private RectTransform detailLayer;
+        [SerializeField] private CardView detailCard;
+        [SerializeField] private CanvasGroup detailCanvasGroup;
+        [SerializeField] private Text detailModeText;
+
+        private readonly Dictionary<string, BattleStandeeView> standeesById =
+            new Dictionary<string, BattleStandeeView>(StringComparer.Ordinal);
         private BattleTestController controller;
+        private BattleStandeeView detailOwner;
+        private bool detailLocked;
         private bool isBound;
 
         public int RenderedCardCount { get; private set; }
@@ -65,8 +73,14 @@ namespace SpireChess.UI.Battle
         public bool IsLogScrollable => logScrollRect != null &&
                                        logScrollRect.vertical;
         public string LogContents => logText == null ? string.Empty : logText.text;
+        public bool IsStandeeDetailVisible => detailCanvasGroup != null &&
+                                              detailCanvasGroup.alpha > 0f;
+        public bool IsStandeeDetailLocked => detailLocked;
+        public string DetailInstanceId => detailOwner == null
+            ? string.Empty
+            : detailOwner.InstanceId;
         public bool HasCompleteBindings =>
-            rootCanvas != null && safeArea != null && cardPrefab != null &&
+            rootCanvas != null && safeArea != null && standeePrefab != null &&
             titleText != null && statusText != null && roundText != null &&
             startButton != null && startButtonText != null &&
             speedButton != null && speedButtonText != null &&
@@ -76,7 +90,10 @@ namespace SpireChess.UI.Battle
             returnButton != null && returnButtonText != null &&
             HasSlots(enemySlots) && HasSlots(playerSlots) &&
             logScrollRect != null && logText != null &&
-            feedbackCanvasGroup != null && feedbackText != null;
+            feedbackCanvasGroup != null && feedbackText != null &&
+            detailLayer != null && detailCard != null &&
+            detailCard.HasCompleteBindings && detailCanvasGroup != null &&
+            detailModeText != null;
 
         public void Bind(BattleTestController value)
         {
@@ -129,8 +146,18 @@ namespace SpireChess.UI.Battle
             var desiredIds = new HashSet<string>(StringComparer.Ordinal);
             SyncRow(enemySlots, state.EnemyCards, BattleSide.Enemy, desiredIds);
             SyncRow(playerSlots, state.PlayerCards, BattleSide.Player, desiredIds);
-            RemoveStaleCards(desiredIds);
+            RemoveStaleStandees(desiredIds);
             RenderedCardCount = desiredIds.Count;
+
+            if (detailOwner != null &&
+                desiredIds.Contains(detailOwner.InstanceId))
+            {
+                RenderStandeeDetail(detailOwner, detailOwner.Model);
+            }
+            else if (detailOwner != null)
+            {
+                CloseStandeeDetail();
+            }
 
             logText.text = state.LogText ?? string.Empty;
             Canvas.ForceUpdateCanvases();
@@ -148,6 +175,7 @@ namespace SpireChess.UI.Battle
 
             var durationScale = 1f / Mathf.Max(1f, playbackSpeed);
             IsAnimationPlaying = true;
+            CloseStandeeDetail();
             ClearHighlights();
             switch (playbackEvent.Kind)
             {
@@ -205,37 +233,44 @@ namespace SpireChess.UI.Battle
                 }
 
                 desiredIds.Add(model.InstanceId);
-                if (!cardsById.TryGetValue(model.InstanceId, out var card) ||
-                    card == null)
+                if (!standeesById.TryGetValue(
+                        model.InstanceId,
+                        out var standee) ||
+                    standee == null)
                 {
-                    var instance = Instantiate(cardPrefab, slot.Content);
-                    instance.name = "BattleCard";
-                    card = instance.GetComponent<BattleCardView>() ??
-                           instance.AddComponent<BattleCardView>();
-                    cardsById[model.InstanceId] = card;
+                    var instance = Instantiate(standeePrefab, slot.Content);
+                    instance.name = "BattleStandee";
+                    standee = instance.GetComponent<BattleStandeeView>();
+                    if (standee == null)
+                    {
+                        throw new InvalidOperationException(
+                            "PF_BattleStandee is missing BattleStandeeView.");
+                    }
+                    standeesById[model.InstanceId] = standee;
                 }
 
-                card.gameObject.SetActive(true);
-                card.transform.SetParent(slot.Content, false);
-                var rect = card.GetComponent<RectTransform>();
+                standee.gameObject.SetActive(true);
+                standee.transform.SetParent(slot.Content, false);
+                var rect = standee.GetComponent<RectTransform>();
                 rect.anchorMin = new Vector2(0f, 1f);
                 rect.anchorMax = new Vector2(0f, 1f);
                 rect.pivot = new Vector2(0f, 1f);
                 rect.anchoredPosition = Vector2.zero;
                 rect.localScale = Vector3.one;
-                card.Initialize(
+                standee.Initialize(
                     controller,
+                    this,
                     rootCanvas,
                     side,
                     index,
                     side == BattleSide.Player);
-                card.Render(model);
+                standee.Render(model);
             }
         }
 
-        private void RemoveStaleCards(ISet<string> desiredIds)
+        private void RemoveStaleStandees(ISet<string> desiredIds)
         {
-            foreach (var pair in cardsById
+            foreach (var pair in standeesById
                          .Where(pair => !desiredIds.Contains(pair.Key))
                          .ToArray())
             {
@@ -252,7 +287,7 @@ namespace SpireChess.UI.Battle
                         DestroyImmediate(pair.Value.gameObject);
                     }
                 }
-                cardsById.Remove(pair.Key);
+                standeesById.Remove(pair.Key);
             }
         }
 
@@ -303,7 +338,7 @@ namespace SpireChess.UI.Battle
                 yield break;
             }
 
-            target.CardView.PlayStatChange(0, playbackEvent.HealthDelta);
+            target.PlayStatChange(0, playbackEvent.HealthDelta);
             var rect = target.RectTransform;
             var start = rect.anchoredPosition;
             yield return Animate(0.16f * scale, value =>
@@ -321,7 +356,11 @@ namespace SpireChess.UI.Battle
             ShowFeedback(gained ? "获得护盾" : "护盾破裂");
             if (gained)
             {
-                target?.CardView.PlayShieldGain(false);
+                target?.SetShieldVisible(true);
+            }
+            else
+            {
+                target?.SetShieldVisible(false);
             }
             SetSlotHighlight(
                 playbackEvent.TargetSide,
@@ -332,7 +371,7 @@ namespace SpireChess.UI.Battle
         private void PlayStats(BattlePlaybackEvent playbackEvent)
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
-            target?.CardView.PlayStatChange(
+            target?.PlayStatChange(
                 playbackEvent.AttackDelta,
                 playbackEvent.HealthDelta);
             ShowFeedback(playbackEvent.Message);
@@ -385,14 +424,14 @@ namespace SpireChess.UI.Battle
             target.transform.localScale = endScale;
         }
 
-        private BattleCardView FindCard(string instanceId)
+        private BattleStandeeView FindCard(string instanceId)
         {
             if (string.IsNullOrWhiteSpace(instanceId))
             {
                 return null;
             }
-            cardsById.TryGetValue(instanceId, out var card);
-            return card;
+            standeesById.TryGetValue(instanceId, out var standee);
+            return standee;
         }
 
         private void SetSlotHighlight(
@@ -425,6 +464,155 @@ namespace SpireChess.UI.Battle
             feedbackText.color = FeedbackColor;
             feedbackCanvasGroup.alpha =
                 string.IsNullOrWhiteSpace(message) ? 0f : 1f;
+        }
+
+        public void ShowStandeeDetail(
+            BattleStandeeView standee,
+            CardViewModel model)
+        {
+            if (standee == null || model == null ||
+                (detailLocked && detailOwner != standee))
+            {
+                return;
+            }
+
+            detailOwner = standee;
+            RenderStandeeDetail(standee, model);
+        }
+
+        public void HideStandeeDetail(BattleStandeeView standee)
+        {
+            if (detailLocked || detailOwner != standee)
+            {
+                return;
+            }
+
+            CloseStandeeDetail();
+        }
+
+        public void ToggleStandeeDetailLock(
+            BattleStandeeView standee,
+            CardViewModel model)
+        {
+            if (standee == null || model == null)
+            {
+                return;
+            }
+
+            if (detailLocked && detailOwner == standee)
+            {
+                CloseStandeeDetail();
+                return;
+            }
+
+            detailLocked = true;
+            detailOwner = standee;
+            RenderStandeeDetail(standee, model);
+        }
+
+        public void CloseStandeeDetail()
+        {
+            detailLocked = false;
+            detailOwner = null;
+            if (detailCanvasGroup != null)
+            {
+                detailCanvasGroup.alpha = 0f;
+                detailCanvasGroup.blocksRaycasts = false;
+                detailCanvasGroup.interactable = false;
+            }
+            if (detailModeText != null)
+            {
+                detailModeText.text = string.Empty;
+            }
+        }
+
+        private void RenderStandeeDetail(
+            BattleStandeeView standee,
+            CardViewModel model)
+        {
+            if (detailCard == null || detailLayer == null ||
+                standee == null || model == null)
+            {
+                return;
+            }
+
+            detailCard.Render(CloneForDetail(model));
+            var detailRect = detailCard.GetComponent<RectTransform>();
+            detailRect.anchorMin = Vector2.zero;
+            detailRect.anchorMax = Vector2.zero;
+            detailRect.pivot = new Vector2(0.5f, 0.5f);
+            detailRect.sizeDelta = new Vector2(240f, 360f);
+            detailRect.localScale = Vector3.one;
+
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(
+                rootCanvas.worldCamera,
+                standee.RectTransform.position);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                detailLayer,
+                screenPoint,
+                rootCanvas.worldCamera,
+                out var localPoint);
+            var verticalOffset = standee.Side == BattleSide.Player
+                ? 260f
+                : -260f;
+            var target = localPoint + new Vector2(0f, verticalOffset);
+            var detailBounds = detailLayer.rect;
+            target.x = Mathf.Clamp(
+                target.x,
+                detailBounds.xMin + 120f,
+                detailBounds.xMax - 120f);
+            target.y = Mathf.Clamp(
+                target.y,
+                detailBounds.yMin + 180f,
+                detailBounds.yMax - 180f);
+            detailRect.anchoredPosition = target;
+            detailRect.SetAsLastSibling();
+
+            detailCanvasGroup.alpha = 1f;
+            detailCanvasGroup.blocksRaycasts = false;
+            detailCanvasGroup.interactable = false;
+            detailModeText.text = detailLocked
+                ? "已锁定 · 再次点击立牌关闭"
+                : "悬停详情 · 点击立牌锁定";
+            var modeRect = detailModeText.rectTransform;
+            modeRect.anchorMin = Vector2.zero;
+            modeRect.anchorMax = Vector2.zero;
+            modeRect.pivot = new Vector2(0.5f, 0f);
+            modeRect.anchoredPosition = target + new Vector2(0f, 186f);
+            modeRect.SetAsLastSibling();
+        }
+
+        private static CardViewModel CloneForDetail(CardViewModel source)
+        {
+            return new CardViewModel
+            {
+                InstanceId = source.InstanceId,
+                ArtId = source.ArtId,
+                Name = source.Name,
+                Description = source.Description,
+                RaceText = source.RaceText,
+                AbilityLabels = source.AbilityLabels ?? Array.Empty<string>(),
+                ProgressText = source.ProgressText,
+                DisabledReason = source.DisabledReason,
+                Tier = source.Tier,
+                Attack = source.Attack,
+                Health = source.Health,
+                BaseAttack = source.BaseAttack,
+                BaseHealth = source.BaseHealth,
+                Cost = source.Cost,
+                DisplayMode = CardDisplayMode.Full,
+                IsMinion = source.IsMinion,
+                ShowCost = false,
+                IsGolden = source.IsGolden,
+                IsSelected = source.IsSelected,
+                IsLegalTarget = source.IsLegalTarget,
+                IsInteractable = source.IsInteractable,
+                IsAffordable = source.IsAffordable,
+                HasShield = source.HasShield,
+                HasNextCombatShield = source.HasNextCombatShield,
+                IsTemporary = source.IsTemporary,
+                Keywords = source.Keywords ?? Array.Empty<string>()
+            };
         }
 
         private static void SetButton(

@@ -55,16 +55,29 @@ namespace SpireChess.UI.Battle
 
         public void OnDrop(PointerEventData eventData)
         {
-            var card = eventData.pointerDrag == null
-                ? null
-                : eventData.pointerDrag.GetComponent<BattleCardView>();
-            if (card == null || controller == null)
+            if (eventData.pointerDrag == null || controller == null)
             {
                 return;
             }
 
-            card.MarkDropHandled();
-            controller.MoveCard(card.Side, card.Index, Side, Index);
+            var standee = eventData.pointerDrag.GetComponent<BattleStandeeView>();
+            if (standee != null)
+            {
+                standee.MarkDropHandled();
+                controller.MoveCard(
+                    standee.Side,
+                    standee.Index,
+                    Side,
+                    Index);
+                return;
+            }
+
+            var card = eventData.pointerDrag.GetComponent<BattleCardView>();
+            if (card != null)
+            {
+                card.MarkDropHandled();
+                controller.MoveCard(card.Side, card.Index, Side, Index);
+            }
         }
     }
 }

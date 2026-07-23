@@ -42,16 +42,17 @@ namespace SpireChess.Tests
             var secondSlot = screen.transform.Find(
                     "SafeArea/Board/PlayerRow/Slots/Slot2")
                 .GetComponent<BattleSlotView>();
-            var card = firstContent.GetComponentInChildren<BattleCardView>();
+            var standee = firstContent.GetComponentInChildren<BattleStandeeView>();
+            Assert.That(standee, Is.Not.Null);
             var drag = new PointerEventData(EventSystem.current)
             {
-                pointerDrag = card.gameObject
+                pointerDrag = standee.gameObject
             };
 
-            card.OnBeginDrag(drag);
-            Assert.That(card.transform.parent, Is.SameAs(screen.transform));
+            standee.OnBeginDrag(drag);
+            Assert.That(standee.transform.parent, Is.SameAs(screen.transform));
             secondSlot.OnDrop(drag);
-            card.OnEndDrag(drag);
+            standee.OnEndDrag(drag);
             yield return null;
 
             Assert.That(controller.SetupState.Player[0].RuntimeInstanceId,

@@ -21,6 +21,12 @@ namespace SpireChess.Editor
             "Assets/Prefabs/UI/Common/PF_Card.prefab";
         public const string PreviewScenePath =
             "Assets/Scenes/CardUiPreview.unity";
+        public const string StorybookNormalFramePath =
+            "Assets/Art/Presentation/UI/Common/" +
+            "card_frame_storybook_normal_v2.png";
+        public const string StorybookGoldenFramePath =
+            "Assets/Art/Presentation/UI/Common/" +
+            "card_frame_storybook_golden_v2.png";
 
         [MenuItem("Spire Chess/UI/Rebuild PF_Card")]
         public static void Build()
@@ -51,6 +57,7 @@ namespace SpireChess.Editor
                     "Unable to load the presentation sprite catalog at " +
                     SpriteCatalogPath);
             }
+            ConfigureCardPresentation(spriteCatalog);
 
             var root = new GameObject(
                 "PF_Card",
@@ -586,6 +593,52 @@ namespace SpireChess.Editor
             var gameObject = new GameObject(name, typeof(RectTransform));
             gameObject.transform.SetParent(parent, false);
             return gameObject.GetComponent<RectTransform>();
+        }
+
+        private static void ConfigureCardPresentation(
+            PresentationSpriteCatalog spriteCatalog)
+        {
+            var serialized = new SerializedObject(spriteCatalog);
+            SetReference(
+                serialized,
+                "normalCardFrame",
+                LoadSprite(StorybookNormalFramePath));
+            SetReference(
+                serialized,
+                "goldenCardFrame",
+                LoadSprite(StorybookGoldenFramePath));
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(spriteCatalog);
+        }
+
+        private static Sprite LoadSprite(string path)
+        {
+            AssetDatabase.ImportAsset(
+                path,
+                ImportAssetOptions.ForceSynchronousImport |
+                ImportAssetOptions.ForceUpdate);
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null)
+            {
+                throw new InvalidOperationException(
+                    "Unable to configure card frame sprite at " + path);
+            }
+
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.mipmapEnabled = false;
+            importer.alphaIsTransparency = true;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.maxTextureSize = 2048;
+            importer.SaveAndReimport();
+
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sprite == null)
+            {
+                throw new InvalidOperationException(
+                    "Unable to load card frame sprite at " + path);
+            }
+            return sprite;
         }
 
         private static void CreatePreviewCard(

@@ -16,8 +16,12 @@ namespace SpireChess.Editor
     {
         public const string SlotPrefabPath =
             "Assets/Prefabs/UI/Battle/PF_BattleSlot.prefab";
+        public const string StandeePrefabPath =
+            "Assets/Prefabs/UI/Battle/PF_BattleStandee.prefab";
         public const string ScreenPrefabPath =
             "Assets/Prefabs/UI/Battle/PF_BattleScreen.prefab";
+        public const string ThemePath =
+            "Assets/Configs/Presentation/PresentationTheme.asset";
         public const string PreviewScenePath =
             "Assets/Scenes/BattleUiPreview.unity";
         public const string BattleScenePath =
@@ -27,12 +31,17 @@ namespace SpireChess.Editor
             new Color(0.025f, 0.035f, 0.055f, 1f);
         private static readonly Color Panel =
             new Color(0.075f, 0.09f, 0.13f, 0.97f);
-        private static readonly Color PlayerSlot =
-            new Color(0.10f, 0.20f, 0.24f, 0.98f);
-        private static readonly Color EnemySlot =
-            new Color(0.24f, 0.11f, 0.14f, 0.98f);
+        private static readonly Color SlotHitArea =
+            Color.clear;
         private static readonly Color ButtonColor =
             new Color(0.16f, 0.19f, 0.25f, 1f);
+        private const string StandeeArtRoot =
+            "Assets/Art/Presentation/UI/Battle/Standee";
+        private const string ShieldMaterialPath =
+            StandeeArtRoot + "/M_BattleShieldAdditive.mat";
+        private const string ShieldSquireArtPath =
+            "Assets/Art/Presentation/Cards/Minions/ForgeSoul/" +
+            "card_minion_forge_soul_shield_squire.png";
 
         [MenuItem("Spire Chess/UI/Rebuild Battle UI")]
         public static void Build()
@@ -49,6 +58,19 @@ namespace SpireChess.Editor
                     "Battle UI requires the pinned font and PF_Card.");
             }
 
+            var catalog = AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                CardUiPrefabBuilder.SpriteCatalogPath);
+            var theme = LoadOrCreateTheme();
+            var shieldMaterial = ConfigureStandeePresentation(catalog);
+            BuildStandee(font, catalog, theme, shieldMaterial);
+            var standeePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                StandeePrefabPath);
+            if (standeePrefab == null)
+            {
+                throw new InvalidOperationException(
+                    "Failed to reload generated battle standee prefab.");
+            }
+
             BuildSlot(font);
             var slotPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 SlotPrefabPath);
@@ -58,7 +80,7 @@ namespace SpireChess.Editor
                     "Failed to reload generated battle slot prefab.");
             }
 
-            BuildScreen(font, cardPrefab, slotPrefab);
+            BuildScreen(font, cardPrefab, standeePrefab, slotPrefab);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             WireBattleTestScene();
@@ -169,7 +191,7 @@ namespace SpireChess.Editor
                 repositoryRoot,
                 "ui-concepts",
                 "unity-validation",
-                "pf-battle-screen-v0.1");
+                "pf-battle-screen-v0.2");
             Directory.CreateDirectory(outputDirectory);
             Capture(
                 camera,
@@ -184,9 +206,338 @@ namespace SpireChess.Editor
                 1920,
                 1200,
                 Path.Combine(outputDirectory, "battle-screen-1920x1200.png"));
+            view.Render(CreateRarityComparisonState());
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1080,
+                Path.Combine(
+                    outputDirectory,
+                    "battle-standee-rarity-1920x1080.png"));
+            view.Render(CreateRarityComparisonState());
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1200,
+                Path.Combine(
+                    outputDirectory,
+                    "battle-standee-rarity-1920x1200.png"));
+            canvasRect.sizeDelta = new Vector2(1920f, 1080f);
+            view.Render(CreatePreviewState());
+            Canvas.ForceUpdateCanvases();
+            var previewStandee = screen.transform.Find(
+                    "SafeArea/Board/PlayerRow/Slots/Slot1/Content")
+                .GetComponentInChildren<BattleStandeeView>();
+            view.ToggleStandeeDetailLock(
+                previewStandee,
+                previewStandee.Model);
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1080,
+                Path.Combine(
+                    outputDirectory,
+                    "battle-standee-detail-1920x1080.png"));
             AssetDatabase.SaveAssets();
             Debug.Log("[BattleUI] Captured validation screenshots to " +
                       outputDirectory);
+        }
+
+        private static PresentationTheme LoadOrCreateTheme()
+        {
+            var theme = AssetDatabase.LoadAssetAtPath<PresentationTheme>(
+                ThemePath);
+            if (theme != null)
+            {
+                ConfigureTheme(theme);
+                return theme;
+            }
+
+            theme = ScriptableObject.CreateInstance<PresentationTheme>();
+            AssetDatabase.CreateAsset(theme, ThemePath);
+            ConfigureTheme(theme);
+            return theme;
+        }
+
+        private static void ConfigureTheme(PresentationTheme theme)
+        {
+            var serialized = new SerializedObject(theme);
+            SetColor(serialized, "normalFrameTint", Color.white);
+            SetColor(serialized, "goldenFrameTint",
+                new Color(1f, 0.90f, 0.62f, 1f));
+            SetColor(serialized, "legalTargetTint",
+                new Color(0.38f, 0.82f, 0.58f, 0.78f));
+            SetColor(serialized, "selectedTargetTint",
+                new Color(0.98f, 0.68f, 0.22f, 0.88f));
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(theme);
+        }
+
+        private static Material ConfigureStandeePresentation(
+            PresentationSpriteCatalog catalog)
+        {
+            if (catalog == null)
+            {
+                throw new InvalidOperationException(
+                    "PresentationSpriteCatalog is required for battle standees.");
+            }
+
+            var serialized = new SerializedObject(catalog);
+            SetReference(serialized, "battleNormalStandeeFrame",
+                LoadSprite(StandeeArtRoot + "/standee_frame_silver_v1.png", true));
+            SetReference(serialized, "battleStandeeFrame",
+                LoadSprite(StandeeArtRoot + "/standee_frame.png", true));
+            SetReference(serialized, "battleAttackMedallion",
+                LoadSprite(StandeeArtRoot + "/attack_medallion.png", true));
+            SetReference(serialized, "battleHealthMedallion",
+                LoadSprite(StandeeArtRoot + "/health_medallion.png", true));
+            SetReference(serialized, "battleShieldOverlay",
+                LoadSprite(StandeeArtRoot + "/shield_overlay_screen.png", false));
+            SetReference(serialized, "battleTauntBase",
+                LoadSprite(StandeeArtRoot + "/taunt_base.png", true));
+            SetReference(serialized, "battleDeathrattleSeal",
+                LoadSprite(StandeeArtRoot + "/deathrattle_seal.png", true));
+            SetReference(serialized, "battleSplashMark",
+                LoadSprite(StandeeArtRoot + "/splash_mark.png", true));
+            AddOrReplaceArtwork(
+                serialized,
+                "placeholder_card_forge_soul_shield_squire",
+                LoadSprite(ShieldSquireArtPath, false));
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(catalog);
+
+            var material = AssetDatabase.LoadAssetAtPath<Material>(
+                ShieldMaterialPath);
+            if (material != null)
+            {
+                return material;
+            }
+
+            var shader = Shader.Find("Mobile/Particles/Additive");
+            if (shader == null)
+            {
+                throw new InvalidOperationException(
+                    "Mobile/Particles/Additive shader is unavailable.");
+            }
+            material = new Material(shader)
+            {
+                name = "M_BattleShieldAdditive"
+            };
+            AssetDatabase.CreateAsset(material, ShieldMaterialPath);
+            return material;
+        }
+
+        private static Sprite LoadSprite(string path, bool alphaTransparency)
+        {
+            AssetDatabase.ImportAsset(
+                path,
+                ImportAssetOptions.ForceSynchronousImport |
+                ImportAssetOptions.ForceUpdate);
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null)
+            {
+                throw new InvalidOperationException(
+                    "Unable to configure presentation sprite at " + path);
+            }
+
+            var changed = importer.textureType != TextureImporterType.Sprite ||
+                          importer.spriteImportMode != SpriteImportMode.Single ||
+                          importer.mipmapEnabled ||
+                          importer.alphaIsTransparency != alphaTransparency;
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.mipmapEnabled = false;
+            importer.alphaIsTransparency = alphaTransparency;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            if (changed)
+            {
+                importer.SaveAndReimport();
+            }
+
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sprite == null)
+            {
+                throw new InvalidOperationException(
+                    "Unable to load presentation sprite at " + path);
+            }
+            return sprite;
+        }
+
+        private static void AddOrReplaceArtwork(
+            SerializedObject catalog,
+            string id,
+            Sprite sprite)
+        {
+            var artworks = catalog.FindProperty("artworks");
+            if (artworks == null)
+            {
+                throw new InvalidOperationException(
+                    "PresentationSpriteCatalog.artworks is unavailable.");
+            }
+
+            SerializedProperty entry = null;
+            for (var index = 0; index < artworks.arraySize; index++)
+            {
+                var candidate = artworks.GetArrayElementAtIndex(index);
+                if (candidate.FindPropertyRelative("id").stringValue == id)
+                {
+                    entry = candidate;
+                    break;
+                }
+            }
+            if (entry == null)
+            {
+                artworks.arraySize++;
+                entry = artworks.GetArrayElementAtIndex(artworks.arraySize - 1);
+            }
+
+            entry.FindPropertyRelative("id").stringValue = id;
+            entry.FindPropertyRelative("sprite").objectReferenceValue = sprite;
+        }
+
+        private static void BuildStandee(
+            Font font,
+            PresentationSpriteCatalog catalog,
+            PresentationTheme theme,
+            Material shieldMaterial)
+        {
+            var root = new GameObject(
+                "PF_BattleStandee",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image),
+                typeof(CanvasGroup),
+                typeof(BattleStandeeView));
+            try
+            {
+                var rootRect = root.GetComponent<RectTransform>();
+                rootRect.pivot = new Vector2(0f, 1f);
+                rootRect.sizeDelta = new Vector2(160f, 240f);
+                var rootImage = root.GetComponent<Image>();
+                rootImage.color = Color.clear;
+                rootImage.raycastTarget = true;
+
+                var target = CreateImage(
+                    "TargetHighlight",
+                    root.transform,
+                    new Color(0.38f, 0.82f, 0.58f, 0.78f));
+                Stretch(target.rectTransform, new Vector2(-3f, -3f),
+                    new Vector2(3f, 3f));
+                target.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>(
+                    "UI/Skin/UISprite.psd");
+                target.type = Image.Type.Sliced;
+                target.fillCenter = false;
+                target.pixelsPerUnitMultiplier = 2.5f;
+                var targetOutline = target.gameObject.AddComponent<Outline>();
+                targetOutline.effectColor = new Color(0.30f, 0.55f, 0.34f, 0.52f);
+                targetOutline.effectDistance = new Vector2(1.5f, -1.5f);
+
+                var taunt = CreateImage("TauntBase", root.transform, Color.white);
+                SetRect(taunt.rectTransform, -8f, 0f, 176f, 35f);
+                taunt.preserveAspect = true;
+
+                var portraitMask = CreateRect("PortraitMask", root.transform);
+                SetRect(portraitMask, 20f, 34f, 120f, 192f);
+                portraitMask.gameObject.AddComponent<RectMask2D>();
+                var portrait = CreateImage(
+                    "Portrait",
+                    portraitMask,
+                    new Color(0.30f, 0.27f, 0.33f, 1f));
+                Stretch(portrait.rectTransform, Vector2.zero, Vector2.zero);
+                var fallback = CreateText(
+                    "PortraitFallback",
+                    portraitMask,
+                    font,
+                    "?",
+                    52,
+                    TextAnchor.MiddleCenter);
+                fallback.fontStyle = FontStyle.Bold;
+                fallback.color = new Color(1f, 0.92f, 0.72f, 0.72f);
+                Stretch(fallback.rectTransform, Vector2.zero, Vector2.zero);
+
+                var shield = CreateImage(
+                    "ShieldOverlay",
+                    root.transform,
+                    new Color(0.78f, 0.96f, 1f, 0.78f));
+                SetRect(shield.rectTransform, 14f, 10f, 132f, 222f);
+                shield.material = shieldMaterial;
+                shield.preserveAspect = true;
+
+                var frame = CreateImage("Frame", root.transform, Color.white);
+                SetRect(frame.rectTransform, 14f, 7f, 132f, 228f);
+
+                var deathrattle = CreateImage(
+                    "DeathrattleSeal",
+                    root.transform,
+                    Color.white);
+                SetRect(deathrattle.rectTransform, 52f, 188f, 56f, 56f);
+                deathrattle.preserveAspect = true;
+
+                var attack = CreateImage(
+                    "AttackMedallion",
+                    root.transform,
+                    Color.white);
+                SetRect(attack.rectTransform, 1f, 0f, 56f, 56f);
+                var attackText = CreateText(
+                    "Value",
+                    attack.transform,
+                    font,
+                    "0",
+                    25,
+                    TextAnchor.MiddleCenter);
+                attackText.fontStyle = FontStyle.Bold;
+                Stretch(attackText.rectTransform, new Vector2(4f, 4f),
+                    new Vector2(-4f, -4f));
+
+                var health = CreateImage(
+                    "HealthMedallion",
+                    root.transform,
+                    Color.white);
+                SetRect(health.rectTransform, 103f, 0f, 56f, 56f);
+                var healthText = CreateText(
+                    "Value",
+                    health.transform,
+                    font,
+                    "0",
+                    25,
+                    TextAnchor.MiddleCenter);
+                healthText.fontStyle = FontStyle.Bold;
+                Stretch(healthText.rectTransform, new Vector2(4f, 4f),
+                    new Vector2(-4f, -4f));
+
+                var splash = CreateImage(
+                    "SplashMark",
+                    root.transform,
+                    Color.white);
+                SetRect(splash.rectTransform, 48f, 41f, 26f, 44f);
+                splash.preserveAspect = true;
+
+                var serialized = new SerializedObject(
+                    root.GetComponent<BattleStandeeView>());
+                SetReference(serialized, "spriteCatalog", catalog);
+                SetReference(serialized, "theme", theme);
+                SetReference(serialized, "portrait", portrait);
+                SetReference(serialized, "portraitFallback", fallback);
+                SetReference(serialized, "frame", frame);
+                SetReference(serialized, "shieldOverlay", shield);
+                SetReference(serialized, "tauntBase", taunt);
+                SetReference(serialized, "deathrattleSeal", deathrattle);
+                SetReference(serialized, "splashMark", splash);
+                SetReference(serialized, "attackMedallion", attack);
+                SetReference(serialized, "healthMedallion", health);
+                SetReference(serialized, "attackText", attackText);
+                SetReference(serialized, "healthText", healthText);
+                SetReference(serialized, "targetHighlight", target);
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                PrefabUtility.SaveAsPrefabAsset(root, StandeePrefabPath);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
         }
 
         private static void BuildSlot(Font font)
@@ -204,7 +555,8 @@ namespace SpireChess.Editor
                 var rect = root.GetComponent<RectTransform>();
                 rect.sizeDelta = new Vector2(176f, 256f);
                 var image = root.GetComponent<Image>();
-                image.color = PlayerSlot;
+                image.color = SlotHitArea;
+                image.raycastTarget = true;
                 var outline = root.GetComponent<Outline>();
                 outline.effectColor = Color.clear;
                 outline.effectDistance = Vector2.zero;
@@ -242,6 +594,7 @@ namespace SpireChess.Editor
         private static void BuildScreen(
             Font font,
             GameObject cardPrefab,
+            GameObject standeePrefab,
             GameObject slotPrefab)
         {
             var root = new GameObject(
@@ -323,7 +676,6 @@ namespace SpireChess.Editor
                     font,
                     slotPrefab,
                     "敌方",
-                    EnemySlot,
                     485f);
                 var playerSlots = BuildRow(
                     "PlayerRow",
@@ -331,7 +683,6 @@ namespace SpireChess.Editor
                     font,
                     slotPrefab,
                     "玩家",
-                    PlayerSlot,
                     95f);
 
                 var logPanel = CreateImage(
@@ -364,11 +715,37 @@ namespace SpireChess.Editor
                 feedbackText.fontStyle = FontStyle.Bold;
                 SetRect(feedbackText.rectTransform, 720f, 500f, 480f, 80f);
 
+                var detailLayer = CreateRect("StandeeDetailLayer", safeArea);
+                SetRect(detailLayer, 20f, 120f, 1490f, 930f);
+                var detailObject = PrefabUtility.InstantiatePrefab(
+                    cardPrefab) as GameObject;
+                if (detailObject == null)
+                {
+                    throw new InvalidOperationException(
+                        "Failed to instantiate PF_Card for standee detail.");
+                }
+                detailObject.name = "DetailCard";
+                detailObject.transform.SetParent(detailLayer, false);
+                var detailCard = detailObject.GetComponent<CardView>();
+                var detailGroup = detailObject.GetComponent<CanvasGroup>();
+                detailGroup.alpha = 0f;
+                detailGroup.blocksRaycasts = false;
+                detailGroup.interactable = false;
+                var detailMode = CreateText(
+                    "DetailMode",
+                    detailLayer,
+                    font,
+                    string.Empty,
+                    15,
+                    TextAnchor.MiddleCenter);
+                detailMode.color = new Color(1f, 0.88f, 0.62f, 1f);
+                detailMode.rectTransform.sizeDelta = new Vector2(280f, 28f);
+
                 var view = root.GetComponent<BattleScreenView>();
                 var serialized = new SerializedObject(view);
                 SetReference(serialized, "rootCanvas", canvas);
                 SetReference(serialized, "safeArea", safeArea);
-                SetReference(serialized, "cardPrefab", cardPrefab);
+                SetReference(serialized, "standeePrefab", standeePrefab);
                 SetReference(serialized, "titleText", title);
                 SetReference(serialized, "statusText", status);
                 SetReference(serialized, "roundText", round);
@@ -390,6 +767,10 @@ namespace SpireChess.Editor
                 SetReference(serialized, "logText", logText);
                 SetReference(serialized, "feedbackCanvasGroup", feedbackCanvas);
                 SetReference(serialized, "feedbackText", feedbackText);
+                SetReference(serialized, "detailLayer", detailLayer);
+                SetReference(serialized, "detailCard", detailCard);
+                SetReference(serialized, "detailCanvasGroup", detailGroup);
+                SetReference(serialized, "detailModeText", detailMode);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 PrefabUtility.SaveAsPrefabAsset(root, ScreenPrefabPath);
             }
@@ -405,7 +786,6 @@ namespace SpireChess.Editor
             Font font,
             GameObject slotPrefab,
             string label,
-            Color slotColor,
             float bottom)
         {
             var panel = CreateImage(name, parent, Panel).rectTransform;
@@ -434,7 +814,6 @@ namespace SpireChess.Editor
                 var instance = PrefabUtility.InstantiatePrefab(slotPrefab) as GameObject;
                 instance.name = $"Slot{index + 1}";
                 instance.transform.SetParent(row, false);
-                instance.GetComponent<Image>().color = slotColor;
                 slots[index] = instance.GetComponent<BattleSlotView>();
             }
             return slots;
@@ -505,13 +884,13 @@ namespace SpireChess.Editor
             };
             state.PlayerCards[0] = PreviewCard(
                 "player-0",
-                "天穹契约者",
-                "每 4 次刷新后，使所有友方星契永久获得 +1/+1。",
-                "星契",
-                5,
+                "铸魂盾侍",
+                "战斗开始时获得护盾；金色时左侧友军也获得护盾。",
+                "铸魂",
+                1,
                 12,
                 19,
-                true,
+                false,
                 true);
             state.PlayerCards[1] = PreviewCard(
                 "player-1",
@@ -535,23 +914,60 @@ namespace SpireChess.Editor
                 false);
             state.EnemyCards[1] = PreviewCard(
                 "enemy-1",
-                "星门守卫",
-                "嘲讽。失去护盾后获得攻击。",
-                "旅团",
-                4,
+                "不熄炉王",
+                "嘲讽。护盾破裂与亡语反馈使用独立空间锚点。",
+                "铸魂",
+                5,
                 11,
                 18,
-                false,
+                true,
                 true);
             state.EnemyCards[3] = PreviewCard(
                 "enemy-3",
-                "破阵佣兵",
-                "溅射。",
+                "关键词校验立牌",
+                "同时验证嘲讽、护盾、亡语和溅射。",
                 "旅团",
                 3,
                 9,
                 12,
                 false,
+                false);
+            return state;
+        }
+
+        private static BattleScreenState CreateRarityComparisonState()
+        {
+            var state = CreatePreviewState();
+            state.Title = "战斗 · 稀有度对照";
+            state.Status = "普通 / 金色 · 同角色、同流派色";
+            state.RoundText = "G1 视觉评审";
+            state.LogText = string.Join("\n", new[]
+            {
+                "左：普通铸魂盾侍。",
+                "右：金色铸魂盾侍。",
+                "金色只强化局部暖金，不覆盖铸魂红与攻防数字。"
+            });
+            Array.Clear(state.PlayerCards, 0, state.PlayerCards.Length);
+            Array.Clear(state.EnemyCards, 0, state.EnemyCards.Length);
+            state.PlayerCards[0] = PreviewCard(
+                "rarity-normal",
+                "铸魂盾侍",
+                "战斗开始时获得护盾。",
+                "铸魂",
+                1,
+                6,
+                10,
+                false,
+                false);
+            state.PlayerCards[1] = PreviewCard(
+                "rarity-golden",
+                "铸魂盾侍",
+                "金色：战斗开始时获得护盾。",
+                "铸魂",
+                1,
+                12,
+                20,
+                true,
                 false);
             return state;
         }
@@ -567,18 +983,16 @@ namespace SpireChess.Editor
             bool golden,
             bool shield)
         {
+            var keywords = ResolvePreviewKeywords(name, shield);
             return new CardViewModel
             {
                 InstanceId = id,
+                ArtId = ResolvePreviewArtId(name),
                 Name = name,
                 Description = description,
                 RaceText = race,
-                AbilityLabels = shield
-                    ? new[] { "护盾" }
-                    : Array.Empty<string>(),
-                Keywords = shield
-                    ? new[] { "护盾" }
-                    : Array.Empty<string>(),
+                AbilityLabels = keywords,
+                Keywords = keywords,
                 Tier = tier,
                 Attack = attack,
                 Health = health,
@@ -589,8 +1003,39 @@ namespace SpireChess.Editor
                 IsGolden = golden,
                 HasShield = shield,
                 IsInteractable = true,
-                IsAffordable = true
+                IsAffordable = true,
+                IsLegalTarget = name == "关键词校验立牌"
             };
+        }
+
+        private static string[] ResolvePreviewKeywords(string name, bool shield)
+        {
+            if (name == "关键词校验立牌")
+            {
+                return new[] { "嘲讽", "护盾", "亡语", "溅射" };
+            }
+            if (name == "铸魂盾侍" || name == "不熄炉王")
+            {
+                return shield ? new[] { "嘲讽", "护盾" } : new[] { "嘲讽" };
+            }
+            if (name == "双尾狐影")
+            {
+                return new[] { "亡语" };
+            }
+            return shield ? new[] { "护盾" } : Array.Empty<string>();
+        }
+
+        private static string ResolvePreviewArtId(string name)
+        {
+            switch (name)
+            {
+                case "铸魂盾侍":
+                    return "placeholder_card_forge_soul_shield_squire";
+                case "不熄炉王":
+                    return "placeholder_card_undying_furnace_king";
+                default:
+                    return string.Empty;
+            }
         }
 
         private static BattleButtonState ButtonState(
@@ -707,6 +1152,20 @@ namespace SpireChess.Editor
                     $"Missing serialized property {name}.");
             }
             property.objectReferenceValue = value;
+        }
+
+        private static void SetColor(
+            SerializedObject serialized,
+            string name,
+            Color value)
+        {
+            var property = serialized.FindProperty(name);
+            if (property == null)
+            {
+                throw new InvalidOperationException(
+                    "Missing serialized color property: " + name);
+            }
+            property.colorValue = value;
         }
 
         private static void SetReferenceArray<T>(

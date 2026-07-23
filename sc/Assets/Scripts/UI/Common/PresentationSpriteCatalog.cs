@@ -21,12 +21,38 @@ namespace SpireChess.UI
 
         [SerializeField] private Sprite normalCardFrame;
         [SerializeField] private Sprite goldenCardFrame;
+        [Header("Battle standee")]
+        [SerializeField] private Sprite battleNormalStandeeFrame;
+        [SerializeField] private Sprite battleStandeeFrame;
+        [SerializeField] private Sprite battleAttackMedallion;
+        [SerializeField] private Sprite battleHealthMedallion;
+        [SerializeField] private Sprite battleShieldOverlay;
+        [SerializeField] private Sprite battleTauntBase;
+        [SerializeField] private Sprite battleDeathrattleSeal;
+        [SerializeField] private Sprite battleSplashMark;
         [SerializeField] private ArtworkEntry[] artworks = Array.Empty<ArtworkEntry>();
 
         private Dictionary<string, Sprite> artworkById;
 
         public Sprite NormalCardFrame => normalCardFrame;
         public Sprite GoldenCardFrame => goldenCardFrame;
+        public Sprite BattleNormalStandeeFrame => battleNormalStandeeFrame;
+        public Sprite BattleGoldenStandeeFrame => battleStandeeFrame;
+        public Sprite BattleAttackMedallion => battleAttackMedallion;
+        public Sprite BattleHealthMedallion => battleHealthMedallion;
+        public Sprite BattleShieldOverlay => battleShieldOverlay;
+        public Sprite BattleTauntBase => battleTauntBase;
+        public Sprite BattleDeathrattleSeal => battleDeathrattleSeal;
+        public Sprite BattleSplashMark => battleSplashMark;
+        public bool HasCompleteBattleStandeeSet =>
+            battleNormalStandeeFrame != null &&
+            battleStandeeFrame != null &&
+            battleAttackMedallion != null &&
+            battleHealthMedallion != null &&
+            battleShieldOverlay != null &&
+            battleTauntBase != null &&
+            battleDeathrattleSeal != null &&
+            battleSplashMark != null;
 
         public bool TryGetArtwork(string artId, out Sprite sprite)
         {

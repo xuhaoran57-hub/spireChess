@@ -15,6 +15,8 @@ namespace SpireChess.Tests.EditMode
     {
         private const string SlotPrefabPath =
             "Assets/Prefabs/UI/Battle/PF_BattleSlot.prefab";
+        private const string StandeePrefabPath =
+            "Assets/Prefabs/UI/Battle/PF_BattleStandee.prefab";
         private const string ScreenPrefabPath =
             "Assets/Prefabs/UI/Battle/PF_BattleScreen.prefab";
         private const string BattleScenePath =
@@ -36,7 +38,9 @@ namespace SpireChess.Tests.EditMode
             "SafeArea/Board/PlayerRow/Slots/Slot1",
             "SafeArea/Board/PlayerRow/Slots/Slot5",
             "SafeArea/LogPanel/LogScroll/Viewport/LogText",
-            "SafeArea/FeedbackLayer/Feedback"
+            "SafeArea/FeedbackLayer/Feedback",
+            "SafeArea/StandeeDetailLayer/DetailCard",
+            "SafeArea/StandeeDetailLayer/DetailMode"
         };
 
         private GameObject screen;
@@ -67,8 +71,53 @@ namespace SpireChess.Tests.EditMode
             Assert.That(slotPrefab.GetComponent<BattleSlotView>(), Is.Not.Null);
             Assert.That(slotPrefab.GetComponent<BattleSlotView>().HasCompleteBindings,
                 Is.True);
+            var slotImage = slotPrefab.GetComponent<Image>();
+            Assert.That(slotImage, Is.Not.Null);
+            Assert.That(slotImage.color.a, Is.LessThanOrEqualTo(0.001f),
+                "Battle slots must remain visually transparent.");
+            Assert.That(slotImage.raycastTarget, Is.True,
+                "Transparent slots must still accept drag-and-drop.");
             Assert.That(slotPrefab.transform.Find("EmptyHint"), Is.Not.Null);
             Assert.That(slotPrefab.transform.Find("Content"), Is.Not.Null);
+            var standeePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                StandeePrefabPath);
+            Assert.That(standeePrefab, Is.Not.Null);
+            var standee = standeePrefab.GetComponent<BattleStandeeView>();
+            Assert.That(standee, Is.Not.Null);
+            Assert.That(standee.HasCompleteBindings, Is.True);
+            var standeeRootImage = standeePrefab.GetComponent<Image>();
+            Assert.That(standeeRootImage.color.a,
+                Is.LessThanOrEqualTo(0.001f));
+            Assert.That(standeeRootImage.raycastTarget, Is.True);
+            Assert.That(standeePrefab.transform.Find("PortraitMask/Portrait"),
+                Is.Not.Null);
+            Assert.That(standeePrefab.transform.Find("ShieldOverlay"),
+                Is.Not.Null);
+            Assert.That(standeePrefab.transform.Find("TauntBase"), Is.Not.Null);
+            Assert.That(standeePrefab.transform.Find("DeathrattleSeal"),
+                Is.Not.Null);
+            Assert.That(standeePrefab.transform.Find("SplashMark"), Is.Not.Null);
+            var targetHighlight = standeePrefab.transform
+                .Find("TargetHighlight").GetComponent<Image>();
+            Assert.That(targetHighlight, Is.Not.Null);
+            Assert.That(targetHighlight.type, Is.EqualTo(Image.Type.Sliced));
+            Assert.That(targetHighlight.fillCenter, Is.False,
+                "Legal targets must use an outline, not a cyan fill block.");
+            var shieldOverlay = standeePrefab.transform
+                .Find("ShieldOverlay").GetComponent<Image>();
+            Assert.That(shieldOverlay.color.a, Is.InRange(0.75f, 0.82f),
+                "Shield must stay clearly readable over battle portraits.");
+            var catalog = AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                "Assets/Configs/Presentation/PresentationSpriteCatalog.asset");
+            var theme = AssetDatabase.LoadAssetAtPath<PresentationTheme>(
+                "Assets/Configs/Presentation/PresentationTheme.asset");
+            Assert.That(catalog, Is.Not.Null);
+            Assert.That(catalog.HasCompleteBattleStandeeSet, Is.True);
+            Assert.That(catalog.BattleNormalStandeeFrame, Is.Not.Null);
+            Assert.That(catalog.BattleGoldenStandeeFrame, Is.Not.Null);
+            Assert.That(catalog.BattleNormalStandeeFrame,
+                Is.Not.SameAs(catalog.BattleGoldenStandeeFrame));
+            Assert.That(theme, Is.Not.Null);
             Assert.That(view, Is.Not.Null);
             Assert.That(view.HasCompleteBindings, Is.True);
             foreach (var path in RequiredScreenPaths)
@@ -140,6 +189,46 @@ namespace SpireChess.Tests.EditMode
             Assert.That(ContentAt(
                 "SafeArea/Board/PlayerRow/Slots/Slot1/Content").childCount,
                 Is.Zero);
+        }
+
+        [Test]
+        public void Standee_RendersFourKeywordsTargetStateAndSharedDetail()
+        {
+            var state = CreateState();
+            var model = state.PlayerCards[0];
+            model.ArtId = "placeholder_card_forge_soul_shield_squire";
+            model.Keywords = new[] { "嘲讽", "护盾", "亡语", "溅射" };
+            model.AbilityLabels = model.Keywords;
+            model.HasShield = true;
+            model.IsLegalTarget = true;
+            view.Render(state);
+
+            var content = ContentAt(
+                "SafeArea/Board/PlayerRow/Slots/Slot1/Content");
+            var standee = content.GetComponentInChildren<BattleStandeeView>();
+            Assert.That(standee, Is.Not.Null);
+            Assert.That(standee.HasCompleteBindings, Is.True);
+            Assert.That(standee.IsShieldVisible, Is.True);
+            Assert.That(standee.IsTauntVisible, Is.True);
+            Assert.That(standee.IsDeathrattleVisible, Is.True);
+            Assert.That(standee.IsSplashVisible, Is.True);
+            Assert.That(standee.IsTargetHighlighted, Is.True);
+
+            standee.OnPointerEnter(null);
+            Assert.That(view.IsStandeeDetailVisible, Is.True);
+            Assert.That(view.IsStandeeDetailLocked, Is.False);
+            Assert.That(view.DetailInstanceId, Is.EqualTo(model.InstanceId));
+            standee.OnPointerExit(null);
+            Assert.That(view.IsStandeeDetailVisible, Is.False);
+
+            standee.OnPointerClick(null);
+            Assert.That(view.IsStandeeDetailVisible, Is.True);
+            Assert.That(view.IsStandeeDetailLocked, Is.True);
+            standee.OnPointerExit(null);
+            Assert.That(view.IsStandeeDetailVisible, Is.True);
+            standee.OnPointerClick(null);
+            Assert.That(view.IsStandeeDetailVisible, Is.False);
+            Assert.That(view.IsStandeeDetailLocked, Is.False);
         }
 
         [Test]

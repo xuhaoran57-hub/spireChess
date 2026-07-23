@@ -26,6 +26,14 @@ namespace SpireChess.UI
             new Color32(0xFF, 0x72, 0x72, 0xFF);
         private static readonly Color NormalTextColor =
             new Color(0.95f, 0.96f, 0.98f, 1f);
+        private static readonly Color InkTextColor =
+            new Color32(0x3D, 0x2E, 0x22, 0xFF);
+        private static readonly Color MutedInkTextColor =
+            new Color32(0x64, 0x4B, 0x37, 0xFF);
+        private static readonly Color StorybookPaperColor =
+            new Color32(0xE9, 0xD7, 0xAE, 0xFA);
+        private static readonly Color StorybookLabelColor =
+            new Color32(0x45, 0x4D, 0x76, 0xFF);
 
         [Header("Root")]
         [SerializeField] private RectTransform rootRect;
@@ -137,6 +145,16 @@ namespace SpireChess.UI
             CurrentDisplayMode = model.DisplayMode;
             background.color = CardTierPalette.GetBackground(model.Tier);
             raceSkin.color = ResolveRaceColor(model.RaceText);
+            namePlate.color = ResolveRacePlateColor(model.RaceText);
+            infoPanel.color = StorybookPaperColor;
+            raceOrSpellTypeText.color = MutedInkTextColor;
+            descriptionText.color = InkTextColor;
+            progressText.color = InkTextColor;
+            progressFill.color = new Color(0.28f, 0.34f, 0.52f, 0.28f);
+            foreach (var label in abilityLabelTexts)
+            {
+                label.color = StorybookLabelColor;
+            }
             var normalFrameSprite = spriteCatalog.NormalCardFrame;
             var goldenFrameSprite = spriteCatalog.GoldenCardFrame;
             ApplyFrameSprite(normalFrame, normalFrameSprite);
@@ -780,6 +798,18 @@ namespace SpireChess.UI
                 case "星契": return new Color(0.20f, 0.34f, 0.62f, 0.44f);
                 case "旅团": return new Color(0.46f, 0.38f, 0.24f, 0.44f);
                 default: return new Color(0.30f, 0.28f, 0.36f, 0.40f);
+            }
+        }
+
+        private static Color ResolveRacePlateColor(string race)
+        {
+            switch (race)
+            {
+                case "铸魂": return new Color(0.48f, 0.22f, 0.14f, 0.96f);
+                case "荒灵": return new Color(0.22f, 0.39f, 0.20f, 0.96f);
+                case "星契": return new Color(0.20f, 0.28f, 0.52f, 0.96f);
+                case "旅团": return new Color(0.42f, 0.32f, 0.20f, 0.96f);
+                default: return new Color(0.29f, 0.26f, 0.31f, 0.94f);
             }
         }
 

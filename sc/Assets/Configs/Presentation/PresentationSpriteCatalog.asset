@@ -12,8 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b9cad64d46da7635dc8f75d7531c85, type: 3}
   m_Name: PresentationSpriteCatalog
   m_EditorClassIdentifier: 
-  normalCardFrame: {fileID: 21300000, guid: 2f20ba4739b074ec290c44cac984f61a, type: 3}
-  goldenCardFrame: {fileID: 21300000, guid: 05b07e7bfa8bd487a2eb56a53426da67, type: 3}
+  normalCardFrame: {fileID: 21300000, guid: 6f0c796c3dad1d146b3900ded62437e4, type: 3}
+  goldenCardFrame: {fileID: 21300000, guid: 9d8eb9fbc751d314c94c0e8925c9fcd4, type: 3}
+  battleNormalStandeeFrame: {fileID: 21300000, guid: 1c3818cd6871c534aa14c87785a54460, type: 3}
+  battleStandeeFrame: {fileID: 21300000, guid: ae0f213661563df4492df7c05e56deee, type: 3}
+  battleAttackMedallion: {fileID: 21300000, guid: 63ae31ca2eafdb647ba6104466d8dc15, type: 3}
+  battleHealthMedallion: {fileID: 21300000, guid: e2b510c1accb45b42816124a3c2239b0, type: 3}
+  battleShieldOverlay: {fileID: 21300000, guid: 6aa416ef7b4465d4bb24401527512422, type: 3}
+  battleTauntBase: {fileID: 21300000, guid: 36e016ee380bc8348b9e181554262016, type: 3}
+  battleDeathrattleSeal: {fileID: 21300000, guid: 9fa01ac256f3d5d46a64cf4f5196f0e0, type: 3}
+  battleSplashMark: {fileID: 21300000, guid: 3246fa79b12192f459d465670fdd70b8, type: 3}
   artworks:
   - id: placeholder_card_undying_furnace_king
     sprite: {fileID: 21300000, guid: 14b43ab810b0fd2fa6ad985d473b45dc, type: 3}
+  - id: placeholder_card_forge_soul_shield_squire
+    sprite: {fileID: 21300000, guid: a518a837ff379ea4aa18c1bd4ddb0abd, type: 3}

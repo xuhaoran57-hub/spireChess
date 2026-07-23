@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4da4c900176f30042a97d10e414cca2a, type: 3}
+  m_Name: PresentationTheme
+  m_EditorClassIdentifier: 
+  forgeSoulPortraitTint: {r: 0.46, g: 0.22, b: 0.14, a: 1}
+  wildSpiritPortraitTint: {r: 0.2, g: 0.42, b: 0.24, a: 1}
+  starboundPortraitTint: {r: 0.2, g: 0.3, b: 0.56, a: 1}
+  wayfarerPortraitTint: {r: 0.42, g: 0.34, b: 0.22, a: 1}
+  fallbackPortraitTint: {r: 0.3, g: 0.27, b: 0.33, a: 1}
+  normalFrameTint: {r: 1, g: 1, b: 1, a: 1}
+  goldenFrameTint: {r: 1, g: 0.9, b: 0.62, a: 1}
+  legalTargetTint: {r: 0.38, g: 0.82, b: 0.58, a: 0.78}
+  selectedTargetTint: {r: 0.98, g: 0.68, b: 0.22, a: 0.88}

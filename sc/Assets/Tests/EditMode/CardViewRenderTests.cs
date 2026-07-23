@@ -137,7 +137,7 @@ namespace SpireChess.Tests.EditMode
             Assert.That(artworkSprite.name,
                 Is.EqualTo("card_minion_undying_furnace_king"));
             Assert.That(ImageAt("NormalFrame").sprite.name,
-                Is.EqualTo("card_frame_normal"));
+                Is.EqualTo("card_frame_storybook_normal_v2"));
             Assert.That(Active("NormalFrame"), Is.True);
             Assert.That(Active("GoldenFrame"), Is.False);
 
@@ -151,7 +151,7 @@ namespace SpireChess.Tests.EditMode
             Assert.That(ImageAt("ArtworkMask/Artwork").sprite,
                 Is.SameAs(artworkSprite));
             Assert.That(ImageAt("GoldenFrame").sprite.name,
-                Is.EqualTo("card_frame_golden"));
+                Is.EqualTo("card_frame_storybook_golden_v2"));
             Assert.That(Active("NormalFrame"), Is.False);
             Assert.That(Active("GoldenFrame"), Is.True);
             Assert.That(RectAt("NormalFrame").rect.size,
