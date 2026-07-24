@@ -27,12 +27,68 @@ namespace SpireChess.Editor
         public const string StorybookGoldenFramePath =
             "Assets/Art/Presentation/UI/Common/" +
             "card_frame_storybook_golden_v2.png";
+        public const string CardCostCoinPath =
+            "Assets/Art/Presentation/UI/Card/card_cost_coin_v1.png";
+        public const string CardTierBookmarkPath =
+            "Assets/Art/Presentation/UI/Card/card_tier_bookmark_v1.png";
+        public const string CardAttackTagPath =
+            "Assets/Art/Presentation/UI/Card/card_attack_tag_v1.png";
+        public const string CardHealthTagPath =
+            "Assets/Art/Presentation/UI/Card/card_health_tag_v1.png";
+
+        private const string MinionArtRoot =
+            "Assets/Art/Presentation/Cards/Minions/";
+
+        private static readonly ArtworkSpec[] ArtworkSpecs =
+        {
+            new ArtworkSpec(
+                "placeholder_card_forge_soul_shield_squire",
+                MinionArtRoot +
+                "ForgeSoul/card_minion_forge_soul_shield_squire.png",
+                0.31f),
+            new ArtworkSpec(
+                "placeholder_card_undying_furnace_king",
+                MinionArtRoot +
+                "ForgeSoul/card_minion_undying_furnace_king.png",
+                0.18f),
+            new ArtworkSpec(
+                "placeholder_card_young_deer_spirit",
+                MinionArtRoot +
+                "WildSpirit/card_minion_young_deer_spirit.png",
+                0.27f),
+            new ArtworkSpec(
+                "placeholder_card_ten_thousand_hoof_surge",
+                MinionArtRoot +
+                "WildSpirit/card_minion_ten_thousand_hoof_surge.png",
+                0.27f),
+            new ArtworkSpec(
+                "placeholder_card_astrolabe_calibrator",
+                MinionArtRoot +
+                "Starbound/card_minion_astrolabe_calibrator.png",
+                0.27f),
+            new ArtworkSpec(
+                "placeholder_card_sky_covenant_bearer",
+                MinionArtRoot +
+                "Starbound/card_minion_sky_covenant_bearer.png",
+                0.25f),
+            new ArtworkSpec(
+                "placeholder_card_traveling_physician",
+                MinionArtRoot +
+                "Wayfarer/card_minion_traveling_physician.png",
+                0.27f),
+            new ArtworkSpec(
+                "placeholder_card_many_arts_apprentice",
+                MinionArtRoot +
+                "Wayfarer/card_minion_many_arts_apprentice.png",
+                0.27f)
+        };
 
         [MenuItem("Spire Chess/UI/Rebuild PF_Card")]
         public static void Build()
         {
             EnsureFolder("Assets/Prefabs", "UI");
             EnsureFolder("Assets/Prefabs/UI", "Common");
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             AssetDatabase.ImportAsset(
                 FontPath,
                 ImportAssetOptions.ForceSynchronousImport |
@@ -607,11 +663,62 @@ namespace SpireChess.Editor
                 serialized,
                 "goldenCardFrame",
                 LoadSprite(StorybookGoldenFramePath));
+            SetReference(
+                serialized,
+                "cardCostCoin",
+                LoadSprite(
+                    CardCostCoinPath,
+                    pixelsPerUnit: 400,
+                    maxTextureSize: 512,
+                    alphaTransparency: true));
+            SetReference(
+                serialized,
+                "cardTierBookmark",
+                LoadSprite(
+                    CardTierBookmarkPath,
+                    pixelsPerUnit: 400,
+                    maxTextureSize: 512,
+                    alphaTransparency: true));
+            SetReference(
+                serialized,
+                "cardAttackTag",
+                LoadSprite(
+                    CardAttackTagPath,
+                    pixelsPerUnit: 400,
+                    maxTextureSize: 512,
+                    alphaTransparency: true,
+                    spriteBorder: new Vector4(58f, 16f, 25f, 16f)));
+            SetReference(
+                serialized,
+                "cardHealthTag",
+                LoadSprite(
+                    CardHealthTagPath,
+                    pixelsPerUnit: 400,
+                    maxTextureSize: 512,
+                    alphaTransparency: true,
+                    spriteBorder: new Vector4(25f, 16f, 69f, 16f)));
+            foreach (var spec in ArtworkSpecs)
+            {
+                AddOrReplaceArtwork(
+                    serialized,
+                    spec.Id,
+                    LoadSprite(
+                        spec.Path,
+                        pixelsPerUnit: 100,
+                        maxTextureSize: 2048,
+                        alphaTransparency: false),
+                    spec.FocalPointY);
+            }
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(spriteCatalog);
         }
 
-        private static Sprite LoadSprite(string path)
+        private static Sprite LoadSprite(
+            string path,
+            int pixelsPerUnit = 100,
+            int maxTextureSize = 2048,
+            bool alphaTransparency = true,
+            Vector4 spriteBorder = default)
         {
             AssetDatabase.ImportAsset(
                 path,
@@ -621,24 +728,65 @@ namespace SpireChess.Editor
             if (importer == null)
             {
                 throw new InvalidOperationException(
-                    "Unable to configure card frame sprite at " + path);
+                    "Unable to configure presentation sprite at " + path);
             }
 
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.mipmapEnabled = false;
-            importer.alphaIsTransparency = true;
+            importer.sRGBTexture = true;
+            importer.alphaIsTransparency = alphaTransparency;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.maxTextureSize = 2048;
+            importer.maxTextureSize = maxTextureSize;
+            importer.isReadable = false;
+            importer.filterMode = FilterMode.Bilinear;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.spritePixelsPerUnit = pixelsPerUnit;
+            importer.spriteMeshType = SpriteMeshType.FullRect;
+            importer.spriteBorder = spriteBorder;
             importer.SaveAndReimport();
 
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
             if (sprite == null)
             {
                 throw new InvalidOperationException(
-                    "Unable to load card frame sprite at " + path);
+                    "Unable to load presentation sprite at " + path);
             }
             return sprite;
+        }
+
+        private static void AddOrReplaceArtwork(
+            SerializedObject catalog,
+            string id,
+            Sprite sprite,
+            float focalPointY)
+        {
+            var artworks = catalog.FindProperty("artworks");
+            if (artworks == null)
+            {
+                throw new InvalidOperationException(
+                    "PresentationSpriteCatalog.artworks is unavailable.");
+            }
+
+            SerializedProperty entry = null;
+            for (var index = 0; index < artworks.arraySize; index++)
+            {
+                var candidate = artworks.GetArrayElementAtIndex(index);
+                if (candidate.FindPropertyRelative("id").stringValue == id)
+                {
+                    entry = candidate;
+                    break;
+                }
+            }
+            if (entry == null)
+            {
+                artworks.arraySize++;
+                entry = artworks.GetArrayElementAtIndex(artworks.arraySize - 1);
+            }
+
+            entry.FindPropertyRelative("id").stringValue = id;
+            entry.FindPropertyRelative("sprite").objectReferenceValue = sprite;
+            entry.FindPropertyRelative("focalPointY").floatValue = focalPointY;
         }
 
         private static void CreatePreviewCard(
@@ -931,6 +1079,23 @@ namespace SpireChess.Editor
             {
                 AssetDatabase.CreateFolder(parent, name);
             }
+        }
+
+        private readonly struct ArtworkSpec
+        {
+            public ArtworkSpec(
+                string id,
+                string path,
+                float focalPointY)
+            {
+                Id = id;
+                Path = path;
+                FocalPointY = focalPointY;
+            }
+
+            public string Id { get; }
+            public string Path { get; }
+            public float FocalPointY { get; }
         }
     }
 }

@@ -13,6 +13,7 @@
 | 文件 | 尺寸 | 用途 |
 |---|---:|---|
 | `standee-frame.png` | 199×376 | 空拱顶立牌框 |
+| `standee-frame-silver-chroma-v0.1.png` | 916×1717 | 普通银灰/白镴立牌框色键母版；透明 Runtime 导出为 `standee_frame_silver_v1.png` |
 | `attack-medallion.png` | 94×96 | 攻击圆章，数字由运行时绘制 |
 | `health-medallion.png` | 96×96 | 生命圆章，数字由运行时绘制 |
 | `deathrattle-seal.png` | 64×64 | 亡语静默态，拱顶正上方 |
@@ -43,3 +44,7 @@
 ## 复现
 
 透明抠图使用 imagegen skill 的 `remove_chroma_key.py`。运行尺寸资产由 `python tools/prepare_arch_standee_runtime_assets.py` 生成。
+
+2026-07-24 项目方已按个人版 OpenAI Terms of Use 确认上述 8 个在用立牌部件的生产
+许可。G1 运行时共同风格与双分辨率评审已通过；本次 G2 候选尚未运行 Unity 回归，
+不得据此把其他未验证资源标记为 Runtime Ready。

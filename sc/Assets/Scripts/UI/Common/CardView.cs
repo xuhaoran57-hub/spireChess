@@ -34,6 +34,14 @@ namespace SpireChess.UI
             new Color32(0xE9, 0xD7, 0xAE, 0xFA);
         private static readonly Color StorybookLabelColor =
             new Color32(0x45, 0x4D, 0x76, 0xFF);
+        private static readonly Color CostNumberColor =
+            new Color32(0xF9, 0xED, 0xCE, 0xFF);
+        private static readonly Color TierNumberColor =
+            new Color32(0x53, 0x35, 0x1D, 0xFF);
+        private static readonly Color AttackNumberColor =
+            new Color32(0xF6, 0xEB, 0xD2, 0xFF);
+        private static readonly Color HealthNumberColor =
+            new Color32(0xFF, 0xEC, 0xD8, 0xFF);
 
         [Header("Root")]
         [SerializeField] private RectTransform rootRect;
@@ -93,6 +101,10 @@ namespace SpireChess.UI
         private Vector2 nameTextArea;
         private Vector2 raceTextArea;
         private Vector2 descriptionTextArea;
+        private Vector2 costTextArea;
+        private Vector2 tierTextArea;
+        private Vector2 attackTextArea;
+        private Vector2 healthTextArea;
 
         public CardDisplayMode CurrentDisplayMode { get; private set; }
 
@@ -160,6 +172,7 @@ namespace SpireChess.UI
             ApplyFrameSprite(normalFrame, normalFrameSprite);
             ApplyFrameSprite(goldenFrame, goldenFrameSprite);
             ApplyArtwork(model);
+            ApplyNumericComponentSprites();
             normalFrame.gameObject.SetActive(!isGolden);
             goldenFrame.gameObject.SetActive(isGolden);
             normalFrame.color = normalFrameSprite != null
@@ -170,11 +183,24 @@ namespace SpireChess.UI
                 : GoldenFrameColor;
 
             costBadge.gameObject.SetActive(model.ShowCost);
-            costText.text = model.Cost.ToString();
+            ApplyNumericText(
+                costText,
+                model.Cost,
+                model.DisplayMode,
+                costTextArea);
             costText.color = model.IsAffordable
-                ? NormalTextColor
+                ? spriteCatalog.CardCostCoin != null
+                    ? CostNumberColor
+                    : NormalTextColor
                 : UnaffordableColor;
-            tierText.text = "T" + model.Tier;
+            ApplyNumericText(
+                tierText,
+                model.Tier,
+                model.DisplayMode,
+                tierTextArea);
+            tierText.color = spriteCatalog.CardTierBookmark != null
+                ? TierNumberColor
+                : NormalTextColor;
 
             ApplySingleLineText(
                 nameText,
@@ -207,18 +233,26 @@ namespace SpireChess.UI
             attackBadge.gameObject.SetActive(isMinion);
             healthBadge.gameObject.SetActive(isMinion);
             spellFooter.gameObject.SetActive(!isMinion);
-            attackText.text = model.Attack.ToString();
-            healthText.text = model.Health.ToString();
-            attackText.fontSize = model.DisplayMode == CardDisplayMode.Full
-                ? 26
-                : 20;
-            healthText.fontSize = attackText.fontSize;
+            ApplyNumericText(
+                attackText,
+                model.Attack,
+                model.DisplayMode,
+                attackTextArea);
+            ApplyNumericText(
+                healthText,
+                model.Health,
+                model.DisplayMode,
+                healthTextArea);
             attackText.color = isInteractable && model.Attack > model.BaseAttack
                 ? GrowthColor
-                : NormalTextColor;
+                : spriteCatalog.CardAttackTag != null
+                    ? AttackNumberColor
+                    : NormalTextColor;
             healthText.color = isInteractable && model.Health > model.BaseHealth
                 ? GrowthColor
-                : NormalTextColor;
+                : spriteCatalog.CardHealthTag != null
+                    ? HealthNumberColor
+                    : NormalTextColor;
             spellFooter.text = "商店法术";
 
             var showShield = isMinion && model.HasShield;
@@ -368,11 +402,11 @@ namespace SpireChess.UI
                 ? new ContractRect(12f, 12f, 216f, 184f)
                 : new ContractRect(8f, 8f, 144f, 112f);
             var cost = full
-                ? new ContractRect(8f, 8f, 48f, 48f)
-                : new ContractRect(6f, 6f, 34f, 34f);
+                ? new ContractRect(13f, 12f, 28f, 29f)
+                : new ContractRect(9f, 8f, 19f, 20f);
             var tier = full
-                ? new ContractRect(184f, 8f, 48f, 48f)
-                : new ContractRect(120f, 6f, 34f, 34f);
+                ? new ContractRect(205f, 13f, 21f, 28f)
+                : new ContractRect(137f, 9f, 14f, 19f);
             var state = full
                 ? new ContractRect(60f, 157f, 120f, 22f)
                 : new ContractRect(42f, 91f, 76f, 18f);
@@ -395,11 +429,17 @@ namespace SpireChess.UI
                 ? new ContractRect(62f, 293f, 116f, 18f)
                 : new ContractRect(44f, 197f, 72f, 14f);
             var attack = full
-                ? new ContractRect(8f, 308f, 44f, 44f)
-                : new ContractRect(6f, 204f, 32f, 32f);
+                ? new ContractRect(13f, 327f, 55f, 22f)
+                : new ContractRect(9f, 218f, 36f, 15f);
             var health = full
-                ? new ContractRect(188f, 308f, 44f, 44f)
-                : new ContractRect(122f, 204f, 32f, 32f);
+                ? new ContractRect(172f, 327f, 55f, 22f)
+                : new ContractRect(115f, 218f, 36f, 15f);
+            var attackNumber = full
+                ? new ContractRect(14f, 1f, 37f, 20f)
+                : new ContractRect(9f, 1f, 24f, 13f);
+            var healthNumber = full
+                ? new ContractRect(4f, 1f, 36f, 20f)
+                : new ContractRect(3f, 1f, 23f, 13f);
             var footer = full
                 ? new ContractRect(58f, 318f, 124f, 22f)
                 : new ContractRect(42f, 211f, 76f, 16f);
@@ -415,9 +455,9 @@ namespace SpireChess.UI
             SetRect(normalFrame.rectTransform, frame);
             SetRect(goldenFrame.rectTransform, frame);
             SetRect(costBadge.rectTransform, cost);
-            Stretch(costText.rectTransform, 3f);
+            Stretch(costText.rectTransform, 1f);
             SetRect(tierBadge.rectTransform, tier);
-            Stretch(tierText.rectTransform, 3f);
+            Stretch(tierText.rectTransform, 1f);
             SetRect(namePlate.rectTransform, name);
             Stretch(nameText.rectTransform, 4f);
             SetRect(infoPanel.rectTransform, info);
@@ -429,9 +469,9 @@ namespace SpireChess.UI
             Stretch(progressText.rectTransform, 2f);
             SetRect(stateBadgeRow, state);
             SetRect(attackBadge.rectTransform, attack);
-            Stretch(attackText.rectTransform, 2f);
+            SetRect(attackText.rectTransform, attackNumber);
             SetRect(healthBadge.rectTransform, health);
-            Stretch(healthText.rectTransform, 2f);
+            SetRect(healthText.rectTransform, healthNumber);
             SetRect(spellFooter.rectTransform, footer);
             SetRect(growthFeedbackRoot, feedback);
             SetRect(selectionFrame.rectTransform, root);
@@ -451,6 +491,16 @@ namespace SpireChess.UI
             descriptionTextArea = new Vector2(
                 description.Width,
                 description.Height);
+            costTextArea = new Vector2(
+                Math.Max(0f, cost.Width - 2f),
+                Math.Max(0f, cost.Height - 2f));
+            tierTextArea = new Vector2(
+                Math.Max(0f, tier.Width - 2f),
+                Math.Max(0f, tier.Height - 2f));
+            attackTextArea =
+                new Vector2(attackNumber.Width, attackNumber.Height);
+            healthTextArea =
+                new Vector2(healthNumber.Width, healthNumber.Height);
             CurrentDisplayMode = mode;
         }
 
@@ -548,6 +598,31 @@ namespace SpireChess.UI
                     1,
                     true,
                     area));
+        }
+
+        private void ApplyNumericText(
+            Text target,
+            int value,
+            CardDisplayMode mode,
+            Vector2 area)
+        {
+            var text = value.ToString();
+            var baseSize = mode == CardDisplayMode.Full ? 15 : 10;
+            const int minimumSize = 7;
+            for (var size = baseSize; size >= minimumSize; size--)
+            {
+                if (!Fits(target, text, size, 1, true, area))
+                {
+                    continue;
+                }
+
+                target.fontSize = size;
+                target.text = text;
+                return;
+            }
+
+            target.fontSize = minimumSize;
+            target.text = text;
         }
 
         private void ApplyDescription(
@@ -836,9 +911,49 @@ namespace SpireChess.UI
             target.fillCenter = true;
         }
 
+        private void ApplyNumericComponentSprites()
+        {
+            ApplyNumericComponentSprite(
+                costBadge,
+                spriteCatalog.CardCostCoin,
+                Image.Type.Simple,
+                new Color(0.16f, 0.42f, 0.66f, 0.96f));
+            ApplyNumericComponentSprite(
+                tierBadge,
+                spriteCatalog.CardTierBookmark,
+                Image.Type.Simple,
+                new Color(0.12f, 0.14f, 0.18f, 0.96f));
+            ApplyNumericComponentSprite(
+                attackBadge,
+                spriteCatalog.CardAttackTag,
+                Image.Type.Sliced,
+                new Color(0.54f, 0.18f, 0.16f, 0.98f));
+            ApplyNumericComponentSprite(
+                healthBadge,
+                spriteCatalog.CardHealthTag,
+                Image.Type.Sliced,
+                new Color(0.18f, 0.50f, 0.26f, 0.98f));
+        }
+
+        private static void ApplyNumericComponentSprite(
+            Image target,
+            Sprite sprite,
+            Image.Type type,
+            Color fallbackColor)
+        {
+            target.sprite = sprite;
+            target.type = sprite == null ? Image.Type.Simple : type;
+            target.preserveAspect = false;
+            target.fillCenter = true;
+            target.color = sprite == null ? fallbackColor : Color.white;
+        }
+
         private void ApplyArtwork(CardViewModel model)
         {
-            if (!spriteCatalog.TryGetArtwork(model.ArtId, out var sprite))
+            if (!spriteCatalog.TryGetArtwork(
+                    model.ArtId,
+                    out var sprite,
+                    out var focalPointY))
             {
                 artwork.sprite = null;
                 artwork.color = ResolveArtworkColor(model.RaceText);
@@ -863,7 +978,10 @@ namespace SpireChess.UI
             rect.anchorMin = new Vector2(0.5f, 0.5f);
             rect.anchorMax = new Vector2(0.5f, 0.5f);
             rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = Vector2.zero;
+            var verticalOverflow = Mathf.Max(0f, size.y - viewport.y);
+            rect.anchoredPosition = new Vector2(
+                0f,
+                (focalPointY - 0.5f) * verticalOverflow);
             rect.sizeDelta = size;
             rect.localScale = Vector3.one;
         }

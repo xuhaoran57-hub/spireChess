@@ -136,6 +136,9 @@ namespace SpireChess.Tests.EditMode
             Assert.That(artworkSprite, Is.Not.Null);
             Assert.That(artworkSprite.name,
                 Is.EqualTo("card_minion_undying_furnace_king"));
+            Assert.That(
+                RectAt("ArtworkMask/Artwork").anchoredPosition.y,
+                Is.EqualTo(-44.8f).Within(0.1f));
             Assert.That(ImageAt("NormalFrame").sprite.name,
                 Is.EqualTo("card_frame_storybook_normal_v2"));
             Assert.That(Active("NormalFrame"), Is.True);
@@ -156,6 +159,68 @@ namespace SpireChess.Tests.EditMode
             Assert.That(Active("GoldenFrame"), Is.True);
             Assert.That(RectAt("NormalFrame").rect.size,
                 Is.EqualTo(RectAt("GoldenFrame").rect.size));
+        }
+
+        [Test]
+        public void NumericComponents_UseCatalogSpritesAndBareTierNumber()
+        {
+            var model = CreateMinion(CardDisplayMode.Full);
+
+            view.Render(model);
+
+            Assert.That(ImageAt("CostBadge").sprite, Is.Not.Null);
+            Assert.That(ImageAt("CostBadge").sprite.name,
+                Is.EqualTo("card_cost_coin_v1"));
+            Assert.That(ImageAt("CostBadge").type, Is.EqualTo(Image.Type.Simple));
+            Assert.That(TextAt("CostBadge/Cost"), Is.EqualTo("3"));
+
+            Assert.That(ImageAt("TierBadge").sprite, Is.Not.Null);
+            Assert.That(ImageAt("TierBadge").sprite.name,
+                Is.EqualTo("card_tier_bookmark_v1"));
+            Assert.That(ImageAt("TierBadge").type, Is.EqualTo(Image.Type.Simple));
+            Assert.That(TextAt("TierBadge/Tier"), Is.EqualTo("3"));
+
+            Assert.That(ImageAt("AttackBadge").sprite, Is.Not.Null);
+            Assert.That(ImageAt("AttackBadge").sprite.name,
+                Is.EqualTo("card_attack_tag_v1"));
+            Assert.That(ImageAt("AttackBadge").type, Is.EqualTo(Image.Type.Sliced));
+            Assert.That(TextAt("AttackBadge/Attack"), Is.EqualTo("4"));
+
+            Assert.That(ImageAt("HealthBadge").sprite, Is.Not.Null);
+            Assert.That(ImageAt("HealthBadge").sprite.name,
+                Is.EqualTo("card_health_tag_v1"));
+            Assert.That(ImageAt("HealthBadge").type, Is.EqualTo(Image.Type.Sliced));
+            Assert.That(TextAt("HealthBadge/Health"), Is.EqualTo("8"));
+        }
+
+        [TestCase(CardDisplayMode.Full, 15)]
+        [TestCase(CardDisplayMode.Compact, 10)]
+        public void FourDigitStats_FitSlotsAndRestoreBaseFontSize(
+            CardDisplayMode mode,
+            int baseFontSize)
+        {
+            var model = CreateMinion(mode);
+            model.Attack = 9999;
+            model.Health = 1200;
+
+            view.Render(model);
+            Canvas.ForceUpdateCanvases();
+
+            Assert.That(TextAt("AttackBadge/Attack"), Is.EqualTo("9999"));
+            Assert.That(TextAt("HealthBadge/Health"), Is.EqualTo("1200"));
+            AssertNumericTextFits("AttackBadge/Attack", baseFontSize);
+            AssertNumericTextFits("HealthBadge/Health", baseFontSize);
+
+            model.Attack = 6;
+            model.Health = 8;
+            view.Render(model);
+
+            Assert.That(
+                TextComponentAt("AttackBadge/Attack").fontSize,
+                Is.EqualTo(baseFontSize));
+            Assert.That(
+                TextComponentAt("HealthBadge/Health").fontSize,
+                Is.EqualTo(baseFontSize));
         }
 
         [Test]
@@ -460,6 +525,20 @@ namespace SpireChess.Tests.EditMode
             var target = root.Find(path) as RectTransform;
             Assert.That(target, Is.Not.Null, "Missing RectTransform at " + path);
             return target;
+        }
+
+        private void AssertNumericTextFits(string path, int maximumFontSize)
+        {
+            var text = TextComponentAt(path);
+            Assert.That(text.fontSize, Is.InRange(7, maximumFontSize));
+            Assert.That(
+                text.preferredWidth,
+                Is.LessThanOrEqualTo(text.rectTransform.rect.width + 0.5f),
+                path + " width");
+            Assert.That(
+                text.preferredHeight,
+                Is.LessThanOrEqualTo(text.rectTransform.rect.height + 0.5f),
+                path + " height");
         }
 
         private static CardViewModel CreateMinion(CardDisplayMode mode)

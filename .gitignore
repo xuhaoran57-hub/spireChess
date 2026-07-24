@@ -25,3 +25,7 @@ Thumbs.db
 
 # Scratch
 test
+
+# Python generated cache
+__pycache__/
+*.py[cod]

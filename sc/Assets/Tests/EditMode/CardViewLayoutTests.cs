@@ -202,8 +202,8 @@ namespace SpireChess.Tests.EditMode
             {
                 ["NormalFrame"] = new ExpectedRect(6f, 6f, 228f, 348f),
                 ["ArtworkMask"] = new ExpectedRect(12f, 12f, 216f, 184f),
-                ["CostBadge"] = new ExpectedRect(8f, 8f, 48f, 48f),
-                ["TierBadge"] = new ExpectedRect(184f, 8f, 48f, 48f),
+                ["CostBadge"] = new ExpectedRect(13f, 12f, 28f, 29f),
+                ["TierBadge"] = new ExpectedRect(205f, 13f, 21f, 28f),
                 ["StateBadgeRow"] = new ExpectedRect(60f, 157f, 120f, 22f),
                 ["NamePlate"] = new ExpectedRect(24f, 181f, 192f, 32f),
                 ["InfoPanel"] = new ExpectedRect(12f, 199f, 216f, 149f),
@@ -215,8 +215,12 @@ namespace SpireChess.Tests.EditMode
                     new ExpectedRect(12f, 256f, 216f, 52f),
                 ["InfoPanel/Progress"] =
                     new ExpectedRect(62f, 293f, 116f, 18f),
-                ["AttackBadge"] = new ExpectedRect(8f, 308f, 44f, 44f),
-                ["HealthBadge"] = new ExpectedRect(188f, 308f, 44f, 44f),
+                ["AttackBadge"] = new ExpectedRect(13f, 327f, 55f, 22f),
+                ["AttackBadge/Attack"] =
+                    new ExpectedRect(27f, 328f, 37f, 20f),
+                ["HealthBadge"] = new ExpectedRect(172f, 327f, 55f, 22f),
+                ["HealthBadge/Health"] =
+                    new ExpectedRect(176f, 328f, 36f, 20f),
                 ["SpellFooter"] = new ExpectedRect(58f, 318f, 124f, 22f),
                 ["SelectionFrame"] = new ExpectedRect(0f, 0f, 240f, 360f)
             };
@@ -228,8 +232,8 @@ namespace SpireChess.Tests.EditMode
             {
                 ["NormalFrame"] = new ExpectedRect(4f, 4f, 152f, 232f),
                 ["ArtworkMask"] = new ExpectedRect(8f, 8f, 144f, 112f),
-                ["CostBadge"] = new ExpectedRect(6f, 6f, 34f, 34f),
-                ["TierBadge"] = new ExpectedRect(120f, 6f, 34f, 34f),
+                ["CostBadge"] = new ExpectedRect(9f, 8f, 19f, 20f),
+                ["TierBadge"] = new ExpectedRect(137f, 9f, 14f, 19f),
                 ["StateBadgeRow"] = new ExpectedRect(42f, 91f, 76f, 18f),
                 ["NamePlate"] = new ExpectedRect(16f, 108f, 128f, 26f),
                 ["InfoPanel"] = new ExpectedRect(8f, 122f, 144f, 110f),
@@ -241,8 +245,12 @@ namespace SpireChess.Tests.EditMode
                     new ExpectedRect(12f, 172f, 136f, 33f),
                 ["InfoPanel/Progress"] =
                     new ExpectedRect(44f, 197f, 72f, 14f),
-                ["AttackBadge"] = new ExpectedRect(6f, 204f, 32f, 32f),
-                ["HealthBadge"] = new ExpectedRect(122f, 204f, 32f, 32f),
+                ["AttackBadge"] = new ExpectedRect(9f, 218f, 36f, 15f),
+                ["AttackBadge/Attack"] =
+                    new ExpectedRect(18f, 219f, 24f, 13f),
+                ["HealthBadge"] = new ExpectedRect(115f, 218f, 36f, 15f),
+                ["HealthBadge/Health"] =
+                    new ExpectedRect(118f, 219f, 23f, 13f),
                 ["SpellFooter"] = new ExpectedRect(42f, 211f, 76f, 16f),
                 ["SelectionFrame"] = new ExpectedRect(0f, 0f, 160f, 240f)
             };
