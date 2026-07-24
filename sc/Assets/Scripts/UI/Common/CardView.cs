@@ -611,7 +611,9 @@ namespace SpireChess.UI
             const int minimumSize = 7;
             for (var size = baseSize; size >= minimumSize; size--)
             {
-                if (!Fits(target, text, size, 1, true, area))
+                if (!Fits(target, text, size, 1, true, area) ||
+                    (text.Length >= 3 &&
+                     !FitsPreferredHeight(target, text, size, area.y)))
                 {
                     continue;
                 }
@@ -758,6 +760,26 @@ namespace SpireChess.UI
                    $"pixelsPerUnit={pixelsPerUnit:0.###}, " +
                    $"lines={generator.lineCount}/{maximumLines}, " +
                    $"populated={populated}.";
+        }
+
+        private static bool FitsPreferredHeight(
+            Text target,
+            string value,
+            int fontSize,
+            float maximumHeight)
+        {
+            var settings = target.GetGenerationSettings(
+                new Vector2(float.MaxValue, maximumHeight));
+            settings.fontSize = fontSize;
+            settings.resizeTextForBestFit = false;
+            settings.horizontalOverflow = HorizontalWrapMode.Overflow;
+            settings.verticalOverflow = VerticalWrapMode.Overflow;
+            var generator = new TextGenerator(
+                Math.Max(8, (value ?? string.Empty).Length));
+            var preferredHeight = generator.GetPreferredHeight(
+                value ?? string.Empty,
+                settings) / ResolvePixelsPerUnit(target);
+            return preferredHeight <= maximumHeight + 0.5f;
         }
 
         private static float ResolvePixelsPerUnit(Text target)
@@ -950,10 +972,12 @@ namespace SpireChess.UI
 
         private void ApplyArtwork(CardViewModel model)
         {
-            if (!spriteCatalog.TryGetArtwork(
+            var resolution = spriteCatalog.ResolveArtwork(
                     model.ArtId,
+                    model.ArtworkFallbackId,
                     out var sprite,
-                    out var focalPointY))
+                    out var focalPointY);
+            if (resolution == ArtworkResolution.Missing)
             {
                 artwork.sprite = null;
                 artwork.color = ResolveArtworkColor(model.RaceText);

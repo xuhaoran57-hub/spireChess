@@ -239,7 +239,12 @@ namespace SpireChess.UI.Battle
 
         private void ApplyPortrait(CardViewModel value)
         {
-            if (spriteCatalog.TryGetArtwork(value.ArtId, out var sprite))
+            var resolution = spriteCatalog.ResolveArtwork(
+                value.ArtId,
+                value.ArtworkFallbackId,
+                out var sprite,
+                out _);
+            if (resolution != ArtworkResolution.Missing)
             {
                 portrait.sprite = sprite;
                 portrait.color = Color.white;

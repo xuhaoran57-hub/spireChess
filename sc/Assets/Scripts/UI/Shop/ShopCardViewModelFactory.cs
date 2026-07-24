@@ -80,6 +80,8 @@ namespace SpireChess.UI.Shop
             return new CardViewModel
             {
                 ArtId = minion.ArtId,
+                ArtworkFallbackId =
+                    PresentationArtworkFallbackIds.ForMinion(minion.Race),
                 Name = minion.Name,
                 Description = minion.GetPrototypeDescription(false),
                 RaceText = ToRaceText(minion.Race),
@@ -112,6 +114,8 @@ namespace SpireChess.UI.Shop
             return new CardViewModel
             {
                 ArtId = spell.ArtId,
+                ArtworkFallbackId =
+                    PresentationArtworkFallbackIds.ForSpell(spell.SpellType),
                 Name = spell.Name,
                 Description = spell.Description,
                 RaceText = ToSpellTypeText(spell.SpellType),
@@ -149,6 +153,8 @@ namespace SpireChess.UI.Shop
             {
                 InstanceId = card.InstanceId,
                 ArtId = minion.ArtId,
+                ArtworkFallbackId =
+                    PresentationArtworkFallbackIds.ForMinion(minion.Race),
                 Name = minion.Name,
                 Description = minion.GetPrototypeDescription(card.IsGolden),
                 RaceText = ToRaceText(minion.Race),
@@ -179,6 +185,8 @@ namespace SpireChess.UI.Shop
             {
                 InstanceId = card.InstanceId,
                 ArtId = spell.ArtId,
+                ArtworkFallbackId =
+                    PresentationArtworkFallbackIds.ForSpell(spell.SpellType),
                 Name = spell.Name,
                 Description = spell.Description,
                 RaceText = ToSpellTypeText(spell.SpellType),

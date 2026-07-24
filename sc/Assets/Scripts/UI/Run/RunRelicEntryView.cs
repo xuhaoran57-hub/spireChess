@@ -6,18 +6,23 @@ namespace SpireChess.UI.Run
     [DisallowMultipleComponent]
     public sealed class RunRelicEntryView : MonoBehaviour
     {
+        [SerializeField] private PresentationSpriteCatalog spriteCatalog;
         [SerializeField] private Image background;
+        [SerializeField] private Image iconImage;
         [SerializeField] private Text gradeText;
         [SerializeField] private Text nameText;
         [SerializeField] private Text metaText;
         [SerializeField] private Text descriptionText;
 
-        public bool HasCompleteBindings => background != null && gradeText != null &&
+        public bool HasCompleteBindings => spriteCatalog != null &&
+                                           background != null && iconImage != null &&
+                                           gradeText != null &&
                                            nameText != null && metaText != null &&
                                            descriptionText != null;
 
         public void Render(RunRelicState state)
         {
+            RenderIcon(state.IconId);
             gradeText.text = state.GradeText ?? string.Empty;
             nameText.text = state.Name ?? string.Empty;
             metaText.text = string.IsNullOrWhiteSpace(state.ProgressText)
@@ -27,6 +32,35 @@ namespace SpireChess.UI.Run
             background.color = state.GradeText == "冠冕"
                 ? new Color(0.28f, 0.22f, 0.08f, 0.98f)
                 : new Color(0.10f, 0.22f, 0.28f, 0.98f);
+        }
+
+        private void RenderIcon(string iconId)
+        {
+            if (iconImage == null)
+            {
+                return;
+            }
+
+            iconImage.sprite = null;
+            iconImage.gameObject.SetActive(false);
+            if (string.IsNullOrWhiteSpace(iconId) || spriteCatalog == null)
+            {
+                return;
+            }
+
+            var resolution = spriteCatalog.ResolveArtwork(
+                iconId,
+                null,
+                out var sprite,
+                out _);
+            if (resolution == ArtworkResolution.Missing || sprite == null)
+            {
+                return;
+            }
+
+            iconImage.sprite = sprite;
+            iconImage.preserveAspect = true;
+            iconImage.gameObject.SetActive(true);
         }
     }
 }

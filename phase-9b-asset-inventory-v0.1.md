@@ -1,7 +1,7 @@
 # 阶段 9B 视听表现资产盘点表 v0.1
 
 - 日期：2026-07-22
-- 状态：G1 已通过；项目方已接受 18 项当前成本样本的生产效率门槛，并确认 28 项活动生产候选的个人版 OpenAI 服务生产许可
+- 状态：G1 已通过；G2 样板技术切片已通过构建器、全量回归、24 个语义 ID 精确命中、非法 ID 诊断与遗珍双分辨率视觉检查；新增 11 项生产签字及新随从/Token/法术专门卡面视觉矩阵待完成
 - 对应方案：`phase-9b-presentation-vertical-slice-technical-design-v0.1.md`
 - 内容基线：5.5.0 / 8B.1
 - 配置真源：`sc/Assets/Resources/Configs/Json/`
@@ -39,10 +39,10 @@
 
 | 类别 | 当前数量 | 当前可用资源 | 缺口 | 9B 处理 |
 | --- | ---: | --- | --- | --- |
-| 非 Token 随从 | 64 | 配置、名称、文案、数值和语义 `artId`；8 张锚点已有 G2 Runtime 候选，另 6 张核心样板 master 已完成 | 56 张无 Runtime 专属 Sprite；其中 6 张已有待接入 master；14 张当前立绘生产许可已确认但 G2 未验；`audioId` 全空 | 三主种族 12 张核心样板；两张旅团只作 G1 附加盲测锚点；其余使用种族回退图 |
-| Token | 3 | 配置和语义 `artId` | 3 张均无正式 Sprite；`audioId` 全空 | 3 张全部制作 |
-| 法术 | 16 | 配置、法术类型和语义 `artId/iconId` | 16 张均为占位插画；`audioId` 全空 | 4 张专属样板插画，其余使用法术类型回退图 |
-| 遗珍 | 15 | 15 个 `uiIconId` | 项目内没有对应 Sprite | 制作 3 个样板图标 |
+| 非 Token 随从 | 64 | 配置、名称、文案、数值和语义 `artId`；12 张核心样板与 2 张旅团附加锚点均已进入 Runtime/Catalog，14 个 ID 精确命中通过 | 50 张无 Runtime 专属 Sprite；新增 6 张核心样板的专门卡面视觉矩阵待完成；`audioId` 全空 | 三主种族 12 张核心样板；两张旅团只作 G1 附加盲测锚点；其余保留种族回退机制，4 张精美回退图本轮暂缓 |
+| Token | 3 | 配置、语义 `artId`；3 张专属插画已进入 Runtime/Catalog，精确命中通过 | 3 张仍为工程样板，生产签字与专门卡面视觉矩阵待完成；`audioId` 全空 | 3 张全部制作并由样板精确命中门禁保护 |
+| 法术 | 16 | 配置、法术类型和语义 `artId/iconId`；4 张专属样板插画已进入 Runtime/Catalog，精确命中通过 | 其余 12 张仍无专属插画；新增 4 张生产签字与专门卡面视觉矩阵待完成；`audioId` 全空 | 4 张专属样板由精确命中门禁保护；其余保留法术类型回退机制，4 张精美回退图本轮暂缓 |
+| 遗珍 | 15 | 15 个 `uiIconId`；3 个样板图标已进入 Runtime/Catalog，精确命中及 Run UI 双分辨率视觉检查通过 | 其余 12 个无对应 Sprite；新增 3 个生产签字待完成 | 3 个样板图标由精确命中门禁保护 |
 | 事件 | 14 | 文案与效果配置 | 无事件插画 | 9B 使用统一事件面板与类型图标；专属插画进入 9C |
 | 遭遇 | 51 | 阵容、名称和三层曲线 | 无遭遇/敌方主题背景 | 9B 制作一套普通战斗背景；楼层/Boss 差异进入 9C |
 | 地图 | 3 张、每层 19 节点 | 布局、连线与状态 | 无正式节点/连线/背景 Sprite | 7 类节点、5 类状态和第一层背景进入 P0 |
@@ -55,7 +55,7 @@
 | UI Prefab | 13 | 功能结构完成、视觉占位 | Card、Shop、Battle、Run、MainMenu 与选择层均已有序列化接线 |
 | 正式/预览 Scene | 11 | 可运行 | 包含 Boot、MainMenu、Shop、Battle、Run 及对应 Preview |
 | 正式字体 | 1 | Runtime Ready | Noto Sans CJK SC Regular，已有 OFL 许可证 |
-| 位图/Sprite | 24 | 生产许可已确认 / G2 未验候选；另有历史工程样板 | 8 张锚点插画、4 个轻量数值组件、8 张立牌部件（含普通银灰/金色双框）与旅团绘本普通/金色卡框已确认生产许可；旧框 2 张已被替代且不纳入许可范围；活动候选的 Unity 自动化仍待完成 |
+| 位图/Sprite | 39 | 28 项生产许可已确认 / 11 项新增工程样板；G2 技术门禁已通过 | 14 张随从插画、4 个轻量数值组件、8 张立牌部件与 2 张绘本 v2 卡框沿用 G1 许可结论；本轮新增 3 张 Token、4 张法术、3 个遗珍图标和 1 张诊断图已通过 Unity 导入与自动化，生产签字仍待完成；新随从/Token/法术专门卡面视觉矩阵待补，旧框 2 张只保留历史证据 |
 | Material/Shader/VFX | 1 | 工程样板 | 护盾使用 `M_BattleShieldAdditive`；Alpha 0.78 与扩大后的肖像覆盖范围已在 G1 实机截图中复核 |
 | AudioClip/AudioMixer | 0 | 未制作 | 没有 WAV/OGG/MP3/Mixer 资源 |
 | 概念图 | 7 张卡牌/商店方向图 + 验收截图 | 概念参考 | 位于 `ui-concepts/`，不能直接等同于 Runtime Ready |
@@ -76,10 +76,10 @@
 
 | 编号 | 等级 | 名称 / 配置 ID | 普通/金色身材 | 关键词与核心反馈 | 专属插画 | 当前状态 | 优先级 |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
-| M-F01 | 1 | 铸魂盾侍 / `forge_soul_shield_squire` | 1/3；2/6 | 嘲讽、开场护盾、金色左侧授盾 | `card_minion_forge_soul_shield_squire.png` | G1 非人修正版 master 与盲测通过；G2 Runtime/Catalog/PF_Card 候选已接入但本轮 Unity 未验证；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
-| M-F02 | 2 | 回火修补匠 / `tempering_mender` | 2/3；4/6 | 战吼、目标框、下场护盾/永久生命分支 | `card_minion_tempering_mender.png` | 1024×1536 master 与 160×240 离线检查完成；G2 待接入；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
-| M-F03 | 4 | 裂甲复仇者 / `cracked_armor_avenger` | 5/4；10/8 | 护盾、亡语、战后随从奖励 | `card_minion_cracked_armor_avenger.png` | 1024×1536 master 与 160×240 离线检查完成；G2 待接入；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
-| M-F04 | 5 | 不熄炉王 / `undying_furnace_king` | 6/8；12/16 | 嘲讽、开场护盾、连续护盾转移、2/4 次上限 | `card_minion_undying_furnace_king.png` | G1 非人王者 v0.5 master 与盲测通过；G2 Runtime/Catalog/PF_Card 候选已接入但本轮 Unity 未验证；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
+| M-F01 | 1 | 铸魂盾侍 / `forge_soul_shield_squire` | 1/3；2/6 | 嘲讽、开场护盾、金色左侧授盾 | `card_minion_forge_soul_shield_squire.png` | G1 非人修正版 master 与盲测通过；G2 Runtime/Catalog/PF_Card 接入、精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
+| M-F02 | 2 | 回火修补匠 / `tempering_mender` | 2/3；4/6 | 战吼、目标框、下场护盾/永久生命分支 | `card_minion_tempering_mender.png` | 1024×1536 master 与离线缩略检查完成；G2 Runtime/Catalog 接入、精确命中与全量回归通过；专门卡面视觉矩阵待补；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
+| M-F03 | 4 | 裂甲复仇者 / `cracked_armor_avenger` | 5/4；10/8 | 护盾、亡语、战后随从奖励 | `card_minion_cracked_armor_avenger.png` | 1024×1536 master 与离线缩略检查完成；G2 Runtime/Catalog 接入、精确命中与全量回归通过；专门卡面视觉矩阵待补；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
+| M-F04 | 5 | 不熄炉王 / `undying_furnace_king` | 6/8；12/16 | 嘲讽、开场护盾、连续护盾转移、2/4 次上限 | `card_minion_undying_furnace_king.png` | G1 非人王者 v0.5 master 与盲测通过；G2 Runtime/Catalog/PF_Card 接入、精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
 
 铸魂配套反馈：熔火种族皮肤、护盾获得/破裂、失盾触发、永久成长、沉重攻击/死亡音色。
 
@@ -87,10 +87,10 @@
 
 | 编号 | 等级 | 名称 / 配置 ID | 普通/金色身材 | 关键词与核心反馈 | 专属插画 | 当前状态 | 优先级 |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
-| M-W01 | 1 | 幼鹿灵 / `young_deer_spirit` | 1/1；2/2 | 亡语、幼灵召唤、满场失败补偿 | `card_minion_young_deer_spirit.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 候选已接入但本轮 Unity 未验证；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
-| M-W02 | 2 | 腐叶承嗣 / `rotleaf_heir` | 2/4；4/8 | 嘲讽、亡语、随机存活荒灵本场成长 | `card_minion_rotleaf_heir.png` | 1024×1536 master 与 160×240 离线检查完成；G2 待接入；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
-| M-W03 | 4 | 狐群巢母 / `fox_den_matriarch` | 4/5；8/10 | 嵌套亡语、双尾狐影、连续幼灵召唤 | `card_minion_fox_den_matriarch.png` | 1024×1536 master 与 160×240 离线检查完成；G2 待接入；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
-| M-W04 | 5 | 万蹄奔潮 / `ten_thousand_hoof_surge` | 7/8；14/16 | 召唤强化、立即攻击、Token 死亡永久成长、长文案 | `card_minion_ten_thousand_hoof_surge.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 候选已接入但本轮 Unity 未验证；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
+| M-W01 | 1 | 幼鹿灵 / `young_deer_spirit` | 1/1；2/2 | 亡语、幼灵召唤、满场失败补偿 | `card_minion_young_deer_spirit.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 接入、精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
+| M-W02 | 2 | 腐叶承嗣 / `rotleaf_heir` | 2/4；4/8 | 嘲讽、亡语、随机存活荒灵本场成长 | `card_minion_rotleaf_heir.png` | 1024×1536 master 与离线缩略检查完成；G2 Runtime/Catalog 接入、精确命中与全量回归通过；专门卡面视觉矩阵待补；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
+| M-W03 | 4 | 狐群巢母 / `fox_den_matriarch` | 4/5；8/10 | 嵌套亡语、双尾狐影、连续幼灵召唤 | `card_minion_fox_den_matriarch.png` | 1024×1536 master 与离线缩略检查完成；G2 Runtime/Catalog 接入、精确命中与全量回归通过；专门卡面视觉矩阵待补；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
+| M-W04 | 5 | 万蹄奔潮 / `ten_thousand_hoof_surge` | 7/8；14/16 | 召唤强化、立即攻击、Token 死亡永久成长、长文案 | `card_minion_ten_thousand_hoof_surge.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 接入、精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
 
 荒灵配套反馈：叶片/花粉种族皮肤、召唤轨迹、Token 入场、死亡连锁、立即攻击与生长浮字。
 
@@ -98,10 +98,10 @@
 
 | 编号 | 等级 | 名称 / 配置 ID | 普通/金色身材 | 关键词与核心反馈 | 专属插画 | 当前状态 | 优先级 |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
-| M-S01 | 2 | 星盘校准师 / `astrolabe_calibrator` | 2/2；4/4 | 第一次刷新、最低攻击星契、永久攻击 | `card_minion_astrolabe_calibrator.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 候选已接入但本轮 Unity 未验证；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
-| M-S02 | 3 | 秘页折光师 / `secret_page_refractor` | 3/4；6/8 | 护盾、前 2 次施法、永久 +1/+1 或 +2/+2 | `card_minion_secret_page_refractor.png` | 1024×1536 master 与 160×240 离线检查完成；G2 待接入；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
-| M-S03 | 3 | 星图掮客 / `star_map_broker` | 3/3；6/6 | 条件战吼、随从发现、金色两轮阻塞选择 | `card_minion_star_map_broker.png` | 1024×1536 master 与 160×240 离线检查完成；G2 待接入；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
-| M-S04 | 5 | 天穹契约者 / `sky_covenant_bearer` | 4/8；8/16 | 每 4/3 次刷新、群体永久成长、进度条 | `card_minion_sky_covenant_bearer.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 候选已接入但本轮 Unity 未验证；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
+| M-S01 | 2 | 星盘校准师 / `astrolabe_calibrator` | 2/2；4/4 | 第一次刷新、最低攻击星契、永久攻击 | `card_minion_astrolabe_calibrator.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 接入、精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
+| M-S02 | 3 | 秘页折光师 / `secret_page_refractor` | 3/4；6/8 | 护盾、前 2 次施法、永久 +1/+1 或 +2/+2 | `card_minion_secret_page_refractor.png` | 1024×1536 master 与离线缩略检查完成；G2 Runtime/Catalog 接入、精确命中与全量回归通过；专门卡面视觉矩阵待补；生产许可已确认（个人版 OpenAI Terms of Use） | P0 |
+| M-S03 | 3 | 星图掮客 / `star_map_broker` | 3/3；6/6 | 条件战吼、随从发现、金色两轮阻塞选择 | `card_minion_star_map_broker.png` | 1024×1536 master 与离线缩略检查完成；G2 Runtime/Catalog 接入、精确命中与全量回归通过；专门卡面视觉矩阵待补；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
+| M-S04 | 5 | 天穹契约者 / `sky_covenant_bearer` | 4/8；8/16 | 每 4/3 次刷新、群体永久成长、进度条 | `card_minion_sky_covenant_bearer.png` | G1 master 与盲测通过；G2 Runtime/Catalog/PF_Card 接入、精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | P1 |
 
 星契配套反馈：星盘/折光种族皮肤、刷新计数环、施法闪烁、发现展开、群体成长和轻量金色流光。
 
@@ -109,8 +109,8 @@
 
 | 名称 / 配置 ID | 用途 | 当前状态 | 是否计入 12 张 G2 样板 |
 | --- | --- | --- | --- |
-| 行脚医师 / `traveling_physician` | 验证实用、非对称负重不会与三主种族混淆 | G1 master/盲测通过；G2 Runtime 候选未运行 Unity 验证；生产许可已确认（个人版 OpenAI Terms of Use） | 否 |
-| 百技学徒 / `many_arts_apprentice` | 验证拼装训练装备不会误读为铸魂 | G1 master/盲测通过；G2 Runtime 候选未运行 Unity 验证；生产许可已确认（个人版 OpenAI Terms of Use） | 否 |
+| 行脚医师 / `traveling_physician` | 验证实用、非对称负重不会与三主种族混淆 | G1 master/盲测通过；G2 Runtime/Catalog 精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | 否 |
+| 百技学徒 / `many_arts_apprentice` | 验证拼装训练装备不会误读为铸魂 | G1 master/盲测通过；G2 Runtime/Catalog 精确命中与全量回归通过；生产许可已确认（个人版 OpenAI Terms of Use） | 否 |
 
 这两张只扩大 G1 的区分压力，不替换三主种族 12 张核心样板，也不改变 G0
 冻结的 9B 交付数量。
@@ -134,9 +134,9 @@
 
 | 编号 | 名称 / ID | 身材 | 依赖来源 | 插画 | 状态 | 优先级 |
 | --- | --- | --- | --- | --- | --- | --- |
-| T-01 | 幼灵 / `token_young_spirit` | 1/1 | 幼鹿灵、狐群巢母 | `card_token_token_young_spirit.png` | 未制作 | P0 |
-| T-02 | 双尾狐影 / `token_two_tailed_fox_shadow` | 2/2 | 狐群巢母 | `card_token_token_two_tailed_fox_shadow.png` | 未制作 | P0 |
-| T-03 | 迅捷幼灵 / `token_swift_young_spirit` | 2/1 | 立即攻击压力预览 | `card_token_token_swift_young_spirit.png` | 未制作 | P1 |
+| T-01 | 幼灵 / `token_young_spirit` | 1/1 | 幼鹿灵、狐群巢母 | `card_token_token_young_spirit.png` | Runtime/Catalog 接入、精确命中与全量回归通过；工程样板，生产签字与专门卡面视觉矩阵待完成 | P0 |
+| T-02 | 双尾狐影 / `token_two_tailed_fox_shadow` | 2/2 | 狐群巢母 | `card_token_token_two_tailed_fox_shadow.png` | Runtime/Catalog 接入、精确命中与全量回归通过；工程样板，生产签字与专门卡面视觉矩阵待完成 | P0 |
+| T-03 | 迅捷幼灵 / `token_swift_young_spirit` | 2/1 | 立即攻击压力预览 | `card_token_token_swift_young_spirit.png` | Runtime/Catalog 接入、精确命中与全量回归通过；工程样板，生产签字与专门卡面视觉矩阵待完成 | P1 |
 
 Token 必须与荒灵共享色彩语言，但轮廓、边框或 Token 徽章应让玩家在 Compact 模式立即识别其“战斗结束消失”身份。
 
@@ -144,31 +144,31 @@ Token 必须与荒灵共享色彩语言，但轮廓、边框或 Token 徽章应�
 
 | 编号 | 等级 | 名称 / ID | 验证语义 | 插画 | 状态 | 优先级 |
 | --- | ---: | --- | --- | --- | --- | --- |
-| S-01 | 1 | 小型锻体 / `minor_tempering` | 单目标永久 +1/+1、合法目标框 | `card_spell_minor_tempering.png` | 未制作 | P0 |
-| S-02 | 2 | 免费刷新 / `free_refresh` | 经济状态、刷新按钮脉冲 | `card_spell_free_refresh.png` | 未制作 | P0 |
-| S-03 | 4 | 高阶发现 / `advanced_discovery` | 三选一、条件提高候选等级 | `card_spell_advanced_discovery.png` | 未制作 | P1 |
-| S-04 | 4 | 战前赐福 / `prebattle_benediction` | 全体下场护盾、战后存活成长 | `card_spell_prebattle_benediction.png` | 未制作 | P1 |
+| S-01 | 1 | 小型锻体 / `minor_tempering` | 单目标永久 +1/+1、合法目标框 | `card_spell_minor_tempering.png` | Runtime/Catalog 接入、精确命中与全量回归通过；工程样板，生产签字与专门卡面视觉矩阵待完成 | P0 |
+| S-02 | 2 | 免费刷新 / `free_refresh` | 经济状态、刷新按钮脉冲 | `card_spell_free_refresh.png` | Runtime/Catalog 接入、精确命中与全量回归通过；工程样板，生产签字与专门卡面视觉矩阵待完成 | P0 |
+| S-03 | 4 | 高阶发现 / `advanced_discovery` | 三选一、条件提高候选等级 | `card_spell_advanced_discovery.png` | Runtime/Catalog 接入、精确命中与全量回归通过；工程样板，生产签字与专门卡面视觉矩阵待完成 | P1 |
+| S-04 | 4 | 战前赐福 / `prebattle_benediction` | 全体下场护盾、战后存活成长 | `card_spell_prebattle_benediction.png` | Runtime/Catalog 接入、精确命中与全量回归通过；工程样板，生产签字与专门卡面视觉矩阵待完成 | P1 |
 
-其余 12 张法术在 9B 使用按 Growth/Economy/Discovery 等法术类型区分的正式回退插画，不能使用纯色空块。
+其余 12 张法术继续保留按 Growth/Economy/Discovery 等类型回退的代码机制；按本轮优先级，4 张精美法术类型回退图暂缓制作，不能把缺失诊断图当作正式回退插画。
 
 ### 4.3 遗珍
 
 | 编号 | 等级 | 名称 / ID | 验证语义 | 图标 | 状态 | 优先级 |
 | --- | --- | --- | --- | --- | --- | --- |
-| R-01 | Crown | 回魂丧钟 / `crown_echo_bell` | 额外亡语、荒灵组合 | `icon_relic_crown_echo_bell.png` | 未制作 | P1 |
-| R-02 | Crown | 千盾王冠 / `crown_thousand_shields` | 开场护盾、铸魂组合 | `icon_relic_crown_thousand_shields.png` | 未制作 | P1 |
-| R-03 | Curio | 漏刻齿轮 / `curio_refresh_gear` | 首次付费刷新免费、星契组合 | `icon_relic_curio_refresh_gear.png` | 未制作 | P1 |
+| R-01 | Crown | 回魂丧钟 / `crown_echo_bell` | 额外亡语、荒灵组合 | `icon_relic_crown_echo_bell.png` | Runtime/Catalog 接入、精确命中、全量回归与 Run UI 双分辨率视觉检查通过；工程样板，生产签字待完成 | P1 |
+| R-02 | Crown | 千盾王冠 / `crown_thousand_shields` | 开场护盾、铸魂组合 | `icon_relic_crown_thousand_shields.png` | Runtime/Catalog 接入、精确命中、全量回归与 Run UI 双分辨率视觉检查通过；工程样板，生产签字待完成 | P1 |
+| R-03 | Curio | 漏刻齿轮 / `curio_refresh_gear` | 首次付费刷新免费、星契组合 | `icon_relic_curio_refresh_gear.png` | Runtime/Catalog 接入、精确命中、全量回归与 Run UI 双分辨率视觉检查通过；工程样板，生产签字待完成 | P1 |
 
 ### 4.4 回退资产
 
 | 编号 | 回退类型 | 覆盖范围 | 运行时文件 | 状态 | 优先级 |
 | --- | --- | --- | --- | --- | --- |
-| F-01 | 铸魂剪影 | 未完成专属插画的铸魂 | `fallback_minion_forge_soul.png` | 未制作 | P0 |
-| F-02 | 荒灵剪影 | 未完成专属插画的荒灵 | `fallback_minion_wild_spirit.png` | 未制作 | P0 |
-| F-03 | 星契剪影 | 未完成专属插画的星契 | `fallback_minion_starbound.png` | 未制作 | P0 |
-| F-04 | 旅团剪影 | 未完成专属插画的旅团 | `fallback_minion_wayfarer.png` | 未制作 | P0 |
-| F-05 | 法术类型组 | 未完成专属插画的 12 张法术 | `fallback_spell_<type>.png`，预计 3–5 张 | 未制作 | P0 |
-| F-06 | 缺失诊断图 | 非法/未知 ArtId | `fallback_missing_art.png`，必须显眼且只用于诊断 | 未制作 | P0 |
+| F-01 | 铸魂剪影 | 未完成专属插画的铸魂 | `fallback_minion_forge_soul.png` | 未制作；本轮明确暂缓精美回退图，代码机制保留 | P0 |
+| F-02 | 荒灵剪影 | 未完成专属插画的荒灵 | `fallback_minion_wild_spirit.png` | 未制作；本轮明确暂缓精美回退图，代码机制保留 | P0 |
+| F-03 | 星契剪影 | 未完成专属插画的星契 | `fallback_minion_starbound.png` | 未制作；本轮明确暂缓精美回退图，代码机制保留 | P0 |
+| F-04 | 旅团剪影 | 未完成专属插画的旅团 | `fallback_minion_wayfarer.png` | 未制作；本轮明确暂缓精美回退图，代码机制保留 | P0 |
+| F-05 | 法术类型组 | 未完成专属插画的 12 张法术 | `fallback_spell_<type>.png`，4 张 | 未制作；本轮明确暂缓精美回退图，代码机制保留 | P0 |
+| F-06 | 缺失诊断图 | 非法/未知 ArtId | `fallback_missing_art.png`，必须显眼且只用于诊断 | Runtime/Catalog 接入、真实非法 ID 诊断与全量回归通过；工程样板，生产签字待完成 | P0 |
 
 `回退资产` 是 9B 有意控制范围的正式中间方案；`fallback_missing_art` 则表示接线错误，两者不能混用。
 
@@ -193,7 +193,7 @@ Token 必须与荒灵共享色彩语言，但轮廓、边框或 Token 徽章应�
 
 | 编号 | Prefab/界面 | 现状 | 9B 交付 | 状态 | 优先级 |
 | --- | --- | --- | --- | --- | --- |
-| UI-01 | `PF_Card` | 几何、字体、状态和交互完成；2026-07-24 已写入 8 张锚点、4 个轻量组件及焦点裁切候选 | 正式框架、插画、种族皮肤、图标和材质 | G2 未验证候选；当前环境未运行 Unity 编译、EditMode/PlayMode 或双分辨率截图 | P0 |
+| UI-01 | `PF_Card` | 几何、字体、状态和交互完成；`CardUiPrefabBuilder` 成功，Catalog 已覆盖 14 张随从、3 张 Token、4 张法术、3 个遗珍、1 张诊断图、4 个轻量组件及焦点裁切 | 正式框架、插画、种族皮肤、图标和材质 | Unity 全量回归及 24 个语义 ID 精确命中通过；新增 6 张随从、3 张 Token、4 张法术的专门卡面视觉矩阵待补 | P0 |
 | UI-02 | `PF_ShopSlot` | 功能完成 | 商品底座、悬停/选中/空槽状态 | 未制作 | P0 |
 | UI-03 | `PF_ShopScreen` | 功能完成、低保真配色 | 商店背景、顶部资源栏、三排区域、操作栏与反馈层 | 未制作 | P0 |
 | UI-04 | `PF_ChoiceOverlay` | 功能完成 | 发现/奖励标题、候选底板、遮罩、确认反馈 | 未制作 | P0 |
@@ -201,7 +201,7 @@ Token 必须与荒灵共享色彩语言，但轮廓、边框或 Token 徽章应�
 | UI-06 | `PF_BattleScreen` | 功能完成 | 普通战斗背景、顶部栏、双方区域、日志与胜负层 | 未制作 | P0 |
 | UI-07 | `PF_RunMapNode` | 功能完成 | 7 类节点图标、5 类状态、当前节点强调 | 未制作 | P0 |
 | UI-08 | `PF_RunMapEdge` | 功能完成 | 锁定/可达/完成/放弃连线 | 未制作 | P0 |
-| UI-09 | `PF_RunRelicEntry` | 功能完成 | 冠冕/奇物底板、图标、进度 | 未制作 | P1 |
+| UI-09 | `PF_RunRelicEntry` | `RunUiPrefabBuilder` 成功，3 个样板遗珍图标接线完成 | 冠冕/奇物底板、图标、进度 | `ui-concepts/unity-validation/pf-run-screen-v0.1/` 的 1920×1080 与 1920×1200 Run UI 截图人工检查通过；新增图标生产签字待完成 | P1 |
 | UI-10 | `PF_RunChoiceOption` | 功能完成 | 事件/锻造/恢复/遗珍选项底板 | 未制作 | P0 |
 | UI-11 | `PF_RunScreen` | 功能完成 | 第一层地图背景、顶栏、横向滚动区、结果层 | 未制作 | P0 |
 | UI-12 | `PF_MainMenuScreen` | 功能完成 | 标题背景、按钮、存档摘要和状态层 | 未制作 | P0 |
@@ -308,11 +308,11 @@ VFX Runtime Ready 还要求完成对象复用、并发上限、跳过清理和�
 | --- | --- | --- | --- | --- |
 | D-01 | `CardViewModel.ArtId` | 已完成 | 字符串语义字段，不传 Unity 对象 | P0 |
 | D-02 | Minion/Spell Factory 映射 | 已完成 | 从配置复制到 ViewModel | P0 |
-| D-03 | `PresentationSpriteCatalog` | G2 未验证候选 | 已写入 8 张锚点、4 个轻量数值组件、焦点值、旅团绘本普通/金色卡框和八张立牌部件；6 张新增核心样板、种族回退、缺失诊断与本轮 Unity 回归待完成 | P0 |
+| D-03 | `PresentationSpriteCatalog` | G2 样板技术门禁通过 | `CardUiPrefabBuilder` / `RunUiPrefabBuilder` 成功；14 张随从、3 张 Token、4 张法术、3 个遗珍共 24 个语义 ID 精确命中通过，真实非法 ID 命中诊断图；精确命中 → 语义回退 → 缺失诊断机制保留，4+4 张精美回退图按本轮决策暂缓 | P0 |
 | D-04 | `PresentationTheme` | G1 样板已建立 | 统一流派回退色、金色立牌 Tint、合法目标与选中状态色；普通立牌由银灰 Sprite 直接表达 | P0 |
 | D-05 | `PresentationAudioCatalog` | 不存在 | Cue→Clips、Mixer Group、音量/音高、并发/冷却 | P0 |
 | D-06 | AudioService/MusicDirector | 不存在 | 常驻、跨场景唯一、设置持久化、淡入淡出 | P0 |
-| D-07 | 资产来源台账 | 18 项当前成本样本及 28 项活动生产候选的源文件/Runtime 路径、工具和哈希已补齐 | 项目方已确认个人版 OpenAI 服务、输入参考权利、非唯一性与正式使用范围；G2 Unity 验收仍未完成 | P0 |
+| D-07 | 资产来源台账 | 18 项当前成本样本、28 项 G1 活动生产候选及 11 项 G2 新增工程样板的源文件/Runtime 路径、工具和哈希已补齐 | G1 的 28 项许可签字不扩展到本轮新增 11 项；新增项已通过 Unity 技术门禁，但生产许可/签字仍待完成 | P0 |
 
 9B 保留配置中现有 `placeholder_*` ArtId 作为稳定键，避免单纯改名改变完整配置哈希。是否在后续 schema 中把表现身份排除出玩法兼容哈希，需要单独技术决策，不在本阶段顺手修改。
 
@@ -323,11 +323,11 @@ VFX Runtime Ready 还要求完成对象复用、并发上限、跳过清理和�
 | Asset ID | 类型 | 作者/负责人 | 工具/模型/素材库 | 来源链接或工程 | 许可证/商用范围 | 生成/购买日期 | 人工修改 | 导出版本 | 评审人 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 示例：`card_minion_xxx` | 插画 | 待填 | 待填 | 待填 | 待填 | YYYY-MM-DD | 待填 | v01 | 待填 | 不完整行不能 Runtime Ready |
-| `card_minion_undying_furnace_king` | 随从插画 | 项目方 / Codex 导出 | 内置 GPT Image 工作流；后端具体模型版本/种子不可获得 | `ui-concepts/phase-9b/archetype-anchor-illustrations-v0.2/masters/forge-undying-furnace-king.png` | 个人版 OpenAI Terms of Use；生产许可已确认 | 2026-07-24 | 非人纠正、端坐王者与威严受控编辑 | v05 | G1 盲测及许可签字通过 | G2 Unity 验收前不标 Runtime Ready |
+| `card_minion_undying_furnace_king` | 随从插画 | 项目方 / Codex 导出 | 内置 GPT Image 工作流；后端具体模型版本/种子不可获得 | `ui-concepts/phase-9b/archetype-anchor-illustrations-v0.2/masters/forge-undying-furnace-king.png` | 个人版 OpenAI Terms of Use；生产许可已确认 | 2026-07-24 | 非人纠正、端坐王者与威严受控编辑 | v05 | G1 盲测及许可签字通过 | G2 Runtime/Catalog 精确命中与全量回归已通过；不代表 G2 总门禁完成 |
 | `card_frame_normal` | 公共普通框 | 用户提供 / Codex 修图 | ChatGPT（后端具体模型版本不可获得）、`extract_card_frame_alpha.py` | `ui-concepts/phase-9b/card-frames/shared-card-frame-normal-alpha-master-v0.1.png` | 不申请本轮生产许可；仅限历史工程样板 | 2026-07-22 | 棋盘格分离、真实 Alpha、边缘去白 | v01 | 已被替代 | 不纳入 28 项生产许可签字范围 |
 | `card_frame_golden` | 公共金色框 | 用户提供参考 / Codex 修图 | ChatGPT（后端具体模型版本不可获得）、`create_golden_card_frame.py` | `ui-concepts/phase-9b/card-frames/shared-card-frame-golden-alpha-master-v0.1.png` | 不申请本轮生产许可；仅限历史工程样板 | 2026-07-22 | 古金材质迁移、裂纹/高光、复制普通框 Alpha | v01 | 已被替代 | 不纳入 28 项生产许可签字范围 |
-| `card_frame_storybook_normal_v2` | 旅团绘本普通框 | Codex 生成/接入 | 内置 GPT Image 工作流、色键抠图工具 | `ui-concepts/phase-9b/card-frames/shared-card-frame-storybook-normal-chroma-v0.2.png` | 个人版 OpenAI Terms of Use；生产许可已确认 | 2026-07-23 | 以旧框为几何目标、v0.3 Style Tile 为风格参考；洋红色键转真实 Alpha | v02 | G1 运行时评审及许可签字通过 | 已替代旧黑银框用于 `PF_Card`；G2 Unity 验收前不标 Runtime Ready |
-| `card_frame_storybook_golden_v2` | 旅团绘本金色框 | Codex 生成/接入 | 内置 GPT Image 工作流、色键抠图工具 | `ui-concepts/phase-9b/card-frames/shared-card-frame-storybook-golden-chroma-v0.2.png` | 个人版 OpenAI Terms of Use；生产许可已确认 | 2026-07-23 | 从普通框受控派生，保留纸面与靛蓝缝线，仅增强局部金箔 | v02 | G1 运行时评审及许可签字通过 | 与普通框共享几何；G2 Unity 验收前不标 Runtime Ready |
+| `card_frame_storybook_normal_v2` | 旅团绘本普通框 | Codex 生成/接入 | 内置 GPT Image 工作流、色键抠图工具 | `ui-concepts/phase-9b/card-frames/shared-card-frame-storybook-normal-chroma-v0.2.png` | 个人版 OpenAI Terms of Use；生产许可已确认 | 2026-07-23 | 以旧框为几何目标、v0.3 Style Tile 为风格参考；洋红色键转真实 Alpha | v02 | G1 运行时评审及许可签字通过 | 已替代旧黑银框用于 `PF_Card`；G2 Unity 全量回归通过 |
+| `card_frame_storybook_golden_v2` | 旅团绘本金色框 | Codex 生成/接入 | 内置 GPT Image 工作流、色键抠图工具 | `ui-concepts/phase-9b/card-frames/shared-card-frame-storybook-golden-chroma-v0.2.png` | 个人版 OpenAI Terms of Use；生产许可已确认 | 2026-07-23 | 从普通框受控派生，保留纸面与靛蓝缝线，仅增强局部金箔 | v02 | G1 运行时评审及许可签字通过 | 与普通框共享几何；G2 Unity 全量回归通过 |
 
 生成式资产还必须保存固定风格参考、提示词、负面提示、种子/模型版本（若工具提供）、生成后人工修改记录。素材库资产必须保留购买凭证或许可文本。
 
@@ -353,10 +353,10 @@ VFX Runtime Ready 还要求完成对象复用、并发上限、跳过清理和�
 1. 建立本表的负责人、来源和评审字段，冻结状态词。
 2. 输出两套 Style Tile；不制作其余样板卡。
 3. 三主种族锚点与两张旅团附加盲测锚点已完成；旅团不计入 12 张 G2 核心样板。
-4. 同时制作四种种族回退图、法术类型回退图和缺失诊断图，保证正式流程没有空白资源。
-5. 当前 8 张锚点与 4 个组件的 Sprite Catalog / `PF_Card` 仅为 G2 未验证候选；有 Unity 环境后完成编译、自动化和双分辨率验收。
-6. 将已完成 master 的其余 6 张核心样板接入 Runtime，并完成 3 个 Token。
-7. 完成 4 张法术、3 件遗珍、卡牌公共框架和状态/关键词图标。
+4. 按本轮优先级只制作并接入一张高可见缺失诊断图；4 张种族与 4 张法术类型精美回退图明确暂缓，已实现的回退代码机制继续保留。
+5. 12 张核心样板随从、2 张旅团附加锚点、3 个 Token、4 张法术、3 件遗珍、1 张诊断图与 4 个轻量组件已进入 Sprite Catalog；两套 Builder、EditMode 278 / 278、PlayMode 22 / 22、24 个语义 ID 精确命中、真实非法 ID 诊断及遗珍 Run UI 双分辨率检查均通过。
+6. 新增 11 项 ImageGen 资产补做生产许可/签字，并补齐新增 6 张随从、3 张 Token、4 张法术的专门卡面视觉矩阵；G1 的 28 项签字不得自动外推。
+7. 完成卡牌公共框架和状态/关键词图标。
 8. 按 Card → Shop → Run/Map → Battle → MainMenu/弹窗顺序换肤。
 9. 接入 VFX、AudioMixer、3 套 BGM 和 P0 Cue。
 10. 完成自动化、双分辨率、真实性能和外部试玩后，把状态更新为已验收，并据实计算 9C 余量。

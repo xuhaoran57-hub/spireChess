@@ -22,6 +22,20 @@ MASTER_ART = (
     / "archetype-anchor-illustrations-v0.2"
     / "masters"
 )
+SAMPLE_MASTER_ART = (
+    ROOT
+    / "ui-concepts"
+    / "phase-9b"
+    / "sample-minion-illustrations-v0.1"
+    / "masters"
+)
+G2_MASTER_ART = (
+    ROOT
+    / "ui-concepts"
+    / "phase-9b"
+    / "g2-card-assets-v0.1"
+    / "masters"
+)
 MASTER_COMPONENTS = (
     ROOT
     / "ui-concepts"
@@ -33,36 +47,132 @@ UNITY_ART = ROOT / "sc" / "Assets" / "Art" / "Presentation"
 
 ARTWORKS = (
     (
+        MASTER_ART,
         "forge-soul-shield-squire.png",
         "Cards/Minions/ForgeSoul/card_minion_forge_soul_shield_squire.png",
     ),
     (
+        MASTER_ART,
         "forge-undying-furnace-king.png",
         "Cards/Minions/ForgeSoul/card_minion_undying_furnace_king.png",
     ),
     (
+        MASTER_ART,
         "wild-young-deer-spirit.png",
         "Cards/Minions/WildSpirit/card_minion_young_deer_spirit.png",
     ),
     (
+        MASTER_ART,
         "wild-ten-thousand-hoof-surge.png",
         "Cards/Minions/WildSpirit/card_minion_ten_thousand_hoof_surge.png",
     ),
     (
+        MASTER_ART,
         "star-astrolabe-calibrator.png",
         "Cards/Minions/Starbound/card_minion_astrolabe_calibrator.png",
     ),
     (
+        MASTER_ART,
         "star-sky-covenant-bearer.png",
         "Cards/Minions/Starbound/card_minion_sky_covenant_bearer.png",
     ),
     (
+        MASTER_ART,
         "wayfarer-traveling-physician.png",
         "Cards/Minions/Wayfarer/card_minion_traveling_physician.png",
     ),
     (
+        MASTER_ART,
         "wayfarer-many-arts-apprentice.png",
         "Cards/Minions/Wayfarer/card_minion_many_arts_apprentice.png",
+    ),
+    (
+        SAMPLE_MASTER_ART,
+        "forge-tempering-mender.png",
+        "Cards/Minions/ForgeSoul/card_minion_tempering_mender.png",
+    ),
+    (
+        SAMPLE_MASTER_ART,
+        "forge-cracked-armor-avenger.png",
+        "Cards/Minions/ForgeSoul/card_minion_cracked_armor_avenger.png",
+    ),
+    (
+        SAMPLE_MASTER_ART,
+        "wild-rotleaf-heir.png",
+        "Cards/Minions/WildSpirit/card_minion_rotleaf_heir.png",
+    ),
+    (
+        SAMPLE_MASTER_ART,
+        "wild-fox-den-matriarch.png",
+        "Cards/Minions/WildSpirit/card_minion_fox_den_matriarch.png",
+    ),
+    (
+        SAMPLE_MASTER_ART,
+        "star-secret-page-refractor.png",
+        "Cards/Minions/Starbound/card_minion_secret_page_refractor.png",
+    ),
+    (
+        SAMPLE_MASTER_ART,
+        "star-star-map-broker.png",
+        "Cards/Minions/Starbound/card_minion_star_map_broker.png",
+    ),
+)
+
+G2_ARTWORKS = (
+    (
+        "token-young-spirit.png",
+        "Cards/Tokens/card_token_token_young_spirit.png",
+        (1024, 1536),
+    ),
+    (
+        "token-two-tailed-fox-shadow.png",
+        "Cards/Tokens/card_token_token_two_tailed_fox_shadow.png",
+        (1024, 1536),
+    ),
+    (
+        "token-swift-young-spirit.png",
+        "Cards/Tokens/card_token_token_swift_young_spirit.png",
+        (1024, 1536),
+    ),
+    (
+        "spell-minor-tempering.png",
+        "Cards/Spells/card_spell_minor_tempering.png",
+        (1024, 1536),
+    ),
+    (
+        "spell-free-refresh.png",
+        "Cards/Spells/card_spell_free_refresh.png",
+        (1024, 1536),
+    ),
+    (
+        "spell-advanced-discovery.png",
+        "Cards/Spells/card_spell_advanced_discovery.png",
+        (1024, 1536),
+    ),
+    (
+        "spell-prebattle-benediction.png",
+        "Cards/Spells/card_spell_prebattle_benediction.png",
+        (1024, 1536),
+    ),
+    (
+        "relic-crown-echo-bell.png",
+        "Icons/Relics/icon_relic_crown_echo_bell.png",
+        (1254, 1254),
+    ),
+    (
+        "relic-crown-thousand-shields.png",
+        "Icons/Relics/icon_relic_crown_thousand_shields.png",
+        (1254, 1254),
+    ),
+    (
+        "relic-curio-refresh-gear.png",
+        "Icons/Relics/icon_relic_curio_refresh_gear.png",
+        (1254, 1254),
+    ),
+    (
+        "diagnostic-missing-art.png",
+        "UI/Diagnostics/fallback_missing_art.png",
+        (1254, 1254),
     ),
 )
 
@@ -72,22 +182,61 @@ FOLDER_GUIDS = {
     "Cards/Minions/WildSpirit": "e98635ee2d9f4ae784ee9d5dbd7b1ba9",
     "Cards/Minions/Starbound": "a1944629a72d42efa1dd7e2cb7c7e19a",
     "Cards/Minions/Wayfarer": "8784088996304f53a4371c7beaa2bf3c",
+    "Cards/Spells": "9ba1f26a529166b4e828f63972f6e81d",
+    "Cards/Tokens": "f6e795f6c33c4cd44864ad8154668748",
+    "Icons": "054eb347674c52a40a1b1c8a2c5929f4",
+    "Icons/Relics": "3f58d49d6d86306498cb8efe4b9ab385",
     "UI/Card": "3c7d154d4a4d45079bbf4ba8ca0343f0",
+    "UI/Diagnostics": "80ae95c6a24a2e04db0f4d5a3f24c985",
 }
 
 TEXTURE_GUIDS = {
+    "Cards/Minions/ForgeSoul/card_minion_tempering_mender.png":
+        "68718a5dc430ca0488d2ac8d546ef074",
+    "Cards/Minions/ForgeSoul/card_minion_cracked_armor_avenger.png":
+        "1fa97e73403224d44acd6ee534e18663",
     "Cards/Minions/WildSpirit/card_minion_young_deer_spirit.png":
         "2d1f0e574b5b4882bbfb0231da3db462",
     "Cards/Minions/WildSpirit/card_minion_ten_thousand_hoof_surge.png":
         "050bf0f7d6ac4a05a10fc3f352c243f4",
+    "Cards/Minions/WildSpirit/card_minion_rotleaf_heir.png":
+        "3bd7fa03a5ef35e4d874b66616b73785",
+    "Cards/Minions/WildSpirit/card_minion_fox_den_matriarch.png":
+        "838a14903c8e7c04ab87597576da7ae8",
     "Cards/Minions/Starbound/card_minion_astrolabe_calibrator.png":
         "14433058cad447eeac1f6e3495056bba",
     "Cards/Minions/Starbound/card_minion_sky_covenant_bearer.png":
         "445cc5b4c7764c86be86da345e405d03",
+    "Cards/Minions/Starbound/card_minion_secret_page_refractor.png":
+        "85869952f0ebdf643aff589e2a576f85",
+    "Cards/Minions/Starbound/card_minion_star_map_broker.png":
+        "d285ff7a2f2f20a4d82c75e7534072cd",
     "Cards/Minions/Wayfarer/card_minion_traveling_physician.png":
         "078cfc8112384ed4ac029ae18f7fef44",
     "Cards/Minions/Wayfarer/card_minion_many_arts_apprentice.png":
         "b9cd43cae9af4522b6897e6fdb4b03a9",
+    "Cards/Tokens/card_token_token_young_spirit.png":
+        "cb13c5e0516cc6b4fa0ad202ede3ff59",
+    "Cards/Tokens/card_token_token_two_tailed_fox_shadow.png":
+        "a94c860707ffa1d42a57c039ec358fcd",
+    "Cards/Tokens/card_token_token_swift_young_spirit.png":
+        "d189b173395fb3d4db872486c8710606",
+    "Cards/Spells/card_spell_minor_tempering.png":
+        "e216b312639b4dc4091e841dbb40b465",
+    "Cards/Spells/card_spell_free_refresh.png":
+        "11ef1edeab6d09b41adf8708eed94265",
+    "Cards/Spells/card_spell_advanced_discovery.png":
+        "5c1b8d8124af603439943f0264a60c57",
+    "Cards/Spells/card_spell_prebattle_benediction.png":
+        "c0a551913238ea7469844b082302ad85",
+    "Icons/Relics/icon_relic_crown_echo_bell.png":
+        "fedd2bfeaaf0ea04cb8afb06acc86d92",
+    "Icons/Relics/icon_relic_crown_thousand_shields.png":
+        "6592b0b3dd7f58847b4fe6b359dc4e27",
+    "Icons/Relics/icon_relic_curio_refresh_gear.png":
+        "6675c1d951ac49449a8de11d015a1279",
+    "UI/Diagnostics/fallback_missing_art.png":
+        "c23ada02db666b0408db93b3f641b887",
     "UI/Card/card_cost_coin_v1.png":
         "438cc794c78b475ca1efc0bb49b9b09f",
     "UI/Card/card_tier_bookmark_v1.png":
@@ -251,7 +400,13 @@ def prepare_unity_meta() -> None:
             texture_meta(
                 guid,
                 pixels_per_unit=400 if is_component else 100,
-                max_texture_size=512 if is_component else 2048,
+                max_texture_size=512
+                if (
+                    is_component
+                    or relative_path.startswith("Icons/Relics/")
+                    or relative_path.startswith("UI/Diagnostics/")
+                )
+                else 2048,
                 alpha_transparency=is_component,
                 border=component_settings.get(relative_path, (0, 0, 0, 0)),
             ),
@@ -259,11 +414,22 @@ def prepare_unity_meta() -> None:
 
 
 def prepare_artworks() -> None:
-    for source_name, relative_target in ARTWORKS:
-        source = MASTER_ART / source_name
+    for source_root, source_name, relative_target in ARTWORKS:
+        source = source_root / source_name
         target = UNITY_ART / relative_target
         with Image.open(source) as image:
             if image.size != (1024, 1536):
+                raise ValueError(
+                    f"Unexpected approved artwork size {image.size}: {source}"
+                )
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+
+    for source_name, relative_target, expected_size in G2_ARTWORKS:
+        source = G2_MASTER_ART / source_name
+        target = UNITY_ART / relative_target
+        with Image.open(source) as image:
+            if image.size != expected_size:
                 raise ValueError(
                     f"Unexpected approved artwork size {image.size}: {source}"
                 )
@@ -305,7 +471,7 @@ def main() -> None:
     prepare_artworks()
     prepare_components()
     prepare_unity_meta()
-    print("Prepared 8 artworks and 4 numeric components for Unity.")
+    print("Prepared 25 artworks and 4 numeric components for Unity.")
 
 
 if __name__ == "__main__":

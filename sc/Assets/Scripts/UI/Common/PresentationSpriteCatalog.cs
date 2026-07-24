@@ -4,6 +4,14 @@ using UnityEngine;
 
 namespace SpireChess.UI
 {
+    public enum ArtworkResolution
+    {
+        Missing,
+        Exact,
+        Fallback,
+        Diagnostic
+    }
+
     [CreateAssetMenu(
         fileName = "PresentationSpriteCatalog",
         menuName = "Spire Chess/Presentation/Sprite Catalog")]
@@ -37,9 +45,13 @@ namespace SpireChess.UI
         [SerializeField] private Sprite battleTauntBase;
         [SerializeField] private Sprite battleDeathrattleSeal;
         [SerializeField] private Sprite battleSplashMark;
+        [Header("Artwork fallback")]
+        [SerializeField] private Sprite missingArtwork;
         [SerializeField] private ArtworkEntry[] artworks = Array.Empty<ArtworkEntry>();
 
         private Dictionary<string, ArtworkEntry> artworkById;
+        private readonly HashSet<string> reportedMissingArtworkIds =
+            new HashSet<string>(StringComparer.Ordinal);
 
         public Sprite NormalCardFrame => normalCardFrame;
         public Sprite GoldenCardFrame => goldenCardFrame;
@@ -95,6 +107,35 @@ namespace SpireChess.UI
             return true;
         }
 
+        public ArtworkResolution ResolveArtwork(
+            string artId,
+            string fallbackArtId,
+            out Sprite sprite,
+            out float focalPointY)
+        {
+            if (TryGetArtwork(artId, out sprite, out focalPointY))
+            {
+                return ArtworkResolution.Exact;
+            }
+
+            if (TryGetArtwork(fallbackArtId, out sprite, out focalPointY))
+            {
+                ReportMissingOnce(artId, fallbackArtId);
+                return ArtworkResolution.Fallback;
+            }
+
+            sprite = missingArtwork;
+            focalPointY = 0.5f;
+            if (sprite != null)
+            {
+                ReportMissingOnce(artId, fallbackArtId);
+                return ArtworkResolution.Diagnostic;
+            }
+
+            ReportMissingOnce(artId, fallbackArtId);
+            return ArtworkResolution.Missing;
+        }
+
         private void OnEnable()
         {
             RebuildLookup();
@@ -128,6 +169,19 @@ namespace SpireChess.UI
 
                 artworkById[entry.Id] = entry;
             }
+        }
+
+        private void ReportMissingOnce(string artId, string fallbackArtId)
+        {
+            if (string.IsNullOrWhiteSpace(artId) ||
+                !reportedMissingArtworkIds.Add(artId))
+            {
+                return;
+            }
+
+            Debug.LogWarning(
+                $"Presentation artwork '{artId}' is missing. " +
+                $"Fallback: '{fallbackArtId ?? "<none>"}'.");
         }
     }
 }

@@ -63,6 +63,7 @@ namespace SpireChess.UI.Run
     public sealed class RunRelicState
     {
         public string RelicId { get; set; }
+        public string IconId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string GradeText { get; set; }
@@ -80,6 +81,7 @@ namespace SpireChess.UI.Run
 
     public sealed class RunChoiceOptionState
     {
+        public string IconId { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }
         public string Badge { get; set; }

@@ -12,6 +12,7 @@ namespace SpireChess.UI
     {
         public string InstanceId { get; set; }
         public string ArtId { get; set; }
+        public string ArtworkFallbackId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string RaceText { get; set; }

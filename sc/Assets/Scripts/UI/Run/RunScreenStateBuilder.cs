@@ -75,7 +75,7 @@ namespace SpireChess.UI.Run
                 Nodes = nodes,
                 Edges = edges,
                 Relics = BuildRelics(state, configs),
-                Choice = BuildChoice(run),
+                Choice = BuildChoice(run, configs),
                 Summary = BuildSummary(state)
             };
         }
@@ -143,6 +143,7 @@ namespace SpireChess.UI.Run
                 result.Add(new RunRelicState
                 {
                     RelicId = owned.RelicId,
+                    IconId = config.UiIconId,
                     Name = config.Name,
                     Description = config.Description,
                     GradeText = config.Grade == "Crown" ? "冠冕" : "奇物",
@@ -153,7 +154,9 @@ namespace SpireChess.UI.Run
             return result;
         }
 
-        private static RunChoiceOverlayState BuildChoice(RunSession run)
+        private static RunChoiceOverlayState BuildChoice(
+            RunSession run,
+            ConfigService configs)
         {
             var state = run.State;
             if (state.Phase == RunPhase.RewardChoice &&
@@ -199,6 +202,9 @@ namespace SpireChess.UI.Run
                 var pending = state.PendingRelicChoice;
                 var options = pending.Candidates.Select(candidate => new RunChoiceOptionState
                 {
+                    IconId = configs.TryGetRelic(candidate.RelicId, out var relic)
+                        ? relic.UiIconId
+                        : null,
                     Label = candidate.Name,
                     Description = candidate.Description,
                     Badge = pending.HealthCost > 0

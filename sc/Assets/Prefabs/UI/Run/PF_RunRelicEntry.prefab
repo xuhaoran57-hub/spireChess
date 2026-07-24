@@ -1,5 +1,80 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &704283940023794565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7432874963281772712}
+  - component: {fileID: 6900966964909411786}
+  - component: {fileID: 1609026018323554689}
+  m_Layer: 0
+  m_Name: Icon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &7432874963281772712
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 704283940023794565}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1195261565937051649}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 12, y: 12}
+  m_SizeDelta: {x: 68, y: 68}
+  m_Pivot: {x: 0, y: 0}
+--- !u!222 &6900966964909411786
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 704283940023794565}
+  m_CullTransparentMesh: 1
+--- !u!114 &1609026018323554689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 704283940023794565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &3955017058411650710
 GameObject:
   m_ObjectHideFlags: 0
@@ -113,8 +188,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 12, y: 70}
-  m_SizeDelta: {x: 306, y: 22}
+  m_AnchoredPosition: {x: 92, y: 70}
+  m_SizeDelta: {x: 226, y: 22}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &484165148588588881
 CanvasRenderer:
@@ -192,8 +267,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 82, y: 96}
-  m_SizeDelta: {x: 236, y: 26}
+  m_AnchoredPosition: {x: 92, y: 96}
+  m_SizeDelta: {x: 226, y: 26}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &2880684177897386261
 CanvasRenderer:
@@ -271,8 +346,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 12, y: 8}
-  m_SizeDelta: {x: 306, y: 58}
+  m_AnchoredPosition: {x: 92, y: 8}
+  m_SizeDelta: {x: 226, y: 58}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &4658861363402995914
 CanvasRenderer:
@@ -348,6 +423,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 7432874963281772712}
   - {fileID: 2908875287747511370}
   - {fileID: 1858515255895856136}
   - {fileID: 3385952083975781078}
@@ -429,7 +505,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f183fc674b403f147a5be85879036403, type: 3}
   m_Name:
   m_EditorClassIdentifier:
+  spriteCatalog: {fileID: 11400000, guid: 75d638606a8084146524a35a317a2cca, type: 2}
   background: {fileID: 7539990735191644757}
+  iconImage: {fileID: 1609026018323554689}
   gradeText: {fileID: 4669152698508512739}
   nameText: {fileID: 144785455559132294}
   metaText: {fileID: 7678009973164989161}

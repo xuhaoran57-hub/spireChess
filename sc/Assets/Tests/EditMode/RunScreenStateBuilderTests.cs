@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using SpireChess.Config;
 using SpireChess.Run;
@@ -84,6 +85,41 @@ namespace SpireChess.Tests.EditMode
                 .IsInteractable, Is.True);
         }
 
+        [Test]
+        public void Build_PropagatesConfiguredRelicIconIds()
+        {
+            var run = new RunSession(configs, 8104);
+            var ownedConfig = configs.RelicsById["curio_refresh_gear"];
+            AddOwnedRelic(run, ownedConfig);
+
+            var state = RunScreenStateBuilder.Build(run, configs, string.Empty);
+
+            Assert.That(state.Relics, Has.Count.EqualTo(1));
+            Assert.That(state.Relics[0].IconId, Is.EqualTo(ownedConfig.UiIconId));
+
+            var pending = run.Relics.CreateChoice(
+                "Crown",
+                "test-attempt",
+                RelicCompletionMode.FloorComplete,
+                0,
+                false);
+            SetInternal(run.State, nameof(RunState.PendingRelicChoice), pending);
+            SetInternal(run.State, nameof(RunState.Phase), RunPhase.RelicChoice);
+
+            state = RunScreenStateBuilder.Build(run, configs, string.Empty);
+
+            Assert.That(state.Choice.Options, Has.Count.EqualTo(pending.Candidates.Count));
+            foreach (var option in state.Choice.Options)
+            {
+                var candidate = pending.Candidates.Single(value =>
+                    value.CandidateId == option.PrimaryId);
+                Assert.That(
+                    option.IconId,
+                    Is.EqualTo(configs.RelicsById[candidate.RelicId].UiIconId),
+                    candidate.RelicId);
+            }
+        }
+
         private static void ClaimAllRewards(RunSession run)
         {
             while (run.State.PendingCardRewards.Count > 0)
@@ -96,6 +132,31 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(result.Error, Is.EqualTo(RunOperationError.BenchFull));
                 Assert.That(run.SkipNextCardReward().Success, Is.True);
             }
+        }
+
+        private static void AddOwnedRelic(RunSession run, RelicConfig relic)
+        {
+            var constructor = typeof(OwnedRelicState).GetConstructors(
+                BindingFlags.Instance | BindingFlags.NonPublic).Single();
+            var owned = (OwnedRelicState)constructor.Invoke(new object[]
+            {
+                relic,
+                "Test",
+                "test",
+                run.State.Floor,
+                run.State.ShopTurn
+            });
+            typeof(RunState).GetMethod(
+                    "AddOwnedRelic",
+                    BindingFlags.Instance | BindingFlags.NonPublic)
+                .Invoke(run.State, new object[] { owned });
+        }
+
+        private static void SetInternal<T>(RunState state, string propertyName, T value)
+        {
+            typeof(RunState).GetProperty(propertyName)
+                .GetSetMethod(true)
+                .Invoke(state, new object[] { value });
         }
     }
 }

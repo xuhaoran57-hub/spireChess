@@ -1,12 +1,14 @@
 using System.Linq;
 using NUnit.Framework;
 using SpireChess.Run;
+using SpireChess.UI;
 using SpireChess.UI.Run;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace SpireChess.Tests.EditMode
@@ -98,6 +100,47 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void RelicViews_HideBlankIconAndRenderDiagnosticForUnknownIcon()
+        {
+            var texture = new Texture2D(2, 2);
+            var diagnostic = Sprite.Create(
+                texture,
+                new Rect(0f, 0f, 2f, 2f),
+                new Vector2(0.5f, 0.5f));
+            diagnostic.name = "diagnostic-relic-icon";
+            var catalog = ScriptableObject.CreateInstance<PresentationSpriteCatalog>();
+            var catalogSerialized = new SerializedObject(catalog);
+            catalogSerialized.FindProperty("missingArtwork").objectReferenceValue = diagnostic;
+            catalogSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+            var relic = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(
+                RootPath + "PF_RunRelicEntry.prefab"));
+            var choice = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(
+                RootPath + "PF_RunChoiceOption.prefab"));
+            try
+            {
+                AssertDiagnosticIcon(
+                    relic.GetComponent<RunRelicEntryView>(),
+                    relic.transform.Find("Icon").GetComponent<Image>(),
+                    catalog,
+                    diagnostic);
+                AssertDiagnosticIcon(
+                    choice.GetComponent<RunChoiceOptionView>(),
+                    choice.transform.Find("Icon").GetComponent<Image>(),
+                    catalog,
+                    diagnostic);
+            }
+            finally
+            {
+                Object.DestroyImmediate(relic);
+                Object.DestroyImmediate(choice);
+                Object.DestroyImmediate(catalog);
+                Object.DestroyImmediate(diagnostic);
+                Object.DestroyImmediate(texture);
+            }
+        }
+
+        [Test]
         public void Render_CreatesNineteenNodesCorrectEdgesRelicsAndChoicesWithoutLeaks()
         {
             var state = CreateState();
@@ -163,6 +206,46 @@ namespace SpireChess.Tests.EditMode
             var component = prefab.GetComponent<T>();
             Assert.That(component, Is.Not.Null);
             Assert.That(isComplete(component), Is.True);
+        }
+
+        private static void AssertDiagnosticIcon(
+            Component view,
+            Image icon,
+            PresentationSpriteCatalog catalog,
+            Sprite diagnostic)
+        {
+            var serialized = new SerializedObject(view);
+            serialized.FindProperty("spriteCatalog").objectReferenceValue = catalog;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+
+            if (view is RunRelicEntryView relic)
+            {
+                relic.Render(new RunRelicState());
+                Assert.That(icon.gameObject.activeSelf, Is.False);
+                LogAssert.Expect(
+                    LogType.Warning,
+                    "Presentation artwork 'missing-relic-icon' is missing. " +
+                    "Fallback: '<none>'.");
+                relic.Render(new RunRelicState { IconId = "missing-relic-icon" });
+            }
+            else
+            {
+                var choice = (RunChoiceOptionView)view;
+                choice.Render(new RunChoiceOptionState());
+                Assert.That(icon.gameObject.activeSelf, Is.False);
+                LogAssert.Expect(
+                    LogType.Warning,
+                    "Presentation artwork 'missing-choice-icon' is missing. " +
+                    "Fallback: '<none>'.");
+                choice.Render(new RunChoiceOptionState
+                {
+                    IconId = "missing-choice-icon"
+                });
+            }
+
+            Assert.That(icon.gameObject.activeSelf, Is.True);
+            Assert.That(icon.sprite, Is.SameAs(diagnostic));
+            Assert.That(icon.preserveAspect, Is.True);
         }
 
         private static RunScreenState CreateState()

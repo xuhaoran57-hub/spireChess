@@ -38,6 +38,14 @@ namespace SpireChess.Editor
 
         private const string MinionArtRoot =
             "Assets/Art/Presentation/Cards/Minions/";
+        private const string TokenArtRoot =
+            "Assets/Art/Presentation/Cards/Tokens/";
+        private const string SpellArtRoot =
+            "Assets/Art/Presentation/Cards/Spells/";
+        private const string RelicIconRoot =
+            "Assets/Art/Presentation/Icons/Relics/";
+        private const string MissingArtworkPath =
+            "Assets/Art/Presentation/UI/Diagnostics/fallback_missing_art.png";
 
         private static readonly ArtworkSpec[] ArtworkSpecs =
         {
@@ -80,7 +88,77 @@ namespace SpireChess.Editor
                 "placeholder_card_many_arts_apprentice",
                 MinionArtRoot +
                 "Wayfarer/card_minion_many_arts_apprentice.png",
-                0.27f)
+                0.27f),
+            new ArtworkSpec(
+                "placeholder_card_tempering_mender",
+                MinionArtRoot +
+                "ForgeSoul/card_minion_tempering_mender.png",
+                0.31f),
+            new ArtworkSpec(
+                "placeholder_card_cracked_armor_avenger",
+                MinionArtRoot +
+                "ForgeSoul/card_minion_cracked_armor_avenger.png",
+                0.27f),
+            new ArtworkSpec(
+                "placeholder_card_rotleaf_heir",
+                MinionArtRoot +
+                "WildSpirit/card_minion_rotleaf_heir.png",
+                0.29f),
+            new ArtworkSpec(
+                "placeholder_card_fox_den_matriarch",
+                MinionArtRoot +
+                "WildSpirit/card_minion_fox_den_matriarch.png",
+                0.32f),
+            new ArtworkSpec(
+                "placeholder_card_secret_page_refractor",
+                MinionArtRoot +
+                "Starbound/card_minion_secret_page_refractor.png",
+                0.28f),
+            new ArtworkSpec(
+                "placeholder_card_star_map_broker",
+                MinionArtRoot +
+                "Starbound/card_minion_star_map_broker.png",
+                0.30f),
+            new ArtworkSpec(
+                "placeholder_token_young_spirit",
+                TokenArtRoot + "card_token_token_young_spirit.png",
+                0.31f),
+            new ArtworkSpec(
+                "placeholder_token_two_tailed_fox_shadow",
+                TokenArtRoot + "card_token_token_two_tailed_fox_shadow.png",
+                0.30f),
+            new ArtworkSpec(
+                "placeholder_token_swift_young_spirit",
+                TokenArtRoot + "card_token_token_swift_young_spirit.png",
+                0.32f),
+            new ArtworkSpec(
+                "placeholder_spell_minor_tempering",
+                SpellArtRoot + "card_spell_minor_tempering.png",
+                0.42f),
+            new ArtworkSpec(
+                "placeholder_spell_free_refresh",
+                SpellArtRoot + "card_spell_free_refresh.png",
+                0.42f),
+            new ArtworkSpec(
+                "placeholder_spell_advanced_discovery",
+                SpellArtRoot + "card_spell_advanced_discovery.png",
+                0.38f),
+            new ArtworkSpec(
+                "placeholder_spell_prebattle_benediction",
+                SpellArtRoot + "card_spell_prebattle_benediction.png",
+                0.36f),
+            new ArtworkSpec(
+                "icon_relic_crown_echo_bell",
+                RelicIconRoot + "icon_relic_crown_echo_bell.png",
+                0.50f),
+            new ArtworkSpec(
+                "icon_relic_crown_thousand_shields",
+                RelicIconRoot + "icon_relic_crown_thousand_shields.png",
+                0.50f),
+            new ArtworkSpec(
+                "icon_relic_curio_refresh_gear",
+                RelicIconRoot + "icon_relic_curio_refresh_gear.png",
+                0.50f)
         };
 
         [MenuItem("Spire Chess/UI/Rebuild PF_Card")]
@@ -697,6 +775,14 @@ namespace SpireChess.Editor
                     maxTextureSize: 512,
                     alphaTransparency: true,
                     spriteBorder: new Vector4(25f, 16f, 69f, 16f)));
+            SetReference(
+                serialized,
+                "missingArtwork",
+                LoadSprite(
+                    MissingArtworkPath,
+                    pixelsPerUnit: 100,
+                    maxTextureSize: 512,
+                    alphaTransparency: false));
             foreach (var spec in ArtworkSpecs)
             {
                 AddOrReplaceArtwork(
@@ -705,7 +791,12 @@ namespace SpireChess.Editor
                     LoadSprite(
                         spec.Path,
                         pixelsPerUnit: 100,
-                        maxTextureSize: 2048,
+                        maxTextureSize:
+                            spec.Path.StartsWith(
+                                RelicIconRoot,
+                                StringComparison.Ordinal)
+                                ? 512
+                                : 2048,
                         alphaTransparency: false),
                     spec.FocalPointY);
             }
@@ -742,8 +833,11 @@ namespace SpireChess.Editor
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.spritePixelsPerUnit = pixelsPerUnit;
-            importer.spriteMeshType = SpriteMeshType.FullRect;
             importer.spriteBorder = spriteBorder;
+            var textureSettings = new TextureImporterSettings();
+            importer.ReadTextureSettings(textureSettings);
+            textureSettings.spriteMeshType = SpriteMeshType.FullRect;
+            importer.SetTextureSettings(textureSettings);
             importer.SaveAndReimport();
 
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);

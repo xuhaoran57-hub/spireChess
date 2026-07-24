@@ -37,6 +37,8 @@ namespace SpireChess.UI.Battle
             {
                 InstanceId = ResolveInstanceId(minion, side, slotIndex),
                 ArtId = minion.Config.ArtId,
+                ArtworkFallbackId =
+                    PresentationArtworkFallbackIds.ForMinion(minion.Config.Race),
                 Name = minion.Name,
                 Description = minion.Config.GetPrototypeDescription(minion.IsGolden),
                 RaceText = ToRaceText(minion.Config.Race),

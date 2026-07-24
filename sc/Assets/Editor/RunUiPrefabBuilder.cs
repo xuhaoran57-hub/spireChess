@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using SpireChess.Config;
 using SpireChess.Run;
+using SpireChess.UI;
 using SpireChess.UI.Run;
 using SpireChess.Utils;
 using UnityEditor;
@@ -50,11 +51,19 @@ namespace SpireChess.Editor
                 throw new InvalidOperationException(
                     "Run UI requires the pinned Noto Sans CJK font.");
             }
+            var spriteCatalog =
+                AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                    CardUiPrefabBuilder.SpriteCatalogPath);
+            if (spriteCatalog == null)
+            {
+                throw new InvalidOperationException(
+                    "Run UI requires PresentationSpriteCatalog.");
+            }
 
             BuildMapNode(font);
             BuildMapEdge();
-            BuildRelicEntry(font);
-            BuildChoiceOption(font);
+            BuildRelicEntry(font, spriteCatalog);
+            BuildChoiceOption(font, spriteCatalog);
             BuildScreen(
                 font,
                 LoadPrefab(NodePrefabPath),
@@ -158,9 +167,21 @@ namespace SpireChess.Editor
                 Description = "冠冕级遗珍会在后续楼层持续改变规则。",
                 Options = new[]
                 {
-                    PreviewChoice("双生战号", "你的战吼额外触发一次。", "冠冕 · 触发"),
-                    PreviewChoice("无价金券", "每个商店阶段第一次购买随从免费。", "冠冕 · 经济"),
-                    PreviewChoice("星海秘囊", "商店开始时获得一张随机普通法术。", "冠冕 · 法术")
+                    PreviewChoice(
+                        "回魂丧钟",
+                        "你的随从的亡语额外触发一次。",
+                        "冠冕 · 亡语",
+                        "icon_relic_crown_echo_bell"),
+                    PreviewChoice(
+                        "千盾王冠",
+                        "战斗开始时为生命最低的友方随从赋予护盾。",
+                        "冠冕 · 护盾",
+                        "icon_relic_crown_thousand_shields"),
+                    PreviewChoice(
+                        "漏刻齿轮",
+                        "每个商店阶段第一次付费刷新免费。",
+                        "奇物 · 刷新",
+                        "icon_relic_curio_refresh_gear")
                 }
             };
             view.Render(state);
@@ -251,7 +272,9 @@ namespace SpireChess.Editor
             }
         }
 
-        private static void BuildRelicEntry(Font font)
+        private static void BuildRelicEntry(
+            Font font,
+            PresentationSpriteCatalog spriteCatalog)
         {
             var root = new GameObject(
                 "PF_RunRelicEntry",
@@ -269,6 +292,14 @@ namespace SpireChess.Editor
                 var element = root.GetComponent<LayoutElement>();
                 element.minHeight = element.preferredHeight = 128f;
                 element.flexibleWidth = 1f;
+                var icon = CreateImage(
+                    "Icon",
+                    root.transform,
+                    Color.white);
+                SetRect(icon.rectTransform, 12f, 12f, 68f, 68f);
+                icon.raycastTarget = false;
+                icon.preserveAspect = true;
+                icon.gameObject.SetActive(false);
                 var grade = CreateText("Grade", root.transform, font, "冠冕", 13,
                     TextAnchor.MiddleLeft);
                 SetRect(grade.rectTransform, 12f, 98f, 70f, 22f);
@@ -276,19 +307,21 @@ namespace SpireChess.Editor
                 var name = CreateText("Name", root.transform, font, "双生战号", 18,
                     TextAnchor.MiddleLeft);
                 name.fontStyle = FontStyle.Bold;
-                SetRect(name.rectTransform, 82f, 96f, 236f, 26f);
+                SetRect(name.rectTransform, 92f, 96f, 226f, 26f);
                 var meta = CreateText("Meta", root.transform, font, "触发 · 持续生效", 12,
                     TextAnchor.MiddleLeft);
-                SetRect(meta.rectTransform, 12f, 70f, 306f, 22f);
+                SetRect(meta.rectTransform, 92f, 70f, 226f, 22f);
                 meta.color = new Color(0.58f, 0.82f, 0.92f, 1f);
                 var description = CreateText("Description", root.transform, font,
                     "你的战吼额外触发一次。", 13, TextAnchor.UpperLeft);
                 description.horizontalOverflow = HorizontalWrapMode.Wrap;
                 description.verticalOverflow = VerticalWrapMode.Truncate;
-                SetRect(description.rectTransform, 12f, 8f, 306f, 58f);
+                SetRect(description.rectTransform, 92f, 8f, 226f, 58f);
 
                 var serialized = new SerializedObject(root.GetComponent<RunRelicEntryView>());
+                SetReference(serialized, "spriteCatalog", spriteCatalog);
                 SetReference(serialized, "background", image);
+                SetReference(serialized, "iconImage", icon);
                 SetReference(serialized, "gradeText", grade);
                 SetReference(serialized, "nameText", name);
                 SetReference(serialized, "metaText", meta);
@@ -302,7 +335,9 @@ namespace SpireChess.Editor
             }
         }
 
-        private static void BuildChoiceOption(Font font)
+        private static void BuildChoiceOption(
+            Font font,
+            PresentationSpriteCatalog spriteCatalog)
         {
             var root = new GameObject(
                 "PF_RunChoiceOption",
@@ -319,6 +354,14 @@ namespace SpireChess.Editor
                 image.color = new Color(0.13f, 0.20f, 0.28f, 1f);
                 var button = root.GetComponent<Button>();
                 button.targetGraphic = image;
+                var icon = CreateImage(
+                    "Icon",
+                    root.transform,
+                    Color.white);
+                SetRect(icon.rectTransform, 14f, 18f, 82f, 82f);
+                icon.raycastTarget = false;
+                icon.preserveAspect = true;
+                icon.gameObject.SetActive(false);
                 var badge = CreateText("Badge", root.transform, font, "冠冕 · 触发", 13,
                     TextAnchor.MiddleLeft);
                 SetRect(badge.rectTransform, 14f, 132f, 414f, 24f);
@@ -326,16 +369,18 @@ namespace SpireChess.Editor
                 var title = CreateText("Title", root.transform, font, "双生战号", 21,
                     TextAnchor.MiddleLeft);
                 title.fontStyle = FontStyle.Bold;
-                SetRect(title.rectTransform, 14f, 92f, 414f, 38f);
+                SetRect(title.rectTransform, 112f, 92f, 316f, 38f);
                 var description = CreateText("Description", root.transform, font,
                     "你的战吼额外触发一次。", 14, TextAnchor.UpperLeft);
                 description.horizontalOverflow = HorizontalWrapMode.Wrap;
                 description.verticalOverflow = VerticalWrapMode.Truncate;
-                SetRect(description.rectTransform, 14f, 14f, 414f, 74f);
+                SetRect(description.rectTransform, 112f, 14f, 316f, 74f);
 
                 var serialized = new SerializedObject(root.GetComponent<RunChoiceOptionView>());
+                SetReference(serialized, "spriteCatalog", spriteCatalog);
                 SetReference(serialized, "button", button);
                 SetReference(serialized, "background", image);
+                SetReference(serialized, "iconImage", icon);
                 SetReference(serialized, "badgeText", badge);
                 SetReference(serialized, "titleText", title);
                 SetReference(serialized, "descriptionText", description);
@@ -618,21 +663,23 @@ namespace SpireChess.Editor
             {
                 new RunRelicState
                 {
-                    RelicId = "preview-crown",
-                    Name = "双生战号",
-                    Description = "你的战吼额外触发一次。",
+                    RelicId = "crown_echo_bell",
+                    IconId = "icon_relic_crown_echo_bell",
+                    Name = "回魂丧钟",
+                    Description = "你的随从的亡语额外触发一次。",
                     GradeText = "冠冕",
-                    CategoryText = "触发",
+                    CategoryText = "亡语",
                     ProgressText = "持续生效"
                 },
                 new RunRelicState
                 {
-                    RelicId = "preview-curio",
-                    Name = "灵感墨瓶",
-                    Description = "每经过两个商店阶段，获得一张随机普通法术。",
+                    RelicId = "curio_refresh_gear",
+                    IconId = "icon_relic_curio_refresh_gear",
+                    Name = "漏刻齿轮",
+                    Description = "每个商店阶段第一次付费刷新免费。",
                     GradeText = "奇物",
-                    CategoryText = "法术",
-                    ProgressText = "进度 1/2"
+                    CategoryText = "刷新",
+                    ProgressText = "本阶段可用"
                 }
             };
             return state;
@@ -641,10 +688,12 @@ namespace SpireChess.Editor
         private static RunChoiceOptionState PreviewChoice(
             string label,
             string description,
-            string badge)
+            string badge,
+            string iconId)
         {
             return new RunChoiceOptionState
             {
+                IconId = iconId,
                 Label = label,
                 Description = description,
                 Badge = badge,
