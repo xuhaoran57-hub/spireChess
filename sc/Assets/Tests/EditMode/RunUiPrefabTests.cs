@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.UI;
 using SpireChess.UI.Run;
+using SpireChess.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -252,6 +254,19 @@ namespace SpireChess.Tests.EditMode
             var nodeLayer = root.Find(
                 "SafeArea/Body/MapPanel/MapScroll/Viewport/Content/NodeLayer");
             Assert.That(edgeLayer.GetSiblingIndex(), Is.LessThan(nodeLayer.GetSiblingIndex()));
+
+            var mapScrollTransform = root.Find(
+                "SafeArea/Body/MapPanel/MapScroll");
+            var viewport = mapScrollTransform.Find("Viewport") as RectTransform;
+            var content = viewport.Find("Content") as RectTransform;
+            var mapScroll = mapScrollTransform.GetComponent<ScrollRect>();
+            Assert.That(mapScroll.horizontal, Is.True);
+            Assert.That(mapScroll.vertical, Is.False);
+            Assert.That(mapScroll.viewport, Is.SameAs(viewport));
+            Assert.That(mapScroll.content, Is.SameAs(content));
+            Assert.That(content.anchorMin, Is.EqualTo(new Vector2(0f, 0.5f)));
+            Assert.That(content.anchorMax, Is.EqualTo(new Vector2(0f, 0.5f)));
+            Assert.That(content.pivot, Is.EqualTo(new Vector2(0f, 0.5f)));
         }
 
         [Test]
@@ -308,6 +323,23 @@ namespace SpireChess.Tests.EditMode
             Assert.That(view.IsChoiceVisible, Is.True);
             Assert.That(view.FindNode("node_0"), Is.Not.Null);
             Assert.That(view.FindNode("node_18"), Is.Not.Null);
+            var renderedChoices = view
+                .GetComponentsInChildren<RunChoiceOptionView>(true);
+            Assert.That(renderedChoices, Has.Length.EqualTo(3));
+            Assert.That(
+                renderedChoices.Select(choice => choice.Action),
+                Is.All.EqualTo(RunUiActionType.SelectRelic));
+            Assert.That(
+                renderedChoices.Select(choice => choice.PrimaryId),
+                Is.EqualTo(new[]
+                {
+                    "choice_0",
+                    "choice_1",
+                    "choice_2"
+                }));
+            Assert.That(
+                renderedChoices.All(choice => choice.IsInteractable),
+                Is.True);
 
             state.Nodes = System.Array.Empty<RunMapNodeState>();
             state.Edges = System.Array.Empty<RunMapEdgeState>();
@@ -320,6 +352,85 @@ namespace SpireChess.Tests.EditMode
             Assert.That(view.RenderedRelicCount, Is.Zero);
             Assert.That(view.RenderedChoiceCount, Is.Zero);
             Assert.That(view.IsChoiceVisible, Is.False);
+        }
+
+        [Test]
+        public void MapViewportApi_FullyCoversProductionFloorOneInThreeSegments()
+        {
+            var state = CreateProductionFloorOneState();
+            Assert.That(state.Nodes, Has.Count.EqualTo(19));
+            Assert.That(state.MaximumColumn, Is.EqualTo(12));
+            Assert.That(state.Choice, Is.Null);
+            view.Render(state);
+            Assert.That(view.IsChoiceVisible, Is.False);
+
+            var clampedLeft =
+                view.SetMapViewportNormalizedPosition(-1f);
+            Assert.That(
+                clampedLeft.HorizontalNormalizedPosition,
+                Is.EqualTo(0f).Within(0.001f));
+            Assert.That(
+                view.MapHorizontalNormalizedPosition,
+                Is.EqualTo(0f).Within(0.001f));
+
+            var left = view.SetMapViewportSegment(
+                RunMapViewportSegment.Left);
+            var center = view.SetMapViewportSegment(
+                RunMapViewportSegment.Center);
+            var right = view.SetMapViewportSegment(
+                RunMapViewportSegment.Right);
+            var clampedRight =
+                view.SetMapViewportNormalizedPosition(2f);
+
+            Assert.That(
+                center.HorizontalNormalizedPosition,
+                Is.EqualTo(0.5f).Within(0.001f));
+            Assert.That(
+                right.HorizontalNormalizedPosition,
+                Is.EqualTo(1f).Within(0.001f));
+            Assert.That(
+                clampedRight.HorizontalNormalizedPosition,
+                Is.EqualTo(1f).Within(0.001f));
+            Assert.That(
+                left.FullyVisibleNodeIds,
+                Does.Contain("f1_shop_start"));
+            Assert.That(
+                right.FullyVisibleNodeIds,
+                Does.Contain("f1_boss"));
+            Assert.That(left.FullyVisibleNodeIds, Is.Not.Empty);
+            Assert.That(center.FullyVisibleNodeIds, Is.Not.Empty);
+            Assert.That(right.FullyVisibleNodeIds, Is.Not.Empty);
+            Assert.That(
+                left.IntersectingNodeIds,
+                Is.SupersetOf(left.FullyVisibleNodeIds));
+            Assert.That(
+                center.IntersectingNodeIds,
+                Is.SupersetOf(center.FullyVisibleNodeIds));
+            Assert.That(
+                right.IntersectingNodeIds,
+                Is.SupersetOf(right.FullyVisibleNodeIds));
+
+            var allFullyVisibleNodeIds = left.FullyVisibleNodeIds
+                .Concat(center.FullyVisibleNodeIds)
+                .Concat(right.FullyVisibleNodeIds)
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            Assert.That(
+                allFullyVisibleNodeIds,
+                Is.EquivalentTo(state.Nodes.Select(node => node.NodeId)));
+
+            Assert.That(
+                left.ContentBoundsInViewport.width,
+                Is.GreaterThan(left.ViewportBounds.width));
+            Assert.That(
+                left.ContentBoundsInViewport.width,
+                Is.EqualTo(2400f).Within(0.01f));
+            Assert.That(
+                left.ContentBoundsInViewport.xMin,
+                Is.EqualTo(left.ViewportBounds.xMin).Within(0.01f));
+            Assert.That(
+                right.ContentBoundsInViewport.xMax,
+                Is.EqualTo(right.ViewportBounds.xMax).Within(0.01f));
         }
 
         [Test]
@@ -453,11 +564,24 @@ namespace SpireChess.Tests.EditMode
                         {
                             Label = "选项 " + index,
                             Action = RunUiActionType.SelectRelic,
+                            PrimaryId = "choice_" + index,
                             IsInteractable = true
                         }).ToArray()
                 },
                 Summary = new RunSummaryState { Text = "等待选择" }
             };
+        }
+
+        private static RunScreenState CreateProductionFloorOneState()
+        {
+            var configs = new ConfigService(new NewtonsoftJsonSerializer());
+            var validation = configs.LoadFromResources();
+            validation.ThrowIfInvalid();
+            var run = new RunSession(configs, 9201);
+            return RunScreenStateBuilder.Build(
+                run,
+                configs,
+                "Map viewport geometry test");
         }
     }
 }

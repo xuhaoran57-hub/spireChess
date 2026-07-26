@@ -6,11 +6,43 @@ using UnityEngine.UI;
 
 namespace SpireChess.UI.Run
 {
+    public enum RunMapViewportSegment
+    {
+        Left,
+        Center,
+        Right
+    }
+
+    public sealed class RunMapViewportSnapshot
+    {
+        internal RunMapViewportSnapshot(
+            float horizontalNormalizedPosition,
+            Rect viewportBounds,
+            Rect contentBoundsInViewport,
+            IReadOnlyList<string> intersectingNodeIds,
+            IReadOnlyList<string> fullyVisibleNodeIds)
+        {
+            HorizontalNormalizedPosition = horizontalNormalizedPosition;
+            ViewportBounds = viewportBounds;
+            ContentBoundsInViewport = contentBoundsInViewport;
+            IntersectingNodeIds = intersectingNodeIds;
+            FullyVisibleNodeIds = fullyVisibleNodeIds;
+        }
+
+        public float HorizontalNormalizedPosition { get; }
+        public Rect ViewportBounds { get; }
+        public Rect ContentBoundsInViewport { get; }
+        public IReadOnlyList<string> IntersectingNodeIds { get; }
+        public IReadOnlyList<string> FullyVisibleNodeIds { get; }
+        public IReadOnlyList<string> VisibleNodeIds => FullyVisibleNodeIds;
+    }
+
     [DisallowMultipleComponent]
     public sealed class RunScreenView : MonoBehaviour
     {
         private const float NodeStartX = 120f;
         private const float NodeColumnGap = 180f;
+        private const float MapViewportVisibilityTolerance = 0.1f;
 
         [Header("Root")]
         [SerializeField] private PresentationTheme theme;
@@ -62,11 +94,16 @@ namespace SpireChess.UI.Run
         public int RenderedRelicCount { get; private set; }
         public int RenderedChoiceCount { get; private set; }
         public bool IsChoiceVisible => choiceOverlay != null && choiceOverlay.activeSelf;
+        public float MapHorizontalNormalizedPosition =>
+            mapScrollRect == null
+                ? 0f
+                : mapScrollRect.horizontalNormalizedPosition;
         public bool HasCompleteBindings =>
             theme != null && rootCanvas != null && safeArea != null &&
             titleText != null && resourceText != null && progressText != null &&
             statusText != null && routeHintText != null &&
             mapScrollRect != null && mapContent != null && mapBackdrop != null &&
+            mapScrollRect.viewport != null && mapScrollRect.content == mapContent &&
             edgeLayer != null &&
             nodeLayer != null && mapNodePrefab != null && mapEdgePrefab != null &&
             relicCountText != null && relicEmptyText != null &&
@@ -112,6 +149,64 @@ namespace SpireChess.UI.Run
         {
             nodeViews.TryGetValue(nodeId ?? string.Empty, out var view);
             return view;
+        }
+
+        public RunMapViewportSnapshot SetMapViewportSegment(
+            RunMapViewportSegment segment)
+        {
+            switch (segment)
+            {
+                case RunMapViewportSegment.Left:
+                    return SetMapViewportNormalizedPosition(0f);
+                case RunMapViewportSegment.Center:
+                    return SetMapViewportNormalizedPosition(0.5f);
+                case RunMapViewportSegment.Right:
+                    return SetMapViewportNormalizedPosition(1f);
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        nameof(segment),
+                        segment,
+                        "Unknown run map viewport segment.");
+            }
+        }
+
+        public RunMapViewportSnapshot SetMapViewportNormalizedPosition(
+            float normalizedPosition)
+        {
+            EnsureMapViewportBindings();
+            ForceMapLayout();
+            mapScrollRect.StopMovement();
+            mapScrollRect.horizontalNormalizedPosition =
+                Mathf.Clamp01(normalizedPosition);
+            ForceMapLayout();
+            return CaptureMapViewportWithoutLayoutRefresh();
+        }
+
+        public RunMapViewportSnapshot CaptureMapViewport()
+        {
+            EnsureMapViewportBindings();
+            ForceMapLayout();
+            return CaptureMapViewportWithoutLayoutRefresh();
+        }
+
+        public void SetChoiceViewportNormalizedPosition(
+            float normalizedPosition)
+        {
+            if (choiceScrollRect == null ||
+                choiceScrollRect.viewport == null ||
+                choiceScrollRect.content == null)
+            {
+                throw new InvalidOperationException(
+                    "Run choice viewport bindings are incomplete.");
+            }
+
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(
+                choiceScrollRect.content);
+            choiceScrollRect.StopMovement();
+            choiceScrollRect.verticalNormalizedPosition =
+                Mathf.Clamp01(normalizedPosition);
+            Canvas.ForceUpdateCanvases();
         }
 
         private void RenderMap(RunScreenState state)
@@ -264,6 +359,106 @@ namespace SpireChess.UI.Run
                 default:
                     return 2f;
             }
+        }
+
+        private RunMapViewportSnapshot CaptureMapViewportWithoutLayoutRefresh()
+        {
+            var viewport = mapScrollRect.viewport;
+            var viewportBounds = viewport.rect;
+            var contentBounds = CalculateBoundsIn(viewport, mapContent);
+            var nodeBounds = nodeViews
+                .Where(pair =>
+                    pair.Value != null &&
+                    pair.Value.gameObject.activeInHierarchy)
+                .Select(pair => new
+                {
+                    pair.Key,
+                    Bounds = CalculateBoundsIn(
+                        viewport,
+                        pair.Value.GetComponent<RectTransform>()),
+                    X = pair.Value.GetComponent<RectTransform>()
+                        .anchoredPosition.x
+                })
+                .OrderBy(pair => pair.X)
+                .ThenBy(pair => pair.Key, StringComparer.Ordinal)
+                .ToArray();
+            var intersectingNodeIds = nodeBounds
+                .Where(pair => IntersectsWithTolerance(
+                    viewportBounds,
+                    pair.Bounds))
+                .Select(pair => pair.Key)
+                .ToArray();
+            var fullyVisibleNodeIds = nodeBounds
+                .Where(pair => ContainsWithTolerance(
+                    viewportBounds,
+                    pair.Bounds))
+                .Select(pair => pair.Key)
+                .ToArray();
+            return new RunMapViewportSnapshot(
+                mapScrollRect.horizontalNormalizedPosition,
+                viewportBounds,
+                contentBounds,
+                Array.AsReadOnly(intersectingNodeIds),
+                Array.AsReadOnly(fullyVisibleNodeIds));
+        }
+
+        private void EnsureMapViewportBindings()
+        {
+            if (mapScrollRect == null ||
+                mapScrollRect.viewport == null ||
+                mapScrollRect.content != mapContent)
+            {
+                throw new InvalidOperationException(
+                    "Run map viewport bindings are incomplete.");
+            }
+        }
+
+        private void ForceMapLayout()
+        {
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(
+                (RectTransform)mapScrollRect.transform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(mapContent);
+            mapScrollRect.Rebuild(CanvasUpdate.PostLayout);
+            Canvas.ForceUpdateCanvases();
+        }
+
+        private static Rect CalculateBoundsIn(
+            RectTransform relativeTo,
+            RectTransform target)
+        {
+            var corners = new Vector3[4];
+            target.GetWorldCorners(corners);
+            var first = relativeTo.InverseTransformPoint(corners[0]);
+            var xMin = first.x;
+            var xMax = first.x;
+            var yMin = first.y;
+            var yMax = first.y;
+            for (var index = 1; index < corners.Length; index++)
+            {
+                var point = relativeTo.InverseTransformPoint(corners[index]);
+                xMin = Mathf.Min(xMin, point.x);
+                xMax = Mathf.Max(xMax, point.x);
+                yMin = Mathf.Min(yMin, point.y);
+                yMax = Mathf.Max(yMax, point.y);
+            }
+            return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+        }
+
+        private static bool IntersectsWithTolerance(Rect container, Rect target)
+        {
+            return target.xMax >= container.xMin - MapViewportVisibilityTolerance &&
+                   target.xMin <= container.xMax + MapViewportVisibilityTolerance &&
+                   target.yMax >= container.yMin - MapViewportVisibilityTolerance &&
+                   target.yMin <= container.yMax + MapViewportVisibilityTolerance;
+        }
+
+        private static bool ContainsWithTolerance(Rect container, Rect target)
+        {
+            return target.xMin >= container.xMin - MapViewportVisibilityTolerance &&
+                   target.xMax <= container.xMax + MapViewportVisibilityTolerance &&
+                   target.yMin >= container.yMin - MapViewportVisibilityTolerance &&
+                   target.yMax <= container.yMax + MapViewportVisibilityTolerance;
         }
 
         private static void DestroyChildren(Transform root)

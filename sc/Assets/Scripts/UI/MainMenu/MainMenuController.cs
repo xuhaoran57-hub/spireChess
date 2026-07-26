@@ -95,7 +95,9 @@ namespace SpireChess.UI.MainMenu
             var acceptanceSeed = G4RuntimeArguments.IsAcceptanceRequested
                 ? G4RuntimeArguments.ReadInt(
                     G4RuntimeArguments.AcceptanceSeedArgument,
-                    940101,
+                    G4RuntimeArguments.IsFrozenVisualRequested
+                        ? 78
+                        : 940101,
                     1,
                     int.MaxValue)
                 : (int?)null;

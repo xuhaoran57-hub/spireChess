@@ -21,6 +21,14 @@ namespace SpireChess.UI.Run
         public string LastArtId { get; private set; } = string.Empty;
         public ArtworkResolution LastArtworkResolution { get; private set; } =
             ArtworkResolution.Missing;
+        public RunUiActionType Action =>
+            state?.Action ?? RunUiActionType.None;
+        public string PrimaryId => state?.PrimaryId;
+        public string SecondaryId => state?.SecondaryId;
+        public bool IsInteractable =>
+            state?.IsInteractable == true &&
+            button != null &&
+            button.IsInteractable();
         public bool HasCompleteBindings => theme != null &&
                                             spriteCatalog != null &&
                                             button != null && background != null &&

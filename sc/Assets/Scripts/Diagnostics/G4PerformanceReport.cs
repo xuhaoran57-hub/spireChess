@@ -22,6 +22,7 @@ namespace SpireChess.Diagnostics
         public G4CheckpointRecord[] checkpoints;
         public G4ArtworkSummary artwork;
         public G4CleanupSnapshot cleanup;
+        public G4RuntimeLogSummary runtimeLogs;
         public string[] unavailableProfilerCounters;
         public string samplesCsvPath;
     }
@@ -175,6 +176,17 @@ namespace SpireChess.Diagnostics
         public int artworkMissingCount;
         public bool sampleScopeExact;
         public G4ArtworkObservation[] artworkObservations;
+    }
+
+    [Serializable]
+    public sealed class G4RuntimeLogSummary
+    {
+        public int errorCount;
+        public int exceptionCount;
+        public int assertCount;
+        public int totalFailureCount;
+        public string[] firstFailures;
+        public bool clean;
     }
 
     [Serializable]

@@ -20,7 +20,9 @@ namespace SpireChess.Diagnostics
     public sealed class G4PerformanceCollector : MonoBehaviour
     {
         private const int MaximumFrameSamples = 300000;
-        private const string ReportSchemaVersion = "spire-chess-g4-performance-v1";
+        private const int MaximumRuntimeFailureSummaries = 32;
+        private const string ReportSchemaVersion =
+            "spire-chess-g4-performance-v2";
 
         private struct FrameSample
         {
@@ -145,6 +147,9 @@ namespace SpireChess.Diagnostics
             new Dictionary<string, double>(StringComparer.Ordinal);
         private readonly List<CounterRecorder> counters =
             new List<CounterRecorder>();
+        private readonly List<string> runtimeFailureSummaries =
+            new List<string>();
+        private readonly object runtimeLogLock = new object();
 
         private CounterRecorder totalUsedMemory;
         private CounterRecorder gcUsedMemory;
@@ -160,6 +165,7 @@ namespace SpireChess.Diagnostics
         private float requestedDurationSeconds;
         private float transientSampleIntervalSeconds;
         private string outputDirectory;
+        private string runtimeFailureMarkerPath;
         private string runId;
         private bool autoQuit;
         private bool completed;
@@ -168,6 +174,9 @@ namespace SpireChess.Diagnostics
         private int pendingFirstFrameRequestedOnFrame = -1;
         private int maximumActivePresentationFx;
         private int maximumActiveNonLoopingAudioSources;
+        private int runtimeErrorCount;
+        private int runtimeExceptionCount;
+        private int runtimeAssertCount;
         private TransientSnapshot currentTransient;
         private PresentationFxPool[] trackedFxPools =
             Array.Empty<PresentationFxPool>();
@@ -219,12 +228,14 @@ namespace SpireChess.Diagnostics
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
             G4SceneLoadDiagnostics.SceneLoadRequested += OnSceneLoadRequested;
+            Application.logMessageReceivedThreaded += OnRuntimeLog;
         }
 
         private void OnDisable()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             G4SceneLoadDiagnostics.SceneLoadRequested -= OnSceneLoadRequested;
+            Application.logMessageReceivedThreaded -= OnRuntimeLog;
         }
 
         private void Update()
@@ -406,6 +417,25 @@ namespace SpireChess.Diagnostics
                    !transient.BattleAnimationPlaying;
         }
 
+        public static bool ValidateNoRuntimeFailures(out string details)
+        {
+            if (instance == null)
+            {
+                details = "G4 performance collector is unavailable.";
+                return false;
+            }
+
+            var summary = instance.BuildRuntimeLogSummary();
+            details =
+                $"errors={summary.errorCount}, " +
+                $"exceptions={summary.exceptionCount}, " +
+                $"asserts={summary.assertCount}" +
+                (summary.firstFailures.Length == 0
+                    ? string.Empty
+                    : "; first=" + summary.firstFailures[0]);
+            return summary.clean;
+        }
+
         public static string Complete(
             string completionStatus,
             string completionMessage)
@@ -446,6 +476,13 @@ namespace SpireChess.Diagnostics
                 : G4RuntimeArguments.RequireAbsolutePath(
                     G4RuntimeArguments.OutputArgument);
             Directory.CreateDirectory(outputDirectory);
+            runtimeFailureMarkerPath = Path.Combine(
+                outputDirectory,
+                "g4-runtime-failures.log");
+            if (File.Exists(runtimeFailureMarkerPath))
+            {
+                File.Delete(runtimeFailureMarkerPath);
+            }
 
             runId = G4RuntimeArguments.SanitizeFileName(
                 G4RuntimeArguments.Read(G4RuntimeArguments.RunIdArgument),
@@ -756,6 +793,7 @@ namespace SpireChess.Diagnostics
                 sceneLoads = sceneLoads.ToArray(),
                 checkpoints = checkpoints.ToArray(),
                 artwork = BuildArtworkSummary(),
+                runtimeLogs = BuildRuntimeLogSummary(),
                 cleanup = new G4CleanupSnapshot
                 {
                     maximumActivePresentationFx =
@@ -779,6 +817,89 @@ namespace SpireChess.Diagnostics
                 },
                 unavailableProfilerCounters = unavailable
             };
+        }
+
+        private void OnRuntimeLog(
+            string condition,
+            string stackTrace,
+            LogType type)
+        {
+            if (type != LogType.Error &&
+                type != LogType.Exception &&
+                type != LogType.Assert)
+            {
+                return;
+            }
+
+            lock (runtimeLogLock)
+            {
+                switch (type)
+                {
+                    case LogType.Error:
+                        runtimeErrorCount++;
+                        break;
+                    case LogType.Exception:
+                        runtimeExceptionCount++;
+                        break;
+                    case LogType.Assert:
+                        runtimeAssertCount++;
+                        break;
+                }
+
+                var summary = string.IsNullOrWhiteSpace(condition)
+                    ? type.ToString()
+                    : condition.Trim();
+                if (summary.Length > 500)
+                {
+                    summary = summary.Substring(0, 500);
+                }
+                if (runtimeFailureSummaries.Count <
+                    MaximumRuntimeFailureSummaries)
+                {
+                    runtimeFailureSummaries.Add($"{type}: {summary}");
+                }
+
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(
+                            runtimeFailureMarkerPath))
+                    {
+                        var singleLine = summary
+                            .Replace("\r", " ")
+                            .Replace("\n", " ");
+                        File.AppendAllText(
+                            runtimeFailureMarkerPath,
+                            $"{DateTime.UtcNow:O}\t{type}\t{singleLine}" +
+                            Environment.NewLine,
+                            new UTF8Encoding(false));
+                    }
+                }
+                catch
+                {
+                    // Do not recursively log from inside Unity's threaded log
+                    // callback. The in-memory failure count still prevents an
+                    // AcceptancePassed report while the collector is active.
+                }
+            }
+        }
+
+        private G4RuntimeLogSummary BuildRuntimeLogSummary()
+        {
+            lock (runtimeLogLock)
+            {
+                var total = runtimeErrorCount +
+                            runtimeExceptionCount +
+                            runtimeAssertCount;
+                return new G4RuntimeLogSummary
+                {
+                    errorCount = runtimeErrorCount,
+                    exceptionCount = runtimeExceptionCount,
+                    assertCount = runtimeAssertCount,
+                    totalFailureCount = total,
+                    firstFailures = runtimeFailureSummaries.ToArray(),
+                    clean = total == 0
+                };
+            }
         }
 
         private static G4EnvironmentSnapshot CaptureEnvironment()

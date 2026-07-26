@@ -17,6 +17,12 @@ param(
 
     [switch]$NoScreenshots,
 
+    [switch]$FrozenVisual,
+
+    [switch]$Stress,
+
+    [switch]$AllowDirtyProbe,
+
     [ValidateRange(5, 300)]
     [int]$StartupTimeoutSeconds = 30,
 
@@ -32,6 +38,16 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+if ($FrozenVisual -and $Stress) {
+    throw "-FrozenVisual and -Stress are mutually exclusive."
+}
+if ($FrozenVisual -and -not $PSBoundParameters.ContainsKey("Seed")) {
+    $Seed = 78
+}
+elseif ($Stress -and -not $PSBoundParameters.ContainsKey("Seed")) {
+    $Seed = 940401
+}
 
 function Measure-ScreenshotContent {
     param(
@@ -347,6 +363,12 @@ if (-not (Test-Path -LiteralPath $buildManifestPath -PathType Leaf)) {
 $buildManifest =
     Get-Content -LiteralPath $buildManifestPath -Encoding UTF8 -Raw |
     ConvertFrom-Json
+if ([bool]$buildManifest.sourceTreeDirty -and -not $AllowDirtyProbe) {
+    throw (
+        "G4 formal acceptance refuses a Player built from a dirty source " +
+        "tree. Rebuild from a clean candidate, or pass -AllowDirtyProbe " +
+        "for non-formal diagnosis only.")
+}
 $manifestExecutableName =
     [System.IO.Path]::GetFileName([string]$buildManifest.outputPath)
 if ([string]::IsNullOrWhiteSpace($manifestExecutableName) -or
@@ -450,8 +472,21 @@ $arguments = @(
 if ($NoScreenshots) {
     $arguments += "-g4NoScreenshots"
 }
+if ($FrozenVisual) {
+    $arguments += "-g4FrozenVisual"
+}
+if ($Stress) {
+    $arguments += "-g4Stress"
+}
 
-Write-Host "Running isolated G4 formal-chain acceptance: $Resolution..."
+$acceptanceMode = if ($Stress) {
+    "stress"
+} elseif ($FrozenVisual) {
+    "frozen-visual"
+} else {
+    "core"
+}
+Write-Host "Running isolated G4 $acceptanceMode acceptance: $Resolution..."
 $startProcessArguments = @{
     FilePath = $resolvedPlayerPath
     ArgumentList = $arguments
@@ -524,6 +559,22 @@ try {
         -Description "G4 Player"
 }
 
+$runtimeFailureMarkerPath = Join-Path `
+    $performanceRoot `
+    "g4-runtime-failures.log"
+if (Test-Path -LiteralPath $runtimeFailureMarkerPath -PathType Leaf) {
+    $runtimeFailurePreview = @(
+        Get-Content `
+            -LiteralPath $runtimeFailureMarkerPath `
+            -Encoding UTF8 `
+            -TotalCount 5
+    ) -join " | "
+    throw (
+        "G4 Player recorded a runtime failure after launch. " +
+        "Marker: $runtimeFailureMarkerPath. " +
+        "First failures: $runtimeFailurePreview")
+}
+
 $reports = @(
     Get-ChildItem `
         -LiteralPath $performanceRoot `
@@ -535,8 +586,23 @@ if ($reports.Count -ne 1) {
 }
 $report = Get-Content -LiteralPath $reports[0].FullName -Encoding UTF8 -Raw |
     ConvertFrom-Json
+if ($report.schemaVersion -ne "spire-chess-g4-performance-v2") {
+    throw "Unsupported G4 performance report schema: '$($report.schemaVersion)'."
+}
 if ($report.completionStatus -ne "AcceptancePassed") {
     throw "G4 report did not pass: $($report.completionStatus) - $($report.completionMessage)"
+}
+if (-not [string]::Equals(
+        [string]$report.runId,
+        $safeRunId,
+        [System.StringComparison]::Ordinal)) {
+    throw "G4 report runId '$($report.runId)' does not match requested runId '$safeRunId'."
+}
+if (-not [string]::Equals(
+        [string]$report.configuration.acceptanceSeed,
+        [string]$Seed,
+        [System.StringComparison]::Ordinal)) {
+    throw "G4 report seed '$($report.configuration.acceptanceSeed)' does not match requested seed '$Seed'."
 }
 if ($report.configuration.actualWidth -ne $width -or
     $report.configuration.actualHeight -ne $height) {
@@ -562,8 +628,61 @@ if ($report.overall.sampleCount -lt 1 -or
     $report.overall.frameTimeMs.sampleCount -lt 1) {
     throw "G4 report contains no usable frame samples."
 }
+$reportedSamplesCsv = [string]$report.samplesCsvPath
+if ([string]::IsNullOrWhiteSpace($reportedSamplesCsv)) {
+    throw "G4 report does not identify its raw frame-sample CSV."
+}
+$resolvedSamplesCsv =
+    [System.IO.Path]::GetFullPath($reportedSamplesCsv)
+$resolvedPerformanceRoot =
+    [System.IO.Path]::GetFullPath($performanceRoot)
+$performancePrefix =
+    $resolvedPerformanceRoot.TrimEnd(
+        [System.IO.Path]::DirectorySeparatorChar,
+        [System.IO.Path]::AltDirectorySeparatorChar) +
+    [System.IO.Path]::DirectorySeparatorChar
+if (-not $resolvedSamplesCsv.StartsWith(
+        $performancePrefix,
+        [System.StringComparison]::OrdinalIgnoreCase) -or
+    -not (Test-Path -LiteralPath $resolvedSamplesCsv -PathType Leaf)) {
+    throw "G4 raw frame-sample CSV is missing or escapes this run's performance directory."
+}
+$samplesCsvInfo = Get-Item -LiteralPath $resolvedSamplesCsv
+if ($samplesCsvInfo.Length -le 0) {
+    throw "G4 raw frame-sample CSV is empty: $resolvedSamplesCsv"
+}
+$samplesCsvLineCount = 0
+$samplesCsvHeader = $null
+foreach ($line in [System.IO.File]::ReadLines($resolvedSamplesCsv)) {
+    if ($samplesCsvLineCount -eq 0) {
+        $samplesCsvHeader = $line
+    }
+    $samplesCsvLineCount++
+}
+$expectedSamplesCsvHeader =
+    "elapsed_seconds,scene,frame_ms,main_thread_ns," +
+    "gc_allocated_bytes,total_used_bytes,gc_used_bytes,texture_bytes," +
+    "audio_bytes,active_fx,active_non_loop_audio,battle_animation"
+if ($samplesCsvHeader -cne $expectedSamplesCsvHeader -or
+    $samplesCsvLineCount -ne ([int]$report.overall.sampleCount + 1)) {
+    throw (
+        "G4 raw frame-sample CSV does not match the JSON sample count: " +
+        "lines=$samplesCsvLineCount, samples=" +
+        "$($report.overall.sampleCount).")
+}
+$samplesCsvHash = (
+    Get-FileHash -LiteralPath $resolvedSamplesCsv -Algorithm SHA256
+).Hash.ToLowerInvariant()
 if (-not $report.cleanup.cleanAtCompletion) {
     throw "G4 presentation cleanup gate failed: activeFx=$($report.cleanup.finalActivePresentationFx), activeNonLoopAudio=$($report.cleanup.finalActiveNonLoopingAudioSources), battleAnimation=$($report.cleanup.finalBattleAnimationPlaying)"
+}
+if (-not $report.runtimeLogs.clean -or
+    $report.runtimeLogs.totalFailureCount -ne 0) {
+    throw (
+        "G4 runtime log gate failed: errors=" +
+        "$($report.runtimeLogs.errorCount), exceptions=" +
+        "$($report.runtimeLogs.exceptionCount), asserts=" +
+        "$($report.runtimeLogs.assertCount).")
 }
 if (-not $report.artwork.sampleScopeExact -or
     -not $report.artwork.catalogExact -or
@@ -589,26 +708,62 @@ if ($missingRequiredCounters.Count -gt 0) {
     throw "G4 required ProfilerRecorder counters are unavailable: $($missingRequiredCounters -join ', ')"
 }
 
-$requiredCheckpoints = @(
-    "main-menu",
-    "run-map",
-    "shop",
-    "shop-buy-play",
-    "shop-frozen",
-    "shop-unfrozen",
-    "run-after-shop",
-    "battle-ready",
-    "battle-death-summon",
-    "battle-result",
-    "run-return",
-    "run-map-after-battle",
-    "run-system-menu",
-    "run-audio-settings",
-    "main-menu-continue",
-    "continued-run",
-    "sample-catalog-exact",
-    "acceptance-complete"
-)
+$requiredCheckpoints = if ($Stress) {
+    @(
+        "stress-shop-ten-compact",
+        "stress-battle-nested-ready",
+        "stress-battle-nested-result",
+        "sample-catalog-exact",
+        "acceptance-complete"
+    )
+} elseif ($FrozenVisual) {
+    @(
+        "main-menu-new-run",
+        "run-map-left",
+        "run-map-center",
+        "run-map-right",
+        "shop-entry",
+        "shop-refresh",
+        "shop-buy-play",
+        "shop-target-or-warcry",
+        "shop-frozen",
+        "shop-unfrozen",
+        "shop-upgrade",
+        "battle-start",
+        "battle-attack-shield",
+        "battle-death-summon",
+        "battle-result",
+        "run-reward",
+        "run-returned-map",
+        "run-system-menu",
+        "run-audio-settings",
+        "main-menu-saved-run",
+        "continued-run",
+        "sample-catalog-exact",
+        "acceptance-complete"
+    )
+} else {
+    @(
+        "main-menu",
+        "run-map",
+        "shop",
+        "shop-buy-play",
+        "shop-frozen",
+        "shop-unfrozen",
+        "run-after-shop",
+        "battle-ready",
+        "battle-death-summon",
+        "battle-result",
+        "run-return",
+        "run-map-after-battle",
+        "run-system-menu",
+        "run-audio-settings",
+        "main-menu-continue",
+        "continued-run",
+        "sample-catalog-exact",
+        "acceptance-complete"
+    )
+}
 $reportedCheckpoints = @($report.checkpoints | ForEach-Object {
     [string]$_.checkpoint
 })
@@ -627,24 +782,56 @@ if (@($report.checkpoints | Where-Object { -not $_.passed }).Count -gt 0) {
 $screenshots = @()
 $screenshotEvidence = @()
 if (-not $NoScreenshots) {
-    $expectedScreenshotNames = @(
-        "01-main-menu-$Resolution.png",
-        "02-run-map-$Resolution.png",
-        "03-shop-$Resolution.png",
-        "04-shop-buy-play-$Resolution.png",
-        "05-shop-frozen-$Resolution.png",
-        "06-shop-unfrozen-$Resolution.png",
-        "07-run-after-shop-$Resolution.png",
-        "08-battle-ready-$Resolution.png",
-        "09-battle-death-summon-$Resolution.png",
-        "10-battle-result-$Resolution.png",
-        "11-run-return-$Resolution.png",
-        "12-run-map-after-battle-$Resolution.png",
-        "13-run-system-menu-$Resolution.png",
-        "14-run-audio-settings-$Resolution.png",
-        "15-main-menu-continue-$Resolution.png",
-        "16-continued-run-$Resolution.png"
-    )
+    $expectedScreenshotNames = if ($Stress) {
+        @(
+            "01-stress-shop-ten-compact-$Resolution.png",
+            "02-stress-battle-nested-ready-$Resolution.png",
+            "03-stress-battle-nested-result-$Resolution.png"
+        )
+    } elseif ($FrozenVisual) {
+        @(
+            "01-main-menu-new-run-$Resolution.png",
+            "02-run-map-left-$Resolution.png",
+            "03-run-map-center-$Resolution.png",
+            "04-run-map-right-$Resolution.png",
+            "05-shop-entry-$Resolution.png",
+            "06-shop-refresh-$Resolution.png",
+            "07-shop-buy-play-$Resolution.png",
+            "08-shop-target-or-warcry-$Resolution.png",
+            "09-shop-frozen-$Resolution.png",
+            "10-shop-unfrozen-$Resolution.png",
+            "11-shop-upgrade-$Resolution.png",
+            "12-battle-start-$Resolution.png",
+            "13-battle-attack-shield-$Resolution.png",
+            "14-battle-death-summon-$Resolution.png",
+            "15-battle-result-$Resolution.png",
+            "16-run-reward-$Resolution.png",
+            "17-run-returned-map-$Resolution.png",
+            "18-run-system-menu-$Resolution.png",
+            "19-run-audio-settings-$Resolution.png",
+            "20-main-menu-saved-run-$Resolution.png",
+            "21-continued-run-$Resolution.png"
+        )
+    } else {
+        @(
+            "01-main-menu-$Resolution.png",
+            "02-run-map-$Resolution.png",
+            "03-shop-$Resolution.png",
+            "04-shop-buy-play-$Resolution.png",
+            "05-shop-frozen-$Resolution.png",
+            "06-shop-unfrozen-$Resolution.png",
+            "07-run-after-shop-$Resolution.png",
+            "08-battle-ready-$Resolution.png",
+            "09-battle-death-summon-$Resolution.png",
+            "10-battle-result-$Resolution.png",
+            "11-run-return-$Resolution.png",
+            "12-run-map-after-battle-$Resolution.png",
+            "13-run-system-menu-$Resolution.png",
+            "14-run-audio-settings-$Resolution.png",
+            "15-main-menu-continue-$Resolution.png",
+            "16-continued-run-$Resolution.png"
+        )
+    }
     $screenshots = @(
         Get-ChildItem `
             -LiteralPath $evidenceRoot `
@@ -681,7 +868,9 @@ if (-not $NoScreenshots) {
     if ($missingScreenshots.Count -gt 0 -or
         $unexpectedScreenshots.Count -gt 0) {
         throw (
-            "G4 screenshot set does not exactly match the 16 expected core-chain files. Missing=[{0}] Unexpected=[{1}]" -f
+            "G4 screenshot set does not exactly match the {0} expected {1} files. Missing=[{2}] Unexpected=[{3}]" -f
+                $expectedScreenshotNames.Count,
+                $acceptanceMode,
                 ($missingScreenshots -join ", "),
                 ($unexpectedScreenshots -join ", "))
     }
@@ -742,8 +931,25 @@ if (-not $NoScreenshots) {
         $screenshotEvidence |
             Select-Object -ExpandProperty sha256 -Unique
     )
-    if ($uniqueScreenshotHashes.Count -lt 8) {
-        throw "G4 screenshot diversity gate failed: expected at least 8 unique frames, found $($uniqueScreenshotHashes.Count)."
+    $minimumUniqueScreenshotCount = if ($Stress) {
+        3
+    } else {
+        8
+    }
+    if ($uniqueScreenshotHashes.Count -lt $minimumUniqueScreenshotCount) {
+        throw "G4 screenshot diversity gate failed for ${acceptanceMode}: expected at least $minimumUniqueScreenshotCount unique frames, found $($uniqueScreenshotHashes.Count)."
+    }
+    if ($FrozenVisual) {
+        $mapScreenshotHashes = @(
+            $screenshotEvidence |
+            Where-Object {
+                $_.file -match '^0[234]-run-map-(left|center|right)-'
+            } |
+            Select-Object -ExpandProperty sha256 -Unique
+        )
+        if ($mapScreenshotHashes.Count -ne 3) {
+            throw "G4 frozen map evidence must contain three visually distinct left/center/right frames."
+        }
     }
 } else {
     $unexpectedScreenshotArtifacts = @(
@@ -775,19 +981,32 @@ $saveFiles = @(
             }
         }
 )
+$playerLogInfo = Get-Item -LiteralPath $logPath
+$playerLogHash = (
+    Get-FileHash -LiteralPath $logPath -Algorithm SHA256
+).Hash.ToLowerInvariant()
 $evidenceManifest = [pscustomobject]@{
-    schemaVersion = "spire-chess-g4-evidence-v1"
+    schemaVersion = "spire-chess-g4-evidence-v2"
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
     runId = $safeRunId
     machineName = [Environment]::MachineName
     resolution = $Resolution
     quality = $Quality
     seed = $Seed
+    acceptanceMode = $acceptanceMode
     playerPath = $resolvedPlayerPath
     playerSha256 = $playerHash
+    playerLog = $playerLogInfo.Name
+    playerLogSha256 = $playerLogHash
+    playerLogBytes = $playerLogInfo.Length
     buildId = $buildManifest.buildId
     gitCommit = $buildManifest.gitCommit
     sourceTreeDirty = [bool]$buildManifest.sourceTreeDirty
+    evidenceClassification = if ([bool]$buildManifest.sourceTreeDirty) {
+        "DirtyProbe"
+    } else {
+        "FormalCandidate"
+    }
     buildManifestSha256 = (
         Get-FileHash -LiteralPath $buildManifestPath -Algorithm SHA256
     ).Hash.ToLowerInvariant()
@@ -795,9 +1014,18 @@ $evidenceManifest = [pscustomobject]@{
     performanceReportSha256 = (
         Get-FileHash -LiteralPath $reports[0].FullName -Algorithm SHA256
     ).Hash.ToLowerInvariant()
+    samplesCsv = $samplesCsvInfo.Name
+    samplesCsvSha256 = $samplesCsvHash
+    samplesCsvBytes = $samplesCsvInfo.Length
+    samplesCsvLineCount = $samplesCsvLineCount
+    samplesCsvSampleCount = [int]$report.overall.sampleCount
     provisionalAudio = [bool]$report.provisional
     sampleCatalogExact = [bool]$report.artwork.catalogExact
     cleanupPassed = [bool]$report.cleanup.cleanAtCompletion
+    runtimeLogGatePassed = [bool]$report.runtimeLogs.clean
+    runtimeFailureLogCount =
+        [int]$report.runtimeLogs.totalFailureCount
+    runtimeFailureMarkerPresent = $false
     checkpoints = @($reportedCheckpoints)
     screenshots = $screenshotEvidence
     isolatedSaveFiles = $saveFiles
@@ -807,7 +1035,11 @@ $evidenceManifest |
     ConvertTo-Json -Depth 8 |
     Set-Content -LiteralPath $evidenceManifestPath -Encoding UTF8
 
-Write-Host "G4 formal-chain acceptance passed: $Resolution"
+if ([bool]$buildManifest.sourceTreeDirty) {
+    Write-Host "G4 $acceptanceMode dirty probe passed: $Resolution"
+} else {
+    Write-Host "G4 $acceptanceMode acceptance passed: $Resolution"
+}
 Write-Host "Report:      $($reports[0].FullName)"
 Write-Host "Manifest:    $evidenceManifestPath"
 Write-Host "Screenshots: $evidenceRoot"

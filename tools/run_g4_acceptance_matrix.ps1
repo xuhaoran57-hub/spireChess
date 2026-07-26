@@ -15,12 +15,33 @@ param(
 
     [switch]$NoScreenshots,
 
+    [switch]$FrozenVisual,
+
+    [switch]$Stress,
+
     [ValidateRange(30, 1800)]
     [int]$TimeoutSeconds = 240
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+if ($FrozenVisual -and $Stress) {
+    throw "-FrozenVisual and -Stress are mutually exclusive."
+}
+if ($FrozenVisual -and -not $PSBoundParameters.ContainsKey("Seed")) {
+    $Seed = 78
+}
+elseif ($Stress -and -not $PSBoundParameters.ContainsKey("Seed")) {
+    $Seed = 940401
+}
+$acceptanceMode = if ($Stress) {
+    "stress"
+} elseif ($FrozenVisual) {
+    "frozen-visual"
+} else {
+    "core"
+}
 
 function Resolve-G4MatrixPlayerPath {
     param(
@@ -78,8 +99,33 @@ function Assert-G4MatrixEvidenceIdentity {
         [string]$ExpectedPlayerSha256,
         [string]$ExpectedBuildId,
         [string]$ExpectedBuildManifestSha256,
+        [string]$ExpectedAcceptanceMode,
+        [int]$ExpectedSeed,
         [string]$RunId
     )
+
+    if (-not [string]::Equals(
+            [string]$EvidenceManifest.schemaVersion,
+            "spire-chess-g4-evidence-v2",
+            [System.StringComparison]::Ordinal)) {
+        throw "G4 matrix run $RunId has an unsupported evidence schema."
+    }
+    if ([bool]$EvidenceManifest.sourceTreeDirty -or
+        -not [string]::Equals(
+            [string]$EvidenceManifest.evidenceClassification,
+            "FormalCandidate",
+            [System.StringComparison]::Ordinal)) {
+        throw "G4 matrix run $RunId is not clean FormalCandidate evidence."
+    }
+    if (-not [string]::Equals(
+            [string]$EvidenceManifest.runId,
+            $RunId,
+            [System.StringComparison]::Ordinal)) {
+        throw "G4 matrix evidence runId '$($EvidenceManifest.runId)' does not match '$RunId'."
+    }
+    if ([int]$EvidenceManifest.seed -ne $ExpectedSeed) {
+        throw "G4 matrix run $RunId used seed '$($EvidenceManifest.seed)'; expected '$ExpectedSeed'."
+    }
 
     $evidencePlayerPath = [string]$EvidenceManifest.playerPath
     if ([string]::IsNullOrWhiteSpace($evidencePlayerPath)) {
@@ -119,6 +165,13 @@ function Assert-G4MatrixEvidenceIdentity {
             $ExpectedBuildManifestSha256,
             [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "G4 matrix run $RunId used a different build manifest SHA-256."
+    }
+
+    if (-not [string]::Equals(
+            [string]$EvidenceManifest.acceptanceMode,
+            $ExpectedAcceptanceMode,
+            [System.StringComparison]::Ordinal)) {
+        throw "G4 matrix run $RunId used acceptanceMode '$($EvidenceManifest.acceptanceMode)'; expected '$ExpectedAcceptanceMode'."
     }
 }
 
@@ -161,6 +214,9 @@ $frozenBuildManifest = Get-Content `
     -Encoding UTF8 `
     -Raw |
     ConvertFrom-Json
+if ([bool]$frozenBuildManifest.sourceTreeDirty) {
+    throw "G4 matrix refuses a Player built from a dirty source tree."
+}
 $frozenBuildId = [string]$frozenBuildManifest.buildId
 if ([string]::IsNullOrWhiteSpace($frozenBuildId)) {
     throw "G4 build manifest has no buildId: $buildManifestPath"
@@ -198,6 +254,12 @@ foreach ($resolution in @("1920x1080", "1920x1200")) {
         if ($NoScreenshots) {
             $runnerArguments.NoScreenshots = $true
         }
+        if ($FrozenVisual) {
+            $runnerArguments.FrozenVisual = $true
+        }
+        if ($Stress) {
+            $runnerArguments.Stress = $true
+        }
         & $runner @runnerArguments
 
         $runRoot = Join-Path $resolvedOutputDirectory $matrixRunId
@@ -227,17 +289,114 @@ foreach ($resolution in @("1920x1080", "1920x1200")) {
             -ExpectedPlayerSha256 $frozenPlayerSha256 `
             -ExpectedBuildId $frozenBuildId `
             -ExpectedBuildManifestSha256 $frozenBuildManifestSha256 `
+            -ExpectedAcceptanceMode $acceptanceMode `
+            -ExpectedSeed $Seed `
             -RunId $matrixRunId
+        $performanceReportName = [string]$manifest.performanceReport
+        if ([string]::IsNullOrWhiteSpace($performanceReportName) -or
+            -not [string]::Equals(
+                [System.IO.Path]::GetFileName($performanceReportName),
+                $performanceReportName,
+                [System.StringComparison]::Ordinal) -or
+            -not [string]::Equals(
+                $reports[0].Name,
+                $performanceReportName,
+                [System.StringComparison]::Ordinal)) {
+            throw "G4 matrix run $matrixRunId has a mismatched or unsafe performance report filename."
+        }
+        $performanceReportHash = (
+            Get-FileHash `
+                -LiteralPath $reports[0].FullName `
+                -Algorithm SHA256
+        ).Hash.ToLowerInvariant()
+        if (-not [string]::Equals(
+                $performanceReportHash,
+                [string]$manifest.performanceReportSha256,
+                [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "G4 matrix run $matrixRunId performance report hash does not match its evidence manifest."
+        }
+        if (-not [string]::Equals(
+                [string]$report.schemaVersion,
+                "spire-chess-g4-performance-v2",
+                [System.StringComparison]::Ordinal) -or
+            -not [string]::Equals(
+                [string]$report.completionStatus,
+                "AcceptancePassed",
+                [System.StringComparison]::Ordinal) -or
+            -not [string]::Equals(
+                [string]$report.runId,
+                $matrixRunId,
+                [System.StringComparison]::Ordinal) -or
+            -not [string]::Equals(
+                [string]$report.configuration.acceptanceSeed,
+                [string]$Seed,
+                [System.StringComparison]::Ordinal)) {
+            throw "G4 matrix run $matrixRunId performance report identity or completion gate failed."
+        }
+        $samplesCsvName = [string]$manifest.samplesCsv
+        if ([string]::IsNullOrWhiteSpace($samplesCsvName) -or
+            -not [string]::Equals(
+                [System.IO.Path]::GetFileName($samplesCsvName),
+                $samplesCsvName,
+                [System.StringComparison]::Ordinal)) {
+            throw "G4 matrix run $matrixRunId has an unsafe raw CSV filename."
+        }
+        $samplesCsvPath = Join-Path `
+            (Join-Path $runRoot "performance") `
+            $samplesCsvName
+        if (-not (Test-Path -LiteralPath $samplesCsvPath -PathType Leaf)) {
+            throw "G4 matrix run $matrixRunId is missing its raw frame-sample CSV."
+        }
+        $samplesCsvHash = (
+            Get-FileHash -LiteralPath $samplesCsvPath -Algorithm SHA256
+        ).Hash.ToLowerInvariant()
+        if (-not [string]::Equals(
+                $samplesCsvHash,
+                [string]$manifest.samplesCsvSha256,
+                [System.StringComparison]::OrdinalIgnoreCase) -or
+            [int]$manifest.samplesCsvSampleCount -ne
+                [int]$report.overall.sampleCount) {
+            throw "G4 matrix run $matrixRunId raw CSV identity does not match its evidence manifest/report."
+        }
+        $playerLogPath = Join-Path $runRoot "player.log"
+        if (-not (Test-Path -LiteralPath $playerLogPath -PathType Leaf)) {
+            throw "G4 matrix run $matrixRunId is missing player.log."
+        }
+        $playerLogHash = (
+            Get-FileHash -LiteralPath $playerLogPath -Algorithm SHA256
+        ).Hash.ToLowerInvariant()
+        if (-not [string]::Equals(
+                $playerLogHash,
+                [string]$manifest.playerLogSha256,
+                [System.StringComparison]::OrdinalIgnoreCase) -or
+            [int]$manifest.runtimeFailureLogCount -ne 0 -or
+            -not [bool]$manifest.runtimeLogGatePassed -or
+            -not ($manifest.PSObject.Properties.Name -contains
+                "runtimeFailureMarkerPresent") -or
+            [bool]$manifest.runtimeFailureMarkerPresent) {
+            throw "G4 matrix run $matrixRunId Player log/runtime-error gate identity failed."
+        }
+        $runtimeFailureMarkerPath = Join-Path `
+            (Join-Path $runRoot "performance") `
+            "g4-runtime-failures.log"
+        if (Test-Path -LiteralPath $runtimeFailureMarkerPath -PathType Leaf) {
+            throw "G4 matrix run $matrixRunId contains a runtime failure marker."
+        }
         $matrixResults += [pscustomobject]@{
             runId = $matrixRunId
             resolution = $resolution
             repetition = $repetition
             reportPath = $reports[0].FullName
-            reportSha256 = (
-                Get-FileHash `
-                    -LiteralPath $reports[0].FullName `
-                -Algorithm SHA256
-            ).Hash.ToLowerInvariant()
+            reportSha256 = $performanceReportHash
+            samplesCsvPath = $samplesCsvPath
+            samplesCsvSha256 = $samplesCsvHash
+            samplesCsvLineCount =
+                [int]$manifest.samplesCsvLineCount
+            playerLogPath = $playerLogPath
+            playerLogSha256 = $playerLogHash
+            runtimeFailureLogCount =
+                [int]$manifest.runtimeFailureLogCount
+            runtimeFailureMarkerPresent = $false
             playerPath = [string]$manifest.playerPath
             playerSha256 = [string]$manifest.playerSha256
             buildId = [string]$manifest.buildId
@@ -284,13 +443,14 @@ if ((Test-Path -LiteralPath $summaryPath) -or
     throw "Refusing to overwrite an existing G4 matrix summary for $matrixId."
 }
 $matrixSummary = [pscustomobject]@{
-    schemaVersion = "spire-chess-g4-matrix-v1"
+    schemaVersion = "spire-chess-g4-matrix-v2"
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
     matrixId = $matrixId
     quality = $Quality
     seed = $Seed
     repetitionsPerResolution = $Repetitions
     noScreenshots = [bool]$NoScreenshots
+    acceptanceMode = $acceptanceMode
     playerPath = $resolvedPlayerPath
     playerSha256 = $frozenPlayerSha256
     buildId = $frozenBuildId
@@ -304,6 +464,6 @@ $matrixSummary |
 $matrixResults |
     Export-Csv -LiteralPath $csvPath -NoTypeInformation -Encoding UTF8
 
-Write-Host "G4 dual-resolution core-chain matrix passed: $Repetitions repetition(s) per resolution; $captureMode."
+Write-Host "G4 dual-resolution $acceptanceMode matrix passed: $Repetitions repetition(s) per resolution; $captureMode."
 Write-Host "Matrix JSON: $summaryPath"
 Write-Host "Matrix CSV:  $csvPath"
