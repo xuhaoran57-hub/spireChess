@@ -50,6 +50,7 @@ namespace SpireChess.UI.Battle
                 BaseHealth = minion.BaseHealth,
                 DisplayMode = CardDisplayMode.Compact,
                 IsMinion = true,
+                IsToken = minion.Config.IsToken,
                 IsGolden = minion.IsGolden,
                 IsInteractable = true,
                 IsAffordable = true,

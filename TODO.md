@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1 已通过。G2 技术切片已完成 Unity 编译、全量自动化与遗珍双分辨率验收；G2 总门禁仍待新增 11 张生成图的生产许可/来源签字，以及新增 6 随从、3 Token、4 法术的专门卡面视觉矩阵。
+当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；正式音频改为项目负责人 AI 自制，仍需完成生成、来源/条款登记、严格门禁与人工听审后关闭 G3。
 
 ## 已完成：阶段 0 项目准备
 
@@ -222,7 +222,7 @@
 - [x] Boss 重试不再开店、发金币或推进回合，并固定同节点战斗随机流；失败尝试不提交永久成长和战后奖励。
 - [x] 新增 21 个正式遭遇的渐进身材曲线，第三层最终 Boss 开战前原始总身材为 100/100。
 - [x] 根据首次完整单局反馈降低第一、二层难度：第一层改为 1/2 → 11/23，第二层改为 14/18 → 36/40；减少普通战满编与金色单位，精英/Boss 失败伤害减半，第三层保持不变。
-- [x] 修复随从发现自循环：随从触发的发现会在牌池预留前排除来源卡 ID，命运洗牌师刷新 3 次后不再能发现自己；正式卡牌增加高对比金边、金色卡名和常驻“金色”徽章。
+- [x] 修复随从发现自循环：随从触发的发现会在牌池预留前排除来源卡 ID，命运洗牌师刷新 3 次后不再能发现自己；正式卡牌使用高对比金边和金色卡名识别金色状态，卡面不再显示“金色”文字。
 - [x] 修复战斗大数值显示：攻击/生命文本按冻结区域自动缩小字号，覆盖三位数和 `999/1200`，短数值重新渲染时恢复标准字号。
 - [x] 更新 `RunTest` 商店节点、战斗序号、商店回合/地图步数和 11 列紧凑布局。
 - [x] 完成自动化回归：EditMode 185 / 185、PlayMode 18 / 18。
@@ -486,11 +486,20 @@
   - [x] 评审组件系统：确认卡框、布标、按钮、弹窗、地图节点、六枚关键词图标和五种节点状态可由共享 Sprite、9-slice 与状态参数复用，不依赖单卡分支。
   - [x] 评审批量生产成本与许可：项目方于 2026-07-24 接受 18 项当前成本样本的建议生产效率门槛，并确认使用个人版 OpenAI 服务、拥有全部输入参考的必要权利、接受输出可能不唯一；正式使用签字覆盖 14 张当前立绘、4 个轻量组件、8 个在用立牌部件和 2 个绘本 v2 卡框，共 28 项活动生产候选，见 `phase-9b-g1-production-license-signoff-v0.1.md`。
   - [x] G1 退出门：成本与正式使用许可已明确签字，28 项活动生产候选已更新为 `生产许可已确认`；G1 关闭。该结论不代表 G2 或 Runtime Ready。
-- [ ] G2：完成 ArtId → Sprite Catalog → CardView、Theme、回退/诊断资源、12 张样板随从、3 个 Token、4 张法术和 3 件遗珍图标。
-  - [x] G2 样板技术切片：`CardUiPrefabBuilder` 与 `RunUiPrefabBuilder` 均成功；12 张核心样板随从、3 个 Token、4 张法术、3 件遗珍以及 2 张旅团附加锚点共 24 个语义 ID 全部通过精确命中门禁，真实非法 ID 通过缺失诊断图门禁；Unity 全量回归 EditMode 278 / 278、PlayMode 22 / 22 通过；遗珍 Run UI 的 1920×1080 与 1920×1200 截图经人工检查通过。
+- [x] G2：完成 ArtId → Sprite Catalog → CardView、Theme、回退/诊断资源、12 张样板随从、3 个 Token、4 张法术和 3 件遗珍图标。
+  - [x] G2 样板技术切片：`CardUiPrefabBuilder` 与 `RunUiPrefabBuilder` 均成功；12 张核心样板随从、3 个 Token、4 张法术、3 件遗珍以及 2 张旅团附加锚点共 24 个语义 ID 全部通过精确命中门禁，真实非法 ID 通过缺失诊断图门禁；本轮最终 Unity 全量回归 EditMode 294 / 294、PlayMode 22 / 22，0 失败、0 跳过；遗珍 Run UI 的 1920×1080 与 1920×1200 截图经人工检查通过。
   - [x] 按本轮优先级暂缓制作 4 张种族与 4 张法术类型精美回退图；保留精确命中 → 语义回退 → 缺失诊断代码机制，本轮只接入一张 `fallback_missing_art` 诊断图。该取舍已完成并由精确命中/非法 ID 自动化保护。
-  - [ ] G2 剩余门禁：为新增 3 个 Token、4 张法术、3 件遗珍和 1 张诊断图补齐生产许可签字，并输出其余 6 张核心随从、3 个 Token、4 张法术的专门卡面视觉矩阵；完成前 G2 总门禁保持未完成，新增 11 项不得标记为 Runtime Ready。
+  - [x] G2 专门卡面视觉矩阵：新增 6 张核心随从、3 个 Token、4 张法术共 13 个配置/ArtId 完成 Full/Compact 双分辨率验证；v0.3 将种族/法术类型行提升到卡框之上、移除分类说明并放大等级/攻防，v0.4 进一步移除卡面“金色”徽章与“金色随从”页脚，仅以高对比金框和金色卡名识别金色状态；每分辨率 38 个状态、合计 76 次 `PF_Card` 渲染，最终证据见 `ui-concepts/unity-validation/g2-card-matrix-v0.4/`。
+  - [x] G2 生产许可门禁：项目负责人已于 2026-07-25 人工复核新增 3 个 Token、4 张法术、3 件遗珍和 1 张诊断图共 11 项，同意纳入项目生产使用；既有技术门禁已通过，11 项已标记为 `Runtime Ready`，签字与哈希边界见 `phase-9b-g2-production-license-signoff-v0.1.md`，G2 关闭。
 - [ ] G3：完成 MainMenu、Shop、Run/Map、Battle、Choice/System Menu 换肤，接入通用 VFX、AudioMixer、3 套 BGM、P0 音效和音量设置。
+  - [x] G3 屏幕与地图工程：MainMenu、Shop、Choice、Run/Map、Battle、Confirm/System Menu 已统一为旅团绘本主题；完成 7 类节点、5 类节点状态、4 类连线状态、共享音频设置面板和程序化背景。
+  - [x] G3 通用表现工程：Shop 结构化反馈、Battle 十类事件、结果层、2×/跳过/重置清理与容量受限的 `PresentationFxPool` 已接通。
+  - [x] G3 音频工程：`SpireChessAudio.mixer`、28 Cue `PresentationAudioCatalog`、`AudioService`、`MusicDirector`、并发/冷却、四路本机音量设置和事件映射已完成；Cue 具有 `Pending/Placeholder/ProductionApproved` 显式状态，严格门禁不再以 Clip 非空推断生产就绪。
+  - [x] G3 本地程序合成占位包：生成并接入 3 首完整循环 BGM 与 25 个 P0 Cue / 64 个短音变体，共 67 个 48 kHz / 24-bit WAV；逐文件 SHA-256、规格和循环接缝通过，`Commissioning` 可播，`ProductionStrict` 以退出码 1 精确拒绝 28 个 `Placeholder` Cue，见 `phase-9b-g3-local-synth-placeholder-audio-v0.1.md`。该包不是正式 AI 生产资产或 `Runtime Ready`。
+  - [x] G3 工程门禁：真实 GPU 双分辨率证据覆盖 MainMenu/Shop/Battle/Run 共 28 张截图；Shop/Battle 验证资源均为精确命中；开发后独立审核最终无 P0 / P1 / P2 可操作遗留；接入本地占位音后的 Unity 全量回归 EditMode 346 / 346、PlayMode 25 / 25，0 失败、0 跳过，见 `phase-9b-g3-engineering-handoff-v0.1.md`。
+  - [x] 3 首 BGM 与 25 个 P0 Cue 的 AI 自制音频生产规范、完整 Prompt、64 个短音变体差异、规格、事件唯一映射和权利台账要求已冻结，见 `phase-9b-g3-ai-audio-production-spec-v0.1.md`。
+  - [ ] 项目负责人按生产规范自行使用 AI 工具生成 3 首正式 BGM 与 25 个 P0 Cue / 64 个 SFX 变体，并补齐工具/模型、Prompt、条款快照、原始输出、母带、Runtime、整文件 loop sample 与 SHA-256。
+  - [ ] 以完成来源/条款、独立文件 QA 与逐 Cue 人工听审的正式 AI Clip 替换 Placeholder，再逐 Cue 标记 `ProductionApproved`；随后通过 `ProductionStrict`、循环/切场/嵌套亡语峰值测试和最终整体听审。严格门禁失败的 Cue 必须在台账退回 `Production Candidate`、Catalog 改回 `Pending`；在此之前不得标记音频 `Runtime Ready` 或关闭 G3。
 - [ ] G4：完成全量自动化、正式链路双分辨率、存档恢复、跳过/2×、两机性能基线和至少 5 名外部试玩者验收。
 
 ## 暂缓

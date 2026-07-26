@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using SpireChess.Run;
@@ -10,6 +12,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace SpireChess.Tests.EditMode
 {
@@ -18,6 +21,8 @@ namespace SpireChess.Tests.EditMode
         private const string RootPath = "Assets/Prefabs/UI/Run/";
         private const string ScreenPath = RootPath + "PF_RunScreen.prefab";
         private const string ScenePath = "Assets/Scenes/RunTest.unity";
+        private const string ThemePath =
+            "Assets/Configs/Presentation/PresentationTheme.asset";
 
         private static readonly string[] RequiredScreenPaths =
         {
@@ -26,6 +31,7 @@ namespace SpireChess.Tests.EditMode
             "SafeArea/TopBar/Progress",
             "SafeArea/TopBar/Status",
             "SafeArea/Body/MapPanel/RouteHint",
+            "SafeArea/Body/MapPanel/MapScroll/Viewport/Content/Backdrop",
             "SafeArea/Body/MapPanel/MapScroll/Viewport/Content/EdgeLayer",
             "SafeArea/Body/MapPanel/MapScroll/Viewport/Content/NodeLayer",
             "SafeArea/Body/RelicPanel/RelicCount",
@@ -72,10 +78,159 @@ namespace SpireChess.Tests.EditMode
             Assert.That(edge.GetComponent<Image>(), Is.Not.Null);
             Assert.That(view, Is.Not.Null);
             Assert.That(view.HasCompleteBindings, Is.True);
+            var nodePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                RootPath + "PF_RunMapNode.prefab");
+            Assert.That(nodePrefab.transform.Find("TypeIcon/Glyph"), Is.Not.Null);
+            Assert.That(nodePrefab.transform.Find("StateOverlay"), Is.Not.Null);
+            Assert.That(nodePrefab.transform.Find("CurrentPulse"), Is.Not.Null);
             foreach (var path in RequiredScreenPaths)
             {
                 Assert.That(root.Find(path), Is.Not.Null,
                     "Missing stable PF_RunScreen path: " + path);
+            }
+        }
+
+        [Test]
+        public void Theme_DefinesCrossScreenSevenTypeFiveStateAndFourEdgeContracts()
+        {
+            var theme = AssetDatabase.LoadAssetAtPath<PresentationTheme>(ThemePath);
+            Assert.That(theme, Is.Not.Null);
+            Assert.That(theme.ScreenBackground.a, Is.EqualTo(1f).Within(0.001f));
+            Assert.That(theme.PanelBackground, Is.Not.EqualTo(theme.PanelRaised));
+            Assert.That(theme.ButtonNormal, Is.Not.EqualTo(theme.ButtonHighlighted));
+            Assert.That(theme.ButtonNormal, Is.Not.EqualTo(theme.ButtonPressed));
+            Assert.That(theme.TextPrimary, Is.Not.EqualTo(theme.TextSecondary));
+            Assert.That(theme.Accent, Is.Not.EqualTo(theme.Success));
+
+            var nodeTypes = (RunNodeType[])Enum.GetValues(typeof(RunNodeType));
+            Assert.That(nodeTypes, Has.Length.EqualTo(7));
+            Assert.That(
+                nodeTypes.Select(theme.GetMapTypeColor).Distinct().ToArray(),
+                Has.Length.EqualTo(7));
+
+            var nodeStatuses = (RunMapPresentationStatus[])Enum.GetValues(
+                typeof(RunMapPresentationStatus));
+            Assert.That(nodeStatuses, Has.Length.EqualTo(5));
+            Assert.That(
+                nodeStatuses.Select(status =>
+                        theme.GetMapNodeColor(RunNodeType.Normal, status))
+                    .Distinct()
+                    .ToArray(),
+                Has.Length.EqualTo(5));
+            Assert.That(
+                nodeStatuses
+                    .Select(theme.GetMapStatusColor)
+                    .Distinct()
+                    .ToArray(),
+                Has.Length.EqualTo(5));
+
+            var edgeStatuses = (RunMapEdgePresentationStatus[])Enum.GetValues(
+                typeof(RunMapEdgePresentationStatus));
+            Assert.That(edgeStatuses, Has.Length.EqualTo(4));
+            Assert.That(
+                edgeStatuses
+                    .Select(theme.GetMapEdgeColor)
+                    .Distinct()
+                    .ToArray(),
+                Has.Length.EqualTo(4));
+        }
+
+        [Test]
+        public void MapNode_RendersSevenTypeGlyphsAndFiveDistinctStatuses()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                RootPath + "PF_RunMapNode.prefab");
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var nodeView = instance.GetComponent<RunMapNodeView>();
+                var iconGlyphs = new HashSet<string>();
+                foreach (RunNodeType type in Enum.GetValues(typeof(RunNodeType)))
+                {
+                    var iconId = "icon_map_" + type.ToString().ToLowerInvariant();
+                    nodeView.Render(new RunMapNodeState
+                    {
+                        NodeId = type.ToString(),
+                        IconId = iconId,
+                        Type = type,
+                        Status = RunNodeStatus.Reachable,
+                        PresentationStatus = RunMapPresentationStatus.Reachable
+                    });
+                    Assert.That(nodeView.IconId, Is.EqualTo(iconId));
+                    Assert.That(nodeView.IconGlyph, Is.Not.Empty);
+                    iconGlyphs.Add(nodeView.IconGlyph);
+                }
+                Assert.That(iconGlyphs, Has.Count.EqualTo(7));
+
+                var backgrounds = new HashSet<Color>();
+                var outlines = new HashSet<Color>();
+                var labels = new HashSet<string>();
+                foreach (RunMapPresentationStatus status in Enum.GetValues(
+                             typeof(RunMapPresentationStatus)))
+                {
+                    nodeView.Render(new RunMapNodeState
+                    {
+                        NodeId = status.ToString(),
+                        IconId = "icon_map_normal",
+                        Type = RunNodeType.Normal,
+                        Status = RunNodeStatus.Locked,
+                        PresentationStatus = status
+                    });
+                    backgrounds.Add(instance.GetComponent<Image>().color);
+                    outlines.Add(instance.GetComponent<Outline>().effectColor);
+                    labels.Add(instance.transform.Find("Status")
+                        .GetComponent<Text>().text);
+                    Assert.That(
+                        nodeView.IsCurrentPulseVisible,
+                        Is.EqualTo(status == RunMapPresentationStatus.Current));
+                }
+                Assert.That(backgrounds, Has.Count.EqualTo(5));
+                Assert.That(outlines, Has.Count.EqualTo(5));
+                Assert.That(labels, Has.Count.EqualTo(5));
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
+        public void Render_UsesFourThemeEdgeStyles()
+        {
+            var theme = AssetDatabase.LoadAssetAtPath<PresentationTheme>(ThemePath);
+            var state = CreateState();
+            state.Nodes = state.Nodes.Take(5).ToArray();
+            var statuses = new[]
+            {
+                RunMapEdgePresentationStatus.Locked,
+                RunMapEdgePresentationStatus.Reachable,
+                RunMapEdgePresentationStatus.Resolved,
+                RunMapEdgePresentationStatus.Abandoned
+            };
+            state.Edges = statuses.Select((status, index) => new RunMapEdgeState
+            {
+                FromNodeId = "node_" + index,
+                ToNodeId = "node_" + (index + 1),
+                PresentationStatus = status
+            }).ToArray();
+            state.MaximumColumn = 4;
+
+            view.Render(state);
+
+            var expectedThickness = new[] { 2f, 5f, 7f, 3f };
+            var edgeLayer = root.Find(
+                "SafeArea/Body/MapPanel/MapScroll/Viewport/Content/EdgeLayer");
+            for (var index = 0; index < statuses.Length; index++)
+            {
+                var edge = edgeLayer.Find(
+                    $"Edge_node_{index}_node_{index + 1}");
+                Assert.That(edge, Is.Not.Null);
+                Assert.That(
+                    edge.GetComponent<Image>().color,
+                    Is.EqualTo(theme.GetMapEdgeColor(statuses[index])));
+                Assert.That(
+                    ((RectTransform)edge).sizeDelta.y,
+                    Is.EqualTo(expectedThickness[index]).Within(0.001f));
             }
         }
 
@@ -253,12 +408,16 @@ namespace SpireChess.Tests.EditMode
             var nodes = Enumerable.Range(0, 19).Select(index => new RunMapNodeState
             {
                 NodeId = "node_" + index,
+                IconId = index == 0 ? "icon_map_shop" : "icon_map_normal",
                 Title = "节点 " + index,
                 Subtitle = "验证地图节点",
                 Column = index,
                 Row = index % 3 - 1,
                 Type = index == 0 ? RunNodeType.Shop : RunNodeType.Normal,
                 Status = index == 0 ? RunNodeStatus.Reachable : RunNodeStatus.Locked,
+                PresentationStatus = index == 0
+                    ? RunMapPresentationStatus.Reachable
+                    : RunMapPresentationStatus.Locked,
                 IsInteractable = index == 0
             }).ToArray();
             var edges = Enumerable.Range(0, 18).Select(index => new RunMapEdgeState
@@ -266,7 +425,10 @@ namespace SpireChess.Tests.EditMode
                 FromNodeId = "node_" + index,
                 ToNodeId = "node_" + (index + 1),
                 FromStatus = nodes[index].Status,
-                ToStatus = nodes[index + 1].Status
+                ToStatus = nodes[index + 1].Status,
+                PresentationStatus = index == 0
+                    ? RunMapEdgePresentationStatus.Reachable
+                    : RunMapEdgePresentationStatus.Locked
             }).ToArray();
             return new RunScreenState
             {

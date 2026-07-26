@@ -1,5 +1,6 @@
 using System;
 using SpireChess.App;
+using SpireChess.Audio;
 using SpireChess.Run;
 using SpireChess.UI.Common;
 using UnityEngine;
@@ -80,6 +81,8 @@ namespace SpireChess.UI.Run
                 return result;
             }
 
+            AudioService.Instance?.PlayCue(
+                PresentationAudioCueIds.RunNodeSelect);
             if (run.State.Phase == RunPhase.Shop)
             {
                 GameApp.Instance.Router.GoToCurrentRunPhase(run);
@@ -99,9 +102,11 @@ namespace SpireChess.UI.Run
             string candidateId,
             string targetInstanceId = null)
         {
-            return CompleteChoice(
+            var result = CompleteChoice(
                 run.SelectRewardCandidate(candidateId, targetInstanceId),
                 "SelectReward");
+            PlayRewardCue(result);
+            return result;
         }
 
         public RunOperationResult SkipReward()
@@ -111,12 +116,25 @@ namespace SpireChess.UI.Run
 
         public RunOperationResult SelectRelic(string candidateId)
         {
-            return CompleteChoice(run.SelectRelicCandidate(candidateId), "SelectRelic");
+            var result = CompleteChoice(
+                run.SelectRelicCandidate(candidateId),
+                "SelectRelic");
+            PlayRewardCue(result);
+            return result;
         }
 
         public RunOperationResult SkipRelic()
         {
             return CompleteChoice(run.SkipRelicChoice(), "SkipRelic");
+        }
+
+        private static void PlayRewardCue(RunOperationResult result)
+        {
+            if (result != null && result.Success)
+            {
+                AudioService.Instance?.PlayCue(
+                    PresentationAudioCueIds.RunReward);
+            }
         }
 
         public RunOperationResult SelectEvent(string eventId, string optionId)

@@ -12,6 +12,12 @@ namespace SpireChess.UI
             new Color(0.72f, 0.78f, 0.84f, 0.28f);
         private static readonly Color GoldenFrameColor =
             new Color(1f, 0.72f, 0.08f, 0.92f);
+        private static readonly Color GoldenFrameSpriteTint =
+            new Color32(0xFF, 0xD2, 0x70, 0xFF);
+        private static readonly Color TokenFrameSpriteTint =
+            new Color32(0xC7, 0xEA, 0xC1, 0xFF);
+        private static readonly Color SpellFrameSpriteTint =
+            new Color32(0xC8, 0xD9, 0xF4, 0xFF);
         private static readonly Color GoldenTextColor =
             new Color32(0xFF, 0xD2, 0x58, 0xFF);
         private static readonly Color SelectionColor =
@@ -54,6 +60,7 @@ namespace SpireChess.UI
         [SerializeField] private RectTransform artworkMask;
         [SerializeField] private Mask artworkMaskComponent;
         [SerializeField] private Image artwork;
+        [SerializeField] private Image shieldOverlay;
         [SerializeField] private Image normalFrame;
         [SerializeField] private Image goldenFrame;
         [SerializeField] private PresentationSpriteCatalog spriteCatalog;
@@ -112,7 +119,8 @@ namespace SpireChess.UI
             rootRect != null && rootImage != null && canvasGroup != null &&
             background != null && raceSkin != null && artworkMask != null &&
             artworkMaskComponent != null && artwork != null &&
-            normalFrame != null && goldenFrame != null &&
+            shieldOverlay != null && normalFrame != null &&
+            goldenFrame != null &&
             spriteCatalog != null &&
             costBadge != null && costText != null &&
             tierBadge != null && tierText != null &&
@@ -148,6 +156,8 @@ namespace SpireChess.UI
 
             var isMinion = model.IsMinion;
             var isGolden = isMinion && model.IsGolden;
+            var isToken = isMinion && model.IsToken;
+            var isSpell = !isMinion;
             var hasProgress = !string.IsNullOrWhiteSpace(model.ProgressText);
             var isInteractable = model.IsInteractable;
 
@@ -176,10 +186,14 @@ namespace SpireChess.UI
             normalFrame.gameObject.SetActive(!isGolden);
             goldenFrame.gameObject.SetActive(isGolden);
             normalFrame.color = normalFrameSprite != null
-                ? Color.white
+                ? isToken
+                    ? TokenFrameSpriteTint
+                    : isSpell
+                        ? SpellFrameSpriteTint
+                        : Color.white
                 : NormalFrameColor;
             goldenFrame.color = goldenFrameSprite != null
-                ? Color.white
+                ? GoldenFrameSpriteTint
                 : GoldenFrameColor;
 
             costBadge.gameObject.SetActive(model.ShowCost);
@@ -187,7 +201,10 @@ namespace SpireChess.UI
                 costText,
                 model.Cost,
                 model.DisplayMode,
-                costTextArea);
+                costTextArea,
+                18,
+                13,
+                9);
             costText.color = model.IsAffordable
                 ? spriteCatalog.CardCostCoin != null
                     ? CostNumberColor
@@ -197,7 +214,10 @@ namespace SpireChess.UI
                 tierText,
                 model.Tier,
                 model.DisplayMode,
-                tierTextArea);
+                tierTextArea,
+                22,
+                16,
+                12);
             tierText.color = spriteCatalog.CardTierBookmark != null
                 ? TierNumberColor
                 : NormalTextColor;
@@ -211,11 +231,10 @@ namespace SpireChess.UI
             nameText.color = isGolden ? GoldenTextColor : NormalTextColor;
             ApplySingleLineText(
                 raceOrSpellTypeText,
-                model.RaceText,
-                model.DisplayMode == CardDisplayMode.Full ? 14 : 11,
-                model.DisplayMode == CardDisplayMode.Full ? 12 : 11,
+                FormatCardTypeLine(model),
+                model.DisplayMode == CardDisplayMode.Full ? 16 : 13,
+                model.DisplayMode == CardDisplayMode.Full ? 14 : 13,
                 raceTextArea);
-            ApplyAbilityLabels(model.AbilityLabels, model.DisplayMode);
             ApplyDescription(
                 model.Description,
                 model.DisplayMode,
@@ -232,17 +251,23 @@ namespace SpireChess.UI
 
             attackBadge.gameObject.SetActive(isMinion);
             healthBadge.gameObject.SetActive(isMinion);
-            spellFooter.gameObject.SetActive(!isMinion);
+            spellFooter.gameObject.SetActive(isToken || isSpell);
             ApplyNumericText(
                 attackText,
                 model.Attack,
                 model.DisplayMode,
-                attackTextArea);
+                attackTextArea,
+                22,
+                16,
+                11);
             ApplyNumericText(
                 healthText,
                 model.Health,
                 model.DisplayMode,
-                healthTextArea);
+                healthTextArea,
+                22,
+                16,
+                11);
             attackText.color = isInteractable && model.Attack > model.BaseAttack
                 ? GrowthColor
                 : spriteCatalog.CardAttackTag != null
@@ -253,22 +278,44 @@ namespace SpireChess.UI
                 : spriteCatalog.CardHealthTag != null
                     ? HealthNumberColor
                     : NormalTextColor;
-            spellFooter.text = "商店法术";
+            spellFooter.text = isToken
+                ? "衍生随从"
+                : isSpell
+                    ? "商店法术"
+                    : string.Empty;
+            spellFooter.fontSize =
+                model.DisplayMode == CardDisplayMode.Full ? 12 : 10;
+            spellFooter.color = isToken
+                ? new Color32(0x32, 0x67, 0x3B, 0xFF)
+                : new Color32(0x35, 0x4F, 0x79, 0xFF);
 
             var showShield = isMinion && model.HasShield;
             var showNextShield = isMinion && model.HasNextCombatShield;
             var showTemporary = model.IsTemporary;
-            goldenBadge.gameObject.SetActive(isGolden);
+            shieldOverlay.sprite = spriteCatalog.BattleShieldOverlay;
+            shieldOverlay.gameObject.SetActive(
+                shieldOverlay.sprite != null &&
+                (showShield || showNextShield));
+            shieldOverlay.color = showShield
+                ? new Color(0.78f, 0.96f, 1f, 0.78f)
+                : new Color(0.58f, 0.86f, 1f, 0.38f);
+            goldenBadge.gameObject.SetActive(false);
             shieldBadge.gameObject.SetActive(showShield);
             nextCombatShieldBadge.gameObject.SetActive(showNextShield);
             temporaryBadge.gameObject.SetActive(showTemporary);
-            goldenBadge.text = "金色";
-            goldenBadge.fontSize = model.DisplayMode == CardDisplayMode.Full ? 11 : 10;
+            goldenBadge.text = string.Empty;
+            var stateFontSize =
+                model.DisplayMode == CardDisplayMode.Full ? 11 : 10;
+            goldenBadge.fontSize = stateFontSize;
+            shieldBadge.fontSize = stateFontSize;
+            nextCombatShieldBadge.fontSize = stateFontSize;
+            temporaryBadge.fontSize = stateFontSize;
             shieldBadge.text = "护盾";
             nextCombatShieldBadge.text = "下战";
             temporaryBadge.text = "临时";
             stateBadgeRow.gameObject.SetActive(
-                isGolden || showShield || showNextShield || showTemporary);
+                showShield || showNextShield || showTemporary);
+            LayoutVisibleStateBadges(model.DisplayMode);
 
             selectionFrame.gameObject.SetActive(model.IsSelected);
             selectionFrame.color = new Color(
@@ -401,15 +448,18 @@ namespace SpireChess.UI
             var art = full
                 ? new ContractRect(12f, 12f, 216f, 184f)
                 : new ContractRect(8f, 8f, 144f, 112f);
+            var shield = full
+                ? new ContractRect(15f, 8f, 210f, 344f)
+                : new ContractRect(10f, 5f, 140f, 230f);
             var cost = full
                 ? new ContractRect(13f, 12f, 28f, 29f)
                 : new ContractRect(9f, 8f, 19f, 20f);
             var tier = full
-                ? new ContractRect(205f, 13f, 21f, 28f)
-                : new ContractRect(137f, 9f, 14f, 19f);
+                ? new ContractRect(198f, 9f, 32f, 40f)
+                : new ContractRect(132f, 6f, 22f, 28f);
             var state = full
-                ? new ContractRect(60f, 157f, 120f, 22f)
-                : new ContractRect(42f, 91f, 76f, 18f);
+                ? new ContractRect(44f, 157f, 152f, 22f)
+                : new ContractRect(28f, 91f, 104f, 18f);
             var name = full
                 ? new ContractRect(24f, 181f, 192f, 32f)
                 : new ContractRect(16f, 108f, 128f, 26f);
@@ -417,32 +467,29 @@ namespace SpireChess.UI
                 ? new ContractRect(12f, 199f, 216f, 149f)
                 : new ContractRect(8f, 122f, 144f, 110f);
             var race = full
-                ? new ContractRect(44f, 215f, 152f, 18f)
-                : new ContractRect(28f, 136f, 104f, 14f);
-            var labels = full
-                ? new ContractRect(20f, 235f, 200f, 20f)
-                : new ContractRect(12f, 154f, 136f, 16f);
+                ? new ContractRect(36f, 232f, 168f, 24f)
+                : new ContractRect(24f, 152f, 112f, 19f);
             var description = full
-                ? new ContractRect(12f, 256f, 216f, hasProgress ? 31f : 52f)
-                : new ContractRect(12f, 172f, 136f, hasProgress ? 21f : 33f);
+                ? new ContractRect(30f, 256f, 180f, hasProgress ? 31f : 64f)
+                : new ContractRect(20f, 172f, 120f, hasProgress ? 21f : 33f);
             var progress = full
                 ? new ContractRect(62f, 293f, 116f, 18f)
                 : new ContractRect(44f, 197f, 72f, 14f);
             var attack = full
-                ? new ContractRect(13f, 327f, 55f, 22f)
-                : new ContractRect(9f, 218f, 36f, 15f);
+                ? new ContractRect(10f, 321f, 68f, 30f)
+                : new ContractRect(7f, 213f, 46f, 21f);
             var health = full
-                ? new ContractRect(172f, 327f, 55f, 22f)
-                : new ContractRect(115f, 218f, 36f, 15f);
+                ? new ContractRect(162f, 321f, 68f, 30f)
+                : new ContractRect(107f, 213f, 46f, 21f);
             var attackNumber = full
-                ? new ContractRect(14f, 1f, 37f, 20f)
-                : new ContractRect(9f, 1f, 24f, 13f);
+                ? new ContractRect(17f, 2f, 46f, 26f)
+                : new ContractRect(11f, 1f, 31f, 19f);
             var healthNumber = full
-                ? new ContractRect(4f, 1f, 36f, 20f)
-                : new ContractRect(3f, 1f, 23f, 13f);
+                ? new ContractRect(5f, 2f, 46f, 26f)
+                : new ContractRect(3f, 1f, 31f, 19f);
             var footer = full
-                ? new ContractRect(58f, 318f, 124f, 22f)
-                : new ContractRect(42f, 211f, 76f, 16f);
+                ? new ContractRect(80f, 332f, 80f, 16f)
+                : new ContractRect(55f, 220f, 50f, 13f);
             var feedback = full
                 ? new ContractRect(40f, 105f, 160f, 40f)
                 : new ContractRect(20f, 55f, 120f, 34f);
@@ -452,6 +499,7 @@ namespace SpireChess.UI
             SetRect(raceSkin.rectTransform, root);
             SetRect(artworkMask, art);
             Stretch(artwork.rectTransform);
+            SetRect(shieldOverlay.rectTransform, shield);
             SetRect(normalFrame.rectTransform, frame);
             SetRect(goldenFrame.rectTransform, frame);
             SetRect(costBadge.rectTransform, cost);
@@ -461,8 +509,7 @@ namespace SpireChess.UI
             SetRect(namePlate.rectTransform, name);
             Stretch(nameText.rectTransform, 4f);
             SetRect(infoPanel.rectTransform, info);
-            SetRect(raceOrSpellTypeText.rectTransform, race, info);
-            SetRect(abilityLabelRow, labels, info);
+            SetRect(raceOrSpellTypeText.rectTransform, race);
             SetRect(descriptionText.rectTransform, description, info);
             SetRect(progressRoot, progress, info);
             Stretch(progressFill.rectTransform);
@@ -477,8 +524,6 @@ namespace SpireChess.UI
             SetRect(selectionFrame.rectTransform, root);
             SetRect(legalTargetFrame.rectTransform, root);
             SetRect(disabledMask.rectTransform, root);
-            LayoutLabels(labels, full ? 3 : 2);
-            LayoutStateBadges(state);
             LayoutDisabledContent(root);
             // Text fitting runs in the same frame as this geometry update.
             // Keep the frozen contract areas explicitly instead of reading
@@ -523,6 +568,7 @@ namespace SpireChess.UI
             disabledIcon.text = string.Empty;
             disabledReasonText.text = string.Empty;
             goldenBadge.text = string.Empty;
+            abilityLabelRow.gameObject.SetActive(false);
             foreach (var label in abilityLabelTexts)
             {
                 label.text = string.Empty;
@@ -530,6 +576,7 @@ namespace SpireChess.UI
             }
 
             progressRoot.gameObject.SetActive(false);
+            shieldOverlay.gameObject.SetActive(false);
             goldenFrame.gameObject.SetActive(false);
             goldenBadge.gameObject.SetActive(false);
             shieldBadge.gameObject.SetActive(false);
@@ -547,25 +594,6 @@ namespace SpireChess.UI
             attackText.color = NormalTextColor;
             healthText.color = NormalTextColor;
             nameText.color = NormalTextColor;
-        }
-
-        private void ApplyAbilityLabels(
-            string[] labels,
-            CardDisplayMode displayMode)
-        {
-            var formatted = UiTextFormatter.FormatAbilityLabels(
-                labels,
-                displayMode);
-            var fontSize = displayMode == CardDisplayMode.Full ? 12 : 10;
-            for (var index = 0; index < abilityLabelTexts.Length; index++)
-            {
-                var visible = index < formatted.Length;
-                abilityLabelTexts[index].gameObject.SetActive(visible);
-                abilityLabelTexts[index].text = visible
-                    ? formatted[index]
-                    : string.Empty;
-                abilityLabelTexts[index].fontSize = fontSize;
-            }
         }
 
         private void ApplySingleLineText(
@@ -604,11 +632,15 @@ namespace SpireChess.UI
             Text target,
             int value,
             CardDisplayMode mode,
-            Vector2 area)
+            Vector2 area,
+            int fullBaseSize,
+            int compactBaseSize,
+            int minimumSize)
         {
             var text = value.ToString();
-            var baseSize = mode == CardDisplayMode.Full ? 15 : 10;
-            const int minimumSize = 7;
+            var baseSize = mode == CardDisplayMode.Full
+                ? fullBaseSize
+                : compactBaseSize;
             for (var size = baseSize; size >= minimumSize; size--)
             {
                 if (!Fits(target, text, size, 1, true, area) ||
@@ -790,24 +822,7 @@ namespace SpireChess.UI
                 : 1f;
         }
 
-        private void LayoutLabels(
-            ContractRect labels,
-            int capacity)
-        {
-            var width = labels.Width / capacity;
-            for (var index = 0; index < abilityLabelTexts.Length; index++)
-            {
-                var column = Math.Min(index, capacity - 1);
-                var rect = new ContractRect(
-                    labels.X + column * width,
-                    labels.Y,
-                    width,
-                    labels.Height);
-                SetRect(abilityLabelTexts[index].rectTransform, rect, labels);
-            }
-        }
-
-        private void LayoutStateBadges(ContractRect state)
+        private void LayoutVisibleStateBadges(CardDisplayMode displayMode)
         {
             var badges = new[]
             {
@@ -816,16 +831,61 @@ namespace SpireChess.UI
                 nextCombatShieldBadge,
                 temporaryBadge
             };
-            var width = state.Width / badges.Length;
-            for (var index = 0; index < badges.Length; index++)
+            var visibleCount = 0;
+            foreach (var badge in badges)
             {
+                if (badge.gameObject.activeSelf)
+                {
+                    visibleCount++;
+                }
+            }
+
+            if (visibleCount == 0)
+            {
+                return;
+            }
+
+            var rowWidth =
+                displayMode == CardDisplayMode.Full ? 152f : 104f;
+            var rowHeight =
+                displayMode == CardDisplayMode.Full ? 22f : 18f;
+            var width = rowWidth / visibleCount;
+            var visibleIndex = 0;
+            foreach (var badge in badges)
+            {
+                if (!badge.gameObject.activeSelf)
+                {
+                    continue;
+                }
+
                 var rect = new ContractRect(
-                    index * width,
+                    visibleIndex * width,
                     0f,
                     width,
-                    state.Height);
-                SetRect(badges[index].rectTransform, rect);
+                    rowHeight);
+                SetRect(badge.rectTransform, rect);
+                visibleIndex++;
             }
+        }
+
+        private static string FormatCardTypeLine(CardViewModel model)
+        {
+            var detail = UiTextFormatter.ToSingleLine(model.RaceText);
+            if (model.IsMinion && model.IsToken)
+            {
+                return string.IsNullOrWhiteSpace(detail)
+                    ? "衍生随从"
+                    : "衍生 · " + detail;
+            }
+
+            if (!model.IsMinion)
+            {
+                return string.IsNullOrWhiteSpace(detail)
+                    ? "法术"
+                    : "法术 · " + detail;
+            }
+
+            return detail;
         }
 
         private void LayoutDisabledContent(ContractRect root)

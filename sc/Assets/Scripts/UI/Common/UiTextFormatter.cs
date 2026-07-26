@@ -105,7 +105,7 @@ namespace SpireChess.UI
                 return 2;
             }
 
-            return displayMode == CardDisplayMode.Full ? 4 : 3;
+            return displayMode == CardDisplayMode.Full ? 5 : 3;
         }
 
         public static string EllipsizeName(

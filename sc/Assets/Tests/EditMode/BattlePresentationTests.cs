@@ -56,9 +56,39 @@ namespace SpireChess.Tests
             Assert.That(model.Health, Is.EqualTo(12));
             Assert.That(model.BaseAttack, Is.EqualTo(6));
             Assert.That(model.BaseHealth, Is.EqualTo(10));
+            Assert.That(model.IsToken, Is.False);
             Assert.That(model.IsGolden, Is.True);
             Assert.That(model.HasShield, Is.True);
             Assert.That(model.Keywords, Is.EquivalentTo(new[] { "嘲讽", "护盾" }));
+        }
+
+        [Test]
+        public void Factory_PreservesTokenIdentity()
+        {
+            var config = new MinionConfig
+            {
+                Id = "token_presentation",
+                Name = "表现幼灵",
+                Description = "战斗结束后消失。",
+                Race = "WildSpirit",
+                Tier = 0,
+                Attack = 1,
+                Health = 1,
+                IsToken = true
+            };
+            var runtime = new BattleMinionRuntime(
+                config,
+                runtimeInstanceId: "runtime-token");
+
+            var model = BattleCardViewModelFactory.FromRuntime(
+                runtime,
+                BattleSide.Player,
+                2);
+
+            Assert.That(model.InstanceId, Is.EqualTo("runtime-token"));
+            Assert.That(model.IsMinion, Is.True);
+            Assert.That(model.IsToken, Is.True);
+            Assert.That(model.IsGolden, Is.False);
         }
 
         [Test]

@@ -1,6 +1,8 @@
 using System.Collections;
 using NUnit.Framework;
 using SpireChess.App;
+using SpireChess.Audio;
+using SpireChess.Battle;
 using SpireChess.Run;
 using SpireChess.UI.Battle;
 using UnityEngine;
@@ -65,8 +67,14 @@ namespace SpireChess.Tests
                 .GetComponent<Button>();
             speed.onClick.Invoke();
             Assert.That(controller.PlaybackSpeed, Is.EqualTo(2f));
+            Assert.That(
+                BattleScreenView.GetDurationScale(controller.PlaybackSpeed),
+                Is.EqualTo(0.5f).Within(0.001f));
             speed.onClick.Invoke();
             Assert.That(controller.PlaybackSpeed, Is.EqualTo(1f));
+            Assert.That(
+                BattleScreenView.GetDurationScale(controller.PlaybackSpeed),
+                Is.EqualTo(1f).Within(0.001f));
         }
 
         [UnityTest]
@@ -98,6 +106,8 @@ namespace SpireChess.Tests
             Assert.That(controller.IsBattleLocked, Is.True);
             screen.transform.Find("SafeArea/TopBar/Actions/Skip")
                 .GetComponent<Button>().onClick.Invoke();
+            Assert.That(screen.IsAnimationPlaying, Is.False);
+            Assert.That(screen.ActiveFeedbackFxCount, Is.Zero);
 
             for (var step = 0; step < 10 && controller.LastResult == null; step++)
             {
@@ -106,6 +116,9 @@ namespace SpireChess.Tests
 
             Assert.That(controller.LastResult, Is.Not.Null);
             Assert.That(run.LastBattleResult, Is.SameAs(controller.LastResult));
+            Assert.That(screen.IsResultVisible, Is.True);
+            Assert.That(screen.ResultTitle, Is.Not.Empty);
+            AssertStandeesAtRest();
             var settledAfter = run.State.Statistics.BattlesWon +
                                run.State.Statistics.BattlesNotWon;
             Assert.That(settledAfter, Is.EqualTo(settledBefore + 1));
@@ -118,6 +131,86 @@ namespace SpireChess.Tests
                         run.State.Statistics.BattlesNotWon,
                 Is.EqualTo(settledAfter));
             Assert.That(run.LastBattleResult, Is.SameAs(controller.LastResult));
+        }
+
+        [UnityTest]
+        public IEnumerator CancelMidDeath_RestoresVisualStateAndClearsFx()
+        {
+            yield return EnsureGameApp();
+            GameApp.Instance.StartNewRun(703);
+            SceneManager.LoadScene("BattleTest");
+            yield return null;
+
+            var controller = Object.FindObjectOfType<BattleTestController>();
+            var screen = Object.FindObjectOfType<BattleScreenView>();
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(screen, Is.Not.Null);
+
+            var standee = screen.transform.Find(
+                    "SafeArea/Board/PlayerRow/Slots/Slot1/Content")
+                .GetComponentInChildren<BattleStandeeView>();
+            Assert.That(standee, Is.Not.Null);
+            var playbackEvent = new BattlePlaybackEvent(
+                BattlePlaybackEventKind.UnitDied,
+                controller.SetupState,
+                "中断阵亡演出",
+                targetSide: BattleSide.Player,
+                targetIndex: 0,
+                targetInstanceId: standee.InstanceId);
+
+            screen.StartCoroutine(screen.PlayEvent(playbackEvent, 1f));
+            yield return new WaitForSecondsRealtime(0.05f);
+            Assert.That(screen.IsAnimationPlaying, Is.True);
+
+            screen.SnapAndClear();
+            yield return null;
+
+            Assert.That(screen.IsAnimationPlaying, Is.False);
+            Assert.That(screen.ActiveFeedbackFxCount, Is.Zero);
+            Assert.That(standee.GetComponent<CanvasGroup>().alpha,
+                Is.EqualTo(1f).Within(0.001f));
+            Assert.That(
+                Vector3.Distance(standee.transform.localScale, Vector3.one),
+                Is.LessThan(0.001f));
+            Assert.That(
+                Vector2.Distance(
+                    standee.RectTransform.anchoredPosition,
+                    Vector2.zero),
+                Is.LessThan(0.001f));
+        }
+
+        [UnityTest]
+        public IEnumerator CombatEnded_ShowsPersistentNonBlockingResultLayer()
+        {
+            yield return EnsureGameApp();
+            GameApp.Instance.StartNewRun(704);
+            SceneManager.LoadScene("BattleTest");
+            yield return null;
+
+            var controller = Object.FindObjectOfType<BattleTestController>();
+            var screen = Object.FindObjectOfType<BattleScreenView>();
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(screen, Is.Not.Null);
+            var playbackEvent = new BattlePlaybackEvent(
+                BattlePlaybackEventKind.CombatEnded,
+                controller.SetupState,
+                "测试结算");
+
+            yield return screen.PlayEvent(
+                playbackEvent,
+                2f,
+                BattleSide.Player);
+
+            Assert.That(screen.IsAnimationPlaying, Is.False);
+            Assert.That(screen.IsResultVisible, Is.True);
+            Assert.That(screen.ResultTitle, Is.EqualTo("战斗胜利"));
+            Assert.That(
+                screen.LastAudioCueId,
+                Is.EqualTo(PresentationAudioCueIds.BattleVictory));
+            var resultGroup = screen.transform.Find("SafeArea/ResultLayer")
+                .GetComponent<CanvasGroup>();
+            Assert.That(resultGroup.blocksRaycasts, Is.False);
+            Assert.That(resultGroup.interactable, Is.False);
         }
 
         private static IEnumerator EnsureGameApp()
@@ -158,6 +251,23 @@ namespace SpireChess.Tests
                 expectedButton.gameObject,
                 pointer,
                 ExecuteEvents.pointerClickHandler);
+        }
+
+        private static void AssertStandeesAtRest()
+        {
+            foreach (var standee in Object.FindObjectsOfType<BattleStandeeView>())
+            {
+                Assert.That(standee.GetComponent<CanvasGroup>().alpha,
+                    Is.EqualTo(1f).Within(0.001f));
+                Assert.That(
+                    Vector3.Distance(standee.transform.localScale, Vector3.one),
+                    Is.LessThan(0.001f));
+                Assert.That(
+                    Vector2.Distance(
+                        standee.RectTransform.anchoredPosition,
+                        Vector2.zero),
+                    Is.LessThan(0.001f));
+            }
         }
     }
 }

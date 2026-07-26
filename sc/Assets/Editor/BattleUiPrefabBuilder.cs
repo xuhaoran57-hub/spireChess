@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using SpireChess.Battle;
 using SpireChess.UI;
 using SpireChess.UI.Battle;
 using UnityEditor;
@@ -191,7 +192,7 @@ namespace SpireChess.Editor
                 repositoryRoot,
                 "ui-concepts",
                 "unity-validation",
-                "pf-battle-screen-v0.2");
+                "g3-battle-screen-v0.1");
             Directory.CreateDirectory(outputDirectory);
             Capture(
                 camera,
@@ -241,6 +242,34 @@ namespace SpireChess.Editor
                 Path.Combine(
                     outputDirectory,
                     "battle-standee-detail-1920x1080.png"));
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1200,
+                Path.Combine(
+                    outputDirectory,
+                    "battle-standee-detail-1920x1200.png"));
+            view.CloseStandeeDetail();
+            view.ShowCombatResult(
+                BattleSide.Player,
+                "敌方全灭 · 剩余友方随从 3 · 结算已写入单局");
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1080,
+                Path.Combine(
+                    outputDirectory,
+                    "battle-result-victory-1920x1080.png"));
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1200,
+                Path.Combine(
+                    outputDirectory,
+                    "battle-result-victory-1920x1200.png"));
             AssetDatabase.SaveAssets();
             Debug.Log("[BattleUI] Captured validation screenshots to " +
                       outputDirectory);
@@ -252,7 +281,6 @@ namespace SpireChess.Editor
                 ThemePath);
             if (theme != null)
             {
-                ConfigureTheme(theme);
                 return theme;
             }
 
@@ -615,16 +643,27 @@ namespace SpireChess.Editor
                 scaler.referenceResolution = new Vector2(1920f, 1080f);
                 scaler.matchWidthOrHeight = 0.5f;
 
-                var safeArea = CreateImage(
+                var safeAreaImage = CreateImage(
                     "SafeArea",
                     root.transform,
-                    Background).rectTransform;
+                    new Color(0.035f, 0.045f, 0.075f, 1f));
+                safeAreaImage.raycastTarget = false;
+                var safeArea = safeAreaImage.rectTransform;
                 Stretch(safeArea, Vector2.zero, Vector2.zero);
-                var topBar = CreateImage(
+                var topBarImage = CreateImage(
                     "TopBar",
                     safeArea,
-                    Panel).rectTransform;
+                    new Color(0.105f, 0.105f, 0.14f, 0.98f));
+                topBarImage.raycastTarget = false;
+                var topBar = topBarImage.rectTransform;
                 SetRect(topBar, 20f, 20f, 1880f, 82f, true);
+                var topBarOutline = topBar.gameObject.AddComponent<Outline>();
+                topBarOutline.effectColor = new Color(
+                    0.72f,
+                    0.52f,
+                    0.22f,
+                    0.72f);
+                topBarOutline.effectDistance = new Vector2(2f, -2f);
 
                 var title = CreateText(
                     "Title",
@@ -633,6 +672,7 @@ namespace SpireChess.Editor
                     "战斗",
                     28,
                     TextAnchor.MiddleLeft);
+                title.color = new Color(1f, 0.84f, 0.50f, 1f);
                 SetRect(title.rectTransform, 18f, 10f, 330f, 62f);
                 var status = CreateText(
                     "Status",
@@ -641,6 +681,7 @@ namespace SpireChess.Editor
                     "准备阶段",
                     20,
                     TextAnchor.MiddleLeft);
+                status.color = new Color(0.82f, 0.86f, 0.92f, 1f);
                 SetRect(status.rectTransform, 350f, 10f, 430f, 62f);
                 var round = CreateText(
                     "Round",
@@ -649,6 +690,7 @@ namespace SpireChess.Editor
                     "准备阶段",
                     18,
                     TextAnchor.MiddleCenter);
+                round.color = new Color(0.58f, 0.82f, 0.96f, 1f);
                 SetRect(round.rectTransform, 790f, 10f, 150f, 62f);
 
                 var actions = CreateRect("Actions", topBar);
@@ -668,8 +710,53 @@ namespace SpireChess.Editor
                 var reset = CreateButton("Reset", actions, font, "重置", out var resetText);
                 var returnButton = CreateButton("Return", actions, font, "查看结算", out var returnText);
 
-                var board = CreateRect("Board", safeArea);
+                var actionButtons = new[]
+                {
+                    start,
+                    speed,
+                    skip,
+                    preset,
+                    reset,
+                    returnButton
+                };
+                var actionColors = new[]
+                {
+                    new Color(0.40f, 0.29f, 0.12f, 1f),
+                    new Color(0.15f, 0.27f, 0.39f, 1f),
+                    new Color(0.34f, 0.23f, 0.13f, 1f),
+                    new Color(0.18f, 0.20f, 0.29f, 1f),
+                    new Color(0.34f, 0.16f, 0.18f, 1f),
+                    new Color(0.16f, 0.31f, 0.25f, 1f)
+                };
+                for (var index = 0; index < actionButtons.Length; index++)
+                {
+                    var button = actionButtons[index];
+                    button.image.color = actionColors[index];
+                    var colors = button.colors;
+                    colors.normalColor = Color.white;
+                    colors.highlightedColor =
+                        new Color(1.16f, 1.12f, 0.98f, 1f);
+                    colors.pressedColor =
+                        new Color(0.74f, 0.76f, 0.82f, 1f);
+                    colors.disabledColor =
+                        new Color(0.44f, 0.44f, 0.48f, 0.62f);
+                    button.colors = colors;
+                }
+
+                var boardImage = CreateImage(
+                    "Board",
+                    safeArea,
+                    new Color(0.045f, 0.055f, 0.085f, 0.96f));
+                boardImage.raycastTarget = false;
+                var board = boardImage.rectTransform;
                 SetRect(board, 20f, 120f, 1490f, 930f);
+                var boardOutline = board.gameObject.AddComponent<Outline>();
+                boardOutline.effectColor = new Color(
+                    0.30f,
+                    0.34f,
+                    0.48f,
+                    0.72f);
+                boardOutline.effectDistance = new Vector2(2f, -2f);
                 var enemySlots = BuildRow(
                     "EnemyRow",
                     board,
@@ -684,11 +771,21 @@ namespace SpireChess.Editor
                     slotPrefab,
                     "玩家",
                     95f);
+                var enemyRow = board.Find("EnemyRow").GetComponent<Image>();
+                enemyRow.color = new Color(0.16f, 0.075f, 0.09f, 0.94f);
+                enemyRow.raycastTarget = false;
+                var playerRow = board.Find("PlayerRow").GetComponent<Image>();
+                playerRow.color = new Color(0.065f, 0.13f, 0.17f, 0.94f);
+                playerRow.raycastTarget = false;
+                board.Find("EnemyRow/Label").GetComponent<Text>().color =
+                    new Color(0.96f, 0.58f, 0.55f, 1f);
+                board.Find("PlayerRow/Label").GetComponent<Text>().color =
+                    new Color(0.48f, 0.86f, 0.88f, 1f);
 
                 var logPanel = CreateImage(
                     "LogPanel",
                     safeArea,
-                    Panel).rectTransform;
+                    new Color(0.075f, 0.07f, 0.10f, 0.98f)).rectTransform;
                 SetRect(logPanel, 1530f, 120f, 370f, 838f);
                 logPanel.GetComponent<Image>().raycastTarget = false;
                 var logTitle = CreateText(
@@ -698,6 +795,7 @@ namespace SpireChess.Editor
                     "战斗日志",
                     22,
                     TextAnchor.MiddleLeft);
+                logTitle.color = new Color(1f, 0.80f, 0.46f, 1f);
                 SetRect(logTitle.rectTransform, 16f, 768f, 338f, 50f);
                 var scrollRect = BuildLogScroll(logPanel, font, out var logText);
 
@@ -705,6 +803,8 @@ namespace SpireChess.Editor
                 Stretch(feedbackRoot, Vector2.zero, Vector2.zero);
                 var feedbackCanvas = feedbackRoot.gameObject.AddComponent<CanvasGroup>();
                 feedbackCanvas.alpha = 0f;
+                feedbackCanvas.interactable = false;
+                feedbackCanvas.blocksRaycasts = false;
                 var feedbackText = CreateText(
                     "Feedback",
                     feedbackRoot,
@@ -714,6 +814,69 @@ namespace SpireChess.Editor
                     TextAnchor.MiddleCenter);
                 feedbackText.fontStyle = FontStyle.Bold;
                 SetRect(feedbackText.rectTransform, 720f, 500f, 480f, 80f);
+
+                var vfxLayer = CreateRect("VfxLayer", safeArea);
+                Stretch(vfxLayer, Vector2.zero, Vector2.zero);
+                var pulseImage = CreateImage(
+                    "BoardPulse",
+                    vfxLayer,
+                    Color.white);
+                pulseImage.raycastTarget = false;
+                Stretch(
+                    pulseImage.rectTransform,
+                    new Vector2(20f, 120f),
+                    new Vector2(-410f, -30f));
+                var pulseCanvas =
+                    pulseImage.gameObject.AddComponent<CanvasGroup>();
+                pulseCanvas.alpha = 0f;
+                pulseCanvas.interactable = false;
+                pulseCanvas.blocksRaycasts = false;
+                var fxPool =
+                    vfxLayer.gameObject.AddComponent<PresentationFxPool>();
+                fxPool.Configure(font, 12);
+
+                var resultImage = CreateImage(
+                    "ResultLayer",
+                    safeArea,
+                    new Color(0.015f, 0.02f, 0.035f, 0.46f));
+                resultImage.raycastTarget = false;
+                Stretch(resultImage.rectTransform, Vector2.zero, Vector2.zero);
+                var resultCanvas =
+                    resultImage.gameObject.AddComponent<CanvasGroup>();
+                resultCanvas.alpha = 0f;
+                resultCanvas.interactable = false;
+                resultCanvas.blocksRaycasts = false;
+                var resultCard = CreateImage(
+                    "ResultCard",
+                    resultImage.transform,
+                    new Color(0.10f, 0.095f, 0.13f, 0.98f));
+                resultCard.raycastTarget = false;
+                SetRect(resultCard.rectTransform, 505f, 380f, 920f, 280f);
+                var resultOutline =
+                    resultCard.gameObject.AddComponent<Outline>();
+                resultOutline.effectColor =
+                    new Color(0.86f, 0.64f, 0.27f, 0.90f);
+                resultOutline.effectDistance = new Vector2(3f, -3f);
+                var resultTitle = CreateText(
+                    "Title",
+                    resultCard.transform,
+                    font,
+                    string.Empty,
+                    46,
+                    TextAnchor.MiddleCenter);
+                resultTitle.fontStyle = FontStyle.Bold;
+                SetRect(resultTitle.rectTransform, 40f, 138f, 840f, 100f);
+                var resultBody = CreateText(
+                    "Body",
+                    resultCard.transform,
+                    font,
+                    string.Empty,
+                    22,
+                    TextAnchor.MiddleCenter);
+                resultBody.color =
+                    new Color(0.82f, 0.84f, 0.90f, 1f);
+                SetRect(resultBody.rectTransform, 50f, 48f, 820f, 82f);
+                resultImage.gameObject.SetActive(false);
 
                 var detailLayer = CreateRect("StandeeDetailLayer", safeArea);
                 SetRect(detailLayer, 20f, 120f, 1490f, 930f);
@@ -767,6 +930,22 @@ namespace SpireChess.Editor
                 SetReference(serialized, "logText", logText);
                 SetReference(serialized, "feedbackCanvasGroup", feedbackCanvas);
                 SetReference(serialized, "feedbackText", feedbackText);
+                SetReference(serialized, "feedbackFxPool", fxPool);
+                SetReference(
+                    serialized,
+                    "boardPulseCanvasGroup",
+                    pulseCanvas);
+                SetReference(serialized, "boardPulseImage", pulseImage);
+                SetReference(
+                    serialized,
+                    "resultLayer",
+                    resultImage.gameObject);
+                SetReference(
+                    serialized,
+                    "resultCanvasGroup",
+                    resultCanvas);
+                SetReference(serialized, "resultTitleText", resultTitle);
+                SetReference(serialized, "resultBodyText", resultBody);
                 SetReference(serialized, "detailLayer", detailLayer);
                 SetReference(serialized, "detailCard", detailCard);
                 SetReference(serialized, "detailCanvasGroup", detailGroup);
@@ -1031,10 +1210,18 @@ namespace SpireChess.Editor
             {
                 case "铸魂盾侍":
                     return "placeholder_card_forge_soul_shield_squire";
+                case "星盘校准师":
+                    return "placeholder_card_astrolabe_calibrator";
+                case "双尾狐影":
+                    return "placeholder_token_two_tailed_fox_shadow";
                 case "不熄炉王":
                     return "placeholder_card_undying_furnace_king";
+                case "关键词校验立牌":
+                    return "placeholder_card_sky_covenant_bearer";
                 default:
-                    return string.Empty;
+                    throw new InvalidOperationException(
+                        "Battle preview artwork mapping is missing for " +
+                        name + ".");
             }
         }
 

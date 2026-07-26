@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using SpireChess.UI.MainMenu;
 using SpireChess.Save;
 using UnityEditor;
@@ -19,7 +20,19 @@ namespace SpireChess.Editor
         public static void Build()
         {
             Directory.CreateDirectory(Path.Combine(Application.dataPath, "Prefabs/UI/MainMenu"));
-            var view = MainMenuScreenView.CreateRuntime();
+            AssetDatabase.ImportAsset(
+                CardUiPrefabBuilder.FontPath,
+                ImportAssetOptions.ForceSynchronousImport |
+                ImportAssetOptions.ForceUpdate);
+            var font = AssetDatabase.LoadAssetAtPath<Font>(
+                CardUiPrefabBuilder.FontPath);
+            if (font == null)
+            {
+                throw new MissingReferenceException(
+                    "Pinned presentation font could not be loaded.");
+            }
+
+            var view = MainMenuScreenView.CreateRuntime(font);
             var dialog = view.transform.Find("PF_ConfirmDialog");
             if (dialog == null)
             {
@@ -74,6 +87,7 @@ namespace SpireChess.Editor
             var cameraObject = new GameObject("MainMenuCamera");
             cameraObject.tag = "MainCamera";
             var camera = cameraObject.AddComponent<Camera>();
+            cameraObject.AddComponent<AudioListener>();
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.035f, 0.05f, 0.08f);
             camera.cullingMask = 0;
@@ -129,7 +143,7 @@ namespace SpireChess.Editor
                 repositoryRoot,
                 "ui-concepts",
                 "unity-validation",
-                "pf-main-menu-v0.1");
+                "g3-main-menu-v0.1");
             Directory.CreateDirectory(outputDirectory);
             Capture(camera, canvasRect, 1920, 1080,
                 Path.Combine(outputDirectory, "main-menu-1920x1080.png"));
@@ -140,6 +154,14 @@ namespace SpireChess.Editor
                 () => { });
             Capture(camera, canvasRect, 1920, 1080,
                 Path.Combine(outputDirectory, "confirm-dialog-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(outputDirectory, "confirm-dialog-1920x1200.png"));
+            view.HideConfirmation();
+            view.ShowSettings();
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(outputDirectory, "audio-settings-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(outputDirectory, "audio-settings-1920x1200.png"));
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/MainMenuUiPreview.unity");
             AssetDatabase.SaveAssets();
             Debug.Log("[UI] Main menu validation screenshots captured to " + outputDirectory);
@@ -162,6 +184,7 @@ namespace SpireChess.Editor
             try
             {
                 camera.targetTexture = renderTexture;
+                PrepareTextForCapture(canvas);
                 Canvas.ForceUpdateCanvases();
                 camera.Render();
                 Canvas.ForceUpdateCanvases();
@@ -177,6 +200,31 @@ namespace SpireChess.Editor
                 RenderTexture.active = null;
                 Object.DestroyImmediate(texture);
                 Object.DestroyImmediate(renderTexture);
+            }
+        }
+
+        private static void PrepareTextForCapture(RectTransform canvas)
+        {
+            var texts = canvas.GetComponentsInChildren<UnityEngine.UI.Text>(true)
+                .Where(value => value.gameObject.activeInHierarchy &&
+                                value.font != null)
+                .ToArray();
+            foreach (var group in texts.GroupBy(value => new
+                     {
+                         value.font,
+                         value.fontSize,
+                         value.fontStyle
+                     }))
+            {
+                group.Key.font.RequestCharactersInTexture(
+                    string.Concat(group.Select(value => value.text)),
+                    group.Key.fontSize,
+                    group.Key.fontStyle);
+            }
+
+            foreach (var text in texts)
+            {
+                text.SetAllDirty();
             }
         }
     }

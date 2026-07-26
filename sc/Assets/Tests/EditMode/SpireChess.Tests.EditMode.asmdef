@@ -2,7 +2,8 @@
   "name": "SpireChess.Tests.EditMode",
   "rootNamespace": "SpireChess.Tests",
   "references": [
-    "SpireChess.Runtime"
+    "SpireChess.Runtime",
+    "SpireChess.Editor"
   ],
   "includePlatforms": [
     "Editor"

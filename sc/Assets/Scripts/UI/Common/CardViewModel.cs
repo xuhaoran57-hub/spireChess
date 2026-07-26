@@ -29,6 +29,7 @@ namespace SpireChess.UI
 
         public CardDisplayMode DisplayMode { get; set; }
         public bool IsMinion { get; set; }
+        public bool IsToken { get; set; }
         public bool ShowCost { get; set; }
         public bool IsGolden { get; set; }
         public bool IsSelected { get; set; }

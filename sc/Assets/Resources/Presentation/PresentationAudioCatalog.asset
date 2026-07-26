@@ -1,0 +1,366 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ca6cb4a9143401d9a2796608bffec6f, type: 3}
+  m_Name: PresentationAudioCatalog
+  m_EditorClassIdentifier: 
+  audioMixer: {fileID: 24100000, guid: 24dcbbd9bcefe81468af3076c1e013a5, type: 2}
+  musicOutput: {fileID: 3613469711141169846, guid: 24dcbbd9bcefe81468af3076c1e013a5, type: 2}
+  sfxOutput: {fileID: -1032947281078174351, guid: 24dcbbd9bcefe81468af3076c1e013a5, type: 2}
+  uiOutput: {fileID: 7709810685623276846, guid: 24dcbbd9bcefe81468af3076c1e013a5, type: 2}
+  cues:
+  - id: bgm_main_menu
+    bus: 0
+    clips:
+    - {fileID: 8300000, guid: ed2ed0c2184d26843a06c85dfc6d9e83, type: 3}
+    assetStatus: 1
+    volume: 0.72
+    minPitch: 1
+    maxPitch: 1
+    concurrencyLimit: 1
+    cooldownSeconds: 0
+    loop: 1
+  - id: bgm_run_shop
+    bus: 0
+    clips:
+    - {fileID: 8300000, guid: 39dd7c43b13670e46bf16b2de64f719c, type: 3}
+    assetStatus: 1
+    volume: 0.72
+    minPitch: 1
+    maxPitch: 1
+    concurrencyLimit: 1
+    cooldownSeconds: 0
+    loop: 1
+  - id: bgm_battle_normal
+    bus: 0
+    clips:
+    - {fileID: 8300000, guid: 7fa0370e49972c0428955bd5a54a8531, type: 3}
+    assetStatus: 1
+    volume: 0.72
+    minPitch: 1
+    maxPitch: 1
+    concurrencyLimit: 1
+    cooldownSeconds: 0
+    loop: 1
+  - id: ui_click
+    bus: 2
+    clips:
+    - {fileID: 8300000, guid: b30d9dd2cbb0df344aa037c67d7d834a, type: 3}
+    - {fileID: 8300000, guid: 68c5166fb5722524880e1f547e171f6d, type: 3}
+    - {fileID: 8300000, guid: 7f472273f01da2b4c9c4fa268765acd4, type: 3}
+    assetStatus: 1
+    volume: 0.7
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: ui_confirm
+    bus: 2
+    clips:
+    - {fileID: 8300000, guid: 79ce770daa7ff084284d5bd63b374c0e, type: 3}
+    - {fileID: 8300000, guid: 99168b8813d9d384da6fb77e83aa19a9, type: 3}
+    assetStatus: 1
+    volume: 0.7
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: ui_cancel
+    bus: 2
+    clips:
+    - {fileID: 8300000, guid: 8005aa5ea8ca4ea4f8163bf42083626d, type: 3}
+    - {fileID: 8300000, guid: fd3fbc82b0ec7d34f934363f7d5b41f3, type: 3}
+    assetStatus: 1
+    volume: 0.7
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: ui_error
+    bus: 2
+    clips:
+    - {fileID: 8300000, guid: eb11f5e2a9d49b64bb16f680918a8667, type: 3}
+    - {fileID: 8300000, guid: 8747dbf6b20c72143aacdb1ad5138e20, type: 3}
+    assetStatus: 1
+    volume: 0.7
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_refresh
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: d3ffa8cad7d22ad45a9ab5c3164eb21b, type: 3}
+    - {fileID: 8300000, guid: 7c20111d2020ae74985ec96edd0b0816, type: 3}
+    - {fileID: 8300000, guid: b10162ce07386b14fa326d40e00d4aa9, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_buy
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 7177c0fd1024b9c4ea9d3759927a818e, type: 3}
+    - {fileID: 8300000, guid: 322163a59cf6207489bfd876a7adb10c, type: 3}
+    - {fileID: 8300000, guid: fae273e1ad6ab8246b8029fba8acf79f, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_sell
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: ebecc287f316ed44f8c95e4873750620, type: 3}
+    - {fileID: 8300000, guid: d6df36eccf045bc49a0f6c097a0eb598, type: 3}
+    - {fileID: 8300000, guid: 91b737ab88f23c24ea6741f387b58ac7, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_play
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: dda0ef585d0f75c469c4fab21a5b05f8, type: 3}
+    - {fileID: 8300000, guid: 36ed8935792b1674488f23ec0d406b7f, type: 3}
+    - {fileID: 8300000, guid: b9b8014f35284224db8e3231f5d36666, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_spell
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: de6eeb181c8be0e49aefdb5d48d2d4ca, type: 3}
+    - {fileID: 8300000, guid: aedcd5d8bf01d364497bd9b1b8434e57, type: 3}
+    - {fileID: 8300000, guid: 675700a974df3ac4ca7b7630ef7331f0, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_triple
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: b0ea57b7cf32baf479833357983061d0, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 1
+    cooldownSeconds: 0.2
+    loop: 0
+  - id: shop_discover_open
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 8c2d8477cdf0227429a4a69d57107aab, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_discover_pick
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: ef9d793e343e7f942bd22152015d2b92, type: 3}
+    - {fileID: 8300000, guid: 5a15ea8c55bd8d44ab55a07f6af76fbd, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: shop_upgrade
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 0c459850001890f419e2b82cb553a6ad, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_attack_light
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: a2c446a4ddd898d4aae34315d540fb3e, type: 3}
+    - {fileID: 8300000, guid: 05e111a990c86e24bac951630e978ec2, type: 3}
+    - {fileID: 8300000, guid: 8525f8d0d6452274685b13b0d097e7e8, type: 3}
+    - {fileID: 8300000, guid: c7c7e82337ba2e44185cd758d966ae9e, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_hit
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 27a6615163e36644ba901da10e49af45, type: 3}
+    - {fileID: 8300000, guid: 41b33721575a65e489b4a69a1c972017, type: 3}
+    - {fileID: 8300000, guid: fe83b92650e289944b62f68570e3ca0f, type: 3}
+    - {fileID: 8300000, guid: 0f94e69d28679e3418b67999da19f969, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 6
+    cooldownSeconds: 0.025
+    loop: 0
+  - id: battle_shield_gain
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: d0d2560e80b93634499c7c2588e1ab03, type: 3}
+    - {fileID: 8300000, guid: c6be9bae8f51bdf4ab06093e6ad76cbd, type: 3}
+    - {fileID: 8300000, guid: 0f1afe0bb5558df4589d93b01a7cc655, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_shield_break
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 6b115e7f45a784b4ca3962155712e4d1, type: 3}
+    - {fileID: 8300000, guid: bf0b43ed13da21e45af1afabe0a01a89, type: 3}
+    - {fileID: 8300000, guid: 68ce93b2433620d40be5e5a7bf5df8c7, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_stat_up
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: beccee12c984c3542ac2199d953b2ff3, type: 3}
+    - {fileID: 8300000, guid: 297b6a6af615a7a4cb9c94680195fcc2, type: 3}
+    - {fileID: 8300000, guid: 87a59d1cd08643749b06379068a831ce, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_death
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 2e14cd82898afd74183d206bcc6b2147, type: 3}
+    - {fileID: 8300000, guid: 79cbb6e2fc455f0499606a8cd03065e8, type: 3}
+    - {fileID: 8300000, guid: c512db647bed4e743a0e55004c743763, type: 3}
+    - {fileID: 8300000, guid: 6d01b958a8897d049b8fc4356b82c95a, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 6
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_token_death
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 4d8f83146a4af1d4897380e80a438efe, type: 3}
+    - {fileID: 8300000, guid: 90b7987f90134474b96538cca3e5858a, type: 3}
+    - {fileID: 8300000, guid: a6c8a02244439c04ab6a2f03cce2f259, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 6
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_summon
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: aac5d43641e1bb945b3630147b9d0624, type: 3}
+    - {fileID: 8300000, guid: 2fd192c61e64c1748a48c0f96661d3d7, type: 3}
+    - {fileID: 8300000, guid: d4590d3e8f186a847ac0c9776986dfcf, type: 3}
+    - {fileID: 8300000, guid: 26a8b1c3abacfcd4586dd8bb1122c437, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 6
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: battle_victory
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 79188e1ea04865f429344df9c01e9952, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 1
+    cooldownSeconds: 0.2
+    loop: 0
+  - id: battle_defeat
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: a2f71ffe1fb2c0a4893856f17be9091f, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 1
+    cooldownSeconds: 0.2
+    loop: 0
+  - id: run_node_select
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 71b093e83fa25ac4bbdcb46a8354fa24, type: 3}
+    - {fileID: 8300000, guid: 4befddb1888c5d74591bcb5ae5aaed56, type: 3}
+    - {fileID: 8300000, guid: e55b5340cd8810b43924ad6a1bffe5d8, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0
+  - id: run_reward
+    bus: 1
+    clips:
+    - {fileID: 8300000, guid: 708f5c395ec38f842a108cdccbd20388, type: 3}
+    - {fileID: 8300000, guid: 60114c73f66825646ad077db63cc70c1, type: 3}
+    assetStatus: 1
+    volume: 0.82
+    minPitch: 0.97
+    maxPitch: 1.03
+    concurrencyLimit: 4
+    cooldownSeconds: 0.05
+    loop: 0

@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SpireChess.Config;
 using SpireChess.UI;
 using SpireChess.UI.Shop;
+using SpireChess.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -26,13 +29,13 @@ namespace SpireChess.Editor
             "Assets/Scenes/ShopTest.unity";
 
         private static readonly Color ScreenBackground =
-            new Color(0.035f, 0.045f, 0.07f, 1f);
+            new Color(0.012f, 0.026f, 0.030f, 1f);
         private static readonly Color PanelColor =
-            new Color(0.075f, 0.09f, 0.13f, 0.97f);
+            new Color(0.070f, 0.067f, 0.082f, 0.96f);
         private static readonly Color PanelBorder =
-            new Color(0.22f, 0.28f, 0.38f, 0.85f);
+            new Color(0.52f, 0.40f, 0.22f, 0.78f);
         private static readonly Color ButtonColor =
-            new Color(0.16f, 0.19f, 0.25f, 1f);
+            new Color(0.14f, 0.20f, 0.21f, 1f);
 
         [MenuItem("Spire Chess/UI/Rebuild Shop UI")]
         public static void Build()
@@ -130,7 +133,7 @@ namespace SpireChess.Editor
                 repositoryRoot,
                 "ui-concepts",
                 "unity-validation",
-                "pf-shop-screen-v0.1");
+                "g3-shop-screen-v0.1");
             Directory.CreateDirectory(outputDirectory);
             Capture(
                 camera,
@@ -156,6 +159,12 @@ namespace SpireChess.Editor
                 1920,
                 1080,
                 Path.Combine(outputDirectory, "choice-overlay-1920x1080.png"));
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1200,
+                Path.Combine(outputDirectory, "choice-overlay-1920x1200.png"));
 
             view.RenderChoice(null);
             state.BattleCards[0].Attack += 2;
@@ -171,6 +180,12 @@ namespace SpireChess.Editor
                 1920,
                 1080,
                 Path.Combine(outputDirectory, "shop-feedback-1920x1080.png"));
+            Capture(
+                camera,
+                canvasRect,
+                1920,
+                1200,
+                Path.Combine(outputDirectory, "shop-feedback-1920x1200.png"));
             AssetDatabase.SaveAssets();
             Debug.Log("[ShopUI] Captured validation screenshots to " +
                       outputDirectory);
@@ -474,6 +489,15 @@ namespace SpireChess.Editor
                     safeArea,
                     ScreenBackground);
                 Stretch(background.rectTransform);
+                var backdropArt = CreateRect("BackdropArt", safeArea);
+                Stretch(backdropArt);
+                var backdrop = backdropArt.gameObject.AddComponent<
+                    PresentationBackdropGraphic>();
+                backdrop.Configure(
+                    PresentationBackdropVariant.Shop,
+                    new Color(0.035f, 0.070f, 0.072f, 1f),
+                    ScreenBackground,
+                    new Color(0.76f, 0.58f, 0.28f, 1f));
 
                 var topBar = BuildTopBar(safeArea, font, out var topTexts);
                 var content = BuildContent(
@@ -571,6 +595,11 @@ namespace SpireChess.Editor
                     serialized,
                     "endButtonText",
                     actionButtons[4].Label);
+                SetReference(
+                    serialized,
+                    "eventFxPool",
+                    feedbackLayer.Find("FloatingTextRoot")
+                        .GetComponent<PresentationFxPool>());
                 SetReference(serialized, "statusToast", statusToast);
                 SetReference(
                     serialized,
@@ -643,6 +672,10 @@ namespace SpireChess.Editor
             texts[2].text = "酒馆等级：5";
             texts[3].text = "升级费用：5";
             texts[4].text = "商店阶段 · 购买、使用手牌或调整阵容";
+            texts[0].color = new Color(0.88f, 0.82f, 0.68f, 1f);
+            texts[1].color = new Color(0.96f, 0.74f, 0.28f, 1f);
+            texts[2].color = new Color(0.65f, 0.86f, 0.78f, 1f);
+            texts[3].color = new Color(0.78f, 0.70f, 0.92f, 1f);
             return topBar.rectTransform;
         }
 
@@ -871,6 +904,8 @@ namespace SpireChess.Editor
             Stretch(layer);
             var floating = CreateRect("FloatingTextRoot", layer);
             Stretch(floating);
+            var fxPool = floating.gameObject.AddComponent<PresentationFxPool>();
+            fxPool.Configure(font, 12);
             var toast = CreateImage(
                 "StatusToast",
                 layer,
@@ -987,41 +1022,48 @@ namespace SpireChess.Editor
 
         private static ShopScreenState CreatePreviewState()
         {
+            var configs = LoadPreviewConfigs();
             var offers = new[]
             {
-                CreateMinion("铁甲卫士", "获得 8 护盾。相邻友军获得 2 护盾。", "铸魂", 1, 2, 4),
-                CreateMinion("森林射手", "攻击时，永久获得 +1 攻击。", "荒灵", 1, 3, 2),
-                CreateMinion("山岭巨人", "战斗开始时，获得 20 护盾。每有 100 护盾，体型 +1。", "铸魂", 2, 4, 6),
-                CreateMinion("暗影刺客", "首次攻击会突进至最远的敌人身后。", "旅团", 1, 3, 3)
+                CreateMinion(configs, "tempering_mender", CardDisplayMode.Full),
+                CreateMinion(configs, "cracked_armor_avenger", CardDisplayMode.Full),
+                CreateMinion(
+                    configs,
+                    "rotleaf_heir",
+                    CardDisplayMode.Full,
+                    true),
+                CreateMinion(configs, "fox_den_matriarch", CardDisplayMode.Full)
             };
-            offers[1].AbilityLabels = new[] { "成长", "穿透" };
-            offers[2].IsGolden = true;
             offers[2].HasShield = true;
 
             var battle = new CardViewModel[5];
-            battle[0] = CreateOwned("森林射手", "攻击时永久成长。", "荒灵", 1, 3, 2);
-            battle[1] = CreateOwned("铁甲卫士", "获得护盾并保护相邻友军。", "铸魂", 1, 2, 4);
+            battle[0] = CreateOwned(configs, "secret_page_refractor");
+            battle[1] = CreateOwned(configs, "tempering_mender");
             battle[1].IsSelected = true;
             battle[1].HasShield = true;
-            battle[2] = CreateOwned("山岭巨人", "护盾越高，力量越强。", "铸魂", 2, 4, 6);
-            battle[2].Attack = 7;
-            battle[2].Health = 10;
+            battle[2] = CreateOwned(configs, "star_map_broker");
+            battle[2].Attack += 3;
+            battle[2].Health += 4;
 
             var handModels = new CardViewModel[5];
-            handModels[0] = CreateOwned("暗影刺客", "首次攻击会突进。", "旅团", 1, 3, 3);
-            handModels[1] = CreateOwned("炼金学徒", "本回合下一次刷新免费。", "星契", 1, 2, 3);
+            handModels[0] = CreateOwned(configs, "fox_den_matriarch");
+            handModels[1] = CreateOwned(configs, "cracked_armor_avenger");
             handModels[1].HasNextCombatShield = true;
             handModels[2] = CreateSpell(
-                "能量涌动",
-                "使一个友军获得 +3 攻击，持续 1 回合。",
+                configs,
+                "minor_tempering",
                 CardDisplayMode.Compact);
             handModels[3] = CreateSpell(
-                "治疗之泉",
-                "恢复一个友军 6 点生命。",
+                configs,
+                "free_refresh",
                 CardDisplayMode.Compact);
             handModels[3].IsTemporary = true;
 
-            return new ShopScreenState
+            var spellOffer = CreateSpell(
+                configs,
+                "advanced_discovery",
+                CardDisplayMode.Full);
+            var state = new ShopScreenState
             {
                 Round = 3,
                 Gold = 8,
@@ -1031,10 +1073,7 @@ namespace SpireChess.Editor
                 FreeRefreshes = 1,
                 IsShopOpen = true,
                 MinionOffers = offers,
-                SpellOffer = CreateSpell(
-                    "能量涌动",
-                    "使一个友军获得 +3 攻击，持续 1 回合。",
-                    CardDisplayMode.Full),
+                SpellOffer = spellOffer,
                 BattleCards = battle,
                 HandCards = new HandCardsState
                 {
@@ -1075,33 +1114,32 @@ namespace SpireChess.Editor
                 },
                 StatusMessage = string.Empty
             };
+
+            ValidateExactPreviewArtwork(
+                offers
+                    .Concat(battle.Where(value => value != null))
+                    .Concat(handModels.Where(value => value != null))
+                    .Concat(new[] { spellOffer }));
+            return state;
         }
 
         private static ChoiceViewModel CreatePreviewChoice()
         {
+            var configs = LoadPreviewConfigs();
             var first = CreateMinion(
-                "天穹契约者",
-                "每完成指定次数刷新，使所有友方星契永久获得成长。",
-                "星契",
-                3,
-                4,
-                8);
+                configs,
+                "secret_page_refractor",
+                CardDisplayMode.Full);
             var second = CreateMinion(
-                "旧塔向导",
-                "每当你刷新商店时，使相邻随从永久获得属性提升，并在达到阈值后获得护盾。",
-                "旅团",
-                3,
-                5,
-                7);
-            second.IsGolden = true;
+                configs,
+                "star_map_broker",
+                CardDisplayMode.Full,
+                true);
             var third = CreateMinion(
-                "万蹄奔涌",
-                "战斗开始时召唤援军；每次友方随从完成成长后，提高本次召唤的属性。",
-                "荒灵",
-                3,
-                6,
-                6);
-            return new ChoiceViewModel
+                configs,
+                "rotleaf_heir",
+                CardDisplayMode.Full);
+            var choice = new ChoiceViewModel
             {
                 Title = "选择一张发现卡牌",
                 Description = "三连奖励必须选择一张，其他商店操作暂时不可用。",
@@ -1113,76 +1151,129 @@ namespace SpireChess.Editor
                     new ChoiceCandidateViewModel { Label = third.Name, Card = third }
                 }
             };
+            ValidateExactPreviewArtwork(
+                choice.Candidates.Select(value => value.Card));
+            return choice;
         }
 
         private static CardViewModel CreateMinion(
-            string name,
-            string description,
-            string race,
-            int tier,
-            int attack,
-            int health)
+            ConfigService configs,
+            string id,
+            CardDisplayMode mode,
+            bool isGolden = false)
         {
-            return new CardViewModel
+            var config = RequireMinion(configs, id);
+            var model = ShopCardViewModelFactory.FromOffer(
+                config,
+                int.MaxValue);
+            model.InstanceId =
+                $"preview_{id}_{(isGolden ? "golden" : "normal")}_{mode}";
+            model.DisplayMode = mode;
+            model.IsGolden = isGolden;
+            model.ShowCost =
+                mode == CardDisplayMode.Full && !config.IsToken;
+            if (isGolden)
             {
-                Name = name,
-                Description = description,
-                RaceText = race,
-                AbilityLabels = new[] { "护盾", "成长" },
-                Tier = tier,
-                Attack = attack,
-                Health = health,
-                BaseAttack = attack,
-                BaseHealth = health,
-                Cost = 3,
-                DisplayMode = CardDisplayMode.Full,
-                IsMinion = true,
-                ShowCost = true,
-                IsInteractable = true,
-                IsAffordable = true
-            };
+                model.Description = config.GetPrototypeDescription(true);
+                model.Attack = config.GoldenAttack;
+                model.Health = config.GoldenHealth;
+                model.BaseAttack = config.GoldenAttack;
+                model.BaseHealth = config.GoldenHealth;
+            }
+
+            return model;
         }
 
         private static CardViewModel CreateOwned(
-            string name,
-            string description,
-            string race,
-            int tier,
-            int attack,
-            int health)
+            ConfigService configs,
+            string id)
         {
             var model = CreateMinion(
-                name,
-                description,
-                race,
-                tier,
-                attack,
-                health);
+                configs,
+                id,
+                CardDisplayMode.Compact);
             model.DisplayMode = CardDisplayMode.Compact;
             model.ShowCost = false;
-            model.InstanceId = "owned_preview_" + name;
+            model.InstanceId = "owned_preview_" + id;
             return model;
         }
 
         private static CardViewModel CreateSpell(
-            string name,
-            string description,
+            ConfigService configs,
+            string id,
             CardDisplayMode mode)
         {
-            return new CardViewModel
+            var config = RequireSpell(configs, id);
+            var model = ShopCardViewModelFactory.FromOffer(
+                config,
+                int.MaxValue);
+            model.InstanceId = $"preview_{id}_{mode}";
+            model.DisplayMode = mode;
+            model.ShowCost = mode == CardDisplayMode.Full;
+            return model;
+        }
+
+        private static ConfigService LoadPreviewConfigs()
+        {
+            var configs = new ConfigService(new NewtonsoftJsonSerializer());
+            var validation = configs.LoadFromResources();
+            validation.ThrowIfInvalid();
+            return configs;
+        }
+
+        private static MinionConfig RequireMinion(
+            ConfigService configs,
+            string id)
+        {
+            if (!configs.MinionsById.TryGetValue(id, out var config) ||
+                config == null)
             {
-                InstanceId = "preview_" + name,
-                Name = name,
-                Description = description,
-                RaceText = "商店法术",
-                AbilityLabels = new[] { "法术" },
-                Tier = 1,
-                Cost = 1,
-                DisplayMode = mode,
-                ShowCost = mode == CardDisplayMode.Full,
-                IsInteractable = true,
-                IsAffordable = true
-            };
+                throw new InvalidOperationException(
+                    "Shop preview minion config is missing: " + id);
+            }
+
+            return config;
+        }
+
+        private static SpellConfig RequireSpell(
+            ConfigService configs,
+            string id)
+        {
+            if (!configs.SpellsById.TryGetValue(id, out var config) ||
+                config == null)
+            {
+                throw new InvalidOperationException(
+                    "Shop preview spell config is missing: " + id);
+            }
+
+            return config;
+        }
+
+        private static void ValidateExactPreviewArtwork(
+            IEnumerable<CardViewModel> models)
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                CardUiPrefabBuilder.SpriteCatalogPath);
+            if (catalog == null)
+            {
+                throw new InvalidOperationException(
+                    "Shop preview sprite catalog is missing.");
+            }
+
+            foreach (var artId in models
+                         .Where(value => value != null)
+                         .Select(value => value.ArtId)
+                         .Distinct(StringComparer.Ordinal))
+            {
+                if (string.IsNullOrWhiteSpace(artId) ||
+                    !catalog.TryGetArtwork(artId, out var sprite) ||
+                    sprite == null)
+                {
+                    throw new InvalidOperationException(
+                        "Shop preview requires an exact artwork hit: " +
+                        (artId ?? "<null>"));
+                }
+            }
         }
 
         private static ShopActionButtonState Action(string text, bool interactable)
@@ -1269,6 +1360,7 @@ namespace SpireChess.Editor
         {
             var panel = CreateImage(name, parent, PanelColor);
             panel.raycastTarget = false;
+            ConfigureFrame(panel, true);
             var element = panel.gameObject.AddComponent<LayoutElement>();
             element.minHeight = element.preferredHeight = height;
             var layout = panel.gameObject.AddComponent<VerticalLayoutGroup>();
@@ -1296,6 +1388,8 @@ namespace SpireChess.Editor
                 TextAnchor.MiddleLeft,
                 HorizontalWrapMode.Overflow);
             title.text = value;
+            title.color = new Color(0.88f, 0.78f, 0.58f, 1f);
+            title.fontStyle = FontStyle.Bold;
             var element = title.gameObject.AddComponent<LayoutElement>();
             element.minHeight = element.preferredHeight = height;
             return title;
@@ -1426,6 +1520,14 @@ namespace SpireChess.Editor
             colors.pressedColor = new Color(0.72f, 0.78f, 0.90f, 1f);
             colors.disabledColor = new Color(0.40f, 0.42f, 0.48f, 0.72f);
             button.colors = colors;
+            var outline = gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(
+                PanelBorder.r,
+                PanelBorder.g,
+                PanelBorder.b,
+                0.62f);
+            outline.effectDistance = new Vector2(1f, -1f);
+            outline.useGraphicAlpha = true;
             return button;
         }
 
@@ -1472,7 +1574,7 @@ namespace SpireChess.Editor
             text.font = font;
             text.fontSize = fontSize;
             text.alignment = alignment;
-            text.color = new Color(0.95f, 0.96f, 0.98f, 1f);
+            text.color = new Color(0.96f, 0.92f, 0.82f, 1f);
             text.supportRichText = false;
             text.resizeTextForBestFit = false;
             text.horizontalOverflow = horizontalOverflow;
@@ -1488,6 +1590,14 @@ namespace SpireChess.Editor
             image.type = Image.Type.Sliced;
             image.fillCenter = fillCenter;
             image.pixelsPerUnitMultiplier = 2f;
+            var outline = image.GetComponent<Outline>();
+            if (outline == null)
+            {
+                outline = image.gameObject.AddComponent<Outline>();
+            }
+            outline.effectColor = PanelBorder;
+            outline.effectDistance = new Vector2(1.5f, -1.5f);
+            outline.useGraphicAlpha = true;
         }
 
         private static void SavePrefab(GameObject root, string path)

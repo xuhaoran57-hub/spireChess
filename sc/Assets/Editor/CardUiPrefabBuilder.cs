@@ -35,6 +35,9 @@ namespace SpireChess.Editor
             "Assets/Art/Presentation/UI/Card/card_attack_tag_v1.png";
         public const string CardHealthTagPath =
             "Assets/Art/Presentation/UI/Card/card_health_tag_v1.png";
+        public const string CardShieldMaterialPath =
+            "Assets/Art/Presentation/UI/Battle/Standee/" +
+            "M_BattleShieldAdditive.mat";
 
         private const string MinionArtRoot =
             "Assets/Art/Presentation/Cards/Minions/";
@@ -108,7 +111,7 @@ namespace SpireChess.Editor
                 "placeholder_card_fox_den_matriarch",
                 MinionArtRoot +
                 "WildSpirit/card_minion_fox_den_matriarch.png",
-                0.32f),
+                0.50f),
             new ArtworkSpec(
                 "placeholder_card_secret_page_refractor",
                 MinionArtRoot +
@@ -126,11 +129,11 @@ namespace SpireChess.Editor
             new ArtworkSpec(
                 "placeholder_token_two_tailed_fox_shadow",
                 TokenArtRoot + "card_token_token_two_tailed_fox_shadow.png",
-                0.30f),
+                0.50f),
             new ArtworkSpec(
                 "placeholder_token_swift_young_spirit",
                 TokenArtRoot + "card_token_token_swift_young_spirit.png",
-                0.32f),
+                0.50f),
             new ArtworkSpec(
                 "placeholder_spell_minor_tempering",
                 SpellArtRoot + "card_spell_minor_tempering.png",
@@ -192,6 +195,14 @@ namespace SpireChess.Editor
                     SpriteCatalogPath);
             }
             ConfigureCardPresentation(spriteCatalog);
+            var shieldMaterial = AssetDatabase.LoadAssetAtPath<Material>(
+                CardShieldMaterialPath);
+            if (shieldMaterial == null)
+            {
+                throw new InvalidOperationException(
+                    "Unable to load the card shield material at " +
+                    CardShieldMaterialPath);
+            }
 
             var root = new GameObject(
                 "PF_Card",
@@ -229,6 +240,14 @@ namespace SpireChess.Editor
                     artworkMaskImage.transform,
                     new Color(0.34f, 0.48f, 0.80f, 0.92f));
                 artwork.preserveAspect = true;
+                var shieldOverlay = CreateImage(
+                    "ShieldOverlay",
+                    root.transform,
+                    new Color(0.78f, 0.96f, 1f, 0.78f));
+                shieldOverlay.sprite = spriteCatalog.BattleShieldOverlay;
+                shieldOverlay.material = shieldMaterial;
+                shieldOverlay.preserveAspect = true;
+                shieldOverlay.raycastTarget = false;
 
                 var normalFrame = CreateImage(
                     "NormalFrame",
@@ -249,7 +268,7 @@ namespace SpireChess.Editor
                     "Cost",
                     costBadge.transform,
                     font,
-                    26,
+                    18,
                     TextAnchor.MiddleCenter,
                     HorizontalWrapMode.Overflow);
                 var tierBadge = CreateImage(
@@ -260,7 +279,7 @@ namespace SpireChess.Editor
                     "Tier",
                     tierBadge.transform,
                     font,
-                    26,
+                    22,
                     TextAnchor.MiddleCenter,
                     HorizontalWrapMode.Overflow);
                 var namePlate = CreateImage(
@@ -281,14 +300,15 @@ namespace SpireChess.Editor
                     new Color(0.07f, 0.08f, 0.11f, 0.94f));
                 var raceText = CreateText(
                     "RaceOrSpellType",
-                    infoPanel.transform,
+                    root.transform,
                     font,
-                    14,
+                    16,
                     TextAnchor.MiddleCenter,
                     HorizontalWrapMode.Overflow);
+                raceText.fontStyle = FontStyle.Bold;
                 var abilityLabelRow = CreateRect(
                     "AbilityLabelRow",
-                    infoPanel.transform);
+                    root.transform);
                 var abilityLabels = new Text[3];
                 for (var index = 0; index < abilityLabels.Length; index++)
                 {
@@ -308,7 +328,7 @@ namespace SpireChess.Editor
                     infoPanel.transform,
                     font,
                     14,
-                    TextAnchor.UpperCenter,
+                    TextAnchor.UpperLeft,
                     HorizontalWrapMode.Wrap,
                     VerticalWrapMode.Overflow);
                 var progressRoot = CreateRect("Progress", infoPanel.transform);
@@ -374,7 +394,7 @@ namespace SpireChess.Editor
                     "Attack",
                     attackBadge.transform,
                     font,
-                    26,
+                    22,
                     TextAnchor.MiddleCenter,
                     HorizontalWrapMode.Overflow);
                 var healthBadge = CreateImage(
@@ -385,7 +405,7 @@ namespace SpireChess.Editor
                     "Health",
                     healthBadge.transform,
                     font,
-                    26,
+                    22,
                     TextAnchor.MiddleCenter,
                     HorizontalWrapMode.Overflow);
                 var spellFooter = CreateText(
@@ -395,7 +415,8 @@ namespace SpireChess.Editor
                     12,
                     TextAnchor.MiddleCenter,
                     HorizontalWrapMode.Overflow);
-                spellFooter.color = new Color(0.74f, 0.82f, 1f, 1f);
+                spellFooter.color = new Color32(0x35, 0x4F, 0x79, 0xFF);
+                spellFooter.fontStyle = FontStyle.Bold;
 
                 var growthFeedbackRoot = CreateRect(
                     "GrowthFeedbackRoot",
@@ -441,14 +462,19 @@ namespace SpireChess.Editor
                     13,
                     TextAnchor.MiddleCenter);
 
-                infoPanel.transform.SetSiblingIndex(3);
-                namePlate.transform.SetSiblingIndex(4);
-                normalFrame.transform.SetSiblingIndex(5);
-                goldenFrame.transform.SetSiblingIndex(6);
-                costBadge.transform.SetSiblingIndex(7);
-                tierBadge.transform.SetSiblingIndex(8);
+                shieldOverlay.transform.SetSiblingIndex(3);
+                infoPanel.transform.SetSiblingIndex(4);
+                namePlate.transform.SetSiblingIndex(5);
+                normalFrame.transform.SetSiblingIndex(6);
+                goldenFrame.transform.SetSiblingIndex(7);
+                raceText.transform.SetSiblingIndex(8);
+                abilityLabelRow.transform.SetSiblingIndex(9);
+                costBadge.transform.SetSiblingIndex(10);
+                tierBadge.transform.SetSiblingIndex(11);
 
+                shieldOverlay.gameObject.SetActive(false);
                 goldenFrame.gameObject.SetActive(false);
+                abilityLabelRow.gameObject.SetActive(false);
                 stateBadgeRow.gameObject.SetActive(false);
                 goldenBadge.gameObject.SetActive(false);
                 shieldBadge.gameObject.SetActive(false);
@@ -473,6 +499,7 @@ namespace SpireChess.Editor
                     artworkMaskImage.rectTransform);
                 SetReference(serialized, "artworkMaskComponent", artworkMask);
                 SetReference(serialized, "artwork", artwork);
+                SetReference(serialized, "shieldOverlay", shieldOverlay);
                 SetReference(serialized, "normalFrame", normalFrame);
                 SetReference(serialized, "goldenFrame", goldenFrame);
                 SetReference(serialized, "spriteCatalog", spriteCatalog);

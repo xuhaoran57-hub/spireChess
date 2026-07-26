@@ -1,4 +1,6 @@
 using System;
+using SpireChess.Audio;
+using SpireChess.UI.Common;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -18,12 +20,15 @@ namespace SpireChess.UI.MainMenu
         [SerializeField] private Text confirmMessage;
         [SerializeField] private Button confirmButton;
         [SerializeField] private Button cancelButton;
+        [SerializeField] private AudioSettingsPanelView audioSettingsPanel;
 
         private MainMenuController controller;
         private Action pendingConfirmation;
 
         public bool ContinueInteractable => continueButton != null && continueButton.interactable;
         public bool ConfirmationVisible => confirmDialog != null && confirmDialog.activeSelf;
+        public bool SettingsVisible =>
+            audioSettingsPanel != null && audioSettingsPanel.IsOpen;
         public string StatusText => statusText == null ? string.Empty : statusText.text;
 
         public void Bind(MainMenuController value)
@@ -37,12 +42,26 @@ namespace SpireChess.UI.MainMenu
             confirmButton.onClick.RemoveAllListeners();
             cancelButton.onClick.RemoveAllListeners();
             newGameButton.onClick.AddListener(controller.NewGame);
+            newGameButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiConfirm));
             continueButton.onClick.AddListener(controller.ContinueGame);
-            settingsButton.onClick.AddListener(controller.OpenSettingsPlaceholder);
+            continueButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiConfirm));
+            settingsButton.onClick.AddListener(ShowSettings);
+            settingsButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiClick));
             deleteButton.onClick.AddListener(controller.DeleteSave);
+            deleteButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiClick));
             quitButton.onClick.AddListener(controller.QuitGame);
+            quitButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiCancel));
             confirmButton.onClick.AddListener(Confirm);
+            confirmButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiConfirm));
             cancelButton.onClick.AddListener(HideConfirmation);
+            cancelButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiCancel));
         }
 
         public void Render(MainMenuScreenState state)
@@ -74,6 +93,11 @@ namespace SpireChess.UI.MainMenu
             confirmDialog.SetActive(false);
         }
 
+        public void ShowSettings()
+        {
+            audioSettingsPanel?.Open();
+        }
+
         private void Confirm()
         {
             var action = pendingConfirmation;
@@ -81,9 +105,16 @@ namespace SpireChess.UI.MainMenu
             action?.Invoke();
         }
 
-        public static MainMenuScreenView CreateRuntime()
+        private static void PlayUiCue(string cueId)
+        {
+            AudioService.Instance?.PlayCue(cueId);
+        }
+
+        public static MainMenuScreenView CreateRuntime(Font preferredFont = null)
         {
             EnsureEventSystem();
+            var font = preferredFont ??
+                       Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             var root = new GameObject(
                 "PF_MainMenuScreen",
                 typeof(RectTransform),
@@ -100,10 +131,39 @@ namespace SpireChess.UI.MainMenu
             scaler.matchWidthOrHeight = 0.5f;
             Stretch(root.GetComponent<RectTransform>());
 
-            var background = CreatePanel(root.transform, "Background", new Color(0.035f, 0.05f, 0.08f));
+            var background = CreatePanel(
+                root.transform,
+                "Background",
+                new Color(0.010f, 0.020f, 0.025f, 1f));
             Stretch(background.rectTransform);
-            var card = CreatePanel(background.transform, "MenuCard", new Color(0.08f, 0.105f, 0.15f, 0.98f));
-            SetRect(card.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(720f, 900f), Vector2.zero);
+            var backdropObject = new GameObject(
+                "BackdropArt",
+                typeof(RectTransform),
+                typeof(PresentationBackdropGraphic));
+            backdropObject.transform.SetParent(background.transform, false);
+            Stretch(backdropObject.GetComponent<RectTransform>());
+            backdropObject.GetComponent<PresentationBackdropGraphic>().Configure(
+                PresentationBackdropVariant.MainMenu,
+                new Color(0.055f, 0.070f, 0.080f, 1f),
+                new Color(0.010f, 0.020f, 0.025f, 1f),
+                new Color(0.78f, 0.58f, 0.25f, 1f));
+
+            var card = CreatePanel(
+                background.transform,
+                "MenuCard",
+                new Color(0.055f, 0.054f, 0.066f, 0.97f));
+            AddFrame(
+                card,
+                new Color(0.66f, 0.49f, 0.25f, 0.82f),
+                new Vector2(2f, -2f));
+            var cardShadow = card.gameObject.AddComponent<Shadow>();
+            cardShadow.effectColor = new Color(0f, 0f, 0f, 0.72f);
+            cardShadow.effectDistance = new Vector2(10f, -12f);
+            SetRect(
+                card.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(760f, 900f),
+                Vector2.zero);
             var layout = card.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.padding = new RectOffset(64, 64, 40, 40);
             layout.spacing = 14f;
@@ -112,19 +172,80 @@ namespace SpireChess.UI.MainMenu
             layout.childControlHeight = true;
             layout.childForceExpandHeight = false;
 
-            CreateText(card.transform, "Title", "尖塔棋局", 58, 80f, FontStyle.Bold);
-            CreateText(card.transform, "Subtitle", "正式单局 · 三层远征", 26, 42f, FontStyle.Normal);
-            var summary = CreateText(card.transform, "ContinueSummary", string.Empty, 24, 64f, FontStyle.Normal);
-            var newGame = CreateButton(card.transform, "NewGameButton", "新游戏");
-            var continueGame = CreateButton(card.transform, "ContinueButton", "继续游戏");
-            var settings = CreateButton(card.transform, "SettingsButton", "设置（即将开放）");
-            var delete = CreateButton(card.transform, "DeleteButton", "删除单局存档");
-            var quit = CreateButton(card.transform, "QuitButton", "退出游戏");
-            var status = CreateText(card.transform, "Status", string.Empty, 22, 54f, FontStyle.Normal);
+            var title = CreateText(
+                card.transform,
+                "Title",
+                "尖塔棋局",
+                58,
+                104f,
+                FontStyle.Bold,
+                font);
+            title.color = new Color(0.98f, 0.88f, 0.62f, 1f);
+            title.verticalOverflow = VerticalWrapMode.Overflow;
+            var subtitle = CreateText(
+                card.transform,
+                "Subtitle",
+                "正式单局 · 三层远征",
+                26,
+                42f,
+                FontStyle.Normal,
+                font);
+            subtitle.color = new Color(0.72f, 0.78f, 0.76f, 1f);
+            var summary = CreateText(
+                card.transform,
+                "ContinueSummary",
+                string.Empty,
+                24,
+                64f,
+                FontStyle.Normal,
+                font);
+            var newGame = CreateButton(
+                card.transform,
+                "NewGameButton",
+                "新游戏",
+                font,
+                true);
+            var continueGame = CreateButton(
+                card.transform,
+                "ContinueButton",
+                "继续游戏",
+                font);
+            var settings = CreateButton(
+                card.transform,
+                "SettingsButton",
+                "设置",
+                font);
+            var delete = CreateButton(
+                card.transform,
+                "DeleteButton",
+                "删除单局存档",
+                font,
+                false,
+                true);
+            var quit = CreateButton(
+                card.transform,
+                "QuitButton",
+                "退出游戏",
+                font);
+            var status = CreateText(
+                card.transform,
+                "Status",
+                string.Empty,
+                22,
+                54f,
+                FontStyle.Normal,
+                font);
 
             var overlay = CreatePanel(root.transform, "PF_ConfirmDialog", new Color(0f, 0f, 0f, 0.72f));
             Stretch(overlay.rectTransform);
-            var dialog = CreatePanel(overlay.transform, "DialogCard", new Color(0.105f, 0.13f, 0.18f, 1f));
+            var dialog = CreatePanel(
+                overlay.transform,
+                "DialogCard",
+                new Color(0.070f, 0.068f, 0.082f, 1f));
+            AddFrame(
+                dialog,
+                new Color(0.70f, 0.50f, 0.24f, 0.88f),
+                new Vector2(2f, -2f));
             SetRect(dialog.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(660f, 440f), Vector2.zero);
             var dialogLayout = dialog.gameObject.AddComponent<VerticalLayoutGroup>();
             dialogLayout.padding = new RectOffset(48, 48, 36, 36);
@@ -133,10 +254,30 @@ namespace SpireChess.UI.MainMenu
             dialogLayout.childControlWidth = true;
             dialogLayout.childControlHeight = true;
             dialogLayout.childForceExpandHeight = false;
-            var message = CreateText(dialog.transform, "Message", string.Empty, 28, 130f, FontStyle.Bold);
-            var confirm = CreateButton(dialog.transform, "ConfirmButton", "确认");
-            var cancel = CreateButton(dialog.transform, "CancelButton", "取消");
+            var message = CreateText(
+                dialog.transform,
+                "Message",
+                string.Empty,
+                28,
+                130f,
+                FontStyle.Bold,
+                font);
+            var confirm = CreateButton(
+                dialog.transform,
+                "ConfirmButton",
+                "确认",
+                font,
+                true);
+            var cancel = CreateButton(
+                dialog.transform,
+                "CancelButton",
+                "取消",
+                font);
             overlay.gameObject.SetActive(false);
+            var settingsPanel = AudioSettingsPanelView.Create(
+                root.transform,
+                font,
+                true);
 
             var view = root.GetComponent<MainMenuScreenView>();
             view.continueSummary = summary;
@@ -150,6 +291,7 @@ namespace SpireChess.UI.MainMenu
             view.confirmMessage = message;
             view.confirmButton = confirm;
             view.cancelButton = cancel;
+            view.audioSettingsPanel = settingsPanel;
             return view;
         }
 
@@ -168,24 +310,33 @@ namespace SpireChess.UI.MainMenu
             string value,
             int size,
             float height,
-            FontStyle style)
+            FontStyle style,
+            Font font = null)
         {
             var gameObject = new GameObject(name, typeof(RectTransform), typeof(Text), typeof(LayoutElement));
             gameObject.transform.SetParent(parent, false);
             var text = gameObject.GetComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.font = font ??
+                        Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = size;
             text.fontStyle = style;
             text.alignment = TextAnchor.MiddleCenter;
-            text.color = Color.white;
+            text.color = new Color(0.96f, 0.93f, 0.84f, 1f);
             text.text = value;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Truncate;
-            gameObject.GetComponent<LayoutElement>().preferredHeight = height;
+            var element = gameObject.GetComponent<LayoutElement>();
+            element.minHeight = element.preferredHeight = height;
             return text;
         }
 
-        private static Button CreateButton(Transform parent, string name, string label)
+        private static Button CreateButton(
+            Transform parent,
+            string name,
+            string label,
+            Font font = null,
+            bool primary = false,
+            bool danger = false)
         {
             var gameObject = new GameObject(
                 name,
@@ -194,17 +345,52 @@ namespace SpireChess.UI.MainMenu
                 typeof(Button),
                 typeof(LayoutElement));
             gameObject.transform.SetParent(parent, false);
-            gameObject.GetComponent<Image>().color = new Color(0.16f, 0.24f, 0.34f);
+            var image = gameObject.GetComponent<Image>();
+            image.color = danger
+                ? new Color(0.30f, 0.12f, 0.12f, 1f)
+                : primary
+                    ? new Color(0.17f, 0.38f, 0.34f, 1f)
+                    : new Color(0.14f, 0.20f, 0.21f, 1f);
+            AddFrame(
+                image,
+                primary
+                    ? new Color(0.74f, 0.61f, 0.32f, 0.82f)
+                    : danger
+                        ? new Color(0.72f, 0.28f, 0.24f, 0.76f)
+                        : new Color(0.42f, 0.36f, 0.24f, 0.64f),
+                new Vector2(1f, -1f));
             var button = gameObject.GetComponent<Button>();
             var colors = button.colors;
-            colors.highlightedColor = new Color(0.22f, 0.34f, 0.48f);
-            colors.pressedColor = new Color(0.11f, 0.18f, 0.27f);
+            colors.highlightedColor = new Color(1.12f, 1.08f, 0.96f, 1f);
+            colors.pressedColor = new Color(0.70f, 0.76f, 0.72f, 1f);
             colors.disabledColor = new Color(0.12f, 0.14f, 0.17f, 0.7f);
             button.colors = colors;
             gameObject.GetComponent<LayoutElement>().preferredHeight = 66f;
-            var text = CreateText(gameObject.transform, "Label", label, 28, 66f, FontStyle.Bold);
+            var text = CreateText(
+                gameObject.transform,
+                "Label",
+                label,
+                28,
+                66f,
+                FontStyle.Bold,
+                font);
             Stretch(text.rectTransform);
             return button;
+        }
+
+        private static void AddFrame(
+            Image image,
+            Color color,
+            Vector2 distance)
+        {
+            var outline = image.GetComponent<Outline>();
+            if (outline == null)
+            {
+                outline = image.gameObject.AddComponent<Outline>();
+            }
+            outline.effectColor = color;
+            outline.effectDistance = distance;
+            outline.useGraphicAlpha = true;
         }
 
         private static void EnsureEventSystem()

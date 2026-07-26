@@ -27,6 +27,10 @@ namespace SpireChess.UI.Run
             var nodes = map == null
                 ? new List<RunMapNodeState>()
                 : map.Nodes.Select(node => BuildNode(state, configs, node)).ToList();
+            if (map != null)
+            {
+                DerivePresentationStatuses(map, nodes);
+            }
             var nodeById = nodes.ToDictionary(node => node.NodeId);
             var edges = new List<RunMapEdgeState>();
             if (map != null)
@@ -45,7 +49,8 @@ namespace SpireChess.UI.Run
                             FromNodeId = node.Id,
                             ToNodeId = nextId,
                             FromStatus = from.Status,
-                            ToStatus = to.Status
+                            ToStatus = to.Status,
+                            PresentationStatus = DeriveEdgeStatus(from, to)
                         });
                     }
                 }
@@ -112,6 +117,7 @@ namespace SpireChess.UI.Run
             return new RunMapNodeState
             {
                 NodeId = node.Id,
+                IconId = ToNodeIconId(node.Type),
                 Title = title,
                 Subtitle = subtitle,
                 RouteText = ToRouteTagText(node.RouteTag),
@@ -119,9 +125,141 @@ namespace SpireChess.UI.Run
                 Row = node.Row,
                 Type = node.Type,
                 Status = status,
+                PresentationStatus = ToPresentationStatus(status),
                 IsInteractable = state.Phase == RunPhase.MapSelection &&
                                  status == RunNodeStatus.Reachable
             };
+        }
+
+        private static void DerivePresentationStatuses(
+            MapDefinition map,
+            IReadOnlyList<RunMapNodeState> nodes)
+        {
+            var statesById = nodes.ToDictionary(node => node.NodeId);
+            var predecessors = map.Nodes.ToDictionary(
+                node => node.Id,
+                _ => new List<string>());
+            foreach (var node in map.Nodes)
+            {
+                foreach (var nextId in node.NextNodeIds)
+                {
+                    if (predecessors.TryGetValue(nextId, out var values))
+                    {
+                        values.Add(node.Id);
+                    }
+                }
+            }
+
+            MarkBypassedAlternatives(map.StartNodeIds, statesById);
+            foreach (var node in map.Nodes)
+            {
+                if (node.NextNodeIds.Count > 1)
+                {
+                    MarkBypassedAlternatives(node.NextNodeIds, statesById);
+                }
+            }
+
+            var changed = true;
+            while (changed)
+            {
+                changed = false;
+                foreach (var node in nodes)
+                {
+                    if (node.Status != RunNodeStatus.Locked ||
+                        node.PresentationStatus == RunMapPresentationStatus.Abandoned ||
+                        !predecessors.TryGetValue(node.NodeId, out var parentIds) ||
+                        parentIds.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    if (parentIds.All(parentId =>
+                            statesById.TryGetValue(parentId, out var parent) &&
+                            parent.PresentationStatus ==
+                            RunMapPresentationStatus.Abandoned))
+                    {
+                        node.PresentationStatus = RunMapPresentationStatus.Abandoned;
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        private static void MarkBypassedAlternatives(
+            IReadOnlyList<string> alternativeIds,
+            IReadOnlyDictionary<string, RunMapNodeState> statesById)
+        {
+            var alternatives = alternativeIds
+                .Where(statesById.ContainsKey)
+                .Select(id => statesById[id])
+                .ToList();
+            if (!alternatives.Any(node =>
+                    node.Status == RunNodeStatus.Current ||
+                    node.Status == RunNodeStatus.Resolved))
+            {
+                return;
+            }
+
+            foreach (var alternative in alternatives.Where(node =>
+                         node.Status == RunNodeStatus.Locked))
+            {
+                alternative.PresentationStatus =
+                    RunMapPresentationStatus.Abandoned;
+            }
+        }
+
+        private static RunMapEdgePresentationStatus DeriveEdgeStatus(
+            RunMapNodeState from,
+            RunMapNodeState to)
+        {
+            if (from.PresentationStatus == RunMapPresentationStatus.Abandoned ||
+                to.PresentationStatus == RunMapPresentationStatus.Abandoned)
+            {
+                return RunMapEdgePresentationStatus.Abandoned;
+            }
+            if (to.PresentationStatus == RunMapPresentationStatus.Reachable)
+            {
+                return RunMapEdgePresentationStatus.Reachable;
+            }
+            if ((from.PresentationStatus == RunMapPresentationStatus.Resolved ||
+                 from.PresentationStatus == RunMapPresentationStatus.Current) &&
+                (to.PresentationStatus == RunMapPresentationStatus.Resolved ||
+                 to.PresentationStatus == RunMapPresentationStatus.Current))
+            {
+                return RunMapEdgePresentationStatus.Resolved;
+            }
+            return RunMapEdgePresentationStatus.Locked;
+        }
+
+        private static RunMapPresentationStatus ToPresentationStatus(
+            RunNodeStatus status)
+        {
+            switch (status)
+            {
+                case RunNodeStatus.Reachable:
+                    return RunMapPresentationStatus.Reachable;
+                case RunNodeStatus.Current:
+                    return RunMapPresentationStatus.Current;
+                case RunNodeStatus.Resolved:
+                    return RunMapPresentationStatus.Resolved;
+                default:
+                    return RunMapPresentationStatus.Locked;
+            }
+        }
+
+        private static string ToNodeIconId(RunNodeType type)
+        {
+            switch (type)
+            {
+                case RunNodeType.Shop: return "icon_map_shop";
+                case RunNodeType.Normal: return "icon_map_normal";
+                case RunNodeType.Elite: return "icon_map_elite";
+                case RunNodeType.Event: return "icon_map_event";
+                case RunNodeType.Enhance: return "icon_map_enhance";
+                case RunNodeType.Rest: return "icon_map_rest";
+                case RunNodeType.Boss: return "icon_map_boss";
+                default: return "icon_map_unknown";
+            }
         }
 
         private static IReadOnlyList<RunRelicState> BuildRelics(

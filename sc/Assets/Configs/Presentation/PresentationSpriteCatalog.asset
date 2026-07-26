@@ -63,7 +63,7 @@ MonoBehaviour:
     focalPointY: 0.29
   - id: placeholder_card_fox_den_matriarch
     sprite: {fileID: 21300000, guid: 838a14903c8e7c04ab87597576da7ae8, type: 3}
-    focalPointY: 0.32
+    focalPointY: 0.5
   - id: placeholder_card_secret_page_refractor
     sprite: {fileID: 21300000, guid: 85869952f0ebdf643aff589e2a576f85, type: 3}
     focalPointY: 0.28
@@ -75,10 +75,10 @@ MonoBehaviour:
     focalPointY: 0.31
   - id: placeholder_token_two_tailed_fox_shadow
     sprite: {fileID: 21300000, guid: a94c860707ffa1d42a57c039ec358fcd, type: 3}
-    focalPointY: 0.3
+    focalPointY: 0.5
   - id: placeholder_token_swift_young_spirit
     sprite: {fileID: 21300000, guid: d189b173395fb3d4db872486c8710606, type: 3}
-    focalPointY: 0.32
+    focalPointY: 0.5
   - id: placeholder_spell_minor_tempering
     sprite: {fileID: 21300000, guid: e216b312639b4dc4091e841dbb40b465, type: 3}
     focalPointY: 0.42

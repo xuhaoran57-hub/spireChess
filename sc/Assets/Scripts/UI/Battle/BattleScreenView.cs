@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using SpireChess.Audio;
 using SpireChess.Battle;
 using SpireChess.UI;
 using UnityEngine;
@@ -18,6 +19,12 @@ namespace SpireChess.UI.Battle
             new Color(1f, 0.28f, 0.24f, 1f);
         private static readonly Color FeedbackColor =
             new Color(1f, 0.84f, 0.48f, 1f);
+        private static readonly Color ShieldColor =
+            new Color(0.28f, 0.72f, 1f, 1f);
+        private static readonly Color GrowthColor =
+            new Color(0.46f, 0.92f, 0.54f, 1f);
+        private static readonly Color DeathColor =
+            new Color(0.52f, 0.46f, 0.66f, 1f);
 
         [Header("Root")]
         [SerializeField] private Canvas rootCanvas;
@@ -54,6 +61,15 @@ namespace SpireChess.UI.Battle
         [Header("Feedback")]
         [SerializeField] private CanvasGroup feedbackCanvasGroup;
         [SerializeField] private Text feedbackText;
+        [SerializeField] private PresentationFxPool feedbackFxPool;
+        [SerializeField] private CanvasGroup boardPulseCanvasGroup;
+        [SerializeField] private Image boardPulseImage;
+
+        [Header("Result")]
+        [SerializeField] private GameObject resultLayer;
+        [SerializeField] private CanvasGroup resultCanvasGroup;
+        [SerializeField] private Text resultTitleText;
+        [SerializeField] private Text resultBodyText;
 
         [Header("Standee detail")]
         [SerializeField] private RectTransform detailLayer;
@@ -67,9 +83,21 @@ namespace SpireChess.UI.Battle
         private BattleStandeeView detailOwner;
         private bool detailLocked;
         private bool isBound;
+        private int presentationEpoch;
 
         public int RenderedCardCount { get; private set; }
         public bool IsAnimationPlaying { get; private set; }
+        public int ActiveFeedbackFxCount =>
+            feedbackFxPool == null ? 0 : feedbackFxPool.ActiveCount;
+        public string LastFeedbackId { get; private set; } = string.Empty;
+        public string LastAudioCueId { get; private set; } = string.Empty;
+        public bool IsResultVisible => resultLayer != null &&
+                                       resultLayer.activeSelf &&
+                                       resultCanvasGroup != null &&
+                                       resultCanvasGroup.alpha > 0f;
+        public string ResultTitle => resultTitleText == null
+            ? string.Empty
+            : resultTitleText.text;
         public bool IsLogScrollable => logScrollRect != null &&
                                        logScrollRect.vertical;
         public string LogContents => logText == null ? string.Empty : logText.text;
@@ -91,6 +119,10 @@ namespace SpireChess.UI.Battle
             HasSlots(enemySlots) && HasSlots(playerSlots) &&
             logScrollRect != null && logText != null &&
             feedbackCanvasGroup != null && feedbackText != null &&
+            feedbackFxPool != null && boardPulseCanvasGroup != null &&
+            boardPulseImage != null && resultLayer != null &&
+            resultCanvasGroup != null && resultTitleText != null &&
+            resultBodyText != null &&
             detailLayer != null && detailCard != null &&
             detailCard.HasCompleteBindings && detailCanvasGroup != null &&
             detailModeText != null;
@@ -166,51 +198,201 @@ namespace SpireChess.UI.Battle
 
         public IEnumerator PlayEvent(
             BattlePlaybackEvent playbackEvent,
-            float playbackSpeed)
+            float playbackSpeed,
+            BattleSide? winner = null)
         {
             if (playbackEvent == null)
             {
                 yield break;
             }
 
-            var durationScale = 1f / Mathf.Max(1f, playbackSpeed);
+            var epoch = ++presentationEpoch;
+            var durationScale = GetDurationScale(playbackSpeed);
             IsAnimationPlaying = true;
             CloseStandeeDetail();
             ClearHighlights();
-            switch (playbackEvent.Kind)
+            HideTransientBannerAndPulse();
+            LastFeedbackId = ResolveFeedbackId(
+                playbackEvent.Kind,
+                playbackEvent.WasBlocked);
+            var targetIsToken =
+                FindCard(playbackEvent.TargetInstanceId)?.Model?.IsToken == true;
+            LastAudioCueId = ResolveAudioCueId(
+                playbackEvent.Kind,
+                playbackEvent.WasBlocked,
+                playbackEvent.AttackDelta,
+                playbackEvent.HealthDelta,
+                targetIsToken,
+                winner) ?? string.Empty;
+            if (!string.IsNullOrEmpty(LastAudioCueId))
+            {
+                AudioService.Instance?.PlayCue(LastAudioCueId);
+            }
+            try
+            {
+                switch (playbackEvent.Kind)
+                {
+                    case BattlePlaybackEventKind.CombatStarted:
+                        yield return PlayCombatStarted(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.RoundStarted:
+                        yield return PlayRoundStarted(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.AttackStarted:
+                        yield return PlayAttack(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.DamageApplied:
+                        yield return PlayDamage(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.ShieldGained:
+                        yield return PlayShield(
+                            playbackEvent,
+                            true,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.ShieldLost:
+                        yield return PlayShield(
+                            playbackEvent,
+                            false,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.StatsChanged:
+                        yield return PlayStats(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.UnitDied:
+                        yield return PlayDeath(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.UnitSummoned:
+                        yield return PlaySummon(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.CombatEnded:
+                        yield return PlayCombatEnded(
+                            playbackEvent,
+                            winner,
+                            durationScale,
+                            epoch);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(
+                            nameof(playbackEvent.Kind),
+                            playbackEvent.Kind,
+                            "Unknown battle presentation event.");
+                }
+            }
+            finally
+            {
+                if (epoch == presentationEpoch)
+                {
+                    SnapTransientVisuals();
+                    IsAnimationPlaying = false;
+                }
+            }
+        }
+
+        public static float GetDurationScale(float playbackSpeed)
+        {
+            return 1f / Mathf.Max(1f, playbackSpeed);
+        }
+
+        public static string ResolveFeedbackId(
+            BattlePlaybackEventKind kind,
+            bool wasBlocked = false)
+        {
+            switch (kind)
+            {
+                case BattlePlaybackEventKind.CombatStarted:
+                    return "battle_start";
+                case BattlePlaybackEventKind.RoundStarted:
+                    return "battle_round";
+                case BattlePlaybackEventKind.AttackStarted:
+                    return "battle_attack";
+                case BattlePlaybackEventKind.DamageApplied:
+                    return wasBlocked
+                        ? "battle_damage_blocked"
+                        : "battle_damage";
+                case BattlePlaybackEventKind.ShieldGained:
+                    return "battle_shield_gain";
+                case BattlePlaybackEventKind.ShieldLost:
+                    return "battle_shield_break";
+                case BattlePlaybackEventKind.StatsChanged:
+                    return "battle_stats";
+                case BattlePlaybackEventKind.UnitDied:
+                    return "battle_death";
+                case BattlePlaybackEventKind.UnitSummoned:
+                    return "battle_summon";
+                case BattlePlaybackEventKind.CombatEnded:
+                    return "battle_end";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+            }
+        }
+
+        public static string ResolveAudioCueId(
+            BattlePlaybackEventKind kind,
+            bool wasBlocked = false,
+            int attackDelta = 0,
+            int healthDelta = 0,
+            bool targetIsToken = false,
+            BattleSide? winner = null)
+        {
+            switch (kind)
             {
                 case BattlePlaybackEventKind.AttackStarted:
-                    yield return PlayAttack(playbackEvent, durationScale);
-                    break;
+                    return PresentationAudioCueIds.BattleAttackLight;
                 case BattlePlaybackEventKind.DamageApplied:
-                    yield return PlayDamage(playbackEvent, durationScale);
-                    break;
+                    return wasBlocked
+                        ? null
+                        : PresentationAudioCueIds.BattleHit;
                 case BattlePlaybackEventKind.ShieldGained:
-                    PlayShield(playbackEvent, true);
-                    yield return Wait(0.16f * durationScale);
-                    break;
+                    return PresentationAudioCueIds.BattleShieldGain;
                 case BattlePlaybackEventKind.ShieldLost:
-                    PlayShield(playbackEvent, false);
-                    yield return Wait(0.16f * durationScale);
-                    break;
+                    return PresentationAudioCueIds.BattleShieldBreak;
                 case BattlePlaybackEventKind.StatsChanged:
-                    PlayStats(playbackEvent);
-                    yield return Wait(0.18f * durationScale);
-                    break;
+                    return (attackDelta > 0 || healthDelta > 0) &&
+                           attackDelta >= 0 &&
+                           healthDelta >= 0
+                        ? PresentationAudioCueIds.BattleStatUp
+                        : null;
                 case BattlePlaybackEventKind.UnitDied:
-                    yield return PlayDeath(playbackEvent, durationScale);
-                    break;
+                    return targetIsToken
+                        ? PresentationAudioCueIds.BattleTokenDeath
+                        : PresentationAudioCueIds.BattleDeath;
                 case BattlePlaybackEventKind.UnitSummoned:
-                    yield return PlaySummon(playbackEvent, durationScale);
-                    break;
+                    return PresentationAudioCueIds.BattleSummon;
+                case BattlePlaybackEventKind.CombatEnded:
+                    if (!winner.HasValue)
+                    {
+                        return null;
+                    }
+                    return winner.Value == BattleSide.Player
+                        ? PresentationAudioCueIds.BattleVictory
+                        : PresentationAudioCueIds.BattleDefeat;
                 default:
-                    ShowFeedback(playbackEvent.Message);
-                    yield return Wait(0.10f * durationScale);
-                    break;
+                    return null;
             }
-
-            ClearHighlights();
-            IsAnimationPlaying = false;
         }
 
         private void SyncRow(
@@ -291,12 +473,69 @@ namespace SpireChess.UI.Battle
             }
         }
 
+        private IEnumerator PlayCombatStarted(
+            BattlePlaybackEvent playbackEvent,
+            float scale,
+            int epoch)
+        {
+            HideResult();
+            ShowFeedback("双方就位", FeedbackColor);
+            PlayFx(
+                "战斗开始",
+                FeedbackColor,
+                Vector2.zero,
+                PresentationFxEmphasis.Critical,
+                0.42f * scale,
+                34f);
+            yield return AnimatePulse(
+                FeedbackColor,
+                0.22f,
+                0.28f * scale,
+                epoch);
+        }
+
+        private IEnumerator PlayRoundStarted(
+            BattlePlaybackEvent playbackEvent,
+            float scale,
+            int epoch)
+        {
+            ShowFeedback(
+                string.IsNullOrWhiteSpace(playbackEvent.Message)
+                    ? "新回合"
+                    : playbackEvent.Message,
+                ShieldColor);
+            PlayFx(
+                "新回合",
+                ShieldColor,
+                Vector2.zero,
+                PresentationFxEmphasis.Strong,
+                0.34f * scale,
+                26f);
+            yield return AnimatePulse(
+                ShieldColor,
+                0.13f,
+                0.20f * scale,
+                epoch);
+        }
+
         private IEnumerator PlayAttack(
             BattlePlaybackEvent playbackEvent,
-            float scale)
+            float scale,
+            int epoch)
         {
             var attacker = FindCard(playbackEvent.SourceInstanceId);
             var target = FindCard(playbackEvent.TargetInstanceId);
+            ShowFeedback("突进", AttackerColor);
+            PlayFx(
+                "攻击",
+                AttackerColor,
+                ResolveFxPosition(
+                    attacker,
+                    playbackEvent.SourceSide,
+                    playbackEvent.SourceIndex),
+                PresentationFxEmphasis.Subtle,
+                0.30f * scale,
+                24f);
             SetSlotHighlight(
                 playbackEvent.SourceSide,
                 playbackEvent.SourceIndex,
@@ -305,123 +544,329 @@ namespace SpireChess.UI.Battle
                 playbackEvent.TargetSide,
                 playbackEvent.TargetIndex,
                 TargetColor);
+            SetPulseColor(AttackerColor);
             if (attacker == null || target == null)
             {
-                yield return Wait(0.20f * scale);
+                yield return AnimatePulse(
+                    AttackerColor,
+                    0.10f,
+                    0.20f * scale,
+                    epoch);
                 yield break;
             }
 
             var rect = attacker.RectTransform;
             var start = rect.anchoredPosition;
-            var worldDirection = (target.RectTransform.position - rect.position).normalized;
+            var worldDirection =
+                (target.RectTransform.position - rect.position).normalized;
             var localDirection = rect.parent.InverseTransformVector(worldDirection);
-            var direction = new Vector2(localDirection.x, localDirection.y).normalized;
+            var direction = new Vector2(
+                localDirection.x,
+                localDirection.y).normalized;
             var destination = start + direction * 46f;
-            yield return Animate(0.12f * scale, value =>
-                rect.anchoredPosition = Vector2.Lerp(start, destination, Smooth(value)));
-            yield return Animate(0.12f * scale, value =>
-                rect.anchoredPosition = Vector2.Lerp(destination, start, Smooth(value)));
-            rect.anchoredPosition = start;
+            yield return Animate(0.12f * scale, epoch, value =>
+            {
+                rect.anchoredPosition = Vector2.Lerp(
+                    start,
+                    destination,
+                    Smooth(value));
+                boardPulseCanvasGroup.alpha =
+                    Mathf.Sin(value * Mathf.PI) * 0.10f;
+            });
+            yield return Animate(0.12f * scale, epoch, value =>
+            {
+                rect.anchoredPosition = Vector2.Lerp(
+                    destination,
+                    start,
+                    Smooth(value));
+                boardPulseCanvasGroup.alpha =
+                    (1f - value) * 0.06f;
+            });
+            if (epoch == presentationEpoch)
+            {
+                rect.anchoredPosition = start;
+            }
         }
 
         private IEnumerator PlayDamage(
             BattlePlaybackEvent playbackEvent,
-            float scale)
+            float scale,
+            int epoch)
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
-            ShowFeedback(playbackEvent.WasBlocked
-                ? "格挡"
-                : $"-{playbackEvent.Amount}");
+            var position = ResolveFxPosition(
+                target,
+                playbackEvent.TargetSide,
+                playbackEvent.TargetIndex);
+            if (playbackEvent.WasBlocked)
+            {
+                ShowFeedback("格挡", ShieldColor);
+                PlayFx(
+                    "格挡",
+                    ShieldColor,
+                    position,
+                    PresentationFxEmphasis.Strong,
+                    0.32f * scale,
+                    30f);
+                SetSlotHighlight(
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex,
+                    ShieldColor);
+                yield return AnimatePulse(
+                    ShieldColor,
+                    0.12f,
+                    0.16f * scale,
+                    epoch);
+                yield break;
+            }
+
+            ShowFeedback($"-{playbackEvent.Amount}", TargetColor);
+            PlayFx(
+                $"-{playbackEvent.Amount}",
+                TargetColor,
+                position,
+                PresentationFxEmphasis.Strong,
+                0.44f * scale,
+                58f);
+            SetSlotHighlight(
+                playbackEvent.TargetSide,
+                playbackEvent.TargetIndex,
+                TargetColor);
+            SetPulseColor(TargetColor);
             if (target == null)
             {
-                yield return Wait(0.14f * scale);
+                yield return AnimatePulse(
+                    TargetColor,
+                    0.16f,
+                    0.16f * scale,
+                    epoch);
                 yield break;
             }
 
             target.PlayStatChange(0, playbackEvent.HealthDelta);
             var rect = target.RectTransform;
             var start = rect.anchoredPosition;
-            yield return Animate(0.16f * scale, value =>
+            yield return Animate(0.16f * scale, epoch, value =>
             {
                 var shake = Mathf.Sin(value * Mathf.PI * 6f) *
                             (1f - value) * 8f;
                 rect.anchoredPosition = start + Vector2.right * shake;
+                boardPulseCanvasGroup.alpha =
+                    Mathf.Sin(value * Mathf.PI) * 0.16f;
             });
-            rect.anchoredPosition = start;
+            if (epoch == presentationEpoch)
+            {
+                rect.anchoredPosition = start;
+            }
         }
 
-        private void PlayShield(BattlePlaybackEvent playbackEvent, bool gained)
+        private IEnumerator PlayShield(
+            BattlePlaybackEvent playbackEvent,
+            bool gained,
+            float scale,
+            int epoch)
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
-            ShowFeedback(gained ? "获得护盾" : "护盾破裂");
-            if (gained)
-            {
-                target?.SetShieldVisible(true);
-            }
-            else
-            {
-                target?.SetShieldVisible(false);
-            }
+            var color = gained ? ShieldColor : TargetColor;
+            var label = gained ? "护盾 +" : "护盾破裂";
+            ShowFeedback(label, color);
+            PlayFx(
+                label,
+                color,
+                ResolveFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                PresentationFxEmphasis.Strong,
+                0.38f * scale,
+                42f);
+            target?.SetShieldVisible(gained);
             SetSlotHighlight(
                 playbackEvent.TargetSide,
                 playbackEvent.TargetIndex,
-                gained ? new Color(0.25f, 0.65f, 1f, 1f) : TargetColor);
+                color);
+
+            var rect = target == null ? null : target.RectTransform;
+            var startScale = rect == null ? Vector3.one : rect.localScale;
+            SetPulseColor(color);
+            yield return Animate(0.18f * scale, epoch, value =>
+            {
+                boardPulseCanvasGroup.alpha =
+                    Mathf.Sin(value * Mathf.PI) * (gained ? 0.12f : 0.18f);
+                if (rect != null)
+                {
+                    rect.localScale = Vector3.Lerp(
+                        startScale,
+                        startScale * (gained ? 1.07f : 0.93f),
+                        Mathf.Sin(value * Mathf.PI));
+                }
+            });
+            if (epoch == presentationEpoch && rect != null)
+            {
+                rect.localScale = startScale;
+            }
         }
 
-        private void PlayStats(BattlePlaybackEvent playbackEvent)
+        private IEnumerator PlayStats(
+            BattlePlaybackEvent playbackEvent,
+            float scale,
+            int epoch)
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
+            var label = FormatStatDelta(
+                playbackEvent.AttackDelta,
+                playbackEvent.HealthDelta);
+            var positive = playbackEvent.AttackDelta >= 0 &&
+                           playbackEvent.HealthDelta >= 0;
+            var color = positive ? GrowthColor : TargetColor;
             target?.PlayStatChange(
                 playbackEvent.AttackDelta,
                 playbackEvent.HealthDelta);
-            ShowFeedback(playbackEvent.Message);
+            ShowFeedback("属性变化", color);
+            PlayFx(
+                label,
+                color,
+                ResolveFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                PresentationFxEmphasis.Normal,
+                0.42f * scale,
+                52f);
+            SetSlotHighlight(
+                playbackEvent.TargetSide,
+                playbackEvent.TargetIndex,
+                color);
+            yield return AnimatePulse(
+                color,
+                0.10f,
+                0.18f * scale,
+                epoch);
         }
 
         private IEnumerator PlayDeath(
             BattlePlaybackEvent playbackEvent,
-            float scale)
+            float scale,
+            int epoch)
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
-            ShowFeedback("死亡");
+            var token = target?.Model?.IsToken == true;
+            var label = token ? "衍生消散" : "阵亡";
+            ShowFeedback(label, DeathColor);
+            PlayFx(
+                label,
+                DeathColor,
+                ResolveFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                token
+                    ? PresentationFxEmphasis.Normal
+                    : PresentationFxEmphasis.Strong,
+                0.42f * scale,
+                38f);
+            SetSlotHighlight(
+                playbackEvent.TargetSide,
+                playbackEvent.TargetIndex,
+                DeathColor);
+            SetPulseColor(DeathColor);
             if (target == null)
             {
-                yield return Wait(0.14f * scale);
+                yield return AnimatePulse(
+                    DeathColor,
+                    0.12f,
+                    0.18f * scale,
+                    epoch);
                 yield break;
             }
 
             var canvasGroup = target.GetComponent<CanvasGroup>();
             var startScale = target.transform.localScale;
-            yield return Animate(0.20f * scale, value =>
+            yield return Animate(0.20f * scale, epoch, value =>
             {
                 canvasGroup.alpha = 1f - value;
                 target.transform.localScale = Vector3.Lerp(
                     startScale,
                     startScale * 0.78f,
                     value);
+                boardPulseCanvasGroup.alpha =
+                    Mathf.Sin(value * Mathf.PI) * 0.12f;
             });
-            canvasGroup.alpha = 1f;
-            target.transform.localScale = startScale;
+            if (epoch == presentationEpoch)
+            {
+                canvasGroup.alpha = 1f;
+                target.transform.localScale = startScale;
+            }
         }
 
         private IEnumerator PlaySummon(
             BattlePlaybackEvent playbackEvent,
-            float scale)
+            float scale,
+            int epoch)
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
-            ShowFeedback("召唤");
+            ShowFeedback("增援入场", GrowthColor);
+            PlayFx(
+                "召唤",
+                GrowthColor,
+                ResolveFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                PresentationFxEmphasis.Strong,
+                0.40f * scale,
+                46f);
+            SetSlotHighlight(
+                playbackEvent.TargetSide,
+                playbackEvent.TargetIndex,
+                GrowthColor);
+            SetPulseColor(GrowthColor);
             if (target == null)
             {
-                yield return Wait(0.14f * scale);
+                yield return AnimatePulse(
+                    GrowthColor,
+                    0.11f,
+                    0.18f * scale,
+                    epoch);
                 yield break;
             }
 
             var endScale = target.transform.localScale;
-            yield return Animate(0.20f * scale, value =>
+            yield return Animate(0.20f * scale, epoch, value =>
+            {
                 target.transform.localScale = Vector3.Lerp(
                     endScale * 0.72f,
                     endScale,
-                    Smooth(value)));
-            target.transform.localScale = endScale;
+                    Smooth(value));
+                boardPulseCanvasGroup.alpha =
+                    Mathf.Sin(value * Mathf.PI) * 0.11f;
+            });
+            if (epoch == presentationEpoch)
+            {
+                target.transform.localScale = endScale;
+            }
+        }
+
+        private IEnumerator PlayCombatEnded(
+            BattlePlaybackEvent playbackEvent,
+            BattleSide? winner,
+            float scale,
+            int epoch)
+        {
+            ShowCombatResult(winner, playbackEvent.Message);
+            var color = GetResultColor(winner);
+            PlayFx(
+                GetResultTitle(winner),
+                color,
+                Vector2.zero,
+                PresentationFxEmphasis.Critical,
+                0.46f * scale,
+                18f);
+            yield return AnimatePulse(
+                color,
+                0.20f,
+                0.30f * scale,
+                epoch);
         }
 
         private BattleStandeeView FindCard(string instanceId)
@@ -452,18 +897,241 @@ namespace SpireChess.UI.Battle
 
         private void ClearHighlights()
         {
-            foreach (var slot in enemySlots.Concat(playerSlots))
+            foreach (var slot in (enemySlots ?? Array.Empty<BattleSlotView>())
+                         .Concat(playerSlots ?? Array.Empty<BattleSlotView>()))
             {
-                slot.SetHighlight(Color.clear, Vector2.zero);
+                if (slot != null)
+                {
+                    slot.SetHighlight(Color.clear, Vector2.zero);
+                }
             }
         }
 
-        private void ShowFeedback(string message)
+        private void ShowFeedback(string message, Color color)
         {
+            if (feedbackText == null || feedbackCanvasGroup == null)
+            {
+                return;
+            }
             feedbackText.text = message ?? string.Empty;
-            feedbackText.color = FeedbackColor;
+            feedbackText.color = color;
             feedbackCanvasGroup.alpha =
                 string.IsNullOrWhiteSpace(message) ? 0f : 1f;
+        }
+
+        public void ShowCombatResult(BattleSide? winner, string detail)
+        {
+            if (resultLayer == null || resultCanvasGroup == null ||
+                resultTitleText == null || resultBodyText == null)
+            {
+                return;
+            }
+
+            resultTitleText.text = GetResultTitle(winner);
+            resultTitleText.color = GetResultColor(winner);
+            resultBodyText.text = detail ?? string.Empty;
+            resultLayer.SetActive(true);
+            resultCanvasGroup.alpha = 1f;
+            resultCanvasGroup.interactable = false;
+            resultCanvasGroup.blocksRaycasts = false;
+        }
+
+        public void SnapAndClear()
+        {
+            presentationEpoch++;
+            IsAnimationPlaying = false;
+            CloseStandeeDetail();
+            SnapTransientVisuals();
+            if (feedbackFxPool != null)
+            {
+                feedbackFxPool.ClearImmediate();
+            }
+            HideResult();
+        }
+
+        private void OnDisable()
+        {
+            SnapAndClear();
+        }
+
+        private void PlayFx(
+            string label,
+            Color color,
+            Vector2 position,
+            PresentationFxEmphasis emphasis,
+            float duration,
+            float verticalTravel)
+        {
+            feedbackFxPool?.Play(
+                label,
+                color,
+                position,
+                emphasis,
+                duration,
+                verticalTravel);
+        }
+
+        private Vector2 ResolveFxPosition(
+            BattleStandeeView standee,
+            BattleSide? side,
+            int index)
+        {
+            RectTransform source = null;
+            if (standee != null)
+            {
+                source = standee.RectTransform;
+            }
+            else if (side.HasValue && index >= 0 &&
+                     index < BattleBoardState.SlotCount)
+            {
+                var slots = side.Value == BattleSide.Player
+                    ? playerSlots
+                    : enemySlots;
+                if (slots != null && index < slots.Length && slots[index] != null)
+                {
+                    source = slots[index].Content;
+                }
+            }
+
+            var poolRect = feedbackFxPool == null
+                ? null
+                : feedbackFxPool.transform as RectTransform;
+            if (source == null || poolRect == null)
+            {
+                return Vector2.zero;
+            }
+
+            var world = source.TransformPoint(source.rect.center);
+            var local = poolRect.InverseTransformPoint(world);
+            return new Vector2(local.x, local.y);
+        }
+
+        private IEnumerator AnimatePulse(
+            Color color,
+            float peakAlpha,
+            float duration,
+            int epoch)
+        {
+            SetPulseColor(color);
+            yield return Animate(duration, epoch, value =>
+            {
+                if (boardPulseCanvasGroup != null)
+                {
+                    boardPulseCanvasGroup.alpha =
+                        Mathf.Sin(value * Mathf.PI) * peakAlpha;
+                }
+            });
+        }
+
+        private void SetPulseColor(Color color)
+        {
+            if (boardPulseImage != null)
+            {
+                boardPulseImage.color = new Color(
+                    color.r,
+                    color.g,
+                    color.b,
+                    1f);
+            }
+        }
+
+        private void HideTransientBannerAndPulse()
+        {
+            if (feedbackCanvasGroup != null)
+            {
+                feedbackCanvasGroup.alpha = 0f;
+            }
+            if (feedbackText != null)
+            {
+                feedbackText.text = string.Empty;
+            }
+            if (boardPulseCanvasGroup != null)
+            {
+                boardPulseCanvasGroup.alpha = 0f;
+                boardPulseCanvasGroup.interactable = false;
+                boardPulseCanvasGroup.blocksRaycasts = false;
+            }
+        }
+
+        private void SnapTransientVisuals()
+        {
+            ClearHighlights();
+            HideTransientBannerAndPulse();
+            foreach (var standee in standeesById.Values)
+            {
+                if (standee != null)
+                {
+                    standee.ResetPresentationState();
+                }
+            }
+        }
+
+        private void HideResult()
+        {
+            if (resultCanvasGroup != null)
+            {
+                resultCanvasGroup.alpha = 0f;
+                resultCanvasGroup.interactable = false;
+                resultCanvasGroup.blocksRaycasts = false;
+            }
+            if (resultTitleText != null)
+            {
+                resultTitleText.text = string.Empty;
+            }
+            if (resultBodyText != null)
+            {
+                resultBodyText.text = string.Empty;
+            }
+            if (resultLayer != null)
+            {
+                resultLayer.SetActive(false);
+            }
+        }
+
+        private static string GetResultTitle(BattleSide? winner)
+        {
+            if (!winner.HasValue)
+            {
+                return "战斗平局";
+            }
+            return winner.Value == BattleSide.Player
+                ? "战斗胜利"
+                : "战斗失利";
+        }
+
+        private static Color GetResultColor(BattleSide? winner)
+        {
+            if (!winner.HasValue)
+            {
+                return new Color(0.70f, 0.78f, 0.90f, 1f);
+            }
+            return winner.Value == BattleSide.Player
+                ? FeedbackColor
+                : TargetColor;
+        }
+
+        private static string FormatStatDelta(
+            int attackDelta,
+            int healthDelta)
+        {
+            if (attackDelta != 0 && healthDelta != 0)
+            {
+                return $"{FormatDelta(attackDelta)}/{FormatDelta(healthDelta)}";
+            }
+            if (attackDelta != 0)
+            {
+                return $"{FormatDelta(attackDelta)} 攻击";
+            }
+            if (healthDelta != 0)
+            {
+                return $"{FormatDelta(healthDelta)} 生命";
+            }
+            return "属性刷新";
+        }
+
+        private static string FormatDelta(int value)
+        {
+            return value > 0 ? "+" + value : value.ToString();
         }
 
         public void ShowStandeeDetail(
@@ -588,6 +1256,7 @@ namespace SpireChess.UI.Battle
             {
                 InstanceId = source.InstanceId,
                 ArtId = source.ArtId,
+                ArtworkFallbackId = source.ArtworkFallbackId,
                 Name = source.Name,
                 Description = source.Description,
                 RaceText = source.RaceText,
@@ -602,6 +1271,7 @@ namespace SpireChess.UI.Battle
                 Cost = source.Cost,
                 DisplayMode = CardDisplayMode.Full,
                 IsMinion = source.IsMinion,
+                IsToken = source.IsToken,
                 ShowCost = false,
                 IsGolden = source.IsGolden,
                 IsSelected = source.IsSelected,
@@ -633,23 +1303,25 @@ namespace SpireChess.UI.Battle
                    slots.All(slot => slot != null && slot.HasCompleteBindings);
         }
 
-        private static IEnumerator Animate(float duration, Action<float> update)
+        private IEnumerator Animate(
+            float duration,
+            int epoch,
+            Action<float> update)
         {
             var elapsed = 0f;
-            while (elapsed < duration)
+            duration = Mathf.Max(0.001f, duration);
+            while (elapsed < duration && epoch == presentationEpoch)
             {
-                elapsed += Time.deltaTime;
-                update(Mathf.Clamp01(elapsed / Mathf.Max(0.001f, duration)));
+                elapsed += Mathf.Clamp(
+                    Time.unscaledDeltaTime,
+                    0.0001f,
+                    0.05f);
+                update(Mathf.Clamp01(elapsed / duration));
                 yield return null;
             }
-            update(1f);
-        }
-
-        private static IEnumerator Wait(float duration)
-        {
-            if (duration > 0f)
+            if (epoch == presentationEpoch)
             {
-                yield return new WaitForSeconds(duration);
+                update(1f);
             }
         }
 

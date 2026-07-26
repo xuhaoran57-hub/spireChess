@@ -121,7 +121,7 @@ namespace SpireChess.Tests.EditMode
                 "card_minion_fox_den_matriarch",
                 "Assets/Art/Presentation/Cards/Minions/WildSpirit/" +
                 "card_minion_fox_den_matriarch.png",
-                0.32f),
+                0.50f),
             new ArtworkExpectation(
                 "placeholder_card_secret_page_refractor",
                 "card_minion_secret_page_refractor",
@@ -147,13 +147,13 @@ namespace SpireChess.Tests.EditMode
                 "card_token_token_two_tailed_fox_shadow",
                 "Assets/Art/Presentation/Cards/Tokens/" +
                 "card_token_token_two_tailed_fox_shadow.png",
-                0.30f),
+                0.50f),
             new ArtworkExpectation(
                 "placeholder_token_swift_young_spirit",
                 "card_token_token_swift_young_spirit",
                 "Assets/Art/Presentation/Cards/Tokens/" +
                 "card_token_token_swift_young_spirit.png",
-                0.32f),
+                0.50f),
 
             // G2 sample scope: 4 spells.
             new ArtworkExpectation(

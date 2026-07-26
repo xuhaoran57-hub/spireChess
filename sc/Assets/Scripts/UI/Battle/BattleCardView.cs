@@ -69,7 +69,7 @@ namespace SpireChess.UI.Battle
                 return;
             }
 
-            SetText("Name", model.IsGolden ? $"金色{model.Name}" : model.Name);
+            SetText("Name", model.Name);
             SetText("Tier", $"T{model.Tier}");
             SetText("Race", model.RaceText);
             SetText("Keywords", string.Join(" / ", model.Keywords));

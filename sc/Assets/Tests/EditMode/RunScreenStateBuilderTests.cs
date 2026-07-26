@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -120,6 +121,88 @@ namespace SpireChess.Tests.EditMode
             }
         }
 
+        [Test]
+        public void Build_DerivesAbandonedBranchesAndCompleteMapVisualContract()
+        {
+            var run = new RunSession(configs, 8105);
+            var statuses = GetMutableMapStatuses(run.State.MapProgress);
+            foreach (var nodeId in statuses.Keys.ToArray())
+            {
+                statuses[nodeId] = RunNodeStatus.Locked;
+            }
+
+            var resolvedPath = new[]
+            {
+                "f1_shop_start",
+                "f1_opening_normal",
+                "f1_shop_2",
+                "f1_safe_normal",
+                "f1_shop_3",
+                "f1_mid_mechanic",
+                "f1_shop_4"
+            };
+            foreach (var nodeId in resolvedPath)
+            {
+                statuses[nodeId] = RunNodeStatus.Resolved;
+            }
+            statuses["f1_elite_wall"] = RunNodeStatus.Current;
+            statuses["f1_enhance"] = RunNodeStatus.Reachable;
+
+            var state = RunScreenStateBuilder.Build(run, configs, string.Empty);
+
+            Assert.That(
+                state.Nodes.Single(node => node.NodeId == "f1_early_summon")
+                    .PresentationStatus,
+                Is.EqualTo(RunMapPresentationStatus.Abandoned));
+            Assert.That(
+                state.Nodes.Single(node => node.NodeId == "f1_route_normal")
+                    .PresentationStatus,
+                Is.EqualTo(RunMapPresentationStatus.Abandoned));
+            Assert.That(
+                state.Nodes.Single(node => node.NodeId == "f1_event")
+                    .PresentationStatus,
+                Is.EqualTo(RunMapPresentationStatus.Abandoned),
+                "Abandoned branches should propagate through unique descendants.");
+            Assert.That(
+                state.Nodes.Single(node => node.NodeId == "f1_shop_5")
+                    .PresentationStatus,
+                Is.EqualTo(RunMapPresentationStatus.Locked),
+                "Propagation must stop at a merge with a live predecessor.");
+            Assert.That(
+                run.State.MapProgress.GetStatus("f1_route_normal"),
+                Is.EqualTo(RunNodeStatus.Locked),
+                "Presentation derivation must not mutate domain progress.");
+
+            Assert.That(
+                state.Nodes.Select(node => node.PresentationStatus).Distinct(),
+                Is.EquivalentTo(new[]
+                {
+                    RunMapPresentationStatus.Locked,
+                    RunMapPresentationStatus.Reachable,
+                    RunMapPresentationStatus.Current,
+                    RunMapPresentationStatus.Resolved,
+                    RunMapPresentationStatus.Abandoned
+                }));
+            Assert.That(
+                state.Edges.Select(edge => edge.PresentationStatus).Distinct(),
+                Is.EquivalentTo(new[]
+                {
+                    RunMapEdgePresentationStatus.Locked,
+                    RunMapEdgePresentationStatus.Reachable,
+                    RunMapEdgePresentationStatus.Resolved,
+                    RunMapEdgePresentationStatus.Abandoned
+                }));
+
+            var iconsByType = state.Nodes
+                .GroupBy(node => node.Type)
+                .ToDictionary(group => group.Key, group => group.First().IconId);
+            Assert.That(iconsByType, Has.Count.EqualTo(7));
+            Assert.That(iconsByType.Values, Has.All.StartsWith("icon_map_"));
+            Assert.That(
+                iconsByType.Values.Distinct().ToArray(),
+                Has.Length.EqualTo(7));
+        }
+
         private static void ClaimAllRewards(RunSession run)
         {
             while (run.State.PendingCardRewards.Count > 0)
@@ -157,6 +240,14 @@ namespace SpireChess.Tests.EditMode
             typeof(RunState).GetProperty(propertyName)
                 .GetSetMethod(true)
                 .Invoke(state, new object[] { value });
+        }
+
+        private static IDictionary<string, RunNodeStatus> GetMutableMapStatuses(
+            MapProgressState progress)
+        {
+            return (IDictionary<string, RunNodeStatus>)typeof(MapProgressState)
+                .GetField("statusById", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(progress);
         }
     }
 }

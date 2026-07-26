@@ -58,8 +58,9 @@ namespace SpireChess.Tests.EditMode
             golden.Health = 20;
             view.Render(golden);
             Assert.That(Active("GoldenFrame"), Is.True);
-            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.True);
-            Assert.That(TextAt("StateBadgeRow/GoldenBadge"), Is.EqualTo("金色"));
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+            Assert.That(TextAt("StateBadgeRow/GoldenBadge"), Is.Empty);
+            Assert.That(Active("SpellFooter"), Is.False);
             Assert.That(Active("StateBadgeRow/ShieldBadge"), Is.True);
             Assert.That(Active("SelectionFrame"), Is.True);
             Assert.That(Active("LegalTargetFrame"), Is.True);
@@ -95,7 +96,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void CompactOwnedGoldenMinion_HasPersistentTextAndFrameIdentification()
+        public void CompactOwnedGoldenMinion_UsesFrameAndNameColorWithoutGoldenText()
         {
             var model = CreateMinion(CardDisplayMode.Compact);
             model.ShowCost = false;
@@ -105,8 +106,10 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(Active("GoldenFrame"), Is.True);
             Assert.That(Active("NormalFrame"), Is.False);
-            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.True);
-            Assert.That(TextAt("StateBadgeRow/GoldenBadge"), Is.EqualTo("金色"));
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+            Assert.That(TextAt("StateBadgeRow/GoldenBadge"), Is.Empty);
+            Assert.That(Active("StateBadgeRow"), Is.False);
+            Assert.That(Active("SpellFooter"), Is.False);
             Assert.That(TextComponentAt("NamePlate/Name").color,
                 Is.EqualTo((Color)new Color32(0xFF, 0xD2, 0x58, 0xFF)));
 
@@ -115,6 +118,165 @@ namespace SpireChess.Tests.EditMode
             Assert.That(Active("GoldenFrame"), Is.False);
             Assert.That(Active("NormalFrame"), Is.True);
             Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+        }
+
+        [Test]
+        public void MinionTokenSpellAndGolden_UseDistinctTypeFooterAndFrameTint()
+        {
+            var minion = CreateMinion(CardDisplayMode.Full);
+            minion.RaceText = "Starbound";
+            view.Render(minion);
+
+            Assert.That(TextAt("RaceOrSpellType"),
+                Is.EqualTo("Starbound"));
+            Assert.That(Active("SpellFooter"), Is.False);
+            Assert.That(ImageAt("NormalFrame").color, Is.EqualTo(Color.white));
+
+            var token = CreateMinion(CardDisplayMode.Full);
+            token.RaceText = "Wild Spirit";
+            token.IsToken = true;
+            token.ShowCost = false;
+            view.Render(token);
+
+            Assert.That(TextAt("RaceOrSpellType"),
+                Is.EqualTo("\u884d\u751f \u00b7 Wild Spirit"));
+            Assert.That(Active("SpellFooter"), Is.True);
+            Assert.That(TextAt("SpellFooter"),
+                Is.EqualTo("\u884d\u751f\u968f\u4ece"));
+            Assert.That(ImageAt("NormalFrame").color,
+                Is.EqualTo((Color)new Color32(0xC7, 0xEA, 0xC1, 0xFF)));
+
+            var spell = CreateSpell(CardDisplayMode.Full);
+            spell.RaceText = "Discovery";
+            view.Render(spell);
+
+            Assert.That(TextAt("RaceOrSpellType"),
+                Is.EqualTo("\u6cd5\u672f \u00b7 Discovery"));
+            Assert.That(Active("SpellFooter"), Is.True);
+            Assert.That(TextAt("SpellFooter"),
+                Is.EqualTo("\u5546\u5e97\u6cd5\u672f"));
+            Assert.That(ImageAt("NormalFrame").color,
+                Is.EqualTo((Color)new Color32(0xC8, 0xD9, 0xF4, 0xFF)));
+
+            var golden = CreateMinion(CardDisplayMode.Full);
+            golden.RaceText = "Forge Soul";
+            golden.IsGolden = true;
+            view.Render(golden);
+
+            Assert.That(TextAt("RaceOrSpellType"),
+                Is.EqualTo("Forge Soul"));
+            Assert.That(Active("SpellFooter"), Is.False);
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+            Assert.That(TextAt("StateBadgeRow/GoldenBadge"), Is.Empty);
+            Assert.That(ImageAt("GoldenFrame").color,
+                Is.EqualTo((Color)new Color32(0xFF, 0xD2, 0x70, 0xFF)));
+        }
+
+        [TestCase(CardDisplayMode.Full, 16)]
+        [TestCase(CardDisplayMode.Compact, 13)]
+        public void TypeLine_UsesReadableFontInsideItsSingleLineArea(
+            CardDisplayMode mode,
+            int expectedFontSize)
+        {
+            var model = CreateMinion(mode);
+            model.RaceText = "\u8352\u7075";
+            view.Render(model);
+            Canvas.ForceUpdateCanvases();
+
+            var typeLine = TextComponentAt("RaceOrSpellType");
+            Assert.That(typeLine.text, Is.EqualTo("\u8352\u7075"));
+            Assert.That(typeLine.fontSize, Is.EqualTo(expectedFontSize));
+            Assert.That(typeLine.alignment, Is.EqualTo(TextAnchor.MiddleCenter));
+            Assert.That(typeLine.text, Does.Not.EndWith(UiTextFormatter.Ellipsis));
+            Assert.That(typeLine.preferredWidth,
+                Is.LessThanOrEqualTo(typeLine.rectTransform.rect.width + 0.5f));
+            Assert.That(typeLine.preferredHeight,
+                Is.LessThanOrEqualTo(typeLine.rectTransform.rect.height + 0.5f));
+        }
+
+        [Test]
+        public void ShieldOverlay_DistinguishesPersistentAndNextCombatShield()
+        {
+            var model = CreateMinion(CardDisplayMode.Full);
+            view.Render(model);
+            Assert.That(Active("ShieldOverlay"), Is.False);
+
+            model.HasNextCombatShield = true;
+            view.Render(model);
+
+            Assert.That(Active("ShieldOverlay"), Is.True);
+            Assert.That(ImageAt("ShieldOverlay").sprite, Is.Not.Null);
+            Assert.That(ImageAt("ShieldOverlay").color,
+                Is.EqualTo(new Color(0.58f, 0.86f, 1f, 0.38f)));
+            Assert.That(Active("StateBadgeRow/NextCombatShieldBadge"), Is.True);
+
+            model.HasShield = true;
+            view.Render(model);
+
+            Assert.That(ImageAt("ShieldOverlay").color,
+                Is.EqualTo(new Color(0.78f, 0.96f, 1f, 0.78f)));
+            Assert.That(Active("StateBadgeRow/ShieldBadge"), Is.True);
+
+            var spell = CreateSpell(CardDisplayMode.Full);
+            spell.HasShield = true;
+            spell.HasNextCombatShield = true;
+            view.Render(spell);
+            Assert.That(Active("ShieldOverlay"), Is.False);
+        }
+
+        [TestCase(CardDisplayMode.Full, 152f, 22f)]
+        [TestCase(CardDisplayMode.Compact, 104f, 18f)]
+        public void StateBadges_OnlyVisibleItemsShareTheWholeRow(
+            CardDisplayMode mode,
+            float rowWidth,
+            float rowHeight)
+        {
+            var model = CreateMinion(mode);
+            model.IsGolden = true;
+            view.Render(model);
+
+            Assert.That(Active("StateBadgeRow"), Is.False);
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+
+            model.IsGolden = false;
+            model.HasShield = true;
+            model.IsTemporary = true;
+            view.Render(model);
+
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+            Assert.That(Active("StateBadgeRow/NextCombatShieldBadge"), Is.False);
+            AssertBadgeRect(
+                "StateBadgeRow/ShieldBadge",
+                0f,
+                rowWidth / 2f,
+                rowHeight);
+            AssertBadgeRect(
+                "StateBadgeRow/TemporaryBadge",
+                rowWidth / 2f,
+                rowWidth / 2f,
+                rowHeight);
+
+            model.IsGolden = true;
+            model.HasNextCombatShield = true;
+            view.Render(model);
+
+            var third = rowWidth / 3f;
+            Assert.That(Active("StateBadgeRow/GoldenBadge"), Is.False);
+            AssertBadgeRect(
+                "StateBadgeRow/ShieldBadge",
+                0f,
+                third,
+                rowHeight);
+            AssertBadgeRect(
+                "StateBadgeRow/NextCombatShieldBadge",
+                third,
+                third,
+                rowHeight);
+            AssertBadgeRect(
+                "StateBadgeRow/TemporaryBadge",
+                third * 2f,
+                third,
+                rowHeight);
         }
 
         [Test]
@@ -179,22 +341,37 @@ namespace SpireChess.Tests.EditMode
                 Is.EqualTo("card_tier_bookmark_v1"));
             Assert.That(ImageAt("TierBadge").type, Is.EqualTo(Image.Type.Simple));
             Assert.That(TextAt("TierBadge/Tier"), Is.EqualTo("3"));
+            Assert.That(TextComponentAt("TierBadge/Tier").fontSize,
+                Is.EqualTo(22));
 
             Assert.That(ImageAt("AttackBadge").sprite, Is.Not.Null);
             Assert.That(ImageAt("AttackBadge").sprite.name,
                 Is.EqualTo("card_attack_tag_v1"));
             Assert.That(ImageAt("AttackBadge").type, Is.EqualTo(Image.Type.Sliced));
             Assert.That(TextAt("AttackBadge/Attack"), Is.EqualTo("4"));
+            Assert.That(TextComponentAt("AttackBadge/Attack").fontSize,
+                Is.EqualTo(22));
 
             Assert.That(ImageAt("HealthBadge").sprite, Is.Not.Null);
             Assert.That(ImageAt("HealthBadge").sprite.name,
                 Is.EqualTo("card_health_tag_v1"));
             Assert.That(ImageAt("HealthBadge").type, Is.EqualTo(Image.Type.Sliced));
             Assert.That(TextAt("HealthBadge/Health"), Is.EqualTo("8"));
+            Assert.That(TextComponentAt("HealthBadge/Health").fontSize,
+                Is.EqualTo(22));
+
+            model.DisplayMode = CardDisplayMode.Compact;
+            view.Render(model);
+            Assert.That(TextComponentAt("TierBadge/Tier").fontSize,
+                Is.EqualTo(16));
+            Assert.That(TextComponentAt("AttackBadge/Attack").fontSize,
+                Is.EqualTo(16));
+            Assert.That(TextComponentAt("HealthBadge/Health").fontSize,
+                Is.EqualTo(16));
         }
 
-        [TestCase(CardDisplayMode.Full, 15)]
-        [TestCase(CardDisplayMode.Compact, 10)]
+        [TestCase(CardDisplayMode.Full, 22)]
+        [TestCase(CardDisplayMode.Compact, 16)]
         public void FourDigitStats_FitSlotsAndRestoreBaseFontSize(
             CardDisplayMode mode,
             int baseFontSize)
@@ -282,15 +459,49 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void LabelsAndProgress_UseFrozenCapacitiesAndRects()
+        public void LegacyBattleCardView_GoldenMinionDoesNotPrefixName()
+        {
+            var cardObject = new GameObject(
+                "BattleCard",
+                typeof(RectTransform),
+                typeof(BattleCardView));
+            var nameObject = new GameObject(
+                "Name",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Text));
+            nameObject.transform.SetParent(cardObject.transform, false);
+            var nameText = nameObject.GetComponent<Text>();
+            var model = CreateMinion(CardDisplayMode.Full);
+            model.Name = "裂甲复仇者";
+            model.IsGolden = true;
+
+            try
+            {
+                cardObject.GetComponent<BattleCardView>().Render(model);
+
+                Assert.That(nameText.text, Is.EqualTo(model.Name));
+                Assert.That(nameText.text, Does.Not.Contain("金色"));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(cardObject);
+            }
+        }
+
+        [Test]
+        public void ClassificationLabelsStayHiddenWhileProgressUsesFrozenRects()
         {
             var model = CreateMinion(CardDisplayMode.Full);
             model.AbilityLabels = new[] { "一", "二", "三", "四", "五" };
             model.ProgressText = "3/4";
             view.Render(model);
-            Assert.That(TextAt("InfoPanel/AbilityLabelRow/Label0"), Is.EqualTo("一"));
-            Assert.That(TextAt("InfoPanel/AbilityLabelRow/Label1"), Is.EqualTo("二"));
-            Assert.That(TextAt("InfoPanel/AbilityLabelRow/Label2"), Is.EqualTo("+3"));
+            Assert.That(Active("AbilityLabelRow"), Is.False);
+            Assert.That(VisibleInHierarchy("AbilityLabelRow/Label0"), Is.False);
+            Assert.That(VisibleInHierarchy("AbilityLabelRow/Label1"), Is.False);
+            Assert.That(VisibleInHierarchy("AbilityLabelRow/Label2"), Is.False);
+            Assert.That(TextComponentAt("InfoPanel/Description").alignment,
+                Is.EqualTo(TextAnchor.UpperLeft));
             Assert.That(Active("InfoPanel/Progress"), Is.True);
             Assert.That(TextAt("InfoPanel/Progress/ProgressText"), Is.EqualTo("3/4"));
             Assert.That(RectAt("InfoPanel/Description").rect.height,
@@ -299,9 +510,10 @@ namespace SpireChess.Tests.EditMode
             model.DisplayMode = CardDisplayMode.Compact;
             model.ProgressText = null;
             view.Render(model);
-            Assert.That(TextAt("InfoPanel/AbilityLabelRow/Label0"), Is.EqualTo("一"));
-            Assert.That(TextAt("InfoPanel/AbilityLabelRow/Label1"), Is.EqualTo("+4"));
-            Assert.That(Active("InfoPanel/AbilityLabelRow/Label2"), Is.False);
+            Assert.That(Active("AbilityLabelRow"), Is.False);
+            Assert.That(VisibleInHierarchy("AbilityLabelRow/Label0"), Is.False);
+            Assert.That(VisibleInHierarchy("AbilityLabelRow/Label1"), Is.False);
+            Assert.That(VisibleInHierarchy("AbilityLabelRow/Label2"), Is.False);
             Assert.That(Active("InfoPanel/Progress"), Is.False);
             Assert.That(RectAt("InfoPanel/Description").rect.height,
                 Is.EqualTo(33f).Within(0.01f));
@@ -370,6 +582,22 @@ namespace SpireChess.Tests.EditMode
                 TextComponentAt("GrowthFeedbackRoot/FeedbackText").color.r,
                 Is.GreaterThan(
                     TextComponentAt("GrowthFeedbackRoot/FeedbackText").color.g));
+        }
+
+        [Test]
+        public void EffectlessToken_UsesAuthoredDescription()
+        {
+            var configs = new ConfigService(new NewtonsoftJsonSerializer());
+            var validation = configs.LoadFromResources();
+            Assert.That(validation.IsValid, Is.True,
+                string.Join("\n", validation.Errors));
+            var token = configs.MinionsById["token_young_spirit"];
+
+            Assert.That(token.IsToken, Is.True);
+            Assert.That(token.Effects, Is.Empty);
+            Assert.That(
+                token.GetPrototypeDescription(false),
+                Is.EqualTo("战斗结束后消失。"));
         }
 
         [Test]
@@ -490,11 +718,34 @@ namespace SpireChess.Tests.EditMode
             Assert.That(elements[elements.Length - 1], Is.LessThan(prefix.Length));
         }
 
+        private void AssertBadgeRect(
+            string path,
+            float expectedX,
+            float expectedWidth,
+            float expectedHeight)
+        {
+            Assert.That(Active(path), Is.True);
+            var rect = RectAt(path);
+            Assert.That(rect.anchoredPosition.x,
+                Is.EqualTo(expectedX).Within(0.01f), path + " x");
+            Assert.That(rect.rect.width,
+                Is.EqualTo(expectedWidth).Within(0.01f), path + " width");
+            Assert.That(rect.rect.height,
+                Is.EqualTo(expectedHeight).Within(0.01f), path + " height");
+        }
+
         private bool Active(string path)
         {
             var target = root.Find(path);
             Assert.That(target, Is.Not.Null, "Missing render path " + path);
             return target.gameObject.activeSelf;
+        }
+
+        private bool VisibleInHierarchy(string path)
+        {
+            var target = root.Find(path);
+            Assert.That(target, Is.Not.Null, "Missing render path " + path);
+            return target.gameObject.activeInHierarchy;
         }
 
         private string TextAt(string path)

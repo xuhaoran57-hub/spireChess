@@ -6,6 +6,7 @@ namespace SpireChess.UI.Run
     [DisallowMultipleComponent]
     public sealed class RunChoiceOptionView : MonoBehaviour
     {
+        [SerializeField] private PresentationTheme theme;
         [SerializeField] private PresentationSpriteCatalog spriteCatalog;
         [SerializeField] private Button button;
         [SerializeField] private Image background;
@@ -17,8 +18,9 @@ namespace SpireChess.UI.Run
         private RunTestController controller;
         private RunChoiceOptionState state;
 
-        public bool HasCompleteBindings => spriteCatalog != null &&
-                                           button != null && background != null &&
+        public bool HasCompleteBindings => theme != null &&
+                                            spriteCatalog != null &&
+                                            button != null && background != null &&
                                            iconImage != null &&
                                            badgeText != null && titleText != null &&
                                            descriptionText != null;
@@ -42,6 +44,12 @@ namespace SpireChess.UI.Run
             background.color = value.IsInteractable
                 ? new Color(0.13f, 0.20f, 0.28f, 1f)
                 : new Color(0.11f, 0.12f, 0.15f, 0.95f);
+            background.color = value.IsInteractable
+                ? theme.ButtonNormal
+                : theme.ButtonDisabled;
+            badgeText.color = theme.Accent;
+            titleText.color = theme.TextPrimary;
+            descriptionText.color = theme.TextSecondary;
         }
 
         private void RenderIcon(string iconId)

@@ -1,5 +1,6 @@
 using System;
 using SpireChess.App;
+using SpireChess.Audio;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,9 +14,15 @@ namespace SpireChess.UI.Common
         private Button saveAndReturnButton;
         private Button abandonButton;
         private Text abandonLabel;
+        private AudioSettingsPanelView audioSettingsPanel;
         private bool confirmingAbandon;
 
         public bool IsOpen => overlay != null && overlay.activeSelf;
+        public bool SettingsOpen =>
+            audioSettingsPanel != null && audioSettingsPanel.IsOpen;
+        public bool HasAudioSettings =>
+            audioSettingsPanel != null &&
+            audioSettingsPanel.HasCompleteBindings;
 
         public static RunSystemMenuView Attach(
             Component screen,
@@ -49,13 +56,23 @@ namespace SpireChess.UI.Common
 
         private void Build()
         {
-            var openButton = CreateButton(transform, "MenuButton", "菜单", new Vector2(150f, 58f));
+            var font = GetComponentInParent<Canvas>()
+                ?.GetComponentInChildren<Text>(true)?.font ??
+                Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var openButton = CreateButton(
+                transform,
+                "MenuButton",
+                "菜单",
+                new Vector2(150f, 58f),
+                font);
             var openRect = openButton.GetComponent<RectTransform>();
             openRect.anchorMin = new Vector2(1f, 1f);
             openRect.anchorMax = new Vector2(1f, 1f);
             openRect.pivot = new Vector2(1f, 1f);
             openRect.anchoredPosition = new Vector2(-24f, -20f);
             openButton.onClick.AddListener(Open);
+            openButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiClick));
 
             overlay = new GameObject("SystemMenuOverlay", typeof(RectTransform), typeof(Image));
             overlay.transform.SetParent(transform, false);
@@ -71,8 +88,12 @@ namespace SpireChess.UI.Common
             var cardRect = card.GetComponent<RectTransform>();
             cardRect.anchorMin = cardRect.anchorMax = new Vector2(0.5f, 0.5f);
             cardRect.pivot = new Vector2(0.5f, 0.5f);
-            cardRect.sizeDelta = new Vector2(560f, 500f);
-            card.GetComponent<Image>().color = new Color(0.08f, 0.105f, 0.15f, 1f);
+            cardRect.sizeDelta = new Vector2(600f, 640f);
+            var cardImage = card.GetComponent<Image>();
+            cardImage.color = new Color(0.060f, 0.058f, 0.072f, 1f);
+            AddOutline(
+                cardImage,
+                new Color(0.68f, 0.50f, 0.25f, 0.84f));
             var layout = card.GetComponent<VerticalLayoutGroup>();
             layout.padding = new RectOffset(48, 48, 46, 46);
             layout.spacing = 22f;
@@ -81,24 +102,62 @@ namespace SpireChess.UI.Common
             layout.childControlHeight = true;
             layout.childForceExpandHeight = false;
 
-            CreateText(card.transform, "Title", "单局菜单", 38, 70f, FontStyle.Bold);
-            status = CreateText(card.transform, "Status", string.Empty, 22, 62f, FontStyle.Normal);
-            var resume = CreateButton(card.transform, "ResumeButton", "继续游戏", new Vector2(0f, 70f));
+            var title = CreateText(
+                card.transform,
+                "Title",
+                "单局菜单",
+                38,
+                70f,
+                FontStyle.Bold,
+                font);
+            title.color = new Color(0.98f, 0.86f, 0.58f, 1f);
+            status = CreateText(
+                card.transform,
+                "Status",
+                string.Empty,
+                22,
+                62f,
+                FontStyle.Normal,
+                font);
+            var resume = CreateButton(
+                card.transform,
+                "ResumeButton",
+                "继续游戏",
+                new Vector2(0f, 70f),
+                font);
+            var settings = CreateButton(
+                card.transform,
+                "AudioSettingsButton",
+                "音频设置",
+                new Vector2(0f, 70f),
+                font);
             saveAndReturnButton = CreateButton(
                 card.transform,
                 "SaveReturnButton",
                 "保存并返回主菜单",
-                new Vector2(0f, 70f));
+                new Vector2(0f, 70f),
+                font);
             abandonButton = CreateButton(
                 card.transform,
                 "AbandonButton",
                 "放弃当前单局",
-                new Vector2(0f, 70f));
+                new Vector2(0f, 70f),
+                font,
+                true);
             abandonLabel = abandonButton.GetComponentInChildren<Text>();
             resume.onClick.AddListener(Close);
+            resume.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiCancel));
+            settings.onClick.AddListener(OpenAudioSettings);
+            settings.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiClick));
             saveAndReturnButton.onClick.AddListener(SaveAndReturn);
             abandonButton.onClick.AddListener(Abandon);
             overlay.SetActive(false);
+            audioSettingsPanel = AudioSettingsPanelView.Create(
+                transform,
+                font,
+                true);
         }
 
         private void Open()
@@ -116,12 +175,20 @@ namespace SpireChess.UI.Common
 
         private void Close()
         {
+            audioSettingsPanel?.Close();
             overlay.SetActive(false);
+        }
+
+        private void OpenAudioSettings()
+        {
+            audioSettingsPanel?.Open();
         }
 
         private void SaveAndReturn()
         {
-            if (GameApp.Instance.SaveAndReturnToMainMenu())
+            var succeeded = GameApp.Instance.SaveAndReturnToMainMenu();
+            PlayUiCue(ResolveSaveAndReturnCue(succeeded));
+            if (succeeded)
             {
                 return;
             }
@@ -129,16 +196,25 @@ namespace SpireChess.UI.Common
             status.text = "保存失败，请检查存储空间后重试";
         }
 
+        public static string ResolveSaveAndReturnCue(bool succeeded)
+        {
+            return succeeded
+                ? PresentationAudioCueIds.UiConfirm
+                : PresentationAudioCueIds.UiError;
+        }
+
         private void Abandon()
         {
             if (!confirmingAbandon)
             {
+                PlayUiCue(PresentationAudioCueIds.UiClick);
                 confirmingAbandon = true;
                 abandonLabel.text = "再次点击确认放弃";
                 status.text = "放弃后将删除本地单局存档";
                 return;
             }
 
+            PlayUiCue(PresentationAudioCueIds.UiConfirm);
             GameApp.Instance.AbandonRun();
             GameApp.Instance.Router.GoToMainMenu();
         }
@@ -147,7 +223,9 @@ namespace SpireChess.UI.Common
             Transform parent,
             string name,
             string label,
-            Vector2 size)
+            Vector2 size,
+            Font font = null,
+            bool danger = false)
         {
             var gameObject = new GameObject(
                 name,
@@ -160,9 +238,24 @@ namespace SpireChess.UI.Common
             var layout = gameObject.GetComponent<LayoutElement>();
             layout.preferredHeight = size.y;
             if (size.x > 0f) layout.preferredWidth = size.x;
-            gameObject.GetComponent<Image>().color = new Color(0.16f, 0.24f, 0.34f, 0.98f);
+            var image = gameObject.GetComponent<Image>();
+            image.color = danger
+                ? new Color(0.30f, 0.12f, 0.12f, 0.98f)
+                : new Color(0.14f, 0.20f, 0.21f, 0.98f);
+            AddOutline(
+                image,
+                danger
+                    ? new Color(0.72f, 0.28f, 0.24f, 0.76f)
+                    : new Color(0.46f, 0.38f, 0.22f, 0.66f));
             var button = gameObject.GetComponent<Button>();
-            var text = CreateText(gameObject.transform, "Label", label, 26, size.y, FontStyle.Bold);
+            var text = CreateText(
+                gameObject.transform,
+                "Label",
+                label,
+                26,
+                size.y,
+                FontStyle.Bold,
+                font);
             Stretch(text.rectTransform);
             return button;
         }
@@ -173,21 +266,36 @@ namespace SpireChess.UI.Common
             string value,
             int fontSize,
             float height,
-            FontStyle fontStyle)
+            FontStyle fontStyle,
+            Font font = null)
         {
             var gameObject = new GameObject(name, typeof(RectTransform), typeof(Text), typeof(LayoutElement));
             gameObject.transform.SetParent(parent, false);
             var text = gameObject.GetComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.font = font ??
+                        Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = fontSize;
             text.fontStyle = fontStyle;
             text.alignment = TextAnchor.MiddleCenter;
-            text.color = Color.white;
+            text.color = new Color(0.96f, 0.92f, 0.82f, 1f);
             text.text = value;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Truncate;
             gameObject.GetComponent<LayoutElement>().preferredHeight = height;
             return text;
+        }
+
+        private static void AddOutline(Image image, Color color)
+        {
+            var outline = image.gameObject.AddComponent<Outline>();
+            outline.effectColor = color;
+            outline.effectDistance = new Vector2(1f, -1f);
+            outline.useGraphicAlpha = true;
+        }
+
+        private static void PlayUiCue(string cueId)
+        {
+            AudioService.Instance?.PlayCue(cueId);
         }
 
         private static void Stretch(RectTransform rect)

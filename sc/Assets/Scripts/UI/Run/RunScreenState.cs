@@ -4,6 +4,23 @@ using SpireChess.Run;
 
 namespace SpireChess.UI.Run
 {
+    public enum RunMapPresentationStatus
+    {
+        Locked,
+        Reachable,
+        Current,
+        Resolved,
+        Abandoned
+    }
+
+    public enum RunMapEdgePresentationStatus
+    {
+        Locked,
+        Reachable,
+        Resolved,
+        Abandoned
+    }
+
     public enum RunUiActionType
     {
         None,
@@ -42,6 +59,7 @@ namespace SpireChess.UI.Run
     public sealed class RunMapNodeState
     {
         public string NodeId { get; set; }
+        public string IconId { get; set; }
         public string Title { get; set; }
         public string Subtitle { get; set; }
         public string RouteText { get; set; }
@@ -49,6 +67,7 @@ namespace SpireChess.UI.Run
         public int Row { get; set; }
         public RunNodeType Type { get; set; }
         public RunNodeStatus Status { get; set; }
+        public RunMapPresentationStatus PresentationStatus { get; set; }
         public bool IsInteractable { get; set; }
     }
 
@@ -58,6 +77,7 @@ namespace SpireChess.UI.Run
         public string ToNodeId { get; set; }
         public RunNodeStatus FromStatus { get; set; }
         public RunNodeStatus ToStatus { get; set; }
+        public RunMapEdgePresentationStatus PresentationStatus { get; set; }
     }
 
     public sealed class RunRelicState

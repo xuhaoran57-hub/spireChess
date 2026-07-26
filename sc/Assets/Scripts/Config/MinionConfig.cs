@@ -86,6 +86,13 @@ namespace SpireChess.Config
 
         public string GetPrototypeDescription(bool isGolden)
         {
+            if (IsToken && !string.IsNullOrWhiteSpace(Description))
+            {
+                return isGolden && !string.IsNullOrWhiteSpace(GoldenDescription)
+                    ? GoldenDescription
+                    : Description;
+            }
+
             var effects = isGolden ? GoldenEffects : Effects;
             if (effects == null || !effects.Any(effect => effect != null))
             {

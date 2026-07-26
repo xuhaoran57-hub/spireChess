@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using SpireChess.Shop;
 using SpireChess.UI;
 using SpireChess.UI.Shop;
 using UnityEditor;
@@ -94,6 +95,17 @@ namespace SpireChess.Tests.EditMode
                 Is.True);
             Assert.That(view, Is.Not.Null);
             Assert.That(view.HasCompleteBindings, Is.True);
+            Assert.That(
+                root.Find("SafeArea/BackdropArt")
+                    .GetComponent<PresentationBackdropGraphic>(),
+                Is.Not.Null);
+            Assert.That(
+                root.Find("SafeArea/TopBar").GetComponent<Outline>(),
+                Is.Not.Null);
+            Assert.That(
+                root.Find("SafeArea/FeedbackLayer/FloatingTextRoot")
+                    .GetComponent<PresentationFxPool>(),
+                Is.Not.Null);
             foreach (var path in RequiredScreenPaths)
             {
                 Assert.That(
@@ -293,6 +305,78 @@ namespace SpireChess.Tests.EditMode
             Assert.That(toastColor.r, Is.GreaterThan(toastColor.g));
             view.ShowStatus(null);
             Assert.That(toast.gameObject.activeSelf, Is.False);
+        }
+
+        [Test]
+        public void ShopEvents_UseFinitePresentationPoolAndRenderDoesNotReplay()
+        {
+            foreach (ShopEventType type in Enum.GetValues(typeof(ShopEventType)))
+            {
+                view.PlayPresentationEvent(new ShopEventData(
+                    type,
+                    cost: 3,
+                    tavernTier: 4,
+                    gold: 1,
+                    freeRefreshes: type == ShopEventType.OnRefresh ? 1 : 0));
+            }
+
+            var expected = Enum.GetValues(typeof(ShopEventType)).Length;
+            var pool = root.Find(
+                    "SafeArea/FeedbackLayer/FloatingTextRoot")
+                .GetComponent<PresentationFxPool>();
+            Assert.That(view.PresentationEventCount, Is.EqualTo(expected));
+            Assert.That(
+                view.LastPresentationEvent,
+                Is.EqualTo(ShopEventType.OnTavernUpgraded));
+            Assert.That(pool.ActiveCount, Is.EqualTo(pool.Capacity));
+            foreach (var graphic in pool.GetComponentsInChildren<Graphic>(true))
+            {
+                Assert.That(graphic.raycastTarget, Is.False);
+            }
+
+            view.Render(CreateState());
+            Assert.That(view.PresentationEventCount, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void AudioCueMapping_ConsumesOnlyPrimaryShopEvents()
+        {
+            var mapped = new[]
+            {
+                ShopEventType.OnRefresh,
+                ShopEventType.OnBuy,
+                ShopEventType.OnSell,
+                ShopEventType.OnPlay,
+                ShopEventType.OnSpellUsed,
+                ShopEventType.OnTripleFormed,
+                ShopEventType.OnDiscoverStarted,
+                ShopEventType.OnDiscoverResolved,
+                ShopEventType.OnTavernUpgraded
+            };
+            foreach (var type in mapped)
+            {
+                Assert.That(
+                    ShopScreenView.TryGetAudioCue(type, out var cueId),
+                    Is.True,
+                    type.ToString());
+                Assert.That(cueId, Is.Not.Empty);
+            }
+
+            var silent = new[]
+            {
+                ShopEventType.OnShopPhaseStart,
+                ShopEventType.OnShopPhaseEnd,
+                ShopEventType.OnTripleRewardGranted,
+                ShopEventType.OnDiscoverCancelled
+            };
+            foreach (var type in silent)
+            {
+                Assert.That(
+                    ShopScreenView.TryGetAudioCue(type, out var cueId),
+                    Is.False,
+                    type.ToString());
+                Assert.That(cueId, Is.Null);
+            }
         }
 
         [Test]

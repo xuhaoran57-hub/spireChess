@@ -101,6 +101,7 @@ namespace SpireChess.UI.Battle
             }
 
             model = value;
+            ResetPresentationState();
             ApplyCatalogSprites(value);
             ApplyPortrait(value);
             frame.color = value.IsGolden
@@ -145,6 +146,41 @@ namespace SpireChess.UI.Battle
                 healthText.color = healthDelta > 0
                     ? new Color(0.48f, 1f, 0.52f, 1f)
                     : new Color(1f, 0.36f, 0.30f, 1f);
+            }
+        }
+
+        public void ResetPresentationState()
+        {
+            if (this == null)
+            {
+                return;
+            }
+
+            if (rectTransform == null)
+            {
+                rectTransform = GetComponent<RectTransform>();
+            }
+            if (canvasGroup == null)
+            {
+                canvasGroup = GetComponent<CanvasGroup>();
+            }
+
+            if (rectTransform != null)
+            {
+                rectTransform.anchoredPosition = Vector2.zero;
+                rectTransform.localScale = Vector3.one;
+            }
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1f;
+            }
+            if (attackText != null)
+            {
+                attackText.color = Color.white;
+            }
+            if (healthText != null)
+            {
+                healthText.color = Color.white;
             }
         }
 

@@ -64,7 +64,7 @@ namespace SpireChess.Tests.EditMode
             SequentialAssert.Run(() =>
             {
                 Assert.That(UiTextFormatter.GetDescriptionMaxLines(
-                    CardDisplayMode.Full, true, false), Is.EqualTo(4));
+                    CardDisplayMode.Full, true, false), Is.EqualTo(5));
                 Assert.That(UiTextFormatter.GetDescriptionMaxLines(
                     CardDisplayMode.Full, true, true), Is.EqualTo(2));
                 Assert.That(UiTextFormatter.GetDescriptionMaxLines(
@@ -112,6 +112,23 @@ namespace SpireChess.Tests.EditMode
                     value,
                     CardDisplayMode.Full,
                     fits));
+        }
+
+        [Test]
+        public void CompactDescription_TruncatesAtUnicodeTextElementBoundary()
+        {
+            var value = "甲e\u0301😀乙";
+
+            var result = UiTextFormatter.EllipsizeDescription(
+                value,
+                CardDisplayMode.Compact,
+                candidate => UiTextFormatter.CountTextElements(candidate) <= 3);
+
+            SequentialAssert.Run(() =>
+            {
+                Assert.That(result, Is.EqualTo("甲e\u0301…"));
+                Assert.That(UiTextFormatter.CountTextElements(result), Is.EqualTo(3));
+            });
         }
 
         [Test]

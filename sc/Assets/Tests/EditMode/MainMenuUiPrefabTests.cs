@@ -1,5 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
+using SpireChess.UI;
+using SpireChess.UI.Common;
 using SpireChess.UI.MainMenu;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -28,6 +30,28 @@ namespace SpireChess.Tests.EditMode
             Assert.That(Find(prefab, "DeleteButton"), Is.Not.Null);
             Assert.That(Find(prefab, "QuitButton"), Is.Not.Null);
             Assert.That(Find(prefab, "PF_ConfirmDialog"), Is.Not.Null);
+            Assert.That(
+                Find(prefab, "AudioSettingsPanel")
+                    .GetComponent<AudioSettingsPanelView>()
+                    .HasCompleteBindings,
+                Is.True);
+            Assert.That(Find(prefab, "MasterSlider"), Is.Not.Null);
+            Assert.That(Find(prefab, "MusicSlider"), Is.Not.Null);
+            Assert.That(Find(prefab, "SFXSlider"), Is.Not.Null);
+            Assert.That(Find(prefab, "UISlider"), Is.Not.Null);
+            Assert.That(
+                Find(prefab, "BackdropArt")
+                    .GetComponent<PresentationBackdropGraphic>(),
+                Is.Not.Null);
+            Assert.That(
+                Find(prefab, "SettingsButton")
+                    .GetComponentInChildren<Text>().text,
+                Is.EqualTo("设置"));
+            Assert.That(
+                prefab.GetComponentsInChildren<Text>(true)
+                    .All(text => text.font != null &&
+                                 text.font.name.Contains("NotoSansCJK")),
+                Is.True);
         }
 
         [Test]
@@ -37,6 +61,55 @@ namespace SpireChess.Tests.EditMode
                 AssetDatabase.LoadAssetAtPath<GameObject>(
                     "Assets/Prefabs/UI/MainMenu/PF_ConfirmDialog.prefab"),
                 Is.Not.Null);
+        }
+
+        [Test]
+        public void MainMenuAndAudioSettings_CopyHasNonCollapsingTextGeometry()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/UI/MainMenu/PF_MainMenuScreen.prefab");
+
+            Assert.That(prefab, Is.Not.Null);
+            AssertText(
+                prefab.transform.Find("Background/MenuCard/Title"),
+                "尖塔棋局",
+                104f);
+            AssertText(
+                prefab.transform.Find(
+                    "AudioSettingsPanel/SettingsCard/Title"),
+                "音频设置",
+                76f);
+            AssertText(
+                prefab.transform.Find(
+                    "AudioSettingsPanel/SettingsCard/Hint"),
+                "设置保存在本机，与单局存档相互独立",
+                48f);
+            Assert.That(
+                prefab.transform.Find(
+                        "AudioSettingsPanel/SettingsCard")
+                    .GetComponent<RectTransform>().sizeDelta.y,
+                Is.GreaterThanOrEqualTo(700f));
+
+            Assert.That(
+                prefab.transform.Find(
+                        "AudioSettingsPanel/SettingsCard/MasterRow/Label")
+                    .GetComponent<Text>().text,
+                Is.EqualTo("总音量"));
+            Assert.That(
+                prefab.transform.Find(
+                        "AudioSettingsPanel/SettingsCard/MusicRow/Label")
+                    .GetComponent<Text>().text,
+                Is.EqualTo("音乐"));
+            Assert.That(
+                prefab.transform.Find(
+                        "AudioSettingsPanel/SettingsCard/SFXRow/Label")
+                    .GetComponent<Text>().text,
+                Is.EqualTo("音效"));
+            Assert.That(
+                prefab.transform.Find(
+                        "AudioSettingsPanel/SettingsCard/UIRow/Label")
+                    .GetComponent<Text>().text,
+                Is.EqualTo("界面"));
         }
 
         [Test]
@@ -67,6 +140,11 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(canvases[0].renderMode,
                     Is.EqualTo(RenderMode.ScreenSpaceOverlay));
                 Assert.That(canvases[0].worldCamera, Is.Null);
+                Assert.That(
+                    roots.SelectMany(value =>
+                        value.GetComponentsInChildren<AudioListener>(true))
+                        .Count(listener => listener.enabled),
+                    Is.EqualTo(1));
             }
             finally
             {
@@ -85,6 +163,23 @@ namespace SpireChess.Tests.EditMode
             }
 
             return null;
+        }
+
+        private static void AssertText(
+            Transform transform,
+            string expected,
+            float expectedMinimumHeight)
+        {
+            Assert.That(transform, Is.Not.Null, expected);
+            Assert.That(
+                transform.GetComponent<Text>().text,
+                Is.EqualTo(expected));
+            var layout = transform.GetComponent<LayoutElement>();
+            Assert.That(layout, Is.Not.Null, expected);
+            Assert.That(
+                layout.minHeight,
+                Is.GreaterThanOrEqualTo(expectedMinimumHeight),
+                expected);
         }
     }
 }

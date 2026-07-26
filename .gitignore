@@ -29,3 +29,9 @@ test
 # Python generated cache
 __pycache__/
 *.py[cod]
+
+# Reproducible Phase 9B G3 local audio placeholders
+sc/Assets/Audio/Presentation/Music/Placeholder/*.wav
+sc/Assets/Audio/Presentation/Music/Placeholder/*.wav.meta
+sc/Assets/Audio/Presentation/SFX/*/Placeholder/*.wav
+sc/Assets/Audio/Presentation/SFX/*/Placeholder/*.wav.meta

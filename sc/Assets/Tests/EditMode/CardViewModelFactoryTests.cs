@@ -44,6 +44,7 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(model.Cost, Is.EqualTo(ShopEconomyRules.MinionPurchaseCost));
                 Assert.That(model.DisplayMode, Is.EqualTo(CardDisplayMode.Full));
                 Assert.That(model.IsMinion, Is.True);
+                Assert.That(model.IsToken, Is.False);
                 Assert.That(model.ShowCost, Is.True);
                 Assert.That(model.IsGolden, Is.False);
                 Assert.That(model.IsAffordable, Is.False);
@@ -80,6 +81,7 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(model.Cost, Is.EqualTo(ShopEconomyRules.SpellPurchaseCost));
                 Assert.That(model.DisplayMode, Is.EqualTo(CardDisplayMode.Full));
                 Assert.That(model.IsMinion, Is.False);
+                Assert.That(model.IsToken, Is.False);
                 Assert.That(model.ShowCost, Is.True);
                 Assert.That(model.IsGolden, Is.False);
                 Assert.That(model.IsAffordable, Is.False);
@@ -88,6 +90,25 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(model.Health, Is.Zero);
                 Assert.That(model.HasShield, Is.False);
                 Assert.That(model.IsTemporary, Is.False);
+            });
+        }
+
+        [Test]
+        public void TokenOffer_MapsTokenIdentityAndSuppressesCost()
+        {
+            var token = CreateMinion();
+            token.Id = "token_test_spirit";
+            token.IsToken = true;
+            token.Tier = 0;
+
+            var model = ShopCardViewModelFactory.FromOffer(token, 10);
+
+            SequentialAssert.Run(() =>
+            {
+                Assert.That(model.IsMinion, Is.True);
+                Assert.That(model.IsToken, Is.True);
+                Assert.That(model.ShowCost, Is.False);
+                Assert.That(model.Tier, Is.Zero);
             });
         }
 
@@ -126,6 +147,7 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(model.Description, Is.EqualTo("金色描述"));
                 Assert.That(model.DisplayMode, Is.EqualTo(CardDisplayMode.Compact));
                 Assert.That(model.IsMinion, Is.True);
+                Assert.That(model.IsToken, Is.False);
                 Assert.That(model.ShowCost, Is.False);
                 Assert.That(model.IsGolden, Is.True);
                 Assert.That(model.IsSelected, Is.True);
@@ -140,6 +162,30 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(model.IsTemporary, Is.False);
                 Assert.That(model.Keywords,
                     Is.EquivalentTo(new[] { "嘲讽", "护盾", "溅射" }));
+            });
+        }
+
+        [Test]
+        public void OwnedToken_PreservesTokenIdentity()
+        {
+            var token = CreateMinion();
+            token.Id = "token_owned_spirit";
+            token.IsToken = true;
+            token.Tier = 0;
+            var owned = ShopCardInstance.CreateMinion(
+                "token_owned_001",
+                token,
+                false);
+
+            var model = ShopCardViewModelFactory.FromOwned(owned, false);
+
+            SequentialAssert.Run(() =>
+            {
+                Assert.That(model.InstanceId, Is.EqualTo("token_owned_001"));
+                Assert.That(model.IsMinion, Is.True);
+                Assert.That(model.IsToken, Is.True);
+                Assert.That(model.ShowCost, Is.False);
+                Assert.That(model.DisplayMode, Is.EqualTo(CardDisplayMode.Compact));
             });
         }
 
@@ -162,6 +208,7 @@ namespace SpireChess.Tests.EditMode
                     Is.EqualTo(new[] { "下场战斗", "护盾" }));
                 Assert.That(model.DisplayMode, Is.EqualTo(CardDisplayMode.Compact));
                 Assert.That(model.IsMinion, Is.False);
+                Assert.That(model.IsToken, Is.False);
                 Assert.That(model.ShowCost, Is.False);
                 Assert.That(model.IsGolden, Is.False);
                 Assert.That(model.IsSelected, Is.False);

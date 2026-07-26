@@ -80,9 +80,7 @@ namespace SpireChess.UI.MainMenu
 
         public void OpenSettingsPlaceholder()
         {
-            statusMessage = "设置将在后续阶段开放";
-            statusIsError = false;
-            Refresh();
+            screenView?.ShowSettings();
         }
 
         public void QuitGame()

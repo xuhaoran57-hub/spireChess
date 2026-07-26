@@ -536,6 +536,8 @@ namespace SpireChess.UI.Shop
             {
                 eventLog.RemoveAt(0);
             }
+
+            screenView?.PlayPresentationEvent(eventData);
         }
 
         private void RefreshAll()

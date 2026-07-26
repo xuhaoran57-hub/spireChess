@@ -1,7 +1,8 @@
 # 阶段 9B 视听表现纵向切片技术与制作方案 v0.1
 
 - 日期：2026-07-22
-- 状态：G1 已通过并关闭；项目方已接受生产效率门槛并确认 28 项活动生产候选的个人版 OpenAI 服务生产许可；G2 技术预接入仍仅为未验证候选
+- 更新：2026-07-26（G3 本地程序合成占位播放链路已接入；正式音频改为项目负责人 AI 自制）
+- 状态：G1、G2 已通过并关闭；39 项活动生产 Sprite 均为 `Runtime Ready`；G3 工程与 67 个本地占位 Clip 为 `Commissioning Ready`，正式 AI 音频尚未生成和验收，G3 总门禁未关闭
 - 实现基线：`5545a4e fix(ui): add main menu display camera`
 - 内容版本：5.5.0
 - 最低规则版本：8B.1
@@ -14,12 +15,15 @@
 
 ## 1. 背景与结论
 
-阶段 7 至 9A 已经完成共享卡牌、商店、战斗、地图、主菜单和存档恢复的工程结构。现有 Prefab、ViewModel、View、Controller、结构化战斗事件和双分辨率布局可以作为正式表现的承载层，但当前视觉仍以纯色、文字和占位图形为主：
+阶段 7 至 9A 已经完成共享卡牌、商店、战斗、地图、主菜单和存档恢复的工程结构。
+以下三项是 9B 立项时的历史基线，不代表 G2 关闭后的当前资产状态：
 
 - 67 个随从配置全部使用 `placeholder_*` 插画 ID，当前仅不熄炉王映射到工程样板 Sprite；67 个 `audioId` 均为空；
 - 16 张法术全部使用占位插画 ID，16 个 `audioId` 均为空；
 - 15 件遗珍已有语义图标 ID，但项目中尚无对应 Sprite；
-- `sc/Assets/Art` 已有 28 项清理生产许可的活动候选，其中部分仅有离线 master、部分已作 G2 技术预接入；材质、动画、音效和 BGM 仍无已清生产许可的正式资产，且任何候选在 G2 验收前都不是 Runtime Ready；
+- G1/G2 随后已使 `sc/Assets/Art` 的 39 项活动生产 Sprite 通过生产许可与技术门禁，
+  均为 `Runtime Ready`；正式音效与 BGM 改为项目负责人 AI 自制，在生成、来源/
+  条款登记、技术门禁和人工听审完成前不得标记为 Runtime Ready；
 - `PF_Card`、`PF_ShopScreen`、`PF_BattleScreen`、`PF_RunScreen` 和 `PF_MainMenuScreen` 已具备信息与交互契约，但不代表最终美术品质。
 
 9B 不直接生产全部内容。先以第一层 10–15 分钟体验为纵向切片，冻结美术方向、资产规格、运行时接线、通用反馈和音频管线，再决定是否进入全量资产生产。自动平衡 S0/S1 可以与表现制作并行；依赖体验判断的 S2 人工单局应在 9B 第一版完成后执行。
@@ -36,7 +40,7 @@
 
 ### 2.2 成功标准
 
-- 指定流程中不存在纯色方块或缺失引用；未制作专属插画的卡牌使用明确的种族剪影回退图，不显示空白或开发占位图。
+- 指定样板流程中的 12 随从、3 Token、4 法术和 3 遗珍必须精确命中，不显示空白或开发占位图；非样板资源保留语义回退机制，当前缺图必须显式进入诊断而不能静默伪装成正式美术。
 - 12 张样板随从和 3 个关联 Token 在 Full/Compact、普通/金色、商店/战斗/选择层中身份一致。
 - 购买、出售、刷新、冻结、升级、上场、施法、三连、发现、攻击、受伤、护盾、属性变化、死亡、召唤和胜负均有可识别反馈。
 - 主菜单、地图/商店、普通战斗至少各有一套可循环 BGM；Master/Music/SFX/UI 四条音量通道可独立调节。
@@ -95,7 +99,7 @@
 - Token：幼灵、双尾狐影、迅捷幼灵，共 3 张；前两者为样板随从直接依赖，迅捷幼灵用于立即攻击与 Token 统一风格验收。
 - 法术：小型锻体、免费刷新、高阶发现、战前赐福，共 4 张；分别覆盖目标成长、经济、发现和下一战状态。
 - 遗珍：回魂丧钟、千盾王冠、漏刻齿轮，共 3 个正式图标；分别覆盖亡语、护盾和刷新语义。
-- 种族剪影回退：铸魂、荒灵、星契、旅团各 1 张；未制作专属插画的卡牌在 9B 使用回退图，不能使用空白或纯色块。
+- 回退与诊断：保留铸魂、荒灵、星契、旅团及四类法术的语义回退代码契约；按项目优先级，本轮不制作 4+4 张精美回退图，只保留 1 张高可见缺图诊断图，并以自动化强制样板范围精确命中。
 - 地图：商店、普通、精英、事件、锻造、恢复、Boss 七类节点图标与可达、当前、完成、锁定、放弃五种状态。
 
 ## 4. 美术方向与评审门
@@ -150,7 +154,7 @@
 
 1. `CardViewModel` 增加只读语义字段 `ArtId`；随从/法术 Factory 直接从配置映射，不传 Sprite 或 Unity 对象。
 2. 建立 `PresentationSpriteCatalog : ScriptableObject`，以稳定字符串 ID 映射 Sprite；禁止每次 Render 调用 `Resources.Load`。
-3. `PF_Card` 序列化引用同一个 Catalog；`CardView` 按 `ArtId` 解析，未命中时按种族/法术类型使用明确的回退图并记录一次诊断。
+3. `PF_Card` 序列化引用同一个 Catalog；`CardView` 按 `ArtId` 依次执行精确命中、种族/法术类型语义回退、缺图诊断并对同一缺失只记录一次。当前未制作 4+4 精美回退 Sprite 时必须进入显式诊断，不得用纯色或空白冒充正式资源。
 4. 9B 保留现有 `placeholder_*` 配置 ID，不仅为改名修改配置哈希或让现有存档失效；Catalog 可以把该稳定 ID 指向正式样板 Sprite。
 5. 正式样板卡的自动化门禁要求精确 ID 命中，不能用种族回退悄悄通过。
 
@@ -193,20 +197,24 @@ sc/Assets/Art/Presentation/
 └── Licenses/
 
 sc/Assets/Audio/Presentation/
+├── SpireChessAudio.mixer
 ├── Music/
 ├── SFX/UI/
 ├── SFX/Shop/
 ├── SFX/Run/
-├── SFX/Battle/
-└── Mixers/
+└── SFX/Battle/
 
 sc/Assets/Configs/Presentation/
 ├── PresentationTheme.asset
-├── PresentationSpriteCatalog.asset
+└── PresentationSpriteCatalog.asset
+
+sc/Assets/Resources/Presentation/
 └── PresentationAudioCatalog.asset
 ```
 
-源文件与运行时导出分离。分层 PSD/KRA、DAW 工程和高采样率母带只有在确认 Git LFS 或外部资产库方案后才能加入仓库；在此之前 Git 只保存可复现的运行时导出、来源记录和许可证。
+源文件与运行时导出分离。分层 PSD/KRA、DAW 工程、AI 原始输出和无损母带只有在
+确认 Git LFS 或外部资产库方案后才能加入仓库；当前约 100.10 MB 的可复现占位 WAV
+尚未提交，普通 Git、按需生成与 LFS 之间仍需明确选择。来源记录和条款快照必须保存。
 
 命名规则：
 
@@ -215,7 +223,7 @@ sc/Assets/Configs/Presentation/
 - 法术：`card_spell_<config-id>.png`
 - 遗珍：`icon_relic_<config-id>.png`
 - 地图：`icon_map_<node-type>_<state>.png`
-- 音效：`sfx_<domain>_<cue>_<variant>.wav`
+- 音效：`SFX/<Domain>/sfx_<cue-id>_<NN>.wav`；Cue ID 已含领域前缀，不重复拼接
 - BGM：`bgm_<context>_<version>.ogg`
 
 文件名使用小写 ASCII 和下划线；中文名称只出现在配置、文档和来源台账中。
@@ -258,6 +266,13 @@ sc/Assets/Configs/Presentation/
 
 9B 不填写每张卡的 `audioId`。购买、刷新、护盾、死亡等使用事件级通用 Cue；只有未来确需专属语音/音效的卡牌才使用配置中的 `audioId`，避免为 64 张卡制造无必要的音频债务。
 
+3 首 BGM 与 P0 音效由项目负责人使用 AI 工具自行生成。代码、Mixer、Catalog、设置、
+事件映射、并发/冷却与严格接入验证由项目工程完成；正式 AI 文件尚未生成，或工具/
+模型、Prompt、服务条款、参考输入、编辑链和 SHA-256 不完整时，只能处于
+`AI Draft/Production Candidate`，不得批准。显式标记的 `Local Synth Placeholder`
+可用于联调，但不能通过生产严格校验，也不能标记为 G3 Runtime Ready。权威生产规范
+见 `phase-9b-g3-ai-audio-production-spec-v0.1.md`。
+
 音频导入基线：
 
 - 短 SFX 保留 WAV 源，Unity 内按长度选择 Decompress On Load 或 ADPCM；高频短音不得使用高延迟 Streaming。
@@ -289,19 +304,35 @@ sc/Assets/Configs/Presentation/
 
 ### G2：卡牌流水线打通
 
-- 实现 ArtId → Sprite Catalog → CardView 接线和种族回退图。
+- 实现 ArtId → Sprite Catalog → CardView 接线、语义回退机制和缺图诊断。
 - 完成 12 张样板随从、3 个 Token、4 张法术和普通/金色框架。
 - 在 Full/Compact、商店/战斗/选择层完成截图与回归。
 
-退出条件：样板卡不依赖单卡代码分支；配置未命中有诊断；自动化阻止样板卡回退。
+完成记录：样板卡不依赖单卡代码分支；24 个语义 ID 精确命中，非法 ID 诊断，
+新增 6 随从、3 Token、4 法术 v0.4 双分辨率卡面矩阵及 EditMode 294 / 294、
+PlayMode 22 / 22 均通过。项目负责人于 2026-07-25 确认新增 11 项生产使用许可，
+签字边界见 `phase-9b-g2-production-license-signoff-v0.1.md`；G2 关闭。
 
 ### G3：屏幕、VFX 与音频接入
 
 - 重制 MainMenu、Shop、Run/Map、Battle 和 Choice/System Menu 皮肤。
-- 接入通用商店反馈、战斗事件 VFX、3 套 BGM 和第一批音效。
+- 接入通用商店反馈、战斗事件 VFX；完成 3 套 BGM 和 P0 音效的 AI 自制生产契约、
+  Prompt/变体矩阵、运行时架构与严格门禁，待正式 AI 候选完成来源和听审后接入。
 - 接入音量设置与场景间 BGM 切换。
 
+工程完成记录：统一皮肤、7 类地图节点、5 类节点状态、4 类连线状态、Shop 反馈、
+Battle 十类事件、有限 VFX 池、结果层、2×/跳过/重置清理均已接入。Mixer、28 Cue
+Catalog、AudioService、MusicDirector、并发/冷却和四路本机音量设置已完成；
+`Commissioning` 校验通过；28 Cue 已挂接 67 个可播放 `Placeholder` Clip，
+`ProductionStrict` 因 28 个 Cue 均非 `ProductionApproved` 按设计失败。
+真实 GPU 双分辨率证据覆盖 MainMenu、Shop、Battle、Run；独立审核发现已修复，
+最终工程回归为 EditMode 346 / 346、PlayMode 25 / 25，
+0 失败、0 跳过。详细边界与证据见
+`phase-9b-g3-engineering-handoff-v0.1.md`。
+
 退出条件：正式流程从主菜单到奖励返回无空白资产、无重复播放、无输入阻塞。
+本条件还要求正式 AI 音频完成生成、来源/条款与严格门禁通过并由项目负责人听审；当前
+只完成工程与占位播放链路，不把可播放的 Placeholder Catalog 解释为 G3 已关闭。
 
 ### G4：集成验收与外部试玩
 
@@ -317,7 +348,7 @@ sc/Assets/Configs/Presentation/
 
 - Sprite Catalog/Audio Catalog ID 唯一、非空且引用资源存在。
 - 12 张样板随从、3 个 Token、4 张法术和 3 件遗珍全部精确命中正式资源。
-- 其余卡牌能够命中合法的种族/法术回退图，并只记录一次缺失诊断。
+- Sprite Catalog 的精确命中 → 语义回退 → 缺图诊断顺序正确；未提供精美回退 Sprite 时显式命中诊断，并只记录一次缺失。
 - `PF_Card`、各屏幕 Prefab、Mixer 和 Theme 序列化引用完整。
 - 普通/金色共享插画但框架/材质不同；法术不显示金色、攻防和随从状态。
 - Full/Compact 几何、66/45 文本上限和状态优先级继续通过阶段 7 测试。
@@ -368,7 +399,7 @@ sc/Assets/Configs/Presentation/
 | 风险 | 控制 |
 | --- | --- |
 | 未定风格就批量画 64 张卡 | G1 前只制作 Style Tile；G1 后先完成 12 张样板 |
-| 样板流程随机出现无专属插画卡 | 提供四种种族剪影回退；专项预览精确展示样板卡，不修改正式牌池 |
+| 样板流程随机出现无专属插画卡 | 样板范围用自动化强制精确命中；其余内容保留语义回退机制并显式诊断，4+4 精美回退图按已确认优先级暂缓 |
 | 为金色卡重复全部插画导致成本翻倍 | 默认共享插画，用框架/材质区分；独立金色插画逐张立项 |
 | 表现层重新计算规则或消费 RNG | 只消费 ViewModel/结构化事件；表现随机使用独立源；确定性回归 |
 | 大量图片导致仓库和内存膨胀 | 源文件与运行时导出分离；先确定 LFS/外部库；统一 Max Size 和压缩 |
@@ -382,7 +413,7 @@ sc/Assets/Configs/Presentation/
 1. 评审并冻结本方案与资产盘点表。
 2. 建立 Before 截图、资源/性能基线和来源台账模板。
 3. 完成两套 Style Tile，执行 G1 评审。
-4. 建立 Sprite Catalog、Theme、ArtId 接线和种族回退图。
+4. 建立 Sprite Catalog、Theme、ArtId 接线、语义回退机制与缺图诊断。
 5. 完成三张风格锚点卡：铸魂盾侍、万蹄奔潮、天穹契约者普通/金色。
 6. 完成剩余 9 张样板随从、3 个 Token、4 张法术和 3 件遗珍。
 7. 依次换肤 Card → Shop → Run/Map → Battle → MainMenu/弹窗，保持每一步可回归。
@@ -395,7 +426,7 @@ sc/Assets/Configs/Presentation/
 
 阶段 9B 只有同时满足以下条件才算完成：
 
-- 12 张样板随从、3 个 Token、4 张法术、3 件遗珍和四类回退图全部 Runtime Ready；
+- 12 张样板随从、3 个 Token、4 张法术、3 件遗珍和缺图诊断图全部 Runtime Ready；4+4 精美回退图按已确认优先级暂缓，但解析机制与样板精确命中门禁必须保留；
 - 卡牌、商店、地图、战斗、主菜单和选择/系统菜单使用同一冻结视觉语言；
 - 核心商店/战斗事件有通用动画、VFX 和音效，三个上下文有可循环 BGM；
 - Master/Music/SFX/UI 设置可用且独立于单局存档；

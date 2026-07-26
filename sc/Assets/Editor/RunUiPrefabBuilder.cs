@@ -5,6 +5,7 @@ using System.Linq;
 using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.UI;
+using SpireChess.UI.Common;
 using SpireChess.UI.Run;
 using SpireChess.Utils;
 using UnityEditor;
@@ -59,21 +60,34 @@ namespace SpireChess.Editor
                 throw new InvalidOperationException(
                     "Run UI requires PresentationSpriteCatalog.");
             }
+            var theme = AssetDatabase.LoadAssetAtPath<PresentationTheme>(
+                BattleUiPrefabBuilder.ThemePath);
+            if (theme == null)
+            {
+                throw new InvalidOperationException(
+                    "Run UI requires PresentationTheme.");
+            }
 
-            BuildMapNode(font);
-            BuildMapEdge();
-            BuildRelicEntry(font, spriteCatalog);
-            BuildChoiceOption(font, spriteCatalog);
+            BuildMapNode(font, theme);
+            BuildMapEdge(theme);
+            BuildRelicEntry(font, spriteCatalog, theme);
+            BuildChoiceOption(font, spriteCatalog, theme);
             BuildScreen(
                 font,
                 LoadPrefab(NodePrefabPath),
                 LoadPrefab(EdgePrefabPath),
                 LoadPrefab(RelicPrefabPath),
-                LoadPrefab(ChoicePrefabPath));
+                LoadPrefab(ChoicePrefabPath),
+                theme);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             WireRunTestScene();
             Debug.Log("[RunUI] Rebuilt formal run prefabs.");
+        }
+
+        public static void BuildFromCommandLine()
+        {
+            Build();
         }
 
         [MenuItem("Spire Chess/UI/Rebuild and Capture Run UI")]
@@ -153,7 +167,7 @@ namespace SpireChess.Editor
                 repositoryRoot,
                 "ui-concepts",
                 "unity-validation",
-                "pf-run-screen-v0.1");
+                "g3-run-screen-v0.1");
             Directory.CreateDirectory(outputDirectory);
             Capture(camera, canvasRect, 1920, 1080,
                 Path.Combine(outputDirectory, "run-screen-1920x1080.png"));
@@ -187,11 +201,40 @@ namespace SpireChess.Editor
             view.Render(state);
             Capture(camera, canvasRect, 1920, 1080,
                 Path.Combine(outputDirectory, "run-choice-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(outputDirectory, "run-choice-1920x1200.png"));
+
+            state.Choice = null;
+            view.Render(state);
+            var systemMenu = RunSystemMenuView.Attach(view, () => true);
+            var menuButton = systemMenu
+                .GetComponentsInChildren<Button>(true)
+                .Single(button => button.name == "MenuButton");
+            menuButton.onClick.Invoke();
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(outputDirectory, "system-menu-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(outputDirectory, "system-menu-1920x1200.png"));
+
+            var audioSettingsButton = systemMenu
+                .GetComponentsInChildren<Button>(true)
+                .Single(button => button.name == "AudioSettingsButton");
+            audioSettingsButton.onClick.Invoke();
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(
+                    outputDirectory,
+                    "system-audio-settings-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(
+                    outputDirectory,
+                    "system-audio-settings-1920x1200.png"));
             AssetDatabase.SaveAssets();
             Debug.Log("[RunUI] Captured validation screenshots to " + outputDirectory);
         }
 
-        private static void BuildMapNode(Font font)
+        private static void BuildMapNode(
+            Font font,
+            PresentationTheme theme)
         {
             var root = new GameObject(
                 "PF_RunMapNode",
@@ -205,38 +248,95 @@ namespace SpireChess.Editor
             try
             {
                 var rect = root.GetComponent<RectTransform>();
-                rect.sizeDelta = new Vector2(154f, 104f);
+                rect.sizeDelta = new Vector2(166f, 116f);
                 var image = root.GetComponent<Image>();
-                image.color = new Color(0.12f, 0.30f, 0.38f, 1f);
+                image.color = theme.GetMapNodeColor(
+                    RunNodeType.Shop,
+                    RunMapPresentationStatus.Reachable);
                 var outline = root.GetComponent<Outline>();
-                outline.effectColor = new Color(1f, 1f, 1f, 0.18f);
+                outline.effectColor = theme.GetMapStatusColor(
+                    RunMapPresentationStatus.Reachable);
                 outline.effectDistance = new Vector2(2f, -2f);
                 var button = root.GetComponent<Button>();
                 button.targetGraphic = image;
+                ConfigureButton(button, theme);
                 var element = root.GetComponent<LayoutElement>();
-                element.minWidth = element.preferredWidth = 154f;
-                element.minHeight = element.preferredHeight = 104f;
+                element.minWidth = element.preferredWidth = 166f;
+                element.minHeight = element.preferredHeight = 116f;
+
+                var stateOverlay = CreateImage(
+                    "StateOverlay",
+                    root.transform,
+                    theme.GetMapStatusOverlayColor(
+                        RunMapPresentationStatus.Reachable));
+                Stretch(stateOverlay.rectTransform, Vector2.zero, Vector2.zero);
+                stateOverlay.raycastTarget = false;
+
+                var currentPulse = CreateImage(
+                    "CurrentPulse",
+                    root.transform,
+                    theme.GetMapStatusColor(RunMapPresentationStatus.Current));
+                Stretch(
+                    currentPulse.rectTransform,
+                    new Vector2(-5f, -5f),
+                    new Vector2(5f, 5f));
+                currentPulse.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>(
+                    "UI/Skin/UISprite.psd");
+                currentPulse.type = Image.Type.Sliced;
+                currentPulse.fillCenter = false;
+                currentPulse.raycastTarget = false;
+                currentPulse.gameObject.SetActive(false);
+
+                var typeIcon = CreateImage(
+                    "TypeIcon",
+                    root.transform,
+                    theme.GetMapTypeColor(RunNodeType.Shop));
+                SetRect(typeIcon.rectTransform, 10f, 35f, 42f, 42f);
+                typeIcon.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>(
+                    "UI/Skin/Knob.psd");
+                typeIcon.raycastTarget = false;
+                var typeIconLabel = CreateText(
+                    "Glyph",
+                    typeIcon.transform,
+                    font,
+                    "\u5546",
+                    22,
+                    TextAnchor.MiddleCenter);
+                Stretch(
+                    typeIconLabel.rectTransform,
+                    new Vector2(2f, 2f),
+                    new Vector2(-2f, -2f));
+                typeIconLabel.fontStyle = FontStyle.Bold;
+                typeIconLabel.color = theme.TextPrimary;
 
                 var route = CreateText("Route", root.transform, font, "强攻", 13,
                     TextAnchor.MiddleCenter);
-                SetRect(route.rectTransform, 8f, 82f, 138f, 18f);
-                route.color = new Color(1f, 0.78f, 0.28f, 1f);
+                SetRect(route.rectTransform, 8f, 94f, 150f, 18f);
+                route.color = theme.Accent;
                 var title = CreateText("Title", root.transform, font, "第 4 战 · 精英", 17,
                     TextAnchor.MiddleCenter);
                 title.fontStyle = FontStyle.Bold;
-                SetRect(title.rectTransform, 8f, 51f, 138f, 30f);
+                title.color = theme.TextPrimary;
+                SetRect(title.rectTransform, 58f, 60f, 100f, 30f);
                 var subtitle = CreateText("Subtitle", root.transform, font, "铜墙守卫", 13,
                     TextAnchor.MiddleCenter);
-                SetRect(subtitle.rectTransform, 8f, 28f, 138f, 23f);
+                subtitle.color = theme.TextSecondary;
+                SetRect(subtitle.rectTransform, 58f, 34f, 100f, 23f);
                 var status = CreateText("Status", root.transform, font, "可进入", 12,
                     TextAnchor.MiddleCenter);
-                SetRect(status.rectTransform, 8f, 5f, 138f, 22f);
-                status.color = new Color(0.62f, 1f, 0.82f, 1f);
+                SetRect(status.rectTransform, 58f, 7f, 100f, 22f);
+                status.color = theme.GetMapStatusColor(
+                    RunMapPresentationStatus.Reachable);
 
                 var serialized = new SerializedObject(root.GetComponent<RunMapNodeView>());
+                SetReference(serialized, "theme", theme);
                 SetReference(serialized, "background", image);
                 SetReference(serialized, "outline", outline);
                 SetReference(serialized, "button", button);
+                SetReference(serialized, "typeIconBackground", typeIcon);
+                SetReference(serialized, "typeIconText", typeIconLabel);
+                SetReference(serialized, "stateOverlay", stateOverlay);
+                SetReference(serialized, "currentPulse", currentPulse);
                 SetReference(serialized, "routeText", route);
                 SetReference(serialized, "titleText", title);
                 SetReference(serialized, "subtitleText", subtitle);
@@ -250,7 +350,7 @@ namespace SpireChess.Editor
             }
         }
 
-        private static void BuildMapEdge()
+        private static void BuildMapEdge(PresentationTheme theme)
         {
             var root = new GameObject(
                 "PF_RunMapEdge",
@@ -262,7 +362,8 @@ namespace SpireChess.Editor
                 var rect = root.GetComponent<RectTransform>();
                 rect.sizeDelta = new Vector2(100f, 4f);
                 var image = root.GetComponent<Image>();
-                image.color = new Color(1f, 1f, 1f, 0.12f);
+                image.color = theme.GetMapEdgeColor(
+                    RunMapEdgePresentationStatus.Locked);
                 image.raycastTarget = false;
                 PrefabUtility.SaveAsPrefabAsset(root, EdgePrefabPath);
             }
@@ -274,13 +375,15 @@ namespace SpireChess.Editor
 
         private static void BuildRelicEntry(
             Font font,
-            PresentationSpriteCatalog spriteCatalog)
+            PresentationSpriteCatalog spriteCatalog,
+            PresentationTheme theme)
         {
             var root = new GameObject(
                 "PF_RunRelicEntry",
                 typeof(RectTransform),
                 typeof(CanvasRenderer),
                 typeof(Image),
+                typeof(Outline),
                 typeof(LayoutElement),
                 typeof(RunRelicEntryView));
             try
@@ -288,7 +391,10 @@ namespace SpireChess.Editor
                 var rect = root.GetComponent<RectTransform>();
                 rect.sizeDelta = new Vector2(330f, 128f);
                 var image = root.GetComponent<Image>();
-                image.color = new Color(0.10f, 0.22f, 0.28f, 1f);
+                image.color = theme.PanelRaised;
+                var outline = root.GetComponent<Outline>();
+                outline.effectColor = theme.PanelBorder;
+                outline.effectDistance = new Vector2(1f, -1f);
                 var element = root.GetComponent<LayoutElement>();
                 element.minHeight = element.preferredHeight = 128f;
                 element.flexibleWidth = 1f;
@@ -303,22 +409,25 @@ namespace SpireChess.Editor
                 var grade = CreateText("Grade", root.transform, font, "冠冕", 13,
                     TextAnchor.MiddleLeft);
                 SetRect(grade.rectTransform, 12f, 98f, 70f, 22f);
-                grade.color = new Color(1f, 0.78f, 0.28f, 1f);
+                grade.color = theme.Accent;
                 var name = CreateText("Name", root.transform, font, "双生战号", 18,
                     TextAnchor.MiddleLeft);
                 name.fontStyle = FontStyle.Bold;
+                name.color = theme.TextPrimary;
                 SetRect(name.rectTransform, 92f, 96f, 226f, 26f);
                 var meta = CreateText("Meta", root.transform, font, "触发 · 持续生效", 12,
                     TextAnchor.MiddleLeft);
                 SetRect(meta.rectTransform, 92f, 70f, 226f, 22f);
-                meta.color = new Color(0.58f, 0.82f, 0.92f, 1f);
+                meta.color = theme.Success;
                 var description = CreateText("Description", root.transform, font,
                     "你的战吼额外触发一次。", 13, TextAnchor.UpperLeft);
                 description.horizontalOverflow = HorizontalWrapMode.Wrap;
                 description.verticalOverflow = VerticalWrapMode.Truncate;
+                description.color = theme.TextSecondary;
                 SetRect(description.rectTransform, 92f, 8f, 226f, 58f);
 
                 var serialized = new SerializedObject(root.GetComponent<RunRelicEntryView>());
+                SetReference(serialized, "theme", theme);
                 SetReference(serialized, "spriteCatalog", spriteCatalog);
                 SetReference(serialized, "background", image);
                 SetReference(serialized, "iconImage", icon);
@@ -337,7 +446,8 @@ namespace SpireChess.Editor
 
         private static void BuildChoiceOption(
             Font font,
-            PresentationSpriteCatalog spriteCatalog)
+            PresentationSpriteCatalog spriteCatalog,
+            PresentationTheme theme)
         {
             var root = new GameObject(
                 "PF_RunChoiceOption",
@@ -345,15 +455,20 @@ namespace SpireChess.Editor
                 typeof(CanvasRenderer),
                 typeof(Image),
                 typeof(Button),
+                typeof(Outline),
                 typeof(RunChoiceOptionView));
             try
             {
                 var rect = root.GetComponent<RectTransform>();
                 rect.sizeDelta = new Vector2(442f, 166f);
                 var image = root.GetComponent<Image>();
-                image.color = new Color(0.13f, 0.20f, 0.28f, 1f);
+                image.color = theme.ButtonNormal;
+                var outline = root.GetComponent<Outline>();
+                outline.effectColor = theme.PanelBorder;
+                outline.effectDistance = new Vector2(1f, -1f);
                 var button = root.GetComponent<Button>();
                 button.targetGraphic = image;
+                ConfigureButton(button, theme);
                 var icon = CreateImage(
                     "Icon",
                     root.transform,
@@ -365,18 +480,21 @@ namespace SpireChess.Editor
                 var badge = CreateText("Badge", root.transform, font, "冠冕 · 触发", 13,
                     TextAnchor.MiddleLeft);
                 SetRect(badge.rectTransform, 14f, 132f, 414f, 24f);
-                badge.color = new Color(1f, 0.78f, 0.28f, 1f);
+                badge.color = theme.Accent;
                 var title = CreateText("Title", root.transform, font, "双生战号", 21,
                     TextAnchor.MiddleLeft);
                 title.fontStyle = FontStyle.Bold;
+                title.color = theme.TextPrimary;
                 SetRect(title.rectTransform, 112f, 92f, 316f, 38f);
                 var description = CreateText("Description", root.transform, font,
                     "你的战吼额外触发一次。", 14, TextAnchor.UpperLeft);
                 description.horizontalOverflow = HorizontalWrapMode.Wrap;
                 description.verticalOverflow = VerticalWrapMode.Truncate;
+                description.color = theme.TextSecondary;
                 SetRect(description.rectTransform, 112f, 14f, 316f, 74f);
 
                 var serialized = new SerializedObject(root.GetComponent<RunChoiceOptionView>());
+                SetReference(serialized, "theme", theme);
                 SetReference(serialized, "spriteCatalog", spriteCatalog);
                 SetReference(serialized, "button", button);
                 SetReference(serialized, "background", image);
@@ -398,7 +516,8 @@ namespace SpireChess.Editor
             GameObject nodePrefab,
             GameObject edgePrefab,
             GameObject relicPrefab,
-            GameObject choicePrefab)
+            GameObject choicePrefab,
+            PresentationTheme theme)
         {
             var root = new GameObject(
                 "PF_RunScreen",
@@ -418,97 +537,137 @@ namespace SpireChess.Editor
                 scaler.referenceResolution = new Vector2(1920f, 1080f);
                 scaler.matchWidthOrHeight = 0.5f;
 
-                var safeArea = CreateImage("SafeArea", root.transform, Background).rectTransform;
+                var safeArea = CreateImage(
+                    "SafeArea",
+                    root.transform,
+                    theme.ScreenBackground).rectTransform;
                 Stretch(safeArea, Vector2.zero, Vector2.zero);
-                var top = CreateImage("TopBar", safeArea, Panel).rectTransform;
+                var top = CreateImage(
+                    "TopBar",
+                    safeArea,
+                    theme.PanelBackground).rectTransform;
                 SetRect(top, 20f, 20f, 1880f, 92f, true);
+                AddPanelOutline(top, theme);
+                var topAccent = CreateImage("AccentRule", top, theme.Accent);
+                SetRect(topAccent.rectTransform, 0f, 0f, 1880f, 3f);
+                topAccent.raycastTarget = false;
                 var title = CreateText("Title", top, font, "第 1 层 · 三层远征", 28,
                     TextAnchor.MiddleLeft);
                 SetRect(title.rectTransform, 18f, 12f, 330f, 68f);
+                title.color = theme.TextPrimary;
                 var resources = CreateText("Resources", top, font,
                     "生命 20/20   商店回合 0   战绩 0胜/0未胜", 18,
                     TextAnchor.MiddleCenter);
                 SetRect(resources.rectTransform, 350f, 12f, 650f, 68f);
+                resources.color = theme.TextSecondary;
                 var progress = CreateText("Progress", top, font,
                     "本层商店 0/6   固定战斗 0/6   地图步数 0", 17,
                     TextAnchor.MiddleCenter);
                 SetRect(progress.rectTransform, 1000f, 12f, 520f, 68f);
+                progress.color = theme.TextSecondary;
                 var status = CreateText("Status", top, font, "选择可达节点继续三层单局", 16,
                     TextAnchor.MiddleRight);
                 SetRect(status.rectTransform, 1520f, 12f, 342f, 68f);
+                status.color = theme.Success;
 
                 var body = CreateRect("Body", safeArea);
                 Stretch(body, new Vector2(20f, 190f), new Vector2(-20f, -140f));
-                var mapPanel = CreateImage("MapPanel", body, Panel).rectTransform;
+                var mapPanel = CreateImage(
+                    "MapPanel",
+                    body,
+                    theme.PanelBackground).rectTransform;
                 Stretch(mapPanel, Vector2.zero, new Vector2(-410f, 0f));
+                AddPanelOutline(mapPanel, theme);
                 var routeHint = CreateText("RouteHint", mapPanel, font,
                     "C2/C5 选择机制 · C4 选择路线 · 事件可能触发额外战斗", 17,
                     TextAnchor.MiddleLeft);
                 SetRect(routeHint.rectTransform, 18f, 12f, 1434f, 38f, true);
-                var mapScroll = BuildMapScroll(mapPanel, out var mapContent,
-                    out var edgeLayer, out var nodeLayer);
+                routeHint.color = theme.TextSecondary;
+                var mapScroll = BuildMapScroll(
+                    mapPanel,
+                    theme,
+                    out var mapContent,
+                    out var mapBackdrop,
+                    out var edgeLayer,
+                    out var nodeLayer);
 
-                var relicPanel = CreateImage("RelicPanel", body, Panel).rectTransform;
+                var relicPanel = CreateImage(
+                    "RelicPanel",
+                    body,
+                    theme.PanelBackground).rectTransform;
                 relicPanel.anchorMin = new Vector2(1f, 0f);
                 relicPanel.anchorMax = Vector2.one;
                 relicPanel.pivot = new Vector2(1f, 0f);
                 relicPanel.offsetMin = new Vector2(-390f, 0f);
                 relicPanel.offsetMax = Vector2.zero;
+                AddPanelOutline(relicPanel, theme);
                 var relicCount = CreateText("RelicCount", relicPanel, font, "遗珍 0", 23,
                     TextAnchor.MiddleLeft);
                 SetRect(relicCount.rectTransform, 18f, 12f, 354f, 42f, true);
+                relicCount.color = theme.TextPrimary;
                 var relicEmpty = CreateText("Empty", relicPanel, font,
                     "尚未获得遗珍\n第一、二层 Boss 会提供冠冕级遗珍。", 15,
                     TextAnchor.UpperCenter);
                 SetRect(relicEmpty.rectTransform, 24f, 74f, 342f, 116f, true);
-                relicEmpty.color = new Color(1f, 1f, 1f, 0.46f);
+                relicEmpty.color = WithAlpha(theme.TextSecondary, 0.58f);
                 var relicScroll = BuildVerticalScroll(
                     "RelicScroll", relicPanel, 16f, 20f, 358f, 660f,
-                    out var relicContent, 10f);
+                    out var relicContent, 10f, theme);
                 Stretch(
                     relicScroll.GetComponent<RectTransform>(),
                     new Vector2(16f, 20f),
                     new Vector2(-16f, -70f));
 
-                var summaryPanel = CreateImage("SummaryPanel", safeArea, Panel).rectTransform;
+                var summaryPanel = CreateImage(
+                    "SummaryPanel",
+                    safeArea,
+                    theme.PanelBackground).rectTransform;
                 SetRect(summaryPanel, 20f, 24f, 1880f, 138f);
+                AddPanelOutline(summaryPanel, theme);
                 var summary = CreateText("Summary", summaryPanel, font,
                     "选择高亮节点继续；未选择的互斥路线会在进入后锁定。", 18,
                     TextAnchor.MiddleLeft);
                 SetRect(summary.rectTransform, 22f, 16f, 1510f, 106f);
+                summary.color = theme.TextPrimary;
                 var summaryButtonImage = CreateImage(
-                    "ActionButton", summaryPanel, ButtonColor);
+                    "ActionButton", summaryPanel, theme.ButtonNormal);
                 SetRect(summaryButtonImage.rectTransform, 1550f, 30f, 300f, 78f);
                 var summaryButton = summaryButtonImage.gameObject.AddComponent<Button>();
                 summaryButton.targetGraphic = summaryButtonImage;
+                ConfigureButton(summaryButton, theme);
                 var summaryButtonText = CreateText("Label", summaryButtonImage.transform,
                     font, "继续前进", 20, TextAnchor.MiddleCenter);
                 Stretch(summaryButtonText.rectTransform, new Vector2(8f, 6f),
                     new Vector2(-8f, -6f));
+                summaryButtonText.color = theme.TextPrimary;
 
                 var choiceOverlay = CreateImage(
-                    "ChoiceOverlay", safeArea, new Color(0f, 0f, 0f, 0.78f)).gameObject;
+                    "ChoiceOverlay", safeArea, theme.ModalScrim).gameObject;
                 Stretch(choiceOverlay.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
                 var dialog = CreateImage("Dialog", choiceOverlay.transform,
-                    new Color(0.065f, 0.08f, 0.12f, 1f)).rectTransform;
+                    theme.PanelBackground).rectTransform;
                 dialog.anchorMin = dialog.anchorMax = new Vector2(0.5f, 0.5f);
                 dialog.pivot = new Vector2(0.5f, 0.5f);
                 dialog.anchoredPosition = Vector2.zero;
                 dialog.sizeDelta = new Vector2(1500f, 620f);
+                AddPanelOutline(dialog, theme);
                 var choiceTitle = CreateText("Title", dialog, font,
                     "选择一件 Boss 遗珍", 30, TextAnchor.MiddleCenter);
                 SetRect(choiceTitle.rectTransform, 36f, 540f, 1428f, 58f);
+                choiceTitle.color = theme.TextPrimary;
                 var choiceDescription = CreateText("Description", dialog, font,
                     "冠冕级遗珍会在后续楼层持续改变规则。", 18,
                     TextAnchor.UpperCenter);
                 choiceDescription.horizontalOverflow = HorizontalWrapMode.Wrap;
+                choiceDescription.color = theme.TextSecondary;
                 SetRect(choiceDescription.rectTransform, 60f, 465f, 1380f, 66f);
                 var choiceScroll = BuildChoiceScroll(
-                    dialog, out var choiceContent);
+                    dialog, out var choiceContent, theme);
                 choiceOverlay.SetActive(false);
 
                 var view = root.GetComponent<RunScreenView>();
                 var serialized = new SerializedObject(view);
+                SetReference(serialized, "theme", theme);
                 SetReference(serialized, "rootCanvas", canvas);
                 SetReference(serialized, "safeArea", safeArea);
                 SetReference(serialized, "titleText", title);
@@ -518,6 +677,7 @@ namespace SpireChess.Editor
                 SetReference(serialized, "routeHintText", routeHint);
                 SetReference(serialized, "mapScrollRect", mapScroll);
                 SetReference(serialized, "mapContent", mapContent);
+                SetReference(serialized, "mapBackdrop", mapBackdrop);
                 SetReference(serialized, "edgeLayer", edgeLayer);
                 SetReference(serialized, "nodeLayer", nodeLayer);
                 SetReference(serialized, "mapNodePrefab", nodePrefab);
@@ -547,13 +707,16 @@ namespace SpireChess.Editor
 
         private static ScrollRect BuildMapScroll(
             Transform parent,
+            PresentationTheme theme,
             out RectTransform content,
+            out Image backdrop,
             out RectTransform edgeLayer,
             out RectTransform nodeLayer)
         {
             var scroll = CreateImage("MapScroll", parent,
-                new Color(0.025f, 0.04f, 0.06f, 0.9f)).rectTransform;
+                theme.MapCanvasBackground).rectTransform;
             Stretch(scroll, new Vector2(16f, 20f), new Vector2(-16f, -62f));
+            AddPanelOutline(scroll, theme);
             var scrollRect = scroll.gameObject.AddComponent<ScrollRect>();
             scrollRect.horizontal = true;
             scrollRect.vertical = false;
@@ -568,6 +731,13 @@ namespace SpireChess.Editor
             content.pivot = new Vector2(0f, 0.5f);
             content.anchoredPosition = Vector2.zero;
             content.sizeDelta = new Vector2(2400f, 620f);
+            backdrop = CreateImage(
+                "Backdrop",
+                content,
+                theme.MapCanvasBackground);
+            Stretch(backdrop.rectTransform, Vector2.zero, Vector2.zero);
+            backdrop.raycastTarget = false;
+            BuildMapDecorations(backdrop.rectTransform, theme);
             edgeLayer = CreateRect("EdgeLayer", content);
             Stretch(edgeLayer, Vector2.zero, Vector2.zero);
             nodeLayer = CreateRect("NodeLayer", content);
@@ -585,10 +755,11 @@ namespace SpireChess.Editor
             float width,
             float height,
             out RectTransform content,
-            float spacing)
+            float spacing,
+            PresentationTheme theme)
         {
             var scroll = CreateImage(name, parent,
-                new Color(0f, 0f, 0f, 0.08f)).rectTransform;
+                WithAlpha(theme.ScreenBackground, 0.44f)).rectTransform;
             SetRect(scroll, left, bottom, width, height);
             var scrollRect = scroll.gameObject.AddComponent<ScrollRect>();
             scrollRect.horizontal = false;
@@ -620,10 +791,11 @@ namespace SpireChess.Editor
 
         private static ScrollRect BuildChoiceScroll(
             Transform parent,
-            out RectTransform content)
+            out RectTransform content,
+            PresentationTheme theme)
         {
             var scroll = CreateImage("OptionsScroll", parent,
-                new Color(0f, 0f, 0f, 0.08f)).rectTransform;
+                WithAlpha(theme.ScreenBackground, 0.44f)).rectTransform;
             SetRect(scroll, 48f, 42f, 1404f, 400f);
             var scrollRect = scroll.gameObject.AddComponent<ScrollRect>();
             scrollRect.horizontal = false;
@@ -650,6 +822,123 @@ namespace SpireChess.Editor
             scrollRect.viewport = viewport;
             scrollRect.content = content;
             return scrollRect;
+        }
+
+        private static void BuildMapDecorations(
+            RectTransform parent,
+            PresentationTheme theme)
+        {
+            CreateMapRule("UpperRule", parent, 0.84f, theme);
+            CreateMapRule("LowerRule", parent, 0.16f, theme);
+
+            var anchors = new[]
+            {
+                new Vector2(0.05f, 0.62f),
+                new Vector2(0.13f, 0.22f),
+                new Vector2(0.24f, 0.78f),
+                new Vector2(0.38f, 0.18f),
+                new Vector2(0.52f, 0.72f),
+                new Vector2(0.66f, 0.28f),
+                new Vector2(0.77f, 0.82f),
+                new Vector2(0.88f, 0.38f),
+                new Vector2(0.95f, 0.68f)
+            };
+            for (var index = 0; index < anchors.Length; index++)
+            {
+                var mark = CreateImage(
+                    "WayfinderMark_" + index,
+                    parent,
+                    theme.MapDecorationTint);
+                var rect = mark.rectTransform;
+                rect.anchorMin = rect.anchorMax = anchors[index];
+                rect.pivot = new Vector2(0.5f, 0.5f);
+                rect.anchoredPosition = Vector2.zero;
+                var size = index % 3 == 0 ? 8f : 5f;
+                rect.sizeDelta = new Vector2(size, size);
+                rect.localEulerAngles = new Vector3(0f, 0f, 45f);
+                mark.raycastTarget = false;
+            }
+
+            var compass = CreateImage(
+                "CompassRose",
+                parent,
+                WithAlpha(theme.MapDecorationTint, 0.24f));
+            compass.rectTransform.anchorMin = compass.rectTransform.anchorMax =
+                new Vector2(0.5f, 0.5f);
+            compass.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            compass.rectTransform.anchoredPosition = Vector2.zero;
+            compass.rectTransform.sizeDelta = new Vector2(54f, 54f);
+            compass.rectTransform.localEulerAngles = new Vector3(0f, 0f, 45f);
+            compass.raycastTarget = false;
+            var inset = CreateImage(
+                "Inset",
+                compass.transform,
+                theme.MapCanvasBackground);
+            Stretch(
+                inset.rectTransform,
+                new Vector2(8f, 8f),
+                new Vector2(-8f, -8f));
+            inset.raycastTarget = false;
+        }
+
+        private static void CreateMapRule(
+            string name,
+            Transform parent,
+            float normalizedY,
+            PresentationTheme theme)
+        {
+            var rule = CreateImage(
+                name,
+                parent,
+                WithAlpha(theme.MapDecorationTint, 0.15f));
+            var rect = rule.rectTransform;
+            rect.anchorMin = new Vector2(0.04f, normalizedY);
+            rect.anchorMax = new Vector2(0.96f, normalizedY);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(0f, 2f);
+            rule.raycastTarget = false;
+        }
+
+        private static void AddPanelOutline(
+            RectTransform rect,
+            PresentationTheme theme)
+        {
+            var outline = rect.gameObject.GetComponent<Outline>() ??
+                          rect.gameObject.AddComponent<Outline>();
+            outline.effectColor = theme.PanelBorder;
+            outline.effectDistance = new Vector2(1f, -1f);
+            outline.useGraphicAlpha = true;
+        }
+
+        private static void ConfigureButton(
+            Button button,
+            PresentationTheme theme)
+        {
+            var colors = button.colors;
+            colors.normalColor = Color.white;
+            colors.highlightedColor = Color.Lerp(
+                Color.white,
+                theme.ButtonHighlighted,
+                0.18f);
+            colors.pressedColor = Color.Lerp(
+                Color.white,
+                theme.ButtonPressed,
+                0.32f);
+            colors.selectedColor = colors.highlightedColor;
+            colors.disabledColor = Color.Lerp(
+                Color.white,
+                theme.ButtonDisabled,
+                0.52f);
+            colors.colorMultiplier = 1f;
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+        }
+
+        private static Color WithAlpha(Color color, float alpha)
+        {
+            color.a = alpha;
+            return color;
         }
 
         private static RunScreenState CreatePreviewState()

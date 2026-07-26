@@ -1,9 +1,10 @@
 # Phase 9B G2 样板资源 v0.1
 
 - 日期：2026-07-24
+- 更新：2026-07-25（专门卡面 v0.4 双分辨率视觉矩阵及最终全量回归通过）
 - 生成方式：Codex 内置 ImageGen
 - 范围：3 个 Token、4 张法术、3 件遗珍、1 张缺图诊断图
-- 状态：已保存母版并复制到约定的 Unity Runtime 路径；生产许可/来源确认仍待项目方确认
+- 状态：已保存母版并复制到约定的 Unity Runtime 路径；技术门禁与适用视觉矩阵均已通过，项目负责人已确认生产使用许可，11 项均为 `Runtime Ready`，G2 关闭
 
 本目录保存 G2 样板新增的 11 张图像母版。此前已经完成的 6 张核心随从位于
 `../sample-minion-illustrations-v0.1/masters/`，不在本目录重复保存。
@@ -16,8 +17,8 @@ Token 与法术沿用配置中的 `artId`，遗珍沿用 `uiIconId`；诊断图�
 | 类型 | 内容 ID / 用途 | 名称 | Catalog 键 / 字段 | Master | Unity Runtime |
 |---|---|---|---|---|---|
 | Token | `token_young_spirit` | 幼灵 | `placeholder_token_young_spirit` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/token-young-spirit.png` | `sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_young_spirit.png` |
-| Token | `token_two_tailed_fox_shadow` | 双尾狐影 | `placeholder_token_two_tailed_fox_shadow` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/token-two-tailed-fox-shadow.png` | `sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_two_tailed_fox_shadow.png` |
-| Token | `token_swift_young_spirit` | 迅捷幼灵 | `placeholder_token_swift_young_spirit` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/token-swift-young-spirit.png` | `sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_swift_young_spirit.png` |
+| Token | `token_two_tailed_fox_shadow` | 双尾狐影 | `placeholder_token_two_tailed_fox_shadow` | `ui-concepts/phase-9b/g2-card-assets-v0.2/masters/token-two-tailed-fox-shadow-landscape.png` | `sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_two_tailed_fox_shadow.png` |
+| Token | `token_swift_young_spirit` | 迅捷幼灵 | `placeholder_token_swift_young_spirit` | `ui-concepts/phase-9b/g2-card-assets-v0.2/masters/token-swift-young-spirit-landscape.png` | `sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_swift_young_spirit.png` |
 | 法术 | `minor_tempering` | 小型锻体 | `placeholder_spell_minor_tempering` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/spell-minor-tempering.png` | `sc/Assets/Art/Presentation/Cards/Spells/card_spell_minor_tempering.png` |
 | 法术 | `free_refresh` | 免费刷新 | `placeholder_spell_free_refresh` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/spell-free-refresh.png` | `sc/Assets/Art/Presentation/Cards/Spells/card_spell_free_refresh.png` |
 | 法术 | `advanced_discovery` | 高阶发现 | `placeholder_spell_advanced_discovery` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/spell-advanced-discovery.png` | `sc/Assets/Art/Presentation/Cards/Spells/card_spell_advanced_discovery.png` |
@@ -27,7 +28,8 @@ Token 与法术沿用配置中的 `artId`，遗珍沿用 `uiIconId`；诊断图�
 | 遗珍 | `curio_refresh_gear` | 漏刻齿轮 | `icon_relic_curio_refresh_gear` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/relic-curio-refresh-gear.png` | `sc/Assets/Art/Presentation/Icons/Relics/icon_relic_curio_refresh_gear.png` |
 | 诊断 | Catalog 缺图 | 缺图诊断图 | `missingArtwork` → `fallback_missing_art` | `ui-concepts/phase-9b/g2-card-assets-v0.1/masters/diagnostic-missing-art.png` | `sc/Assets/Art/Presentation/UI/Diagnostics/fallback_missing_art.png` |
 
-Token 与法术母版均为 1024×1536 RGB PNG；遗珍与诊断母版均为 1254×1254 RGB PNG。
+幼灵 Token 与法术母版为 1024×1536 RGB PNG；双尾狐影和迅捷幼灵最终修订母版分别为
+1403×1121、1402×1122 横构图 RGB PNG；遗珍与诊断母版均为 1254×1254 RGB PNG。
 Token、法术图只包含画面，不包含卡框、文字、数值或 UI。遗珍图标保留大面积浅色纸纹背景，
 方便在当前样板 UI 中稳定缩放。诊断图有意采用高对比洋红/黑棋盘格，不能当作正式回退美术。
 
@@ -51,19 +53,23 @@ Token、法术图只包含画面，不包含卡框、文字、数值或 UI。遗
   种族/法术回退或诊断图蒙混过关。
 - 当前配置中的随从 `artId`、法术 `artId` 与遗珍 `uiIconId` 均会逐项校验为精确命中；
   真实非法 ID 则必须返回 `fallback_missing_art` 诊断图。
-- Unity 全量测试结果为 EditMode 278/278、PlayMode 22/22。
+- 本轮最终 Unity 全量测试结果为 EditMode 294/294、PlayMode 22/22，0 失败、0 跳过。
 - 遗珍在 Run UI 的 1920×1080 与 1920×1200 截图均已人工验收，证据位于
   `../../unity-validation/pf-run-screen-v0.1/`。
-- G2 总门禁仍保留两项待办：新增 11 张生成图的生产许可/来源签字，以及新增 6 随从、
-  3 Token、4 法术的专门卡面视觉矩阵。
+- 新增 6 随从、3 Token、4 法术已完成 1920×1080 / 1920×1200 专门卡面视觉矩阵：
+  每分辨率 38 个状态、合计 76 次 `PF_Card` 渲染，6 张截图与逐卡验收结论位于
+  `../../unity-validation/g2-card-matrix-v0.4/`；v0.1-v0.3 作为历次修复前审核基线保留。
+- 项目负责人已于 2026-07-25 人工复核并确认本目录 11 项的生产使用许可；既有技术
+  门禁通过后全部标记为 `Runtime Ready`，G2 关闭。签字边界见
+  `../../../phase-9b-g2-production-license-signoff-v0.1.md`。
 
 ## 母版校验值
 
 | 文件 | 尺寸 | SHA-256 |
 |---|---:|---|
 | `masters/token-young-spirit.png` | 1024×1536 | `78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218` |
-| `masters/token-two-tailed-fox-shadow.png` | 1024×1536 | `02e3ef4d1a88ed8ad06c88ecc835a6156f9bef65f8f142697f3b8e12e8497f3e` |
-| `masters/token-swift-young-spirit.png` | 1024×1536 | `8381b50c434f38d9de79f79680b0625c62206f92044ae3f66efdb6d5eeeab1f4` |
+| `../g2-card-assets-v0.2/masters/token-two-tailed-fox-shadow-landscape.png` | 1403×1121 | `6fa213e471af861a23cbf21c95fe2a566f9b4bebe08f90819a46932974cb1010` |
+| `../g2-card-assets-v0.2/masters/token-swift-young-spirit-landscape.png` | 1402×1122 | `261cd67e14a819b849a7d0fef665ba8c92b29129702b2b6b5c31917dc26ced54` |
 | `masters/spell-minor-tempering.png` | 1024×1536 | `9d56dc56f0b3d07e2d3ad89c46c29b15bc670efb6404e69c754a19c292aec667` |
 | `masters/spell-free-refresh.png` | 1024×1536 | `e2e9d614f5fd12c8adb9efdbf35d5a4a9e18eee039e79629c44f7f71813dfe08` |
 | `masters/spell-advanced-discovery.png` | 1024×1536 | `7c6e9a7dc7844fe8b8cafc03b00e67a6fbdc0a14c52ea9518debd0f79bbc936b` |
@@ -79,5 +85,6 @@ Token、法术图只包含画面，不包含卡框、文字、数值或 UI。遗
 - `token_two_tailed_fox_shadow` 与 `token_swift_young_spirit` 在首稿基础上使用内置 ImageGen
   做过受控编辑；其余文件采用选定的新图生成结果。
 - 项目内可复现记录以本目录母版、上表校验值和 `PROMPTS.md` 为准。
-- 当前记录中，项目方尚未明确确认这 11 张生成图的生产许可与最终来源验收。因此它们可以作为
-  G2 工程接入和自动化样板资源，但在发布台账中不得标记为“生产许可已确认”或最终正式美术。
+- 项目负责人已于 2026-07-25 人工复核这 11 项最终 Runtime 资源，同意纳入项目生产
+  使用；技术门禁已经通过，故全部标记为 `Runtime Ready`。历史竖构图首稿继续仅作
+  迭代证据，不在签字范围。

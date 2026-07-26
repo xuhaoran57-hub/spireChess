@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using SpireChess.Audio;
+using SpireChess.Shop;
 using SpireChess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,6 +61,7 @@ namespace SpireChess.UI.Shop
         [SerializeField] private Text endButtonText;
 
         [Header("Feedback and modal")]
+        [SerializeField] private PresentationFxPool eventFxPool;
         [SerializeField] private GameObject statusToast;
         [SerializeField] private Image statusToastImage;
         [SerializeField] private CanvasGroup statusToastCanvasGroup;
@@ -86,6 +89,8 @@ namespace SpireChess.UI.Shop
 
         public int RenderedCardCount { get; private set; }
         public int LastRenderFeedbackCount { get; private set; }
+        public int PresentationEventCount { get; private set; }
+        public ShopEventType? LastPresentationEvent { get; private set; }
         public bool IsChoiceVisible => choiceOverlay != null &&
                                        choiceOverlay.IsVisible;
         public bool ChoiceCanCancel => choiceOverlay != null &&
@@ -111,6 +116,7 @@ namespace SpireChess.UI.Shop
             upgradeButton != null && upgradeButtonText != null &&
             sellButton != null && sellButtonText != null &&
             endButton != null && endButtonText != null &&
+            eventFxPool != null &&
             statusToast != null && statusToastImage != null &&
             statusToastCanvasGroup != null && statusToastText != null &&
             modalBlocker != null && choiceOverlay != null &&
@@ -262,6 +268,34 @@ namespace SpireChess.UI.Shop
             {
                 toastRoutine = StartCoroutine(HideStatusToast());
             }
+        }
+
+        public void PlayPresentationEvent(ShopEventData eventData)
+        {
+            if (eventData == null || eventFxPool == null)
+            {
+                return;
+            }
+
+            var presentation = GetEventPresentation(eventData);
+            eventFxPool.Play(
+                presentation.Label,
+                presentation.Color,
+                presentation.Position,
+                presentation.Emphasis,
+                presentation.Duration,
+                presentation.VerticalTravel);
+            PresentationEventCount++;
+            LastPresentationEvent = eventData.Type;
+            if (TryGetAudioCue(eventData.Type, out var cueId))
+            {
+                AudioService.Instance?.PlayCue(cueId);
+            }
+        }
+
+        public void ClearPresentationFeedback()
+        {
+            eventFxPool?.ClearImmediate();
         }
 
         private void RenderOffers(ShopScreenState state)
@@ -468,6 +502,129 @@ namespace SpireChess.UI.Shop
                        value => value != null && value.HasCompleteBindings);
         }
 
+        private static EventPresentation GetEventPresentation(
+            ShopEventData eventData)
+        {
+            switch (eventData.Type)
+            {
+                case ShopEventType.OnShopPhaseStart:
+                    return EventPresentation.Strong(
+                        "商店开启",
+                        new Color(0.22f, 0.72f, 0.68f, 1f),
+                        new Vector2(-120f, 280f));
+                case ShopEventType.OnShopPhaseEnd:
+                    return EventPresentation.Strong(
+                        "阵容锁定",
+                        new Color(0.82f, 0.68f, 0.36f, 1f),
+                        new Vector2(-120f, 20f));
+                case ShopEventType.OnRefresh:
+                    return EventPresentation.Normal(
+                        eventData.FreeRefreshes > 0 ? "免费刷新" : "刷新",
+                        new Color(0.26f, 0.68f, 0.86f, 1f),
+                        new Vector2(-310f, 250f));
+                case ShopEventType.OnBuy:
+                    return EventPresentation.Normal(
+                        eventData.Cost > 0
+                            ? $"购买  -{eventData.Cost} 金币"
+                            : "购买",
+                        new Color(0.90f, 0.72f, 0.34f, 1f),
+                        new Vector2(-330f, 130f));
+                case ShopEventType.OnSell:
+                    return EventPresentation.Normal(
+                        eventData.Gold > 0
+                            ? $"出售  +{eventData.Gold} 金币"
+                            : "出售",
+                        new Color(0.88f, 0.64f, 0.30f, 1f),
+                        new Vector2(590f, -30f));
+                case ShopEventType.OnPlay:
+                    return EventPresentation.Normal(
+                        "随从上场",
+                        new Color(0.34f, 0.78f, 0.50f, 1f),
+                        new Vector2(-190f, -40f));
+                case ShopEventType.OnSpellUsed:
+                    return EventPresentation.Strong(
+                        "法术生效",
+                        new Color(0.48f, 0.60f, 0.98f, 1f),
+                        new Vector2(-180f, -110f));
+                case ShopEventType.OnTripleFormed:
+                    return EventPresentation.Critical(
+                        "三连合成",
+                        new Color(0.98f, 0.73f, 0.20f, 1f),
+                        new Vector2(-100f, 80f));
+                case ShopEventType.OnTripleRewardGranted:
+                    return EventPresentation.Strong(
+                        "获得发现奖励",
+                        new Color(0.92f, 0.78f, 0.36f, 1f),
+                        new Vector2(0f, 110f));
+                case ShopEventType.OnDiscoverStarted:
+                    return EventPresentation.Strong(
+                        "发现开启",
+                        new Color(0.54f, 0.44f, 0.92f, 1f),
+                        new Vector2(0f, 130f));
+                case ShopEventType.OnDiscoverResolved:
+                    return EventPresentation.Strong(
+                        "选择完成",
+                        new Color(0.38f, 0.78f, 0.66f, 1f),
+                        new Vector2(0f, 90f));
+                case ShopEventType.OnDiscoverCancelled:
+                    return EventPresentation.Normal(
+                        "取消发现",
+                        new Color(0.54f, 0.58f, 0.66f, 1f),
+                        new Vector2(0f, 90f));
+                case ShopEventType.OnTavernUpgraded:
+                    return EventPresentation.Critical(
+                        eventData.TavernTier > 0
+                            ? $"酒馆升至 {eventData.TavernTier} 级"
+                            : "酒馆升级",
+                        new Color(0.94f, 0.62f, 0.24f, 1f),
+                        new Vector2(590f, 170f));
+                default:
+                    return EventPresentation.Normal(
+                        eventData.Type.ToString(),
+                        new Color(0.40f, 0.66f, 0.72f, 1f),
+                        Vector2.zero);
+            }
+        }
+
+        public static bool TryGetAudioCue(
+            ShopEventType eventType,
+            out string cueId)
+        {
+            switch (eventType)
+            {
+                case ShopEventType.OnRefresh:
+                    cueId = PresentationAudioCueIds.ShopRefresh;
+                    return true;
+                case ShopEventType.OnBuy:
+                    cueId = PresentationAudioCueIds.ShopBuy;
+                    return true;
+                case ShopEventType.OnSell:
+                    cueId = PresentationAudioCueIds.ShopSell;
+                    return true;
+                case ShopEventType.OnPlay:
+                    cueId = PresentationAudioCueIds.ShopPlay;
+                    return true;
+                case ShopEventType.OnSpellUsed:
+                    cueId = PresentationAudioCueIds.ShopSpell;
+                    return true;
+                case ShopEventType.OnTripleFormed:
+                    cueId = PresentationAudioCueIds.ShopTriple;
+                    return true;
+                case ShopEventType.OnDiscoverStarted:
+                    cueId = PresentationAudioCueIds.ShopDiscoverOpen;
+                    return true;
+                case ShopEventType.OnDiscoverResolved:
+                    cueId = PresentationAudioCueIds.ShopDiscoverPick;
+                    return true;
+                case ShopEventType.OnTavernUpgraded:
+                    cueId = PresentationAudioCueIds.ShopUpgrade;
+                    return true;
+                default:
+                    cueId = null;
+                    return false;
+            }
+        }
+
         private void ApplyCardFeedback(CardView view, CardViewModel model)
         {
             if (string.IsNullOrWhiteSpace(model.InstanceId))
@@ -612,6 +769,74 @@ namespace SpireChess.UI.Shop
             public int Health { get; }
             public bool HasShield { get; }
             public bool HasNextCombatShield { get; }
+        }
+
+        private readonly struct EventPresentation
+        {
+            private EventPresentation(
+                string label,
+                Color color,
+                Vector2 position,
+                PresentationFxEmphasis emphasis,
+                float duration,
+                float verticalTravel)
+            {
+                Label = label;
+                Color = color;
+                Position = position;
+                Emphasis = emphasis;
+                Duration = duration;
+                VerticalTravel = verticalTravel;
+            }
+
+            public string Label { get; }
+            public Color Color { get; }
+            public Vector2 Position { get; }
+            public PresentationFxEmphasis Emphasis { get; }
+            public float Duration { get; }
+            public float VerticalTravel { get; }
+
+            public static EventPresentation Normal(
+                string label,
+                Color color,
+                Vector2 position)
+            {
+                return new EventPresentation(
+                    label,
+                    color,
+                    position,
+                    PresentationFxEmphasis.Normal,
+                    0.62f,
+                    72f);
+            }
+
+            public static EventPresentation Strong(
+                string label,
+                Color color,
+                Vector2 position)
+            {
+                return new EventPresentation(
+                    label,
+                    color,
+                    position,
+                    PresentationFxEmphasis.Strong,
+                    0.78f,
+                    86f);
+            }
+
+            public static EventPresentation Critical(
+                string label,
+                Color color,
+                Vector2 position)
+            {
+                return new EventPresentation(
+                    label,
+                    color,
+                    position,
+                    PresentationFxEmphasis.Critical,
+                    1.02f,
+                    104f);
+            }
         }
     }
 }

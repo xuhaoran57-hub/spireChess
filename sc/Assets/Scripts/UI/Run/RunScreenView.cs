@@ -13,6 +13,7 @@ namespace SpireChess.UI.Run
         private const float NodeColumnGap = 180f;
 
         [Header("Root")]
+        [SerializeField] private PresentationTheme theme;
         [SerializeField] private Canvas rootCanvas;
         [SerializeField] private RectTransform safeArea;
 
@@ -26,6 +27,7 @@ namespace SpireChess.UI.Run
         [SerializeField] private Text routeHintText;
         [SerializeField] private ScrollRect mapScrollRect;
         [SerializeField] private RectTransform mapContent;
+        [SerializeField] private Image mapBackdrop;
         [SerializeField] private RectTransform edgeLayer;
         [SerializeField] private RectTransform nodeLayer;
         [SerializeField] private GameObject mapNodePrefab;
@@ -61,10 +63,11 @@ namespace SpireChess.UI.Run
         public int RenderedChoiceCount { get; private set; }
         public bool IsChoiceVisible => choiceOverlay != null && choiceOverlay.activeSelf;
         public bool HasCompleteBindings =>
-            rootCanvas != null && safeArea != null &&
+            theme != null && rootCanvas != null && safeArea != null &&
             titleText != null && resourceText != null && progressText != null &&
             statusText != null && routeHintText != null &&
-            mapScrollRect != null && mapContent != null && edgeLayer != null &&
+            mapScrollRect != null && mapContent != null && mapBackdrop != null &&
+            edgeLayer != null &&
             nodeLayer != null && mapNodePrefab != null && mapEdgePrefab != null &&
             relicCountText != null && relicEmptyText != null &&
             relicScrollRect != null && relicContent != null && relicEntryPrefab != null &&
@@ -117,6 +120,7 @@ namespace SpireChess.UI.Run
             var maximumColumn = Math.Max(1, state.MaximumColumn);
             var width = Math.Max(1900f, NodeStartX * 2f + maximumColumn * NodeColumnGap);
             mapContent.sizeDelta = new Vector2(width, 620f);
+            mapBackdrop.color = theme.MapCanvasBackground;
             var positions = new Dictionary<string, Vector2>(StringComparer.Ordinal);
             foreach (var node in state.Nodes ?? Array.Empty<RunMapNodeState>())
             {
@@ -150,20 +154,25 @@ namespace SpireChess.UI.Run
                 rect.anchorMin = rect.anchorMax = new Vector2(0f, 0f);
                 rect.pivot = new Vector2(0.5f, 0.5f);
                 rect.anchoredPosition = (from + to) * 0.5f;
-                rect.sizeDelta = new Vector2(delta.magnitude, 4f);
+                rect.sizeDelta = new Vector2(
+                    delta.magnitude,
+                    ResolveEdgeThickness(edge.PresentationStatus));
                 rect.localEulerAngles = new Vector3(
                     0f,
                     0f,
                     Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
-                instance.GetComponent<Image>().color = ResolveEdgeColor(edge);
+                instance.GetComponent<Image>().color =
+                    theme.GetMapEdgeColor(edge.PresentationStatus);
             }
 
             RenderedNodeCount = nodeViews.Count;
             RenderedEdgeCount = edgeLayer.childCount;
             var focus = (state.Nodes ?? Array.Empty<RunMapNodeState>())
-                .FirstOrDefault(node => node.Status == SpireChess.Run.RunNodeStatus.Current) ??
+                .FirstOrDefault(node =>
+                    node.PresentationStatus == RunMapPresentationStatus.Current) ??
                         (state.Nodes ?? Array.Empty<RunMapNodeState>())
-                .FirstOrDefault(node => node.Status == SpireChess.Run.RunNodeStatus.Reachable);
+                .FirstOrDefault(node =>
+                    node.PresentationStatus == RunMapPresentationStatus.Reachable);
             if (focus != null)
             {
                 mapScrollRect.horizontalNormalizedPosition =
@@ -227,20 +236,20 @@ namespace SpireChess.UI.Run
             choiceScrollRect.verticalNormalizedPosition = 1f;
         }
 
-        private static Color ResolveEdgeColor(RunMapEdgeState edge)
+        private static float ResolveEdgeThickness(
+            RunMapEdgePresentationStatus status)
         {
-            if (edge.FromStatus == SpireChess.Run.RunNodeStatus.Resolved &&
-                (edge.ToStatus == SpireChess.Run.RunNodeStatus.Resolved ||
-                 edge.ToStatus == SpireChess.Run.RunNodeStatus.Current ||
-                 edge.ToStatus == SpireChess.Run.RunNodeStatus.Reachable))
+            switch (status)
             {
-                return new Color(0.34f, 0.84f, 0.68f, 0.88f);
+                case RunMapEdgePresentationStatus.Reachable:
+                    return 5f;
+                case RunMapEdgePresentationStatus.Resolved:
+                    return 7f;
+                case RunMapEdgePresentationStatus.Abandoned:
+                    return 3f;
+                default:
+                    return 2f;
             }
-            if (edge.ToStatus == SpireChess.Run.RunNodeStatus.Reachable)
-            {
-                return new Color(0.26f, 0.68f, 0.82f, 0.82f);
-            }
-            return new Color(1f, 1f, 1f, 0.12f);
         }
 
         private static void DestroyChildren(Transform root)

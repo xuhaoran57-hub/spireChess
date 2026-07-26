@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using SpireChess.UI;
 using UnityEditor;
@@ -19,15 +20,16 @@ namespace SpireChess.Tests.EditMode
             "RaceSkin",
             "ArtworkMask",
             "ArtworkMask/Artwork",
+            "ShieldOverlay",
             "NormalFrame",
             "GoldenFrame",
             "CostBadge/Cost",
             "TierBadge/Tier",
             "NamePlate/Name",
-            "InfoPanel/RaceOrSpellType",
-            "InfoPanel/AbilityLabelRow/Label0",
-            "InfoPanel/AbilityLabelRow/Label1",
-            "InfoPanel/AbilityLabelRow/Label2",
+            "RaceOrSpellType",
+            "AbilityLabelRow/Label0",
+            "AbilityLabelRow/Label1",
+            "AbilityLabelRow/Label2",
             "InfoPanel/Description",
             "InfoPanel/Progress/ProgressFill",
             "InfoPanel/Progress/ProgressText",
@@ -86,9 +88,58 @@ namespace SpireChess.Tests.EditMode
             Assert.That(artworkMask.GetComponent<Mask>(), Is.Not.Null);
             Assert.That(root.Find("ArtworkMask/Artwork").parent,
                 Is.SameAs(artworkMask));
+            Assert.That(root.Find("ShieldOverlay").IsChildOf(artworkMask), Is.False);
             Assert.That(root.Find("NormalFrame").IsChildOf(artworkMask), Is.False);
             Assert.That(root.Find("StateBadgeRow").IsChildOf(artworkMask), Is.False);
             Assert.That(root.Find("LegalTargetFrame").IsChildOf(artworkMask), Is.False);
+
+            var labelRow = root.Find("AbilityLabelRow");
+            Assert.That(labelRow.parent, Is.SameAs(root));
+            var typeLine = root.Find("RaceOrSpellType");
+            Assert.That(typeLine.parent, Is.SameAs(root));
+            Assert.That(typeLine.GetSiblingIndex(),
+                Is.GreaterThan(root.Find("NormalFrame").GetSiblingIndex()));
+            Assert.That(typeLine.GetSiblingIndex(),
+                Is.GreaterThan(root.Find("GoldenFrame").GetSiblingIndex()));
+        }
+
+        [Test]
+        public void ShopUiPreview_DoesNotSerializeGoldenIdentityText()
+        {
+            var scenePath = Path.Combine(
+                Application.dataPath,
+                "Scenes",
+                "ShopUiPreview.unity");
+            var sceneYaml = File.ReadAllText(scenePath);
+
+            Assert.That(sceneYaml, Does.Not.Contain("\\u91D1\\u8272"));
+            Assert.That(sceneYaml, Does.Not.Contain("m_Text: 金色"));
+
+            const string goldenBadgeMarker = "  m_Name: GoldenBadge";
+            var searchIndex = 0;
+            var goldenBadgeCount = 0;
+            while ((searchIndex = sceneYaml.IndexOf(
+                       goldenBadgeMarker,
+                       searchIndex,
+                       StringComparison.Ordinal)) >= 0)
+            {
+                var componentIndex = sceneYaml.IndexOf(
+                    "--- !u!224",
+                    searchIndex,
+                    StringComparison.Ordinal);
+                Assert.That(componentIndex, Is.GreaterThan(searchIndex));
+                var gameObjectBlock = sceneYaml.Substring(
+                    searchIndex,
+                    componentIndex - searchIndex);
+                Assert.That(
+                    gameObjectBlock,
+                    Does.Contain("  m_IsActive: 0"),
+                    "Every serialized GoldenBadge must remain inactive.");
+                goldenBadgeCount++;
+                searchIndex = componentIndex;
+            }
+
+            Assert.That(goldenBadgeCount, Is.EqualTo(12));
         }
 
         [Test]
@@ -106,6 +157,27 @@ namespace SpireChess.Tests.EditMode
             }
 
             AssertLayout(CardDisplayMode.Compact, 160f, 240f, CompactRects());
+        }
+
+        [TestCase(CardDisplayMode.Full, 30f, 232f, 210f, 256f)]
+        [TestCase(CardDisplayMode.Compact, 20f, 152f, 140f, 171f)]
+        public void TypeLine_StaysInsideTheFrameSafeOpening(
+            CardDisplayMode mode,
+            float safeLeft,
+            float safeTop,
+            float safeRight,
+            float safeBottom)
+        {
+            view.Render(CreateModel(mode));
+            var actual = GetRootRect(
+                (RectTransform)root.Find("RaceOrSpellType"));
+
+            Assert.That(actual.X, Is.GreaterThanOrEqualTo(safeLeft));
+            Assert.That(actual.Y, Is.GreaterThanOrEqualTo(safeTop));
+            Assert.That(actual.X + actual.Width,
+                Is.LessThanOrEqualTo(safeRight));
+            Assert.That(actual.Y + actual.Height,
+                Is.LessThanOrEqualTo(safeBottom));
         }
 
         [Test]
@@ -202,26 +274,27 @@ namespace SpireChess.Tests.EditMode
             {
                 ["NormalFrame"] = new ExpectedRect(6f, 6f, 228f, 348f),
                 ["ArtworkMask"] = new ExpectedRect(12f, 12f, 216f, 184f),
+                ["ShieldOverlay"] = new ExpectedRect(15f, 8f, 210f, 344f),
                 ["CostBadge"] = new ExpectedRect(13f, 12f, 28f, 29f),
-                ["TierBadge"] = new ExpectedRect(205f, 13f, 21f, 28f),
-                ["StateBadgeRow"] = new ExpectedRect(60f, 157f, 120f, 22f),
+                ["TierBadge"] = new ExpectedRect(198f, 9f, 32f, 40f),
+                ["TierBadge/Tier"] =
+                    new ExpectedRect(199f, 10f, 30f, 38f),
+                ["StateBadgeRow"] = new ExpectedRect(44f, 157f, 152f, 22f),
                 ["NamePlate"] = new ExpectedRect(24f, 181f, 192f, 32f),
                 ["InfoPanel"] = new ExpectedRect(12f, 199f, 216f, 149f),
-                ["InfoPanel/RaceOrSpellType"] =
-                    new ExpectedRect(44f, 215f, 152f, 18f),
-                ["InfoPanel/AbilityLabelRow"] =
-                    new ExpectedRect(20f, 235f, 200f, 20f),
+                ["RaceOrSpellType"] =
+                    new ExpectedRect(36f, 232f, 168f, 24f),
                 ["InfoPanel/Description"] =
-                    new ExpectedRect(12f, 256f, 216f, 52f),
+                    new ExpectedRect(30f, 256f, 180f, 64f),
                 ["InfoPanel/Progress"] =
                     new ExpectedRect(62f, 293f, 116f, 18f),
-                ["AttackBadge"] = new ExpectedRect(13f, 327f, 55f, 22f),
+                ["AttackBadge"] = new ExpectedRect(10f, 321f, 68f, 30f),
                 ["AttackBadge/Attack"] =
-                    new ExpectedRect(27f, 328f, 37f, 20f),
-                ["HealthBadge"] = new ExpectedRect(172f, 327f, 55f, 22f),
+                    new ExpectedRect(27f, 323f, 46f, 26f),
+                ["HealthBadge"] = new ExpectedRect(162f, 321f, 68f, 30f),
                 ["HealthBadge/Health"] =
-                    new ExpectedRect(176f, 328f, 36f, 20f),
-                ["SpellFooter"] = new ExpectedRect(58f, 318f, 124f, 22f),
+                    new ExpectedRect(167f, 323f, 46f, 26f),
+                ["SpellFooter"] = new ExpectedRect(80f, 332f, 80f, 16f),
                 ["SelectionFrame"] = new ExpectedRect(0f, 0f, 240f, 360f)
             };
         }
@@ -232,26 +305,27 @@ namespace SpireChess.Tests.EditMode
             {
                 ["NormalFrame"] = new ExpectedRect(4f, 4f, 152f, 232f),
                 ["ArtworkMask"] = new ExpectedRect(8f, 8f, 144f, 112f),
+                ["ShieldOverlay"] = new ExpectedRect(10f, 5f, 140f, 230f),
                 ["CostBadge"] = new ExpectedRect(9f, 8f, 19f, 20f),
-                ["TierBadge"] = new ExpectedRect(137f, 9f, 14f, 19f),
-                ["StateBadgeRow"] = new ExpectedRect(42f, 91f, 76f, 18f),
+                ["TierBadge"] = new ExpectedRect(132f, 6f, 22f, 28f),
+                ["TierBadge/Tier"] =
+                    new ExpectedRect(133f, 7f, 20f, 26f),
+                ["StateBadgeRow"] = new ExpectedRect(28f, 91f, 104f, 18f),
                 ["NamePlate"] = new ExpectedRect(16f, 108f, 128f, 26f),
                 ["InfoPanel"] = new ExpectedRect(8f, 122f, 144f, 110f),
-                ["InfoPanel/RaceOrSpellType"] =
-                    new ExpectedRect(28f, 136f, 104f, 14f),
-                ["InfoPanel/AbilityLabelRow"] =
-                    new ExpectedRect(12f, 154f, 136f, 16f),
+                ["RaceOrSpellType"] =
+                    new ExpectedRect(24f, 152f, 112f, 19f),
                 ["InfoPanel/Description"] =
-                    new ExpectedRect(12f, 172f, 136f, 33f),
+                    new ExpectedRect(20f, 172f, 120f, 33f),
                 ["InfoPanel/Progress"] =
                     new ExpectedRect(44f, 197f, 72f, 14f),
-                ["AttackBadge"] = new ExpectedRect(9f, 218f, 36f, 15f),
+                ["AttackBadge"] = new ExpectedRect(7f, 213f, 46f, 21f),
                 ["AttackBadge/Attack"] =
-                    new ExpectedRect(18f, 219f, 24f, 13f),
-                ["HealthBadge"] = new ExpectedRect(115f, 218f, 36f, 15f),
+                    new ExpectedRect(18f, 214f, 31f, 19f),
+                ["HealthBadge"] = new ExpectedRect(107f, 213f, 46f, 21f),
                 ["HealthBadge/Health"] =
-                    new ExpectedRect(118f, 219f, 23f, 13f),
-                ["SpellFooter"] = new ExpectedRect(42f, 211f, 76f, 16f),
+                    new ExpectedRect(110f, 214f, 31f, 19f),
+                ["SpellFooter"] = new ExpectedRect(55f, 220f, 50f, 13f),
                 ["SelectionFrame"] = new ExpectedRect(0f, 0f, 160f, 240f)
             };
         }

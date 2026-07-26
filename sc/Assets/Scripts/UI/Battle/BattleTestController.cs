@@ -181,6 +181,7 @@ namespace SpireChess.UI.Battle
         private float playbackSpeed = 1f;
         private bool skipPlaybackRequested;
         private bool battleCommitSaved = true;
+        private bool resultFinalized;
 
         public bool IsBattleLocked => battleRunning || battleResolved;
         public bool IsRunBattle => runBattle;
@@ -247,10 +248,12 @@ namespace SpireChess.UI.Battle
             initialSetupState = setupState.Clone();
             displayedState = setupState.Clone();
             screenView.Bind(this);
+            screenView.SnapAndClear();
             RunSystemMenuView.Attach(screenView, () => !battleRunning);
             if (restoredResult != null)
             {
                 lastResult = restoredResult;
+                resultFinalized = true;
                 displayedState = restoredResult.FinalState;
                 battleResolved = true;
                 returnSceneName = context.ReturnSceneName;
@@ -263,6 +266,24 @@ namespace SpireChess.UI.Battle
                 currentStatus = BuildReadyStatus();
             }
             RenderFormalState();
+            if (restoredResult != null)
+            {
+                screenView.ShowCombatResult(
+                    restoredResult.Winner,
+                    BuildResultStatus(restoredResult));
+            }
+        }
+
+        private void OnDisable()
+        {
+            screenView?.SnapAndClear();
+            if (playbackCoroutine != null)
+            {
+                StopCoroutine(playbackCoroutine);
+                playbackCoroutine = null;
+            }
+            battleRunning = false;
+            skipPlaybackRequested = false;
         }
 
         public void MoveCard(BattleSide fromSide, int fromIndex, BattleSide toSide, int toIndex)
@@ -304,6 +325,7 @@ namespace SpireChess.UI.Battle
                 StopCoroutine(playbackCoroutine);
             }
 
+            screenView?.SnapAndClear();
             playbackCoroutine = StartCoroutine(PlayBattle());
         }
 
@@ -336,7 +358,8 @@ namespace SpireChess.UI.Battle
                 {
                     yield return screenView.PlayEvent(
                         playbackEvent,
-                        playbackSpeed);
+                        playbackSpeed,
+                        result.Winner);
                     displayedState = playbackEvent.BoardState;
                     RenderFormalState();
                 }
@@ -346,7 +369,8 @@ namespace SpireChess.UI.Battle
                     RenderFormalState();
                     yield return screenView.PlayEvent(
                         playbackEvent,
-                        playbackSpeed);
+                        playbackSpeed,
+                        result.Winner);
                 }
             }
 
@@ -358,6 +382,7 @@ namespace SpireChess.UI.Battle
             currentStatus = BuildResultStatus(result);
             FinalizeBattle(result);
             RenderFormalState();
+            screenView.ShowCombatResult(result.Winner, currentStatus);
         }
 
         public void TogglePlaybackSpeed()
@@ -371,14 +396,15 @@ namespace SpireChess.UI.Battle
             if (battleRunning)
             {
                 skipPlaybackRequested = true;
+                screenView?.SnapAndClear();
             }
         }
 
         public BattleSimulationResult ResolveImmediately()
         {
-            if (simulator == null || battleRunning)
+            if (simulator == null || battleRunning || battleResolved)
             {
-                return null;
+                return lastResult;
             }
 
             var result = simulator.Simulate(setupState);
@@ -390,11 +416,13 @@ namespace SpireChess.UI.Battle
             currentStatus = BuildResultStatus(result);
             FinalizeBattle(result);
             RenderFormalState();
+            screenView?.ShowCombatResult(result.Winner, currentStatus);
             return result;
         }
 
         public void ResetBattle()
         {
+            screenView?.SnapAndClear();
             if (playbackCoroutine != null)
             {
                 StopCoroutine(playbackCoroutine);
@@ -408,6 +436,7 @@ namespace SpireChess.UI.Battle
             displayedLog.Clear();
             battleRunning = false;
             battleResolved = false;
+            resultFinalized = false;
             lastResult = null;
             returnSceneName = null;
             battleCommitSaved = true;
@@ -553,6 +582,12 @@ namespace SpireChess.UI.Battle
 
         private void FinalizeBattle(BattleSimulationResult result)
         {
+            if (result == null || resultFinalized)
+            {
+                return;
+            }
+
+            resultFinalized = true;
             lastResult = result;
             if (!runBattle)
             {
