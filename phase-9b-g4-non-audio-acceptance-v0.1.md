@@ -1,10 +1,12 @@
 # 阶段 9B G4 非音频集成验收包 v0.1
 
 - 日期：2026-07-26
-- 文档状态：执行中；G4 核心工程链与开发机重复基线已通过，完整 17 状态、
-  第二台机器、外部试玩与正式音频仍未完成
-- 当前工程源基线：`c5f5e57 feat(presentation): complete Phase 9B G3 engineering baseline`
-- 当前 G4 构建：`20260726-114707`；源工作树为 dirty，尚不能作为最终冻结候选
+- 文档状态：执行中；G4 工程自动化候选与 DEV-A 性能基线已完成，项目负责人
+  逐图签字、第二台机器、两机门槛、外部试玩与正式音频仍未完成
+- 当前工程源基线：
+  `f377497d1f3e65486370d6b35d91811d1bff50bc feat(presentation): complete G4 acceptance automation`
+- 当前 G4 构建：`20260726-g4-f377497`；`sourceTreeDirty=false`、
+  `cleanBuild=true`
 - Unity：2022.3.62f3c1
 - 内容身份：5.5.0 / 8B.1
 - 完整配置哈希：`818596be90de4e2ddf6c4b7f9ba0b6e1fee994fcc31ec9893652e02f49ef4311`
@@ -62,33 +64,39 @@
 
 已有（2026-07-26 最新有效证据）：
 
-- G4 变更后全量回归：EditMode 350 / 350（6.601 s）、PlayMode 28 / 28
-  （14.581 s），0 失败、0 跳过、0 inconclusive、`ForcedShutdown=false`；结果见
-  `sc/Logs/TestResults/EditMode-results.xml` 与
-  `sc/Logs/TestResults/PlayMode-results.xml`；
-- Clean Development Build `20260726-114707` 构建成功；Player 为
-  `sc/Builds/G4/20260726-114707/Windows-x64/SpireChess.exe`，Manifest SHA-256 为
-  `112c1a664c4ae1d030b9181ae5cae3c1e67bb09d32af721517583084da48c31c`，
+- G4 变更后全量回归：EditMode 351 / 351（6.7499407 s）、PlayMode 30 / 30
+  （33.5135665 s），0 失败、0 跳过、0 inconclusive、`ForcedShutdown=false`；
+  XML SHA-256 分别为
+  `a2bdcab030c88a8fe5ce76a35ed427fe51797a5a84281e62e29ddcf88ab774e2` 与
+  `bd29017bfd68ef952ee8f358a5fd75f301d7b98e94b81e01504bc19f2b2137f8`；
+- Clean Development Build `20260726-g4-f377497` 构建成功；Player 为
+  `sc/Builds/G4/20260726-g4-f377497/Windows-x64/SpireChess.exe`，Build
+  Manifest SHA-256 为
+  `e09691e14ba931dddade86223527fa30e02dfcc6071a0e08be63bfea12023576`，
   EXE SHA-256 为
   `fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7`；
-  Manifest 记录 `c5f5e57c63f128ac38b5bc42f682e3240825adba`、dirty 工作树、
-  Unity 2022.3.62f3c1、247 个构建文件的长度与 SHA-256；
-- 真实 Player 核心链路在 1920×1080 与 1920×1200 各通过 1 轮，
-  每轮 16 张非黑图、组内画面均有足够差异；证据目录前缀为
-  `sc/Logs/G4/Acceptance/20260726-114805-DESKTOP-453378L-*`；
-- 同一构建保持窗口可见并关闭截图编码后，两种分辨率各通过 5 轮，
-  汇总见
-  `sc/Logs/G4/Acceptance/g4-matrix-20260726-115434-DESKTOP-453378L-summary.json`
-  与同名前缀 CSV；
-- 10 轮重复采集全部满足完整 G2 样板 Catalog `22 / 22 Exact`、可见样板
-  违规 0、最终临时 FX 0、非循环 AudioSource 0、战斗动画 false；
-- 1×、2×、跳过的领域结果哈希、Run 指纹和单次结算一致；真实
-  `MainMenu → Run → Shop → Run → Battle → Run → MainMenu → Continue`
-  保存恢复链通过；
-- 早期 `20260726-110359-*` 隐藏窗口矩阵虽流程通过，但亚毫秒帧时间是
-  Windows 隐藏窗口改变呈现行为造成的无效数据，明确拒绝用于性能结论；
-- `20260726-112738-*` 是外层命令过早超时后留下的孤立单轮，没有 Evidence
-  Manifest 或矩阵汇总，也明确作废；
+  Manifest 记录完整源提交、干净工作树、Unity 2022.3.62f3c1 及全部构建文件哈希；
+- Core visual 矩阵 `20260726-134409-DESKTOP-453378L` 双分辨率各 1 轮，
+  共 32 张截图；Frozen visual 矩阵 `20260726-134454-DESKTOP-453378L`
+  双分辨率各 21 张，共 42 张，合法 4 店/4 战覆盖冻结 17 项并拆出地图左/中/右、
+  冻结/解冻与音频设置；Stress visual 矩阵
+  `20260726-134612-DESKTOP-453378L` 共 6 张；
+- Core performance 矩阵 `20260726-135013-DESKTOP-453378L` 与 Stress
+  performance 矩阵 `20260726-135305-DESKTOP-453378L` 均在
+  1920×1080、1920×1200 各完成 5 轮无截图采集；
+- 5 份矩阵、26 个正式 Player 运行全部为 `FormalCandidate`、
+  `AcceptancePassed`，并绑定同一源提交、Player SHA-256 与 Build Manifest
+  SHA-256；运行时 Error/Exception/Assert 为 0，独立 failure marker 为 0；
+- 全部运行满足 G2 样板 Catalog `22 / 22 Exact`、可见样板违规 0、最终临时
+  FX 0、非循环 AudioSource 0、战斗动画 false；非样板诊断图按冻结机制显式记录，
+  不被解释为正式美术命中；
+- 1×、2×、跳过的领域结果哈希、Run 指纹和单次结算一致；Stress 在同一进程执行
+  5 轮并覆盖同屏 10 张 Compact、嵌套亡语、连续召唤、群体永久成长与 30 秒
+  稳定窗口；
+- 可提交证据索引、构建 Manifest、矩阵汇总与可视运行 Manifest 见
+  `ui-concepts/unity-validation/g4-formal-chain-v0.1/`；完整原始 CSV、报告、
+  Player.log 和 80 张截图保留于
+  `sc/Logs/G4/Formal/f377497/`；
 - `g3-main-menu-v0.1`、`g3-shop-screen-v0.1`、`g3-battle-screen-v0.1`、
   `g3-run-screen-v0.1` 共 28 张真实 GPU 双分辨率截图；
 - 存档、2×、跳过、重置、VFX 清理、AudioService 唯一性等工程覆盖；
@@ -98,15 +106,8 @@
 
 仍缺：
 
-- 当前核心链只有 16 个截图状态，不等于第 3.3 节冻结的 17 状态完整通过。
-  合法补齐 `shop_refresh`、`shop_target_or_warcry`、`shop_upgrade`、
-  `battle_attack_shield` 和严格 `RunPhase.RewardChoice` 至少需要扩展到
-  3 店/3 战，严格奖励选择需要 4 店/4 战；不得改金币或直接改领域状态伪造；
-- 当前地图通过横向滚动呈现 19 节点并显示明确提示，但仍需补全图/分段滚动证据，
-  不能把单张视口图描述成 19 节点同时可见；
-- 开发机已完成核心链 5×2 轮性能采集，但“同屏 10 张 Compact 卡 + 嵌套召唤”
-  独立压力场景尚未完成，因此 G4-P02 仍不能整体关闭；
-- 当前构建来自 dirty 工作树；需在代码提交后重建并冻结最终 SHA；
+- G4-V01/V02 的截图、哈希和自动布局/语义门禁已经完成，但仍需项目负责人逐图
+  视觉复核并签字；自动门禁不能替代负责人结论；
 - 尚无第二台不同配置机器的同构结果；
 - 尚无至少 5 名外部试玩者记录；
 - 正式 AI 音频仍未生成、接入、批准和听审。
@@ -118,21 +119,21 @@
 
 | ID | 门禁 | 证据等级 | 通过条件 | 责任 | 状态 | 证据/备注 |
 | --- | --- | --- | --- | --- | --- | --- |
-| G4-A01 | 候选身份冻结 | `NOW` | SHA、Unity、内容/规则版本、配置哈希、工作树状态均已记录 | 工程 | 未执行 | 构建身份完整，但源工作树 dirty；待提交后重建 |
-| G4-A02 | 全量 Unity 回归 | `NOW` | EditMode/PlayMode 0 失败、0 跳过；XML 与日志归档 | 工程 | 通过 | 350 / 350（6.601 s）；28 / 28（14.581 s）；0 inconclusive；ForcedShutdown=false |
+| G4-A01 | 候选身份冻结 | `NOW` | SHA、Unity、内容/规则版本、配置哈希、工作树状态均已记录 | 工程 | 通过 | `f377497…`；Build `20260726-g4-f377497`；clean tree/clean build；Manifest `e09691e1…` |
+| G4-A02 | 全量 Unity 回归 | `NOW` | EditMode/PlayMode 0 失败、0 跳过；XML 与日志归档 | 工程 | 通过 | 351 / 351（6.7499407 s）；30 / 30（33.5135665 s）；0 inconclusive；ForcedShutdown=false |
 | G4-A03 | 样板 Sprite 门禁 | `NOW` | 12 随从、3 Token、4 法术、3 遗珍精确命中；非法 ID 进入一次诊断 | 工程 | 通过 | 22 / 22 Catalog Exact；可见样板违规 0 |
-| G4-A04 | 正式端到端链路 | `NOW` | 不使用 Preview Scene；完整链路无空白、输入阻塞、重复结算或未处理异常 | 工程 | 通过 | `20260726-114805-*`；真实 UI 点击含遮挡射线门禁 |
+| G4-A04 | 正式端到端链路 | `NOW` | 不使用 Preview Scene；完整链路无空白、输入阻塞、重复结算或未处理异常 | 工程 | 通过 | `Formal/f377497` 的 Core/Frozen/Stress；真实 UI 点击、遮挡射线和运行时错误门禁 |
 | G4-A05 | 存档返回与继续 | `NOW` | 返回 MainMenu 后 Continue 重建卡面、地图、阶段和可交互状态；领域快照一致 | 工程 | 通过 | Continue 后 Run 指纹与阶段一致 |
 | G4-A06 | 2× 等价性 | `NOW` | 只缩放表现时间；领域结果、随机流、结算次数与 1× 完全一致 | 工程 | 通过 | `OneTimesTwoTimesAndSkip_MatchDomainResultAndSettleOnce` |
 | G4-A07 | 跳过等价性 | `NOW` | 直接显示同一 FinalState；只结算一次；无残留协程、VFX 或立牌状态 | 工程 | 通过 | 同上；重复操作不产生二次结算 |
-| G4-A08 | 嵌套亡语/连续召唤 | `NOW` | 事件不丢失、不覆盖槽位；池容量受控；结束后临时实例为 0 | 工程 | 通过 | 领域嵌套召唤回归 + 真实 `battle_summon` 帧；最终 FX=0 |
+| G4-A08 | 嵌套亡语/连续召唤 | `NOW` | 事件不丢失、不覆盖槽位；池容量受控；结束后临时实例为 0 | 工程 | 通过 | Stress 五轮、真实 `battle_summon`、群体成长；30 秒后 FX/voice/动画归零 |
 | G4-A09 | 场景服务唯一性 | `NOW` | 全链路始终只有一个 Canvas/EventSystem/常驻 AudioService；切场无旧对象残留 | 工程 | 通过 | PlayMode 正式链逐场检查 |
 | G4-A10 | Headless/确定性 | `NOW` | 表现层不加载进平衡批次、不消费领域 RNG；确定性结果不变 | 工程 | 通过 | 1×/2×/Skip 领域哈希与 Run 指纹一致 |
-| G4-V01 | 1920×1080 正式链路 | `NOW` | 第 3 节清单逐项通过，截图哈希和评审结论完整 | 工程 + 负责人 | 未执行 | 核心 16 图已通过；冻结 17 状态尚未补齐 |
-| G4-V02 | 1920×1200 正式链路 | `NOW` | 与 V01 同一候选、同一链路；无新增遮挡、裁切或特效越界 | 工程 + 负责人 | 未执行 | 核心 16 图已通过；冻结 17 状态尚未补齐 |
-| G4-P01 | 可重复性能采集 | `NOW` | 固定构建、设置、场景、预热、重复次数和原始记录格式 | 工程 | 通过 | watchdog、隔离存档、逐帧 CSV、矩阵 JSON/CSV 已完成 |
-| G4-P02 | 开发机性能基线 | `NOW` | 第 5 节全部场景至少 5 次有效采样；无崩溃或持续增长 | 工程 | 未执行 | 核心链 5×2 轮有效；独立 10 卡/嵌套压力场景待补 |
-| G4-P03 | 第二台机器性能基线 | `OWNER` | 不同配置 Windows x64 机器运行同一构建、设置与脚本 | 负责人 | 未执行 |  |
+| G4-V01 | 1920×1080 正式链路 | `NOW` | 第 3 节清单逐项通过，截图哈希和评审结论完整 | 工程 + 负责人 | 未执行 | 自动化与 21 图技术门禁通过；待项目负责人逐图复核/签字 |
+| G4-V02 | 1920×1200 正式链路 | `NOW` | 与 V01 同一候选、同一链路；无新增遮挡、裁切或特效越界 | 工程 + 负责人 | 未执行 | 自动化与 21 图技术门禁通过；待项目负责人逐图复核/签字 |
+| G4-P01 | 可重复性能采集 | `NOW` | 固定构建、设置、场景、预热、重复次数和原始记录格式 | 工程 | 通过 | v2 JSON、逐帧 CSV、Player.log 哈希、watchdog、错误 marker 与 5×2 矩阵已完成 |
+| G4-P02 | 开发机性能基线 | `NOW` | 第 5 节全部场景至少 5 次有效采样；无崩溃或持续增长 | 工程 | 通过 | Core/Stress visual 各 1×2 作为排除预热；performance 各 5×2；趋势审查通过 |
+| G4-P03 | 第二台机器性能基线 | `OWNER` | 不同配置 Windows x64 机器运行同一构建、设置与脚本 | 负责人 | 未执行 | 执行包与说明已生成；ZIP SHA-256 `83699817…`；尚无第二机结果 |
 | G4-P04 | 两机门槛冻结 | `OWNER` | 依据两机实测写明帧时间、加载和内存接受值；不得只用单机 FPS | 负责人 | 未执行 |  |
 | G4-U01 | 至少 5 人完成正式任务 | `OWNER` | 5 名未参与实现者，各有独立记录；无口头引导完成核心链路 | 负责人 + 试玩者 | 未执行 |  |
 | G4-U02 | 非音频理解度 | `OWNER` | 第 6 节六类核心信息均达标，开放阻塞问题为 0 | 负责人 + 试玩者 | 未执行 |  |
@@ -149,18 +150,18 @@
 
 | 字段 | 填写值 |
 | --- | --- |
-| 候选完整 SHA |  |
-| 工作树是否干净 |  |
-| Unity 完整版本 |  |
-| 内容/最低规则版本 |  |
-| 完整配置哈希 |  |
-| Windows 构建 SHA-256 |  |
-| 运行模式 | Editor / Development Build / Release-like Build |
-| 分辨率与窗口模式 | 1920×1080 / 1920×1200；窗口 / 无边框 / 全屏 |
-| 质量档、VSync、目标帧率 |  |
-| 新建单局 seed/存档 ID |  |
-| 执行人、日期、机器 ID |  |
-| Player.log/测试日志 |  |
+| 候选完整 SHA | `f377497d1f3e65486370d6b35d91811d1bff50bc` |
+| 工作树是否干净 | 是；Build Manifest `sourceTreeDirty=false` |
+| Unity 完整版本 | `2022.3.62f3c1` |
+| 内容/最低规则版本 | `5.5.0 / 8B.1` |
+| 完整配置哈希 | `818596be90de4e2ddf6c4b7f9ba0b6e1fee994fcc31ec9893652e02f49ef4311` |
+| Windows 构建 SHA-256 | EXE `fa01ccd…eb7`；Build Manifest `e09691e…76`（候选身份必须同时引用） |
+| 运行模式 | Windowed Development Build；`cleanBuild=true` |
+| 分辨率与窗口模式 | 1920×1080 / 1920×1200；窗口 |
+| 质量档、VSync、目标帧率 | High / VSync 1 / `Application.targetFrameRate=-1` |
+| 新建单局 seed/存档 ID | Core `940101`；Frozen `78`；Stress `940401`；逐轮隔离存档 |
+| 执行人、日期、机器 ID | Codex / 2026-07-26 / `DESKTOP-453378L` |
+| Player.log/测试日志 | `sc/Logs/G4/Formal/f377497/`；`sc/Logs/TestResults/` |
 
 ### 3.2 正式链路规则
 
@@ -193,23 +194,23 @@ ui-concepts/unity-validation/g4-formal-chain-v0.1/
 
 | 序号/建议文件名 | 必须呈现的真实状态 | 1080 | 1200 | 评审结论/缺陷 ID |
 | --- | --- | --- | --- | --- |
-| `01_main_menu_new_run` | 主菜单、存档摘要、新建/继续可用性 |  |  |  |
-| `02_run_initial_map` | 第一层 19 节点、连线、可达/锁定/当前状态 |  |  |  |
-| `03_shop_entry` | 5 商品位、资源栏、阵容、手牌、详情区 |  |  |  |
-| `04_shop_refresh` | 一次合法刷新及唯一反馈，商品身份精确命中 |  |  |  |
-| `05_shop_buy_and_play` | 购买、金币变化、上场落位及反馈 |  |  |  |
-| `06_shop_target_or_warcry` | 目标框、目标型法术或战吼反馈 |  |  |  |
-| `07_shop_freeze_unfreeze` | 冻结与解冻状态均可识别 |  |  |  |
-| `08_shop_upgrade` | 酒馆等级、费用与升级反馈 |  |  |  |
-| `09_battle_start` | 双方各至多 5 个立牌、日志、速度/跳过控件 |  |  |  |
-| `10_battle_attack_shield` | 攻击者、受击者、伤害和护盾破裂可辨认 |  |  |  |
-| `11_battle_death_summon` | 死亡/召唤次序、空槽与新单位落点可辨认 |  |  |  |
-| `12_battle_result` | 胜负、结算文案和返回操作无阻塞 |  |  |  |
-| `13_run_reward` | 战后奖励/选择层及确认反馈 |  |  |  |
-| `14_run_returned_map` | 已完成路径、当前位置和下一可达节点 |  |  |  |
-| `15_run_system_menu` | 系统菜单与四路音量设置布局 |  |  |  |
-| `16_main_menu_saved_run` | 保存返回后的 Continue 与存档摘要 |  |  |  |
-| `17_continued_run_restored` | Continue 后阶段、地图、阵容、资源和主题重建 |  |  |  |
+| `01_main_menu_new_run` | 主菜单、存档摘要、新建/继续可用性 | 自动通过 | 自动通过 | 待负责人签字 |
+| `02_run_initial_map` | 第一层 19 节点、连线、可达/锁定/当前状态 | 自动通过；左/中/右 | 自动通过；左/中/右 | 待负责人签字 |
+| `03_shop_entry` | 5 商品位、资源栏、阵容、手牌、详情区 | 自动通过 | 自动通过 | 待负责人签字 |
+| `04_shop_refresh` | 一次合法刷新及唯一反馈，商品身份精确命中 | 自动通过 | 自动通过 | 待负责人签字 |
+| `05_shop_buy_and_play` | 购买、金币变化、上场落位及反馈 | 自动通过 | 自动通过 | 待负责人签字 |
+| `06_shop_target_or_warcry` | 目标框、目标型法术或战吼反馈 | 自动通过 | 自动通过 | 待负责人签字 |
+| `07_shop_freeze_unfreeze` | 冻结与解冻状态均可识别 | 自动通过；两帧 | 自动通过；两帧 | 待负责人签字 |
+| `08_shop_upgrade` | 酒馆等级、费用与升级反馈 | 自动通过 | 自动通过 | 待负责人签字 |
+| `09_battle_start` | 双方各至多 5 个立牌、日志、速度/跳过控件 | 自动通过 | 自动通过 | 待负责人签字 |
+| `10_battle_attack_shield` | 攻击者、受击者、伤害和护盾破裂可辨认 | 自动通过 | 自动通过 | 待负责人签字 |
+| `11_battle_death_summon` | 死亡/召唤次序、空槽与新单位落点可辨认 | 自动通过 | 自动通过 | 待负责人签字 |
+| `12_battle_result` | 胜负、结算文案和返回操作无阻塞 | 自动通过 | 自动通过 | 待负责人签字；已记录日志裁行 P2 |
+| `13_run_reward` | 战后奖励/选择层及确认反馈 | 自动通过 | 自动通过 | 待负责人签字；已记录滚动提示 P2 |
+| `14_run_returned_map` | 已完成路径、当前位置和下一可达节点 | 自动通过 | 自动通过 | 待负责人签字 |
+| `15_run_system_menu` | 系统菜单与四路音量设置布局 | 自动通过；菜单/音频两帧 | 自动通过；菜单/音频两帧 | 待负责人签字 |
+| `16_main_menu_saved_run` | 保存返回后的 Continue 与存档摘要 | 自动通过 | 自动通过 | 待负责人签字 |
+| `17_continued_run_restored` | Continue 后阶段、地图、阵容、资源和主题重建 | 自动通过 | 自动通过 | 待负责人签字 |
 
 截图 Manifest 模板：
 
@@ -221,13 +222,13 @@ ui-concepts/unity-validation/g4-formal-chain-v0.1/
 
 | 项目 | 命令/测试名 | 结果 | 通过/失败/跳过 | 耗时 | 日志/XML |
 | --- | --- | --- | --- | --- | --- |
-| EditMode 全量 | `.\tools\run_unity_tests.ps1 -Platform EditMode` |  |  |  |  |
-| PlayMode 全量 | `.\tools\run_unity_tests.ps1 -Platform PlayMode` |  |  |  |  |
-| 正式链路 |  |  |  |  |  |
-| 存档恢复 |  |  |  |  |  |
-| 跳过/2× |  |  |  |  |  |
-| 嵌套亡语/召唤 |  |  |  |  |  |
-| Headless/确定性 |  |  |  |  |  |
+| EditMode 全量 | `.\tools\run_unity_tests.ps1 -Platform EditMode` | Passed | 351 / 0 / 0 | 6.7499407 s | `EditMode-results.xml` |
+| PlayMode 全量 | `.\tools\run_unity_tests.ps1 -Platform PlayMode` | Passed | 30 / 0 / 0 | 33.5135665 s | `PlayMode-results.xml` |
+| 正式链路 | `run_g4_acceptance_matrix.ps1` Core/Frozen | AcceptancePassed | 双分辨率各 1 | Core 34.6 s；Frozen 68.2 s | `Formal/f377497/*-visual` |
+| 存档恢复 | Frozen checkpoint + Run 指纹 | Passed | 2 / 0 / 0 | 含于 Frozen | 同上 |
+| 跳过/2× | Stress 五轮哈希/结算对照 | Passed | 10 / 0 / 0 | 636.4 s（性能矩阵） | `stress-performance` |
+| 嵌套亡语/召唤 | Stress PlayMode + Player | Passed | 30 个 PlayMode 用例内 + 12 个正式 Stress 运行 | 含于上述 | XML + Stress matrices |
+| Headless/确定性 | 领域回归 + 1×/2×/Skip 指纹 | Passed | 0 失败 | 含于上述 | XML + Player reports |
 
 ## 4. 存档、2× 与跳过等价性模板
 
@@ -296,12 +297,12 @@ MainMenu、Run/Shop、Battle 的循环和交叉淡化。
 | RAM | 15.9 GB |  |
 | GPU/显存 | NVIDIA GeForce RTX 5070，12227 MiB |  |
 | GPU 驱动 | 591.86 |  |
-| 显示器刷新率 |  |  |
-| 电源模式 |  |  |
-| 后台负载说明 |  |  |
-| 构建 SHA-256 |  |  |
-| 质量/VSync/目标帧 |  |  |
-| 执行人/日期 |  |  |
+| 显示器刷新率 | 60 Hz（Player 报告值） |  |
+| 电源模式 | Windows `平衡`（GUID `381b4222-f694-41f0-9685-ff5bb260df2e`） |  |
+| 后台负载说明 | Player 串行执行，无 Unity Editor/其他 SpireChess 进程；系统后台未冻结 |  |
+| 构建 SHA-256 | EXE `fa01ccd…eb7` + Manifest `e09691e…76` |  |
+| 质量/VSync/目标帧 | High / 1 / -1 |  |
+| 执行人/日期 | Codex / 2026-07-26 |  |
 
 ### 5.3 原始采集记录
 
@@ -319,38 +320,69 @@ MainMenu、Run/Shop、Battle 的循环和交叉淡化。
 | TARGET-B | 1920×1080 | 同上整组 | 5 |  |  |  |  |  |  |  |  |  |
 | TARGET-B | 1920×1200 | 同上整组 | 5 |  |  |  |  |  |  |  |  |  |
 
-#### 5.3.1 2026-07-26 DEV-A 核心链有效重复基线
+#### 5.3.1 2026-07-26 DEV-A Core/Stress 自动矩阵
 
-采集使用 Clean Development Build `20260726-114707`、High、VSync 1、
-seed `940101`。Player 窗口保持可见，只关闭 PNG 捕获/编码；每个分辨率 5 轮，
-共 10 轮均为 `AcceptancePassed`。
+采集使用 Clean Development Build `20260726-g4-f377497`、High、VSync 1。
+Core seed `940101`，Stress seed `940401`。Player 窗口保持可见，性能轮只关闭
+PNG 捕获/编码；每种模式、每个分辨率 5 轮，共 20 轮均为
+`AcceptancePassed`。以下为“五轮中位数 `[最小–最大]`”。
 
-| 分辨率 | 轮数 / 样本范围 | Frame 平均中位 | P50 | P95 | P99 中位（轮间范围） | 单帧最大值范围 | Total Used 峰值中位（范围） | GC Used 峰值中位 | Texture 峰值中位 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1920×1080 | 5 / 687–692 | 17.004 ms | 16.667 ms | 16.683 ms | 16.684 ms（16.684–16.684） | 116.662–133.331 ms | 247.65 MiB（247.61–248.03） | 10.05 MiB | 149.47 MiB |
-| 1920×1200 | 5 / 684–691 | 17.004 ms | 16.667 ms | 16.683 ms | 16.684 ms（16.684–16.684） | 99.997–116.666 ms | 249.39 MiB（249.34–249.52） | 10.00 MiB | 149.47 MiB |
+预热与计量时序：
 
-| 分辨率 | GC Alloc / frame 平均中位 | P50 | P95 | P99 | 五轮最大值 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 1920×1080 | 37,827 B | 2,838 B | 4,512 B | 1,282,174 B | 3,300,212 B |
-| 1920×1200 | 37,784 B | 2,838 B | 4,512 B | 1,280,369 B | 3,297,378 B |
+| 模式 | 不计入汇总的完整预热矩阵 | 计量矩阵 |
+| --- | --- | --- |
+| Core | `20260726-134409-DESKTOP-453378L`，13:44 UTC，1×2 visual | `20260726-135013-DESKTOP-453378L`，13:50 UTC，5×2 |
+| Stress | `20260726-134612-DESKTOP-453378L`，13:46 UTC，1×2 visual | `20260726-135305-DESKTOP-453378L`，13:53 UTC，5×2 |
 
-首次正式路由的场景加载中位数：
+两组预热与各自计量使用同一 Build/Player/Manifest SHA、High、Windowed、
+VSync 1、seed 和分辨率；预热轮的性能值没有进入 5×2 Summary。Frozen visual
+seed 78 是额外的全链路预热/视觉证据，不对应单独的 Frozen performance 组。
 
-| 分辨率 | MainMenu Load / 激活至首帧 | Run Load / 激活至首帧 | Shop Load / 激活至首帧 | Battle Load / 激活至首帧 |
-| --- | --- | --- | --- | --- |
-| 1920×1080 | 33.26 / 541.73 ms | 64.92 / 52.39 ms | 10.84 / 34.29 ms | 10.04 / 21.97 ms |
-| 1920×1200 | 31.58 / 546.26 ms | 65.86 / 54.35 ms | 11.69 / 34.74 ms | 10.14 / 22.19 ms |
+| 模式 / 分辨率 | Frame Avg ms | P95 ms | P99 ms | 单帧 Max ms | Total Peak / Final MiB | GC Peak / Final MiB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Core 1920×1080 | 17.005 `[16.979–17.104]` | 16.683 | 16.684 `[16.684–33.348]` | 116.664 `[116.663–133.332]` | 247.627 / 245.148 | 10.023 / 8.707 |
+| Core 1920×1200 | 17.004 `[17.003–17.005]` | 16.683 | 16.684 `[16.684–18.349]` | 116.664 `[116.664–133.331]` | 249.380 / 246.880 | 10.004 / 8.719 |
+| Stress 1920×1080 | 16.861 `[16.853–16.890]` | 16.683 | 16.684 | 583.363 `[516.694–600.025]` | 266.868 / 248.963 | 25.812 / 11.023 |
+| Stress 1920×1200 | 16.862 `[16.862–16.866]` | 16.683 | 16.684 | 600.025 `[583.356–616.690]` | 268.307 / 250.905 | 25.742 / 11.207 |
+
+| 模式 / 分辨率 | GC Alloc/frame Average | P95 | P99 | 五轮 Maximum 中位 |
+| --- | ---: | ---: | ---: | ---: |
+| Core 1920×1080 | 38,085 B | 4,688 B | 1,281,737 B | 3,251,730 B |
+| Core 1920×1200 | 38,055 B | 4,688 B | 1,280,811 B | 3,285,832 B |
+| Stress 1920×1080 | 29,362 B | 5,886 B | 453,268 B | 42,781,610 B |
+| Stress 1920×1200 | 29,358 B | 5,886 B | 453,268 B | 42,684,710 B |
+
+场景加载中位/P95 与激活至首帧中位/P95：
+
+| 路径 | 1920×1080 | 1920×1200 |
+| --- | --- | --- |
+| Core MainMenu | `33.19/33.61；536.79/540.19 ms` | `34.19/35.04；540.16/545.33 ms` |
+| Core 首次 Run | `63.73/65.62；52.88/53.64 ms` | `63.07/70.64；53.48/54.22 ms` |
+| Core Shop | `10.99/12.35；35.80/37.54 ms` | `10.91/11.12；35.54/36.43 ms` |
+| Core Battle | `10.37/10.74；22.32/22.82 ms` | `9.92/10.58；21.87/23.31 ms` |
+| Stress MainMenu | `32.78/33.59；544.77/548.40 ms` | `32.40/33.21；546.11/550.80 ms` |
+| Stress 十卡 Shop | `65.49/67.35；523.54/579.56 ms` | `65.24/68.32；530.62/538.63 ms` |
+| Stress Battle #1 | `15.06/16.09；32.62/34.07 ms` | `13.78/15.08；30.26/32.04 ms` |
+| Stress Battle #2–#5 | `6.77/9.56；11.94/12.93 ms` | `6.85/8.83；11.82/12.91 ms` |
 
 解释边界：
 
-- P50/P95 表明核心链在本机稳定受 60 Hz VSync 限制；
-- 99.997–133.331 ms 单帧尖峰位于场景切换/首次资源建立附近，不含截图编码；
-- 全部 10 轮最终 FX、非循环 AudioSource 和战斗动画均归零，未见轮间内存单调增长；
-- 本结果不含独立“同屏 10 张 Compact 卡 + 嵌套召唤”压力夹具，不能单独关闭
-  G4-P02，也不能替代第二台机器或项目负责人冻结的产品门槛；
-- `20260726-110359-*` 是隐藏窗口诊断轮，约 0.1 ms 的帧时间已判无效，不得与
-  本表混合。
+- Core/Stress 的 P95/P99 在本机稳定受 60 Hz VSync 限制；Core 相对旧开发机
+  基线没有指标触发 20% 调查线；
+- Stress 十卡 Shop 初始化稳定出现 516–617 ms 单帧尖峰，并伴随约 42.7 MB
+  （约 40.8 MiB）单帧 GC Alloc；随后 P95/P99 回到 VSync 附近。它是当前需要
+  负责人决定接受还是优化的主要性能信号，不得被总体平均值掩盖；
+- 四组均无跨完整五轮的单调内存增长。10 / 10 个 Stress 运行按“末样本前
+  30 秒的首个样本 → 末样本”口径回落 0.773–0.955 MiB，且窗口内 FX、
+  非循环 AudioSource、战斗动画峰值
+  均为 0，因此未触发“持续增长且稳定期无法回落”的阻塞条件；
+- 20 个 JSON、20 个原始 CSV 共 42,162 条数据样本（另有 20 行表头）已核对
+  样本数、汇总值和 SHA-256；
+  所有 Profiler counter 可用；
+- 上述先行 visual 完整轮已透明指定为第 5.1 节排除预热；结合 5×2 计量、逐轮与
+  30 秒稳定期趋势审查，DEV-A 的 G4-P02 通过；
+- 本结果只是 Development Build 的单机诊断基线，不是 Release 性能、两机门槛或
+  正式音频内存结论；Stress Shop 尖峰仍需项目负责人在 P04 决定接受或优化。
 
 ### 5.4 两机门槛冻结
 
@@ -521,15 +553,20 @@ U-T07 在 Placeholder 下只验证设置与保存恢复功能，不评价声音�
 
 ## 8. G4 非音频候选交付检查
 
-- [ ] 当前候选身份与工作树状态已冻结。
+- [x] 当前候选身份与工作树状态已冻结。
 - [x] 全量 EditMode/PlayMode 结果、XML 和日志已归档。
 - [x] 核心正式链路自动化、存档恢复、1×/2×/跳过等价性全部通过。
-- [ ] 正式链路 17 个状态 × 2 个分辨率的截图和 Manifest 已归档。
+- [x] 正式链路 17 个逻辑状态 × 2 个分辨率的自动截图和 Manifest 已生成；Frozen
+  每分辨率拆为 21 张。
+- [ ] 项目负责人完成上述双分辨率截图逐图视觉复核并签字。
 - [x] 当前 G3 夹具截图与 G4 正式链路截图没有混用。
 - [x] 开发机核心链双分辨率各 5 轮原始记录与汇总完成。
-- [ ] 开发机独立 10 卡/嵌套召唤压力基线完成。
-- [ ] 第二台机器执行包已生成；未取得实测前门禁保持未完成。
+- [x] 开发机独立 10 卡/嵌套召唤 Stress 5×2 自动矩阵完成。
+- [x] Core/Stress 先行 visual 完整轮已作为排除预热；5×2 与逐轮/稳定期趋势复核
+  完成，DEV-A P02 通过。
+- [x] 第二台机器执行包与说明已生成并完成归档校验。
+- [ ] 第二台机器尚未实测；G4-P03/P04 保持未执行。
 - [ ] 五人试玩包与记录模板完成；未取得真实记录前门禁保持未完成。
-- [ ] 所有 Placeholder 影响项明确标为 `PROVISIONAL`。
-- [ ] 正式音频等待项明确标为 `AUDIO`，没有错误标记 `Runtime Ready`。
+- [x] 所有 Placeholder 影响项明确标为 `PROVISIONAL`。
+- [x] 正式音频等待项明确标为 `AUDIO`，没有错误标记 `Runtime Ready`。
 - [ ] 项目负责人完成非音频候选复核；最终三选一仍等待全部前置条件。

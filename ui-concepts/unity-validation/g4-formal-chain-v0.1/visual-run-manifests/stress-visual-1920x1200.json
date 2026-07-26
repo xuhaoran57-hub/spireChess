@@ -1,0 +1,81 @@
+﻿{
+    "schemaVersion":  "spire-chess-g4-evidence-v2",
+    "generatedAtUtc":  "2026-07-26T13:48:20.3696509Z",
+    "runId":  "20260726-134612-DESKTOP-453378L-1920x1200-r01",
+    "machineName":  "DESKTOP-453378L",
+    "resolution":  "1920x1200",
+    "quality":  "High",
+    "seed":  940401,
+    "acceptanceMode":  "stress",
+    "playerPath":  "D:\\code\\spireChess\\spireChess\\sc\\Builds\\G4\\20260726-g4-f377497\\Windows-x64\\SpireChess.exe",
+    "playerSha256":  "fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7",
+    "playerLog":  "player.log",
+    "playerLogSha256":  "324940c0f419ec2f2aaccce4a936a8352f11905e9b2ede04e1b01d66f87d74a0",
+    "playerLogBytes":  165363,
+    "buildId":  "20260726-g4-f377497",
+    "gitCommit":  "f377497d1f3e65486370d6b35d91811d1bff50bc",
+    "sourceTreeDirty":  false,
+    "evidenceClassification":  "FormalCandidate",
+    "buildManifestSha256":  "e09691e14ba931dddade86223527fa30e02dfcc6071a0e08be63bfea12023576",
+    "performanceReport":  "g4-performance-20260726-134612-DESKTOP-453378L-1920x1200-r01-1920x1200.json",
+    "performanceReportSha256":  "b7cabcdbba695220d41273dd914be36e95c52c6f7f81c8706830ddca9ecfa8d2",
+    "samplesCsv":  "g4-performance-20260726-134612-DESKTOP-453378L-1920x1200-r01-1920x1200.csv",
+    "samplesCsvSha256":  "ecdf0b35c8b5f936855364ee0c5fafb2a549c5be5bd21e864d1a69df6eca8688",
+    "samplesCsvBytes":  314300,
+    "samplesCsvLineCount":  3534,
+    "samplesCsvSampleCount":  3533,
+    "provisionalAudio":  true,
+    "sampleCatalogExact":  true,
+    "cleanupPassed":  true,
+    "runtimeLogGatePassed":  true,
+    "runtimeFailureLogCount":  0,
+    "runtimeFailureMarkerPresent":  false,
+    "checkpoints":  [
+                        "stress-shop-ten-compact",
+                        "stress-battle-nested-ready",
+                        "stress-battle-nested-result",
+                        "sample-catalog-exact",
+                        "acceptance-complete"
+                    ],
+    "screenshots":  [
+                        {
+                            "file":  "01-stress-shop-ten-compact-1920x1200.png",
+                            "bytes":  1137526,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "8ebf5709f473c1910c8a8c4c1cd0ae8a48ed90ace4712785ac3995c3b5470f5e",
+                            "brightSampleRatio":  0.92404513888888884,
+                            "luminanceRange":  254.99999999999997
+                        },
+                        {
+                            "file":  "02-stress-battle-nested-ready-1920x1200.png",
+                            "bytes":  335475,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "1042a5e1e769b6f594ba2d8ee947d25521215333ff5852054aec8692c163cf3d",
+                            "brightSampleRatio":  0.99869791666666663,
+                            "luminanceRange":  253.99999999999997
+                        },
+                        {
+                            "file":  "03-stress-battle-nested-result-1920x1200.png",
+                            "bytes":  294460,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "6a494268875d5283d004c16f8b58c17612257d2806fc30c7363814bb25e1aa03",
+                            "brightSampleRatio":  0.77994791666666663,
+                            "luminanceRange":  253.85159999999996
+                        }
+                    ],
+    "isolatedSaveFiles":  [
+                              {
+                                  "file":  "run-slot-0.json",
+                                  "bytes":  16172,
+                                  "sha256":  "bbce40d09bc36d532f58fcf95c5ac38ebdc1b6fd490c9b31e9c59b869380f3cd"
+                              },
+                              {
+                                  "file":  "run-slot-0.json.bak",
+                                  "bytes":  7239,
+                                  "sha256":  "6b221d2f5c2108bba77543097b3bd82a304591765995a1ee17f773509eb06ca5"
+                              }
+                          ]
+}

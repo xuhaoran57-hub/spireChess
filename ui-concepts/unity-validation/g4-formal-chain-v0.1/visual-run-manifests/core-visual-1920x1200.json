@@ -1,0 +1,211 @@
+﻿{
+    "schemaVersion":  "spire-chess-g4-evidence-v2",
+    "generatedAtUtc":  "2026-07-26T13:44:43.4817630Z",
+    "runId":  "20260726-134409-DESKTOP-453378L-1920x1200-r01",
+    "machineName":  "DESKTOP-453378L",
+    "resolution":  "1920x1200",
+    "quality":  "High",
+    "seed":  940101,
+    "acceptanceMode":  "core",
+    "playerPath":  "D:\\code\\spireChess\\spireChess\\sc\\Builds\\G4\\20260726-g4-f377497\\Windows-x64\\SpireChess.exe",
+    "playerSha256":  "fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7",
+    "playerLog":  "player.log",
+    "playerLogSha256":  "d963d3e623a9d9de972ca4c46a60eb4a5e1355b9d920b1f8a2401400b3713127",
+    "playerLogBytes":  70748,
+    "buildId":  "20260726-g4-f377497",
+    "gitCommit":  "f377497d1f3e65486370d6b35d91811d1bff50bc",
+    "sourceTreeDirty":  false,
+    "evidenceClassification":  "FormalCandidate",
+    "buildManifestSha256":  "e09691e14ba931dddade86223527fa30e02dfcc6071a0e08be63bfea12023576",
+    "performanceReport":  "g4-performance-20260726-134409-DESKTOP-453378L-1920x1200-r01-1920x1200.json",
+    "performanceReportSha256":  "9249ea0d566928c3273ef69c5313b40ffdd9fd4d3165b9d996b7ac6c86efed8e",
+    "samplesCsv":  "g4-performance-20260726-134409-DESKTOP-453378L-1920x1200-r01-1920x1200.csv",
+    "samplesCsvSha256":  "61f2a50e1bce90b5975f55a414f72066cdd6048a6622ac436b29b054a0928f1f",
+    "samplesCsvBytes":  59838,
+    "samplesCsvLineCount":  702,
+    "samplesCsvSampleCount":  701,
+    "provisionalAudio":  true,
+    "sampleCatalogExact":  true,
+    "cleanupPassed":  true,
+    "runtimeLogGatePassed":  true,
+    "runtimeFailureLogCount":  0,
+    "runtimeFailureMarkerPresent":  false,
+    "checkpoints":  [
+                        "main-menu",
+                        "run-map",
+                        "shop",
+                        "shop-buy-play",
+                        "shop-frozen",
+                        "shop-unfrozen",
+                        "run-after-shop",
+                        "battle-ready",
+                        "battle-death-summon",
+                        "battle-result",
+                        "run-return",
+                        "run-map-after-battle",
+                        "run-system-menu",
+                        "run-audio-settings",
+                        "main-menu-continue",
+                        "continued-run",
+                        "sample-catalog-exact",
+                        "acceptance-complete"
+                    ],
+    "screenshots":  [
+                        {
+                            "file":  "01-main-menu-1920x1200.png",
+                            "bytes":  117295,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "91a79e7916315846d2470e8ed31072b7946806bcdbcb168f544541afd86fe697",
+                            "brightSampleRatio":  0.60416666666666663,
+                            "luminanceRange":  254.99999999999997
+                        },
+                        {
+                            "file":  "02-run-map-1920x1200.png",
+                            "bytes":  184393,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "3bcf5bfaa5fdb8f2b48dd127ebf3327c4a73e7ea256cbfa5652fb6f36800651d",
+                            "brightSampleRatio":  0.88064236111111116,
+                            "luminanceRange":  247.12599999999998
+                        },
+                        {
+                            "file":  "03-shop-1920x1200.png",
+                            "bytes":  568651,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "7abc844edf960ff7f4c8525eacaa9db859a0b9b07e103b1e3c1f485f80413d35",
+                            "brightSampleRatio":  0.92881944444444442,
+                            "luminanceRange":  253.99999999999997
+                        },
+                        {
+                            "file":  "04-shop-buy-play-1920x1200.png",
+                            "bytes":  465828,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "4d1946be98d02f06072c66952802521b9d36cbb5ab1483b650b319eebd0dfee6",
+                            "brightSampleRatio":  0.92881944444444442,
+                            "luminanceRange":  253.99999999999997
+                        },
+                        {
+                            "file":  "05-shop-frozen-1920x1200.png",
+                            "bytes":  460935,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "4066e11bc4dfe56b024cde7552fa09073d147dd8d23444c664c1fddfb335c275",
+                            "brightSampleRatio":  0.92881944444444442,
+                            "luminanceRange":  253.99999999999997
+                        },
+                        {
+                            "file":  "06-shop-unfrozen-1920x1200.png",
+                            "bytes":  466229,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "14627c2d9c38bd811669328a195f3e4de3b05d1f6825c5c138e0ece4d0bb89c7",
+                            "brightSampleRatio":  0.92881944444444442,
+                            "luminanceRange":  253.99999999999997
+                        },
+                        {
+                            "file":  "07-run-after-shop-1920x1200.png",
+                            "bytes":  185016,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "01a841b6885f59ab9a82008cb8b3b989a55d3952b8372a45fe84f45f4571ac01",
+                            "brightSampleRatio":  0.88064236111111116,
+                            "luminanceRange":  247.12599999999998
+                        },
+                        {
+                            "file":  "08-battle-ready-1920x1200.png",
+                            "bytes":  226982,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "5524155e15cfdc909ded837e40eb7deb2ff5764e09cee46ddd70c7730dab7e6c",
+                            "brightSampleRatio":  0.99913194444444442,
+                            "luminanceRange":  254.28479999999996
+                        },
+                        {
+                            "file":  "09-battle-death-summon-1920x1200.png",
+                            "bytes":  230797,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "c56a3db49011e3c896e9f7f180c32dcf9d3774970e16b3f0d81b87a522826029",
+                            "brightSampleRatio":  0.99956597222222221,
+                            "luminanceRange":  244.56679999999997
+                        },
+                        {
+                            "file":  "10-battle-result-1920x1200.png",
+                            "bytes":  149346,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "874935091e62a220aa3e14a60ea764166efe42ab3028589305342be95857c276",
+                            "brightSampleRatio":  0.78038194444444442,
+                            "luminanceRange":  249.42239999999998
+                        },
+                        {
+                            "file":  "11-run-return-1920x1200.png",
+                            "bytes":  182239,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "d56b0898b6e9287ee6affb1062a61a8f91ccf806bc24a358f2f931020e6d0723",
+                            "brightSampleRatio":  0.88064236111111116,
+                            "luminanceRange":  247.12599999999998
+                        },
+                        {
+                            "file":  "12-run-map-after-battle-1920x1200.png",
+                            "bytes":  182391,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "5f3e153d649ee7ddf7d2209eb9de64c4f780e3ef5f1a1a8645c33f07cbfc95d6",
+                            "brightSampleRatio":  0.88064236111111116,
+                            "luminanceRange":  247.12599999999998
+                        },
+                        {
+                            "file":  "13-run-system-menu-1920x1200.png",
+                            "bytes":  174800,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "50f89df0796e4131ff77e2f2498d26ba500ffabf230fa12f74d12ce5e5672f71",
+                            "brightSampleRatio":  0.28385416666666669,
+                            "luminanceRange":  252.63779999999997
+                        },
+                        {
+                            "file":  "14-run-audio-settings-1920x1200.png",
+                            "bytes":  163525,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "9f85dc1b2866edb78cc7aa8c0b1330c45e0d2803fd495bcaa320f7e540724ee7",
+                            "brightSampleRatio":  0.29557291666666669,
+                            "luminanceRange":  254.21259999999998
+                        },
+                        {
+                            "file":  "15-main-menu-continue-1920x1200.png",
+                            "bytes":  117532,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "b70b6f29c0f0ed7b1c96ca4601bbdec7f3dd37be680a44e155e274f690aa7945",
+                            "brightSampleRatio":  0.63888888888888884,
+                            "luminanceRange":  254.99999999999997
+                        },
+                        {
+                            "file":  "16-continued-run-1920x1200.png",
+                            "bytes":  185525,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "eefc86138a7d063ee87fcf3f0a011156c4d2923fa031a15b5eaece52a851fd1a",
+                            "brightSampleRatio":  0.88064236111111116,
+                            "luminanceRange":  247.12599999999998
+                        }
+                    ],
+    "isolatedSaveFiles":  [
+                              {
+                                  "file":  "run-slot-0.json",
+                                  "bytes":  12687,
+                                  "sha256":  "be7bc2c4be9c1f98ab4b9f086aa65f00412229eb3ba408301abce2d2e76336b5"
+                              },
+                              {
+                                  "file":  "run-slot-0.json.bak",
+                                  "bytes":  12687,
+                                  "sha256":  "7a11d458828288bd9578dec053af90c5c6c5500165f66a8727f9cc5cfbd07fa3"
+                              }
+                          ]
+}

@@ -54,12 +54,20 @@ watchdog 的 `-executeMethod` 命令；本机已经复现过它们在许可证/�
 
 ```powershell
 & .\tools\run_g4_acceptance_matrix.ps1 `
+  -PlayerPath '<冻结构建的 SpireChess.exe 绝对路径>' `
   -Quality High
 ```
 
 不传 `-PlayerPath` 时，脚本只会选择 `sc/Builds/G4` 下最后生成且带 Manifest 的
-构建；也可传入本轮冻结构建的绝对路径。矩阵依次运行 `1920x1080` 和
-`1920x1200`。
+构建；正式证据应显式传入本轮冻结构建的绝对路径。矩阵依次运行
+`1920x1080` 和 `1920x1200`。
+
+三种模式互斥：
+
+- 无额外开关：Core 保存/继续与速度等价链；
+- `-FrozenVisual`：固定 seed 78 的合法 4 店/4 战链，每分辨率 21 张截图；
+- `-Stress`：同屏 10 张 Compact、嵌套亡语、群体成长、五轮
+  Normal/Accelerated/Skip 对照和 30 秒稳定窗口。
 
 每次运行都会创建不可复用的独立目录，
 其中包含：
@@ -86,13 +94,20 @@ watchdog 的 `-executeMethod` 命令；本机已经复现过它们在许可证/�
 尺寸正确但全黑的 PNG；验收脚本会抽样检查亮度范围、非暗像素比例和组内画面哈希，
 黑图、空图或内容多样性不足均直接失败。
 
-稳定的视觉候选先各跑 1 次带截图矩阵；性能重复采集使用相同 Player、画质和 seed，
-关闭截图编码干扰并各跑至少 5 次：
+稳定的视觉候选先对 Core、Frozen、Stress 各跑 1 次带截图矩阵；性能重复采集使用
+相同 Player、画质和 seed，关闭截图编码干扰并对 Core、Stress 各跑至少 5 次：
 
 ```powershell
 & .\tools\run_g4_acceptance_matrix.ps1 `
   -PlayerPath '<冻结构建的 SpireChess.exe 绝对路径>' `
   -Quality High `
+  -Repetitions 5 `
+  -NoScreenshots
+
+& .\tools\run_g4_acceptance_matrix.ps1 `
+  -PlayerPath '<同一冻结构建的 SpireChess.exe 绝对路径>' `
+  -Quality High `
+  -Stress `
   -Repetitions 5 `
   -NoScreenshots
 ```
@@ -101,16 +116,28 @@ watchdog 的 `-executeMethod` 命令；本机已经复现过它们在许可证/�
 它只关闭 PNG 捕获与编码，Player 窗口仍必须保持可见；隐藏或最小化窗口会改变
 Windows 呈现/VSync 行为，产生不可作为 GPU 基线的亚毫秒假帧时间。
 
-2026-07-26 当前有效开发机样例使用 Clean Development Build
-`20260726-114707`，Player 为
-`sc/Builds/G4/20260726-114707/Windows-x64/SpireChess.exe`，Manifest SHA-256 为
-`112c1a664c4ae1d030b9181ae5cae3c1e67bb09d32af721517583084da48c31c`，
+2026-07-26 当前有效开发机候选使用 Clean Development Build
+`20260726-g4-f377497`，源提交为
+`f377497d1f3e65486370d6b35d91811d1bff50bc`，`sourceTreeDirty=false`。
+Player 为
+`sc/Builds/G4/20260726-g4-f377497/Windows-x64/SpireChess.exe`，Build Manifest
+SHA-256 为
+`e09691e14ba931dddade86223527fa30e02dfcc6071a0e08be63bfea12023576`，
 EXE SHA-256 为
 `fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7`。
-带截图的双分辨率矩阵为 `20260726-114805-DESKTOP-453378L`，关闭截图编码并通过
-空目录强门禁的 5×2 重复矩阵为 `20260726-115434-DESKTOP-453378L`。
-`20260726-112738-*` 是外层命令过早超时后留下的孤立单轮，缺少 Evidence Manifest
-和矩阵汇总，不得引用。
+
+五组正式矩阵：
+
+| 模式 | Matrix ID | 轮数 |
+| --- | --- | ---: |
+| Core visual | `20260726-134409-DESKTOP-453378L` | 1×2 |
+| Frozen visual | `20260726-134454-DESKTOP-453378L` | 1×2 |
+| Stress visual | `20260726-134612-DESKTOP-453378L` | 1×2 |
+| Core performance | `20260726-135013-DESKTOP-453378L` | 5×2 |
+| Stress performance | `20260726-135305-DESKTOP-453378L` | 5×2 |
+
+可提交索引与代表性原图位于
+`ui-concepts/unity-validation/g4-formal-chain-v0.1/`。
 
 ## 4. 安全与真实性门禁
 
@@ -129,9 +156,15 @@ EXE SHA-256 为
   不能作为正式美术命中或 Runtime Ready 证据。
 - `run_g4_acceptance.ps1` 同样具有启动、无进展和总运行 watchdog，并在成功/失败
   路径都核对及回收本轮精确 PID；任何强制结束都属于失败，不得沿用旧结果文件。
-- “核心链路自动化通过”只证明报告中列出的真实操作 checkpoint，不自动等于
-  G4-V01/V02 冻结的 17 个视觉状态全部通过。冻结清单缺一项、使用不同候选，或只
-  由无截图 checkpoint 代替时，V01/V02 必须继续保持未完成。
+- 正式运行拒绝 `sourceTreeDirty=true` 的构建；`-AllowDirtyProbe` 只允许单次本地
+  诊断，矩阵永不接受 DirtyProbe。
+- 单轮报告、证据与矩阵 schema 均为 v2；脚本会重验 runId、seed、完成状态、
+  Build/Player 身份、JSON/CSV/Player.log 文件名与 SHA-256。
+- Unity 的线程级 Error/Exception/Assert 同时写入结构化报告与
+  `g4-runtime-failures.log`。报告通过后到 Player 退出前出现的错误仍会留下 marker，
+  单轮和矩阵都会拒绝。
+- Frozen 自动化与 21 图技术门禁通过仍不自动等于项目负责人完成 G4-V01/V02
+  视觉签字。
 
 ## 5. 指标
 
@@ -154,5 +187,23 @@ JSON 汇总与 CSV 原始数据包括：
 双分辨率矩阵，再比较 JSON 的 P50/P95/P99、峰值内存和场景加载记录。
 
 Development Build 本身有额外开销，所以本基线适合发现同类构建之间的回退，不等同于
-最终 Release 包性能。当前工具没有自动制造“同屏 10 张 Compact 卡 + 嵌套召唤”的独立
-压力夹具；该压力场景需要在正式链路基线稳定后单独补充。
+最终 Release 包性能。Stress 已实现同屏 10 张 Compact 卡、嵌套亡语、连续召唤、
+群体永久成长、1×/2×/Skip 五轮对照和 30 秒稳定窗口。
+
+预热轮不要求使用专用矩阵或 `-NoScreenshots`，但必须在计量前完整运行、与计量使用
+同一 Build/Player/Manifest SHA、画质、窗口、VSync、seed、分辨率，并明确不进入
+计量 Summary。当前候选将 Core visual
+`20260726-134409-DESKTOP-453378L` 和 Stress visual
+`20260726-134612-DESKTOP-453378L` 各 1×2 轮透明指定为排除预热；它们分别先于
+Core/Stress performance 5×2，截图编码只发生在被排除的预热轮。结合逐轮与 30 秒
+稳定期趋势审查，当前 DEV-A G4-P02 通过。
+
+G4-P03/P04 仍必须使用第二台不同配置机器，并由项目负责人冻结数值门槛。当前
+Development Build 单机基线不是 Release 性能批准；正式音频接入前，音频内存、
+Streaming 与混音均保持 `PROVISIONAL`。
+
+第二机固定执行顺序、环境记录和证据回收要求见
+`phase-9b-g4-second-machine-execution-v0.1.md`。本地执行包为
+`sc/Builds/G4/20260726-g4-f377497/G4-SecondMachine-f377497.zip`，SHA-256 为
+`83699817f774b8736cc3852eb17e8fb391c480bffc7f2829788c4d1c79fa796d`；
+包已生成和校验不等于 G4-P03 已执行。

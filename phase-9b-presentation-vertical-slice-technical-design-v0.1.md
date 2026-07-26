@@ -1,9 +1,9 @@
 # 阶段 9B 视听表现纵向切片技术与制作方案 v0.1
 
 - 日期：2026-07-22
-- 更新：2026-07-26（G3 本地程序合成占位播放链路已接入；正式音频改为项目负责人 AI 自制）
-- 状态：G1、G2 已通过并关闭；39 项活动生产 Sprite 均为 `Runtime Ready`；G3 工程与 67 个本地占位 Clip 为 `Commissioning Ready`，正式 AI 音频尚未生成和验收，G3 总门禁未关闭
-- 实现基线：`5545a4e fix(ui): add main menu display camera`
+- 更新：2026-07-26（G4 干净工程自动化候选、Frozen/Stress 与正式矩阵已归档）
+- 状态：G1、G2 已通过并关闭；39 项活动生产 Sprite 均为 `Runtime Ready`；G3 工程与 67 个本地占位 Clip 为 `Commissioning Ready`；G4 工程自动化候选已完成，但负责人/跨机/外部试玩/正式音频门禁均未关闭
+- 实现基线：`f377497 feat(presentation): complete G4 acceptance automation`
 - 内容版本：5.5.0
 - 最低规则版本：8B.1
 - 完整配置哈希：`818596be90de4e2ddf6c4b7f9ba0b6e1fee994fcc31ec9893652e02f49ef4311`
@@ -339,6 +339,23 @@ Catalog、AudioService、MusicDirector、并发/冷却和四路本机音量设�
 - 完成全量 EditMode/PlayMode。
 - 完成两种分辨率、存档恢复、跳过/2× 和性能检查。
 - 完成至少 5 名外部试玩者的理解度与体验记录。
+
+2026-07-26 工程候选进度：
+
+- `f377497d1f3e65486370d6b35d91811d1bff50bc` 的 Clean Development Build
+  `20260726-g4-f377497` 已冻结，源工作树干净，Build Manifest SHA-256 为
+  `e09691e14ba931dddade86223527fa30e02dfcc6071a0e08be63bfea12023576`；
+- EditMode 351 / 351、PlayMode 30 / 30 全量通过；
+- Core/Frozen/Stress 双分辨率可视矩阵、Core/Stress 5×2 性能矩阵共 26 个
+  正式 Player 运行全部通过；Frozen 合法 4 店/4 战覆盖冻结 17 个逻辑状态，
+  Stress 覆盖 10 Compact、嵌套召唤、五轮等价和 30 秒稳定窗；
+- 自动证据与代表性原图见
+  `ui-concepts/unity-validation/g4-formal-chain-v0.1/`。
+
+Core/Stress 的先行 visual 1×2 轮已作为排除预热，随后 performance 5×2 与
+逐轮/30 秒稳定期趋势审查通过，DEV-A G4-P02 完成。该进度仍只表示 G4 工程
+候选和单机基线完成；项目负责人视觉签字、第二台机器、两机门槛、至少 5 名外部
+试玩者和正式音频仍未完成。
 
 退出条件：阻塞问题为 0；明确记录“可进入全量生产”“需要一次样板返工”或“方向不成立”三者之一，不默认进入 9C。
 
