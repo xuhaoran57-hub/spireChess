@@ -1,5 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
+using SpireChess.Run;
+using SpireChess.Save;
 using SpireChess.UI;
 using SpireChess.UI.Common;
 using SpireChess.UI.MainMenu;
@@ -61,6 +66,69 @@ namespace SpireChess.Tests.EditMode
                 AssetDatabase.LoadAssetAtPath<GameObject>(
                     "Assets/Prefabs/UI/MainMenu/PF_ConfirmDialog.prefab"),
                 Is.Not.Null);
+        }
+
+        [TestCase(RunSaveLoadStatus.Missing, false)]
+        [TestCase(RunSaveLoadStatus.Valid, true)]
+        [TestCase(RunSaveLoadStatus.CorruptJson, true)]
+        public void Render_DeleteActionMatchesSavePresence(
+            RunSaveLoadStatus status,
+            bool expected)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/UI/MainMenu/PF_MainMenuScreen.prefab");
+            var instance = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                instance.GetComponent<MainMenuScreenView>().Render(
+                    new MainMenuScreenState
+                    {
+                        SaveStatus = status
+                    });
+
+                Assert.That(
+                    Find(instance, "DeleteButton").GetComponent<Button>().interactable,
+                    Is.EqualTo(expected));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
+        public void ContinueSummary_UsesLocalizedLabelsForEveryRunPhase()
+        {
+            var method = typeof(MainMenuController).GetMethod(
+                "ToPhaseLabel",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+
+            var expected = new Dictionary<RunPhase, string>
+            {
+                { RunPhase.MapSelection, "地图选择" },
+                { RunPhase.EnteringNode, "进入节点" },
+                { RunPhase.Shop, "商店" },
+                { RunPhase.Battle, "战斗" },
+                { RunPhase.BattleResult, "战斗结算" },
+                { RunPhase.RewardChoice, "奖励选择" },
+                { RunPhase.RelicChoice, "遗珍选择" },
+                { RunPhase.EventChoice, "事件选择" },
+                { RunPhase.EnhanceChoice, "强化选择" },
+                { RunPhase.RestChoice, "休整选择" },
+                { RunPhase.FloorComplete, "楼层完成" },
+                { RunPhase.RunWon, "单局胜利" },
+                { RunPhase.RunLost, "单局失败" }
+            };
+
+            foreach (RunPhase phase in Enum.GetValues(typeof(RunPhase)))
+            {
+                Assert.That(expected.ContainsKey(phase), Is.True, phase.ToString());
+                Assert.That(
+                    method.Invoke(null, new object[] { phase }),
+                    Is.EqualTo(expected[phase]),
+                    phase.ToString());
+            }
         }
 
         [Test]

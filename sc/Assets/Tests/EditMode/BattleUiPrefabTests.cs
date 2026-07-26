@@ -142,7 +142,7 @@ namespace SpireChess.Tests.EditMode
                 Is.EqualTo(new Vector2(1920f, 1080f)));
             Assert.That(scaler.screenMatchMode,
                 Is.EqualTo(CanvasScaler.ScreenMatchMode.MatchWidthOrHeight));
-            Assert.That(scaler.matchWidthOrHeight, Is.EqualTo(0.5f).Within(0.001f));
+            Assert.That(scaler.matchWidthOrHeight, Is.EqualTo(0f).Within(0.001f));
 
             var enemyRow = root.Find("SafeArea/Board/EnemyRow/Slots")
                 .GetComponent<HorizontalLayoutGroup>();
@@ -156,15 +156,31 @@ namespace SpireChess.Tests.EditMode
             AssertSlotSize("SafeArea/Board/PlayerRow/Slots/Slot1");
 
             var topBar = root.Find("SafeArea/TopBar") as RectTransform;
+            var board = root.Find("SafeArea/Board") as RectTransform;
             var logPanel = root.Find("SafeArea/LogPanel") as RectTransform;
+            var boardPulse =
+                root.Find("SafeArea/VfxLayer/BoardPulse") as RectTransform;
+            var detailLayer =
+                root.Find("SafeArea/StandeeDetailLayer") as RectTransform;
             Assert.That(topBar, Is.Not.Null);
+            Assert.That(board, Is.Not.Null);
             Assert.That(logPanel, Is.Not.Null);
+            Assert.That(boardPulse, Is.Not.Null);
+            Assert.That(detailLayer, Is.Not.Null);
             Assert.That(logPanel.GetComponent<Image>().raycastTarget, Is.False);
+            AssertVerticalBattleArea(board);
+            AssertVerticalBattleArea(detailLayer);
+            Assert.That(boardPulse.sizeDelta.y, Is.EqualTo(-240f).Within(0.01f));
             Canvas.ForceUpdateCanvases();
             var topCorners = new Vector3[4];
+            var boardCorners = new Vector3[4];
             var logCorners = new Vector3[4];
             topBar.GetWorldCorners(topCorners);
+            board.GetWorldCorners(boardCorners);
             logPanel.GetWorldCorners(logCorners);
+            Assert.That(boardCorners[2].y,
+                Is.LessThan(topCorners[0].y),
+                "Board must not overlap and hide the TopBar at 1920x1080.");
             Assert.That(logCorners[2].y,
                 Is.LessThan(topCorners[0].y),
                 "LogPanel must not overlap the TopBar action buttons.");
@@ -505,6 +521,15 @@ namespace SpireChess.Tests.EditMode
             Assert.That(card.anchorMax, Is.EqualTo(new Vector2(0f, 1f)));
             Assert.That(card.pivot, Is.EqualTo(new Vector2(0f, 1f)));
             Assert.That(card.anchoredPosition, Is.EqualTo(Vector2.zero));
+        }
+
+        private static void AssertVerticalBattleArea(RectTransform rect)
+        {
+            Assert.That(rect.anchorMin, Is.EqualTo(new Vector2(0f, 0f)));
+            Assert.That(rect.anchorMax, Is.EqualTo(new Vector2(0f, 1f)));
+            Assert.That(rect.pivot, Is.EqualTo(new Vector2(0f, 0f)));
+            Assert.That(rect.anchoredPosition.y, Is.EqualTo(120f).Within(0.01f));
+            Assert.That(rect.sizeDelta.y, Is.EqualTo(-240f).Within(0.01f));
         }
 
         private RectTransform ContentAt(string path)

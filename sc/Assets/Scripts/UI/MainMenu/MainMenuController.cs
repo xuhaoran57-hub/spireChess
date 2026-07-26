@@ -1,5 +1,7 @@
 using System;
 using SpireChess.App;
+using SpireChess.Diagnostics;
+using SpireChess.Run;
 using SpireChess.Save;
 using UnityEngine;
 
@@ -90,7 +92,14 @@ namespace SpireChess.UI.MainMenu
 
         private void CreateNewRun()
         {
-            GameApp.Instance.StartNewRun();
+            var acceptanceSeed = G4RuntimeArguments.IsAcceptanceRequested
+                ? G4RuntimeArguments.ReadInt(
+                    G4RuntimeArguments.AcceptanceSeedArgument,
+                    940101,
+                    1,
+                    int.MaxValue)
+                : (int?)null;
+            GameApp.Instance.StartNewRun(acceptanceSeed);
             if (GameApp.Instance.Run == null)
             {
                 statusMessage = "无法创建新单局，请检查存储空间后重试";
@@ -144,7 +153,42 @@ namespace SpireChess.UI.MainMenu
             }
 
             return $"第 {summary.Floor} 层 · 生命 {summary.Health}/{summary.MaxHealth} · " +
-                   $"回合 {summary.ShopTurn} · {summary.Phase}";
+                   $"回合 {summary.ShopTurn} · {ToPhaseLabel(summary.Phase)}";
+        }
+
+        private static string ToPhaseLabel(RunPhase phase)
+        {
+            switch (phase)
+            {
+                case RunPhase.MapSelection:
+                    return "地图选择";
+                case RunPhase.EnteringNode:
+                    return "进入节点";
+                case RunPhase.Shop:
+                    return "商店";
+                case RunPhase.Battle:
+                    return "战斗";
+                case RunPhase.BattleResult:
+                    return "战斗结算";
+                case RunPhase.RewardChoice:
+                    return "奖励选择";
+                case RunPhase.RelicChoice:
+                    return "遗珍选择";
+                case RunPhase.EventChoice:
+                    return "事件选择";
+                case RunPhase.EnhanceChoice:
+                    return "强化选择";
+                case RunPhase.RestChoice:
+                    return "休整选择";
+                case RunPhase.FloorComplete:
+                    return "楼层完成";
+                case RunPhase.RunWon:
+                    return "单局胜利";
+                case RunPhase.RunLost:
+                    return "单局失败";
+                default:
+                    return "未知阶段";
+            }
         }
 
         private static string ToPlayerMessage(RunSaveLoadStatus status)

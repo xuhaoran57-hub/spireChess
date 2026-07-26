@@ -567,7 +567,7 @@ namespace SpireChess.Editor
                 progress.color = theme.TextSecondary;
                 var status = CreateText("Status", top, font, "选择可达节点继续三层单局", 16,
                     TextAnchor.MiddleRight);
-                SetRect(status.rectTransform, 1520f, 12f, 342f, 68f);
+                SetRect(status.rectTransform, 1490f, 12f, 230f, 68f);
                 status.color = theme.Success;
 
                 var body = CreateRect("Body", safeArea);

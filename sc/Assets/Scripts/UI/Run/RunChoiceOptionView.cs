@@ -18,6 +18,9 @@ namespace SpireChess.UI.Run
         private RunTestController controller;
         private RunChoiceOptionState state;
 
+        public string LastArtId { get; private set; } = string.Empty;
+        public ArtworkResolution LastArtworkResolution { get; private set; } =
+            ArtworkResolution.Missing;
         public bool HasCompleteBindings => theme != null &&
                                             spriteCatalog != null &&
                                             button != null && background != null &&
@@ -54,6 +57,8 @@ namespace SpireChess.UI.Run
 
         private void RenderIcon(string iconId)
         {
+            LastArtId = iconId ?? string.Empty;
+            LastArtworkResolution = ArtworkResolution.Missing;
             if (iconImage == null)
             {
                 return;
@@ -71,6 +76,7 @@ namespace SpireChess.UI.Run
                 null,
                 out var sprite,
                 out _);
+            LastArtworkResolution = resolution;
             if (resolution == ArtworkResolution.Missing || sprite == null)
             {
                 return;

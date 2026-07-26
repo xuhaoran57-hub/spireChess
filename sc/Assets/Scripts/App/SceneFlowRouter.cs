@@ -1,4 +1,5 @@
 using System;
+using SpireChess.Diagnostics;
 using SpireChess.Run;
 using UnityEngine.SceneManagement;
 
@@ -57,6 +58,7 @@ namespace SpireChess.App
                 return;
             }
 
+            G4SceneLoadDiagnostics.NotifySceneLoadRequested(target);
             loadScene(target);
         }
     }

@@ -114,6 +114,9 @@ namespace SpireChess.UI
         private Vector2 healthTextArea;
 
         public CardDisplayMode CurrentDisplayMode { get; private set; }
+        public string LastArtId { get; private set; } = string.Empty;
+        public ArtworkResolution LastArtworkResolution { get; private set; } =
+            ArtworkResolution.Missing;
 
         public bool HasCompleteBindings =>
             rootRect != null && rootImage != null && canvasGroup != null &&
@@ -666,8 +669,8 @@ namespace SpireChess.UI
             bool hasProgress)
         {
             var normalized = UiTextFormatter.NormalizeWhitespace(value);
-            var baseSize = mode == CardDisplayMode.Full ? 14 : 11;
-            var minimumSize = mode == CardDisplayMode.Full ? 11 : 10;
+            var baseSize = mode == CardDisplayMode.Full ? 14 : 13;
+            var minimumSize = mode == CardDisplayMode.Full ? 11 : 12;
             var maximumLines = UiTextFormatter.GetDescriptionMaxLines(
                 mode,
                 isMinion,
@@ -1037,6 +1040,8 @@ namespace SpireChess.UI
                     model.ArtworkFallbackId,
                     out var sprite,
                     out var focalPointY);
+            LastArtId = model.ArtId ?? string.Empty;
+            LastArtworkResolution = resolution;
             if (resolution == ArtworkResolution.Missing)
             {
                 artwork.sprite = null;

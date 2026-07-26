@@ -1,5 +1,6 @@
 using System;
 using SpireChess.Audio;
+using SpireChess.Save;
 using SpireChess.UI.Common;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -72,6 +73,7 @@ namespace SpireChess.UI.MainMenu
             }
 
             continueButton.interactable = state.ContinueEnabled;
+            deleteButton.interactable = state.SaveStatus != RunSaveLoadStatus.Missing;
             continueSummary.text = state.ContinueSummary ?? string.Empty;
             statusText.text = state.StatusMessage ?? string.Empty;
             statusText.color = state.StatusIsError

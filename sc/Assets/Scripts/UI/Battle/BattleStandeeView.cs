@@ -48,6 +48,9 @@ namespace SpireChess.UI.Battle
         public int Index { get; private set; }
         public string InstanceId => model == null ? string.Empty : model.InstanceId;
         public CardViewModel Model => model;
+        public string LastArtId { get; private set; } = string.Empty;
+        public ArtworkResolution LastArtworkResolution { get; private set; } =
+            ArtworkResolution.Missing;
         public RectTransform RectTransform => rectTransform;
         public bool IsShieldVisible => shieldOverlay != null &&
                                        shieldOverlay.gameObject.activeSelf;
@@ -280,6 +283,8 @@ namespace SpireChess.UI.Battle
                 value.ArtworkFallbackId,
                 out var sprite,
                 out _);
+            LastArtId = value.ArtId ?? string.Empty;
+            LastArtworkResolution = resolution;
             if (resolution != ArtworkResolution.Missing)
             {
                 portrait.sprite = sprite;

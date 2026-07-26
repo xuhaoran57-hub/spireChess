@@ -641,7 +641,10 @@ namespace SpireChess.Editor
                 var scaler = root.GetComponent<CanvasScaler>();
                 scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                 scaler.referenceResolution = new Vector2(1920f, 1080f);
-                scaler.matchWidthOrHeight = 0.5f;
+                // The battle screen uses a fixed 1920-wide composition. Matching
+                // width keeps its right-side log and actions visible on taller
+                // landscape resolutions such as 1920x1200.
+                scaler.matchWidthOrHeight = 0f;
 
                 var safeAreaImage = CreateImage(
                     "SafeArea",
@@ -694,7 +697,7 @@ namespace SpireChess.Editor
                 SetRect(round.rectTransform, 790f, 10f, 150f, 62f);
 
                 var actions = CreateRect("Actions", topBar);
-                SetRect(actions, 950f, 10f, 912f, 62f);
+                SetRect(actions, 950f, 10f, 748f, 62f);
                 var actionLayout = actions.gameObject.AddComponent<
                     HorizontalLayoutGroup>();
                 actionLayout.spacing = 8f;
@@ -749,7 +752,7 @@ namespace SpireChess.Editor
                     new Color(0.045f, 0.055f, 0.085f, 0.96f));
                 boardImage.raycastTarget = false;
                 var board = boardImage.rectTransform;
-                SetRect(board, 20f, 120f, 1490f, 930f);
+                SetVerticalStretchRect(board, 20f, 120f, 1490f, 120f);
                 var boardOutline = board.gameObject.AddComponent<Outline>();
                 boardOutline.effectColor = new Color(
                     0.30f,
@@ -825,7 +828,7 @@ namespace SpireChess.Editor
                 Stretch(
                     pulseImage.rectTransform,
                     new Vector2(20f, 120f),
-                    new Vector2(-410f, -30f));
+                    new Vector2(-410f, -120f));
                 var pulseCanvas =
                     pulseImage.gameObject.AddComponent<CanvasGroup>();
                 pulseCanvas.alpha = 0f;
@@ -879,7 +882,12 @@ namespace SpireChess.Editor
                 resultImage.gameObject.SetActive(false);
 
                 var detailLayer = CreateRect("StandeeDetailLayer", safeArea);
-                SetRect(detailLayer, 20f, 120f, 1490f, 930f);
+                SetVerticalStretchRect(
+                    detailLayer,
+                    20f,
+                    120f,
+                    1490f,
+                    120f);
                 var detailObject = PrefabUtility.InstantiatePrefab(
                     cardPrefab) as GameObject;
                 if (detailObject == null)
@@ -1249,7 +1257,7 @@ namespace SpireChess.Editor
             var button = image.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             var element = image.gameObject.AddComponent<LayoutElement>();
-            element.minWidth = element.preferredWidth = 142f;
+            element.minWidth = element.preferredWidth = 118f;
             text = CreateText(
                 "Label",
                 image.transform,
@@ -1314,6 +1322,20 @@ namespace SpireChess.Editor
                 ? new Vector2(left, -bottom)
                 : new Vector2(left, bottom);
             rect.sizeDelta = new Vector2(width, height);
+        }
+
+        private static void SetVerticalStretchRect(
+            RectTransform rect,
+            float left,
+            float bottom,
+            float width,
+            float top)
+        {
+            rect.anchorMin = new Vector2(0f, 0f);
+            rect.anchorMax = new Vector2(0f, 1f);
+            rect.pivot = new Vector2(0f, 0f);
+            rect.offsetMin = new Vector2(left, bottom);
+            rect.offsetMax = new Vector2(left + width, -top);
         }
 
         private static void Stretch(

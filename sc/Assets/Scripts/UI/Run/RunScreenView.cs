@@ -97,7 +97,10 @@ namespace SpireChess.UI.Run
             resourceText.text = state.ResourceSummary ?? string.Empty;
             progressText.text = state.ProgressSummary ?? string.Empty;
             statusText.text = state.Status ?? string.Empty;
-            routeHintText.text = state.RouteHint ?? string.Empty;
+            var nodeCount = state.Nodes?.Count ?? 0;
+            routeHintText.text = nodeCount > 0
+                ? $"共 {nodeCount} 个节点 · 左右拖动查看完整路线 · {state.RouteHint}"
+                : state.RouteHint ?? string.Empty;
             RenderMap(state);
             RenderRelics(state.Relics);
             RenderSummary(state.Summary);
@@ -173,10 +176,21 @@ namespace SpireChess.UI.Run
                         (state.Nodes ?? Array.Empty<RunMapNodeState>())
                 .FirstOrDefault(node =>
                     node.PresentationStatus == RunMapPresentationStatus.Reachable);
-            if (focus != null)
+            if (focus != null && positions.TryGetValue(focus.NodeId, out var focusPosition))
             {
+                Canvas.ForceUpdateCanvases();
+                var viewportWidth = mapScrollRect.viewport.rect.width;
+                var scrollableWidth = Mathf.Max(
+                    0f,
+                    mapContent.rect.width - viewportWidth);
+                var focusOffset = Mathf.Clamp(
+                    focusPosition.x - viewportWidth * 0.5f,
+                    0f,
+                    scrollableWidth);
                 mapScrollRect.horizontalNormalizedPosition =
-                    Mathf.Clamp01((float)focus.Column / maximumColumn);
+                    scrollableWidth <= 0.01f
+                        ? 0f
+                        : focusOffset / scrollableWidth;
             }
         }
 

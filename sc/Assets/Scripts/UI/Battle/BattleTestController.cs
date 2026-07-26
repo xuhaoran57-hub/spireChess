@@ -249,7 +249,6 @@ namespace SpireChess.UI.Battle
             displayedState = setupState.Clone();
             screenView.Bind(this);
             screenView.SnapAndClear();
-            RunSystemMenuView.Attach(screenView, () => !battleRunning);
             if (restoredResult != null)
             {
                 lastResult = restoredResult;
@@ -272,6 +271,11 @@ namespace SpireChess.UI.Battle
                     restoredResult.Winner,
                     BuildResultStatus(restoredResult));
             }
+            // Build the shared menu after the first battle render. The legacy
+            // dynamic font can rebuild its atlas while the battle labels are
+            // populated; attaching the menu last keeps its initial label mesh
+            // valid instead of showing an empty button until the next update.
+            RunSystemMenuView.Attach(screenView, () => !battleRunning);
         }
 
         private void OnDisable()

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using SpireChess.Config;
+using SpireChess.Diagnostics;
 using SpireChess.Run;
 using SpireChess.Save;
 using SpireChess.UI.MainMenu;
@@ -23,6 +24,9 @@ namespace SpireChess.App
         public RunSaveRepository RunSaves { get; private set; }
         public RunPersistenceCoordinator Persistence { get; private set; }
         public SceneFlowRouter Router { get; private set; }
+        public string SaveRootPath { get; private set; }
+        public static string InitializationFailure { get; private set; } =
+            string.Empty;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -47,7 +51,20 @@ namespace SpireChess.App
 
             instance = this;
             DontDestroyOnLoad(gameObject);
-            Initialize();
+            InitializationFailure = string.Empty;
+            try
+            {
+                Initialize();
+            }
+            catch (Exception exception)
+            {
+                InitializationFailure =
+                    $"{exception.GetType().Name}: {exception.Message}";
+                instance = null;
+                enabled = false;
+                Debug.LogException(exception, this);
+                Destroy(gameObject);
+            }
         }
 
         private void OnEnable()
@@ -68,7 +85,10 @@ namespace SpireChess.App
             var validation = Configs.LoadFromResources();
             LogValidation(validation);
             validation.ThrowIfInvalid();
-            RunSaves = new RunSaveRepository(Configs);
+            SaveRootPath = ResolveSaveRootPath();
+            RunSaves = new RunSaveRepository(
+                Configs,
+                new AtomicFileSaveStorage(SaveRootPath));
             var persistenceEnabled = ReadIntArgument(BalanceRunSeedArgument) == null &&
                                      !HasArgument("-runTests");
             Persistence = new RunPersistenceCoordinator(RunSaves, persistenceEnabled);
@@ -83,6 +103,34 @@ namespace SpireChess.App
                 $"[GameApp] Ready. Loaded {Configs.Minions.Count} minions " +
                 $"({Configs.Minions.Count(minion => minion.IsToken)} tokens) and " +
                 $"{Configs.Spells.Count} spells. config={Configs.Identity?.ConfigHash}.");
+        }
+
+        private static string ResolveSaveRootPath()
+        {
+            var injected = ReadArgument(G4RuntimeArguments.SaveRootArgument);
+            if (string.IsNullOrWhiteSpace(injected))
+            {
+                if (G4RuntimeArguments.IsPerformanceRequested)
+                {
+                    throw new InvalidOperationException(
+                        "G4 Player validation requires an isolated absolute " +
+                        $"{G4RuntimeArguments.SaveRootArgument}.");
+                }
+
+                return Path.GetFullPath(Application.persistentDataPath);
+            }
+
+            if (!G4RuntimeArguments.IsPerformanceRequested)
+            {
+                throw new InvalidOperationException(
+                    $"{G4RuntimeArguments.SaveRootArgument} is reserved for " +
+                    "isolated G4 validation runs.");
+            }
+
+            var isolated =
+                G4RuntimeArguments.RequirePristineIsolatedSaveRoot();
+            Debug.Log($"[G4] Isolated run-save root: {isolated}");
+            return isolated;
         }
 
         public void StartNewRun(int? randomSeed = null)

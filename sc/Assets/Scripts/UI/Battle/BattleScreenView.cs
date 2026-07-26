@@ -759,7 +759,7 @@ namespace SpireChess.UI.Battle
                 ResolveFxPosition(
                     target,
                     playbackEvent.TargetSide,
-                    playbackEvent.TargetIndex),
+                    playbackEvent.TargetIndex) + new Vector2(-72f, 38f),
                 token
                     ? PresentationFxEmphasis.Normal
                     : PresentationFxEmphasis.Strong,
@@ -812,7 +812,7 @@ namespace SpireChess.UI.Battle
                 ResolveFxPosition(
                     target,
                     playbackEvent.TargetSide,
-                    playbackEvent.TargetIndex),
+                    playbackEvent.TargetIndex) + new Vector2(72f, -34f),
                 PresentationFxEmphasis.Strong,
                 0.40f * scale,
                 46f);

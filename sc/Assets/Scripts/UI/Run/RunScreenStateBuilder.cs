@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Run;
 
@@ -482,7 +483,13 @@ namespace SpireChess.UI.Run
             {
                 return "等待节点结算。";
             }
-            var outcome = state.LastSettlement.PlayerWon ? "胜利" : "未胜利";
+            var outcome = state.LastSettlement.PlayerWon
+                ? "胜利"
+                : state.LastSettlement.OutcomeReason == BattleOutcomeReason.MutualElimination
+                    ? "平局（双方同时倒下）"
+                    : state.LastSettlement.OutcomeReason == BattleOutcomeReason.RoundLimit
+                        ? "平局（达到回合上限）"
+                        : "失败";
             var reward = string.IsNullOrWhiteSpace(state.LastRewardSummary)
                 ? string.Empty
                 : $"；{state.LastRewardSummary}";
