@@ -958,7 +958,7 @@ namespace SpireChess.Diagnostics
                         : string.Empty,
                 vSyncCount = QualitySettings.vSyncCount,
                 antiAliasing = QualitySettings.antiAliasing,
-                textureQualityLimit = QualitySettings.masterTextureLimit,
+                textureQualityLimit = QualitySettings.globalTextureMipmapLimit,
                 targetFrameRate = Application.targetFrameRate,
                 colorSpace = QualitySettings.activeColorSpace.ToString(),
                 audioSampleRate = configuration.sampleRate,
