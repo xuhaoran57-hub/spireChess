@@ -95,6 +95,7 @@ namespace SpireChess.UI.Run
     {
         public string Title { get; set; }
         public string Description { get; set; }
+        public string ArtworkId { get; set; }
         public IReadOnlyList<RunChoiceOptionState> Options { get; set; } =
             Array.Empty<RunChoiceOptionState>();
     }

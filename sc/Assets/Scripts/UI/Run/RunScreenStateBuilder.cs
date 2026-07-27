@@ -378,7 +378,12 @@ namespace SpireChess.UI.Run
                     RunUiActionType.SelectEvent,
                     pending.Config.Id,
                     option.Id)).ToList();
-                return Choice(pending.Config.Name, pending.Config.Description, options);
+                var choice = Choice(
+                    pending.Config.Name,
+                    pending.Config.Description,
+                    options);
+                choice.ArtworkId = pending.Config.ArtId;
+                return choice;
             }
 
             if (state.Phase == RunPhase.EnhanceChoice &&

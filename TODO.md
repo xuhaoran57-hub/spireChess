@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；G4 已形成提交 `f377497` 的干净工程自动化候选并完成 DEV-A 性能基线，仍需负责人视觉签字、第二机/两机门槛、五人试玩与正式音频门禁。
+当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；G4-E 已依据提交 `f377497` 的干净工程自动化候选与 DEV-A 性能基线关闭，正式视觉样板闭环已接入并转入 G4-V，仍需 Unity 双分辨率复验、负责人视觉/许可签字、第二机/两机门槛、五人试玩与正式音频门禁。
 
 ## 已完成：阶段 0 项目准备
 
@@ -501,6 +501,10 @@
   - [ ] 项目负责人按生产规范自行使用 AI 工具生成 3 首正式 BGM 与 25 个 P0 Cue / 64 个 SFX 变体，并补齐工具/模型、Prompt、条款快照、原始输出、母带、Runtime、整文件 loop sample 与 SHA-256。
   - [ ] 以完成来源/条款、独立文件 QA 与逐 Cue 人工听审的正式 AI Clip 替换 Placeholder，再逐 Cue 标记 `ProductionApproved`；随后通过 `ProductionStrict`、循环/切场/嵌套亡语峰值测试和最终整体听审。严格门禁失败的 Cue 必须在台账退回 `Production Candidate`、Catalog 改回 `Pending`；在此之前不得标记音频 `Runtime Ready` 或关闭 G3。
 - [ ] G4：完成全量自动化、正式链路双分辨率、存档恢复、跳过/2×、两机性能基线和至少 5 名外部试玩者验收。
+  - [x] G4-E 工程集成门禁关闭：以 `f377497` 的 351 / 351 EditMode、30 / 30 PlayMode、26 次正式 Player 运行、完整链路/存档/等价性/清理/性能证据为边界；G4-V、第二机、试玩和正式音频不再混入工程退出条件，见 `phase-9b-g4e-engineering-gate-closure-v0.1.md`。
+  - [x] 接入一套代表最终效果的视觉闭环：主菜单主视觉、楼层地图、商店环境、静谧林地事件插画与配置/UI 接线、战斗背景；继续复用当前 22 项 Exact 卡牌/法术/遗珍样板，资源与提示词见 `ui-concepts/phase-9b/g4-visual-slice-v0.1/`。
+  - [x] 实现 `tools/run_g4v_visual_acceptance.ps1` 一键链路：全量 EditMode/PlayMode、Clean Windows Player 构建、seed=10 指定事件夹具、双分辨率五画面精确采集与 10 图聚合 SHA-256 清单；协议见 `phase-9b-g4v-one-click-acceptance-v0.1.md`。
+  - [ ] G4-V：在 Unity 2022.3.62f3c1 运行新增资源导入/事件接线门禁，复跑 EditMode、PlayMode 和 Windows 正式链，并完成 1920×1080 / 1920×1200 五画面复核及负责人生产许可/视觉签字；签字前新增五图保持 `工程样板`，不得标记 `Runtime Ready`。
   - [x] 完成 G4 隔离 Player 构建、真实 UI 点击与遮挡射线门禁、独立存档根、完整构建文件 SHA-256、启动/无进展/总时限 watchdog，以及失败路径精确进程回收。
   - [x] 完成核心 `MainMenu → Run → Shop → Run → Battle → Run → MainMenu → Continue` 链、Run 指纹恢复、1×/2×/跳过等价、单次结算、召唤动态帧、22 / 22 样板 Catalog Exact 与清理归零门禁。
   - [x] 当前全量回归 EditMode 351 / 351（6.7499407 s）、PlayMode 30 / 30（33.5135665 s），0 失败、0 跳过、0 inconclusive、`ForcedShutdown=false`。

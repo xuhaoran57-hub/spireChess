@@ -88,12 +88,17 @@ namespace SpireChess.UI.Run
         private readonly Dictionary<string, RunMapNodeView> nodeViews =
             new Dictionary<string, RunMapNodeView>(StringComparer.Ordinal);
         private RunTestController controller;
+        private Image choiceArtworkImage;
 
         public int RenderedNodeCount { get; private set; }
         public int RenderedEdgeCount { get; private set; }
         public int RenderedRelicCount { get; private set; }
         public int RenderedChoiceCount { get; private set; }
         public bool IsChoiceVisible => choiceOverlay != null && choiceOverlay.activeSelf;
+        public bool IsChoiceArtworkVisible =>
+            choiceArtworkImage != null &&
+            choiceArtworkImage.gameObject.activeInHierarchy &&
+            choiceArtworkImage.sprite != null;
         public float MapHorizontalNormalizedPosition =>
             mapScrollRect == null
                 ? 0f
@@ -218,7 +223,14 @@ namespace SpireChess.UI.Run
             var maximumColumn = Math.Max(1, state.MaximumColumn);
             var width = Math.Max(1900f, NodeStartX * 2f + maximumColumn * NodeColumnGap);
             mapContent.sizeDelta = new Vector2(width, 620f);
-            mapBackdrop.color = theme.MapCanvasBackground;
+            var productionBackdrop = PresentationArtworkResources.LoadBackdrop(
+                PresentationBackdropVariant.RunMap);
+            mapBackdrop.sprite = productionBackdrop;
+            mapBackdrop.type = Image.Type.Simple;
+            mapBackdrop.preserveAspect = false;
+            mapBackdrop.color = productionBackdrop == null
+                ? theme.MapCanvasBackground
+                : new Color(0.52f, 0.55f, 0.52f, 0.84f);
             var positions = new Dictionary<string, Vector2>(StringComparer.Ordinal);
             foreach (var node in state.Nodes ?? Array.Empty<RunMapNodeState>())
             {
@@ -327,12 +339,14 @@ namespace SpireChess.UI.Run
             choiceOverlay.SetActive(choice != null);
             if (choice == null)
             {
+                SetChoiceArtwork(null);
                 RenderedChoiceCount = 0;
                 return;
             }
 
             choiceTitleText.text = choice.Title ?? string.Empty;
             choiceDescriptionText.text = choice.Description ?? string.Empty;
+            SetChoiceArtwork(choice.ArtworkId);
             foreach (var option in choice.Options ?? Array.Empty<RunChoiceOptionState>())
             {
                 var instance = Instantiate(choiceOptionPrefab, choiceContent);
@@ -343,6 +357,41 @@ namespace SpireChess.UI.Run
             }
             RenderedChoiceCount = choice.Options?.Count ?? 0;
             choiceScrollRect.verticalNormalizedPosition = 1f;
+        }
+
+        private void SetChoiceArtwork(string artworkId)
+        {
+            var sprite = PresentationArtworkResources.LoadEvent(artworkId);
+            var hasArtwork = sprite != null;
+            if (hasArtwork)
+            {
+                choiceArtworkImage = PresentationArtworkResources.EnsureImage(
+                    choiceTitleText.transform.parent,
+                    "EventArtwork",
+                    sprite,
+                    Color.white,
+                    false);
+                if (choiceArtworkImage != null)
+                {
+                    var artworkRect = choiceArtworkImage.rectTransform;
+                    artworkRect.anchorMin = Vector2.zero;
+                    artworkRect.anchorMax = Vector2.zero;
+                    artworkRect.pivot = Vector2.zero;
+                    artworkRect.anchoredPosition = new Vector2(48f, 42f);
+                    artworkRect.sizeDelta = new Vector2(450f, 400f);
+                    choiceArtworkImage.preserveAspect = true;
+                }
+            }
+            else if (choiceArtworkImage != null)
+            {
+                choiceArtworkImage.gameObject.SetActive(false);
+            }
+
+            var scrollRect = choiceScrollRect.GetComponent<RectTransform>();
+            scrollRect.anchoredPosition =
+                new Vector2(hasArtwork ? 520f : 48f, 42f);
+            scrollRect.sizeDelta =
+                new Vector2(hasArtwork ? 932f : 1404f, 400f);
         }
 
         private static float ResolveEdgeThickness(

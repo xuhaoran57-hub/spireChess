@@ -65,7 +65,7 @@
       ]
     },
     {
-      "id": "tranquil_grove", "name": "静谧林地", "description": "短暂休整，或为下一次招募保留灵感。",
+      "id": "tranquil_grove", "name": "静谧林地", "description": "短暂休整，或为下一次招募保留灵感。", "artId": "event_tranquil_grove",
       "options": [
         { "id": "heal", "label": "恢复 3 点生命", "effects": [{ "type": "HealHealth", "amount": 3 }] },
         { "id": "refresh", "label": "下个商店获得 2 次免费刷新", "effects": [{ "type": "FreeRefresh", "amount": 2 }] }

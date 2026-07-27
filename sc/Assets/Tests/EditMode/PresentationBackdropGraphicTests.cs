@@ -33,11 +33,36 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(graphic.BottomColor, Is.EqualTo(bottom));
                 Assert.That(graphic.AccentColor, Is.EqualTo(accent));
                 Assert.That(graphic.raycastTarget, Is.False);
+                Assert.That(graphic.HasProductionArtwork, Is.True);
             }
             finally
             {
                 Object.DestroyImmediate(root);
             }
+        }
+
+        [TestCase(PresentationBackdropVariant.MainMenu)]
+        [TestCase(PresentationBackdropVariant.Shop)]
+        [TestCase(PresentationBackdropVariant.RunMap)]
+        [TestCase(PresentationBackdropVariant.Battle)]
+        public void ProductionBackdrops_AreImportableSprites(
+            PresentationBackdropVariant variant)
+        {
+            Assert.That(
+                PresentationArtworkResources.GetBackdropPath(variant),
+                Is.Not.Empty);
+            Assert.That(
+                PresentationArtworkResources.LoadBackdrop(variant),
+                Is.Not.Null);
+        }
+
+        [Test]
+        public void TranquilGroveEventArtwork_IsImportableSprite()
+        {
+            Assert.That(
+                PresentationArtworkResources.LoadEvent(
+                    "event_tranquil_grove"),
+                Is.Not.Null);
         }
     }
 }

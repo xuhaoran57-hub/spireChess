@@ -19,6 +19,8 @@ param(
 
     [switch]$FrozenVisual,
 
+    [switch]$VisualSlice,
+
     [switch]$Stress,
 
     [switch]$AllowDirtyProbe,
@@ -39,11 +41,18 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-if ($FrozenVisual -and $Stress) {
-    throw "-FrozenVisual and -Stress are mutually exclusive."
+$selectedSpecialModes =
+    [int]$FrozenVisual.IsPresent +
+    [int]$VisualSlice.IsPresent +
+    [int]$Stress.IsPresent
+if ($selectedSpecialModes -gt 1) {
+    throw "-FrozenVisual, -VisualSlice, and -Stress are mutually exclusive."
 }
 if ($FrozenVisual -and -not $PSBoundParameters.ContainsKey("Seed")) {
     $Seed = 78
+}
+elseif ($VisualSlice -and -not $PSBoundParameters.ContainsKey("Seed")) {
+    $Seed = 10
 }
 elseif ($Stress -and -not $PSBoundParameters.ContainsKey("Seed")) {
     $Seed = 940401
@@ -475,6 +484,9 @@ if ($NoScreenshots) {
 if ($FrozenVisual) {
     $arguments += "-g4FrozenVisual"
 }
+if ($VisualSlice) {
+    $arguments += "-g4VisualSlice"
+}
 if ($Stress) {
     $arguments += "-g4Stress"
 }
@@ -483,6 +495,8 @@ $acceptanceMode = if ($Stress) {
     "stress"
 } elseif ($FrozenVisual) {
     "frozen-visual"
+} elseif ($VisualSlice) {
+    "visual-slice"
 } else {
     "core"
 }
@@ -742,6 +756,16 @@ $requiredCheckpoints = if ($Stress) {
         "sample-catalog-exact",
         "acceptance-complete"
     )
+} elseif ($VisualSlice) {
+    @(
+        "main-menu",
+        "floor-map",
+        "shop-environment",
+        "battle-background",
+        "event-tranquil-grove",
+        "sample-catalog-exact",
+        "acceptance-complete"
+    )
 } else {
     @(
         "main-menu",
@@ -811,6 +835,14 @@ if (-not $NoScreenshots) {
             "19-run-audio-settings-$Resolution.png",
             "20-main-menu-saved-run-$Resolution.png",
             "21-continued-run-$Resolution.png"
+        )
+    } elseif ($VisualSlice) {
+        @(
+            "01-main-menu-$Resolution.png",
+            "02-floor-map-$Resolution.png",
+            "03-shop-environment-$Resolution.png",
+            "04-battle-background-$Resolution.png",
+            "05-event-tranquil-grove-$Resolution.png"
         )
     } else {
         @(
@@ -933,6 +965,8 @@ if (-not $NoScreenshots) {
     )
     $minimumUniqueScreenshotCount = if ($Stress) {
         3
+    } elseif ($VisualSlice) {
+        5
     } else {
         8
     }

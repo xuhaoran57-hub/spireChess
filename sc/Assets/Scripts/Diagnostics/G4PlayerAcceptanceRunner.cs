@@ -37,6 +37,11 @@ namespace SpireChess.Diagnostics
         private const float SceneTimeoutSeconds = 20f;
         private const float ScreenshotTimeoutSeconds = 10f;
         private const float CheckpointSettleSeconds = 0.65f;
+        private const int VisualSliceSeed = 10;
+        private const string VisualSliceEventNodeId = "f1_event";
+        private const string VisualSliceEventId = "tranquil_grove";
+        private const string VisualSliceEventArtworkId =
+            "event_tranquil_grove";
 
         private static G4PlayerAcceptanceRunner instance;
         private string evidenceDirectory;
@@ -72,11 +77,15 @@ namespace SpireChess.Diagnostics
 
         private IEnumerator Start()
         {
-            if (G4RuntimeArguments.IsFrozenVisualRequested &&
-                G4RuntimeArguments.IsStressRequested)
+            var selectedSpecialModes =
+                (G4RuntimeArguments.IsFrozenVisualRequested ? 1 : 0) +
+                (G4RuntimeArguments.IsVisualSliceRequested ? 1 : 0) +
+                (G4RuntimeArguments.IsStressRequested ? 1 : 0);
+            if (selectedSpecialModes > 1)
             {
                 Fail(
-                    $"{G4RuntimeArguments.FrozenVisualFlag} and " +
+                    $"{G4RuntimeArguments.FrozenVisualFlag}, " +
+                    $"{G4RuntimeArguments.VisualSliceFlag}, and " +
                     $"{G4RuntimeArguments.StressFlag} are mutually exclusive.");
                 yield break;
             }
@@ -169,6 +178,14 @@ namespace SpireChess.Diagnostics
             }
 
             GameApp.Instance.AbandonRun();
+            if (G4RuntimeArguments.IsVisualSliceRequested &&
+                !ValidateVisualSliceArtworkResources(out var artworkDetails))
+            {
+                Fail(
+                    "G4-V visual slice is missing a required production " +
+                    "artwork resource. " + artworkDetails);
+                yield break;
+            }
             yield return CaptureCheckpoint(
                 G4RuntimeArguments.IsFrozenVisualRequested
                     ? "main-menu-new-run"
@@ -176,7 +193,9 @@ namespace SpireChess.Diagnostics
                 "Fresh isolated save root; no continue slot.",
                 fileOrdinal: G4RuntimeArguments.IsFrozenVisualRequested
                     ? 1
-                    : 0);
+                    : G4RuntimeArguments.IsVisualSliceRequested
+                        ? 1
+                        : 0);
             if (failed)
             {
                 yield break;
@@ -184,7 +203,11 @@ namespace SpireChess.Diagnostics
 
             var seed = G4RuntimeArguments.ReadInt(
                 G4RuntimeArguments.AcceptanceSeedArgument,
-                G4RuntimeArguments.IsFrozenVisualRequested ? 78 : 940101,
+                G4RuntimeArguments.IsFrozenVisualRequested
+                    ? 78
+                    : G4RuntimeArguments.IsVisualSliceRequested
+                        ? VisualSliceSeed
+                        : 940101,
                 1,
                 int.MaxValue);
             var mainMenuController =
@@ -206,6 +229,11 @@ namespace SpireChess.Diagnostics
             if (G4RuntimeArguments.IsFrozenVisualRequested)
             {
                 yield return RunFrozenVisualAcceptanceFlow(seed);
+                yield break;
+            }
+            if (G4RuntimeArguments.IsVisualSliceRequested)
+            {
+                yield return RunVisualSliceAcceptanceFlow(seed);
                 yield break;
             }
             yield return CaptureCheckpoint(
@@ -624,6 +652,340 @@ namespace SpireChess.Diagnostics
                 "Formal MainMenu -> Run -> Shop -> Run -> Battle -> Run -> " +
                 "MainMenu -> Continue chain completed with isolated " +
                 "persistence.");
+        }
+
+        private IEnumerator RunVisualSliceAcceptanceFlow(int seed)
+        {
+            if (seed != VisualSliceSeed)
+            {
+                Fail(
+                    "The G4-V visual slice is a deterministic production " +
+                    $"contract and requires seed {VisualSliceSeed}, got {seed}.");
+                yield break;
+            }
+
+            yield return WaitForRunPresentationReady(
+                "G4-V initial floor map");
+            if (failed)
+            {
+                yield break;
+            }
+
+            var runController =
+                Object.FindObjectOfType<RunTestController>();
+            var runView = runController?.FormalScreenView;
+            var run = GameApp.Instance.Run;
+            if (run == null ||
+                runView == null ||
+                run.State.Phase != RunPhase.MapSelection ||
+                runView.IsChoiceVisible)
+            {
+                Fail(
+                    "G4-V did not start on the unobstructed formal floor map.");
+                yield break;
+            }
+
+            var mapSnapshot =
+                runView.SetMapViewportSegment(RunMapViewportSegment.Center);
+            if (mapSnapshot.FullyVisibleNodeIds.Count == 0)
+            {
+                Fail(
+                    "G4-V center map viewport contains no fully visible node.");
+                yield break;
+            }
+            yield return CaptureCheckpoint(
+                "floor-map",
+                $"Seed {seed}; center map segment; fullyVisible=" +
+                string.Join(",", mapSnapshot.FullyVisibleNodeIds) + ".",
+                fileOrdinal: 2);
+            if (failed)
+            {
+                yield break;
+            }
+
+            if (!ExecuteStep(
+                    "enter f1_shop_start through the visible map node",
+                    () => InvokeMapNodeInVisibleSegment(
+                        runController,
+                        "f1_shop_start")))
+            {
+                yield break;
+            }
+            yield return WaitForScene<ShopTestController>(
+                GameSceneNames.Shop);
+            if (failed)
+            {
+                yield break;
+            }
+            yield return WaitForShopPresentationReady(
+                "G4-V shop environment");
+            if (failed)
+            {
+                yield break;
+            }
+            yield return CaptureCheckpoint(
+                "shop-environment",
+                "Formal shop entered through f1_shop_start.",
+                fileOrdinal: 3);
+            if (failed)
+            {
+                yield break;
+            }
+
+            var shopController =
+                Object.FindObjectOfType<ShopTestController>();
+            var firstOfferIndex =
+                FindFirstMinionOfferIndex(shopController);
+            if (!ExecuteStep(
+                    "buy the first G4-V minion offer through ShopCardView",
+                    () =>
+                {
+                    if (shopController == null || firstOfferIndex < 0)
+                    {
+                        return false;
+                    }
+
+                    var offer = FindShopCard(
+                        ShopCardZone.MinionOffer,
+                        firstOfferIndex);
+                    return InvokePointerClick(offer) &&
+                           shopController.LastOperationResult?.Success == true;
+                }))
+            {
+                yield break;
+            }
+            yield return null;
+
+            var purchasedBenchIndex =
+                FindFirstOccupiedBenchIndex(shopController);
+            if (!ExecuteStep(
+                    "play the G4-V minion into battle slot 0",
+                    () =>
+                {
+                    var bench = FindShopCard(
+                        ShopCardZone.Bench,
+                        purchasedBenchIndex);
+                    var battleSlot = FindShopSlot(
+                        ShopCardZone.Battle,
+                        0);
+                    return bench != null &&
+                           battleSlot != null &&
+                           InvokePointerClick(bench) &&
+                           InvokePointerClick(battleSlot) &&
+                           shopController.Session.Collection.Battle[0] != null;
+                }))
+            {
+                yield break;
+            }
+            yield return null;
+            if (!ExecuteStep(
+                    "end the G4-V shop through EndButton",
+                    () => InvokeNamedButton(
+                        shopController.FormalScreenView,
+                        "EndButton")))
+            {
+                yield break;
+            }
+
+            yield return WaitForScene<RunTestController>(
+                GameSceneNames.Run);
+            if (failed)
+            {
+                yield break;
+            }
+            yield return WaitForRunPresentationReady(
+                "G4-V shop return");
+            if (failed)
+            {
+                yield break;
+            }
+            runController =
+                Object.FindObjectOfType<RunTestController>();
+            if (!ExecuteStep(
+                    "enter f1_opening_normal through the visible map node",
+                    () => InvokeMapNodeInVisibleSegment(
+                        runController,
+                        "f1_opening_normal")))
+            {
+                yield break;
+            }
+
+            yield return WaitForScene<BattleTestController>(
+                GameSceneNames.Battle);
+            if (failed)
+            {
+                yield break;
+            }
+            yield return WaitForBattlePresentationReady(
+                "G4-V opening battle");
+            if (failed)
+            {
+                yield break;
+            }
+            yield return CaptureCheckpoint(
+                "battle-background",
+                "Formal battle entered from f1_opening_normal with a " +
+                "purchased player minion.",
+                fileOrdinal: 4);
+            if (failed)
+            {
+                yield break;
+            }
+
+            if (!ExecuteStep(
+                    "prepare deterministic tranquil_grove event fixture",
+                    PrepareVisualSliceEvent))
+            {
+                yield break;
+            }
+            GameApp.Instance.Router.GoToCurrentRunPhase(
+                GameApp.Instance.Run);
+            yield return WaitForScene<RunTestController>(
+                GameSceneNames.Run);
+            if (failed)
+            {
+                yield break;
+            }
+            yield return WaitForRunPresentationReady(
+                "G4-V tranquil_grove event");
+            if (failed)
+            {
+                yield break;
+            }
+            yield return WaitForCondition(
+                () =>
+                {
+                    var controller =
+                        Object.FindObjectOfType<RunTestController>();
+                    var pending =
+                        GameApp.Instance?.Run?.State?.PendingEventChoice;
+                    return controller?.FormalScreenView != null &&
+                           controller.FormalScreenView.IsChoiceVisible &&
+                           controller.FormalScreenView
+                               .IsChoiceArtworkVisible &&
+                           pending?.Config != null &&
+                           string.Equals(
+                               pending.Config.Id,
+                               VisualSliceEventId,
+                               StringComparison.Ordinal) &&
+                           string.Equals(
+                               pending.Config.ArtId,
+                               VisualSliceEventArtworkId,
+                               StringComparison.Ordinal) &&
+                           controller.FormalScreenView.RenderedChoiceCount ==
+                           pending.Config.Options.Count;
+                },
+                "formal tranquil_grove event artwork and choices");
+            if (failed)
+            {
+                yield break;
+            }
+            yield return CaptureCheckpoint(
+                "event-tranquil-grove",
+                "Seed-10 fixture made only f1_event reachable; the real " +
+                "RunSession selected tranquil_grove and the formal event UI " +
+                "rendered event_tranquil_grove.",
+                fileOrdinal: 5);
+            if (failed)
+            {
+                yield break;
+            }
+
+            yield return CompleteAcceptance(
+                "G4-V captured the deterministic five-screen visual slice " +
+                "at the requested resolution.");
+        }
+
+        private static bool PrepareVisualSliceEvent()
+        {
+            GameApp.Instance.StartNewRun(VisualSliceSeed);
+            var run = GameApp.Instance.Run;
+            var nodes = run?.State?.CurrentMap?.Nodes;
+            if (run == null || nodes == null)
+            {
+                return false;
+            }
+
+            var statuses = nodes.ToDictionary(
+                node => node.Id,
+                _ => RunNodeStatus.Locked,
+                StringComparer.Ordinal);
+            if (!statuses.ContainsKey(VisualSliceEventNodeId))
+            {
+                return false;
+            }
+            statuses[VisualSliceEventNodeId] =
+                RunNodeStatus.Reachable;
+            run.State.MapProgress.RestoreStatuses(statuses);
+
+            var result = run.EnterNode(VisualSliceEventNodeId);
+            var pending = run.State.PendingEventChoice;
+            return result.Success &&
+                   run.State.Phase == RunPhase.EventChoice &&
+                   pending?.Config != null &&
+                   string.Equals(
+                       pending.Config.Id,
+                       VisualSliceEventId,
+                       StringComparison.Ordinal) &&
+                   string.Equals(
+                       pending.Config.ArtId,
+                       VisualSliceEventArtworkId,
+                       StringComparison.Ordinal);
+        }
+
+        private static bool ValidateVisualSliceArtworkResources(
+            out string details)
+        {
+            var missing = new List<string>();
+            foreach (var entry in new[]
+                     {
+                         new
+                         {
+                             Id = "backdrop_main_menu",
+                             Sprite =
+                                 PresentationArtworkResources.LoadBackdrop(
+                                     PresentationBackdropVariant.MainMenu)
+                         },
+                         new
+                         {
+                             Id = "backdrop_floor_map",
+                             Sprite =
+                                 PresentationArtworkResources.LoadBackdrop(
+                                     PresentationBackdropVariant.RunMap)
+                         },
+                         new
+                         {
+                             Id = "backdrop_shop",
+                             Sprite =
+                                 PresentationArtworkResources.LoadBackdrop(
+                                     PresentationBackdropVariant.Shop)
+                         },
+                         new
+                         {
+                             Id = "backdrop_battle",
+                             Sprite =
+                                 PresentationArtworkResources.LoadBackdrop(
+                                     PresentationBackdropVariant.Battle)
+                         },
+                         new
+                         {
+                             Id = VisualSliceEventArtworkId,
+                             Sprite =
+                                 PresentationArtworkResources.LoadEvent(
+                                     VisualSliceEventArtworkId)
+                         }
+                     })
+            {
+                if (entry.Sprite == null)
+                {
+                    missing.Add(entry.Id);
+                }
+            }
+
+            details = missing.Count == 0
+                ? "All five G4-V artwork resources resolved."
+                : "Missing: " + string.Join(", ", missing) + ".";
+            return missing.Count == 0;
         }
 
         private IEnumerator RunFrozenVisualAcceptanceFlow(int seed)

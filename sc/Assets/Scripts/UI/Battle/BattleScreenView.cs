@@ -84,6 +84,7 @@ namespace SpireChess.UI.Battle
         private bool detailLocked;
         private bool isBound;
         private int presentationEpoch;
+        private Image productionBackdrop;
 
         public int RenderedCardCount { get; private set; }
         public bool IsAnimationPlaying { get; private set; }
@@ -127,6 +128,34 @@ namespace SpireChess.UI.Battle
             detailCard.HasCompleteBindings && detailCanvasGroup != null &&
             detailModeText != null;
 
+        private void Awake()
+        {
+            var board = safeArea == null
+                ? null
+                : safeArea.Find("Board");
+            if (board == null)
+            {
+                return;
+            }
+
+            productionBackdrop = PresentationArtworkResources.EnsureImage(
+                board,
+                "ProductionArtwork",
+                PresentationArtworkResources.LoadBackdrop(
+                    PresentationBackdropVariant.Battle),
+                new Color(0.72f, 0.72f, 0.68f, 0.86f),
+                true);
+            if (productionBackdrop == null ||
+                productionBackdrop.sprite == null)
+            {
+                return;
+            }
+
+            SetImageAlpha(board.GetComponent<Image>(), 0.20f);
+            SetImageAlpha(board.Find("EnemyRow")?.GetComponent<Image>(), 0.42f);
+            SetImageAlpha(board.Find("PlayerRow")?.GetComponent<Image>(), 0.36f);
+        }
+
         public void Bind(BattleTestController value)
         {
             if (value == null)
@@ -151,6 +180,18 @@ namespace SpireChess.UI.Battle
             resetButton.onClick.AddListener(controller.ResetBattle);
             returnButton.onClick.AddListener(controller.ReturnToFlow);
             isBound = true;
+        }
+
+        private static void SetImageAlpha(Image image, float alpha)
+        {
+            if (image == null)
+            {
+                return;
+            }
+
+            var color = image.color;
+            color.a = alpha;
+            image.color = color;
         }
 
         public void Render(BattleScreenState state)

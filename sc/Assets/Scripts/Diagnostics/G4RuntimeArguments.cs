@@ -9,6 +9,7 @@ namespace SpireChess.Diagnostics
     {
         public const string AcceptanceFlag = "-g4Acceptance";
         public const string FrozenVisualFlag = "-g4FrozenVisual";
+        public const string VisualSliceFlag = "-g4VisualSlice";
         public const string StressFlag = "-g4Stress";
         public const string PerformanceFlag = "-g4Perf";
         public const string SaveRootArgument = "-g4SaveRoot";
@@ -33,6 +34,9 @@ namespace SpireChess.Diagnostics
 
         public static bool IsFrozenVisualRequested =>
             HasFlag(FrozenVisualFlag);
+
+        public static bool IsVisualSliceRequested =>
+            HasFlag(VisualSliceFlag);
 
         public static bool IsStressRequested =>
             HasFlag(StressFlag);

@@ -1,8 +1,8 @@
 # 阶段 9B 资产来源与许可台账 v0.1
 
 - 日期：2026-07-22
-- 更新：2026-07-26（G3 本地程序合成占位音频已登记；正式音频改由项目负责人使用 AI 自制）
-- 状态：G1、G2 已通过并关闭；39 项活动生产 Sprite 均为 `Runtime Ready`；G3 本地占位播放链路通过 EditMode 346 / 346、PlayMode 25 / 25，正式 AI 音频等待生成、筛选、来源/条款登记、技术门禁与人工听审
+- 更新：2026-07-27（登记 G4 正式视觉样板闭环五图；仍按工程样板管理）
+- 状态：G1、G2 已通过并关闭；39 项活动生产 Sprite 均为 `Runtime Ready`；G4 新增五张正式效果候选已接线但尚待 Unity G4-V 双分辨率复验和负责人生产许可签字；G3 正式 AI 音频仍等待生成、筛选、来源/条款登记、技术门禁与人工听审
 - 适用范围：Phase 9B 运行时美术、字体、音频、VFX 及其源文件
 - 治理基线：`phase-9b-g0-baseline-v0.1.md`
 - G1 签字包：`phase-9b-g1-production-license-signoff-v0.1.md`
@@ -83,6 +83,11 @@
 | `card_frame_golden` | `sc/Assets/Art/Presentation/UI/Common/card_frame_golden.png` | `e3eb8e2b9fa33639be0f47e403cfc40d0a91cfa291021c48710bf5ac9f0aa365` | `ui-concepts/phase-9b/card-frames/shared-card-frame-golden-alpha-master-v0.1.png`，与运行时导出哈希一致 | ChatGPT 参考稿；`create_golden_card_frame.py` 完成古金材质迁移并复用普通框 Alpha | 不申请本轮生产许可；历史 `工程样板` | 已被 `card_frame_storybook_golden_v2` 替代；只保留作技术与版本证据 |
 | `card_frame_storybook_normal_v2` | `sc/Assets/Art/Presentation/UI/Common/card_frame_storybook_normal_v2.png` | `5d4ba907deaf361af45df84d727ab7d35b814987647a6ec3b48c10048a29fbb5` | `ui-concepts/phase-9b/card-frames/shared-card-frame-storybook-normal-chroma-v0.2.png`，源图 SHA-256 `d8f93e81b31695970dbdb0a0d3b9f2022aa5a5ae139f1b1b0fecec55492fb0ce` | 内置 GPT Image 工作流；以旧框为几何目标、Style Tile v0.3 为风格参考；洋红色键、软边、去溢色转真实 Alpha | 个人版 OpenAI Terms of Use；`生产许可已确认` | G1 运行时共同风格/可读性通过；已替代旧黑银框；G2 Unity 全量回归通过 |
 | `card_frame_storybook_golden_v2` | `sc/Assets/Art/Presentation/UI/Common/card_frame_storybook_golden_v2.png` | `f21e410d1682fb910f4c4ed4c7a57f8babe126ae6996b48517ee723878d67baa` | `ui-concepts/phase-9b/card-frames/shared-card-frame-storybook-golden-chroma-v0.2.png`，源图 SHA-256 `8d06ed5627277d113a7e8d2082982a2d68be5a8d566937445d58e1f49bbc8941` | 内置 GPT Image 工作流；从普通框受控派生；洋红色键、软边、去溢色转真实 Alpha | 个人版 OpenAI Terms of Use；`生产许可已确认` | G1 金色对照通过；局部暖金未覆盖流派色与攻防数字 |
+| `backdrop_main_menu` | `sc/Assets/Resources/Presentation/Backdrops/backdrop_main_menu.png` | `22bf895f37af610bc19d2d5db7ef01e5cddb670dfbb18299836426e01e727dbd` | Style Tile v0.3 与铸魂全量立绘作为项目内参考；提示词见 `ui-concepts/phase-9b/g4-visual-slice-v0.1/PROMPTS.md` | Codex 内置 ImageGen；后端模型版本/种子不可获得；Runtime 直接复制原始输出 | 个人版 OpenAI Terms of Use；正式效果候选，`工程样板` | 已接入主菜单背景；待 G4-V 双分辨率与负责人许可/视觉签字 |
+| `backdrop_floor_map` | `sc/Assets/Resources/Presentation/Backdrops/backdrop_floor_map.png` | `3ca9619518b6ef76146aac7db7674bf8d33a4ca23d9ae1817acf083d5b22ab27` | 同上 | Codex 内置 ImageGen；后端模型版本/种子不可获得；Runtime 直接复制原始输出 | 个人版 OpenAI Terms of Use；正式效果候选，`工程样板` | 已接入 Run 滚动地图背景；待 G4-V |
+| `backdrop_shop` | `sc/Assets/Resources/Presentation/Backdrops/backdrop_shop.png` | `5568bca7cf58c6dc5bdd748028775d0322d61daa484b7408681d6502044f9095` | 同上 | Codex 内置 ImageGen；后端模型版本/种子不可获得；Runtime 直接复制原始输出 | 个人版 OpenAI Terms of Use；正式效果候选，`工程样板` | 已接入商店环境并降低面板遮挡；待 G4-V |
+| `event_tranquil_grove` | `sc/Assets/Resources/Presentation/Events/event_tranquil_grove.png` | `ce17a57d2e7219aa9a94fff9469198b1f3dd925a374da0ba7cd5252957193a73` | 同上 | Codex 内置 ImageGen；后端模型版本/种子不可获得；Runtime 直接复制原始输出 | 个人版 OpenAI Terms of Use；正式效果候选，`工程样板` | 已通过 `artId` 接入事件状态与 UI；待 G4-V |
+| `backdrop_battle` | `sc/Assets/Resources/Presentation/Backdrops/backdrop_battle.png` | `ee48fcaf2d4ff7e186c36d0e1b9150419e15c982f2c80af112efe7d63bca2d4e` | 同上 | Codex 内置 ImageGen；后端模型版本/种子不可获得；Runtime 直接复制原始输出 | 个人版 OpenAI Terms of Use；正式效果候选，`工程样板` | 已接入战斗棋盘底层；待 G4-V |
 
 ### 3.1 本次 G1 生产许可签字范围
 

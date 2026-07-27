@@ -122,9 +122,34 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void Build_DerivesAbandonedBranchesAndCompleteMapVisualContract()
+        public void Build_PropagatesConfiguredEventArtworkId()
         {
             var run = new RunSession(configs, 8105);
+            var eventConfig = configs.EventsById["tranquil_grove"];
+            SetInternal(
+                run.State,
+                nameof(RunState.PendingEventChoice),
+                new PendingEventChoice("test-attempt", eventConfig));
+            SetInternal(run.State, nameof(RunState.Phase), RunPhase.EventChoice);
+
+            var state = RunScreenStateBuilder.Build(
+                run,
+                configs,
+                string.Empty);
+
+            Assert.That(state.Choice, Is.Not.Null);
+            Assert.That(
+                state.Choice.ArtworkId,
+                Is.EqualTo("event_tranquil_grove"));
+            Assert.That(
+                state.Choice.Options.Select(option => option.PrimaryId),
+                Has.All.EqualTo("tranquil_grove"));
+        }
+
+        [Test]
+        public void Build_DerivesAbandonedBranchesAndCompleteMapVisualContract()
+        {
+            var run = new RunSession(configs, 8106);
             var statuses = GetMutableMapStatuses(run.State.MapProgress);
             foreach (var nodeId in statuses.Keys.ToArray())
             {

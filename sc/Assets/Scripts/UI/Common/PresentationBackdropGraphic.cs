@@ -23,15 +23,27 @@ namespace SpireChess.UI
         [SerializeField] private Color accentColor =
             new Color(0.72f, 0.55f, 0.28f, 1f);
 
+        private Image productionArtwork;
+
         public PresentationBackdropVariant Variant => variant;
         public Color TopColor => topColor;
         public Color BottomColor => bottomColor;
         public Color AccentColor => accentColor;
+        public bool HasProductionArtwork =>
+            productionArtwork != null &&
+            productionArtwork.gameObject.activeSelf &&
+            productionArtwork.sprite != null;
 
         protected override void Awake()
         {
             base.Awake();
             raycastTarget = false;
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            EnsureProductionArtwork();
         }
 
         public void Configure(
@@ -47,6 +59,35 @@ namespace SpireChess.UI
             raycastTarget = false;
             SetVerticesDirty();
             SetMaterialDirty();
+            EnsureProductionArtwork();
+        }
+
+        private void EnsureProductionArtwork()
+        {
+            productionArtwork = PresentationArtworkResources.EnsureImage(
+                transform,
+                "ProductionArtwork",
+                PresentationArtworkResources.LoadBackdrop(variant),
+                new Color(1f, 1f, 1f, ResolveArtworkAlpha(variant)),
+                true);
+        }
+
+        private static float ResolveArtworkAlpha(
+            PresentationBackdropVariant value)
+        {
+            switch (value)
+            {
+                case PresentationBackdropVariant.MainMenu:
+                    return 0.82f;
+                case PresentationBackdropVariant.Shop:
+                    return 0.74f;
+                case PresentationBackdropVariant.RunMap:
+                    return 0.70f;
+                case PresentationBackdropVariant.Battle:
+                    return 0.76f;
+                default:
+                    return 0f;
+            }
         }
 
         protected override void OnPopulateMesh(VertexHelper vertexHelper)

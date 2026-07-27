@@ -252,6 +252,9 @@ namespace SpireChess.Config
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        [JsonProperty("artId")]
+        public string ArtId { get; set; }
+
         [JsonProperty("options")]
         public List<EventOptionConfig> Options { get; set; } = new List<EventOptionConfig>();
     }

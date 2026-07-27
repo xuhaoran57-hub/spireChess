@@ -97,7 +97,9 @@ namespace SpireChess.UI.MainMenu
                     G4RuntimeArguments.AcceptanceSeedArgument,
                     G4RuntimeArguments.IsFrozenVisualRequested
                         ? 78
-                        : 940101,
+                        : G4RuntimeArguments.IsVisualSliceRequested
+                            ? 10
+                            : 940101,
                     1,
                     int.MaxValue)
                 : (int?)null;

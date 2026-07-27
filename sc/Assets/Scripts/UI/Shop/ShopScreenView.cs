@@ -124,6 +124,15 @@ namespace SpireChess.UI.Shop
             rewardText != null && rewardClaimButton != null &&
             rewardSkipButton != null;
 
+        private void Awake()
+        {
+            SetPanelAlpha("TopBar", 0.78f);
+            SetPanelAlpha("Content/OfferPanel", 0.62f);
+            SetPanelAlpha("Content/BattlePanel", 0.66f);
+            SetPanelAlpha("Content/HandPanel", 0.66f);
+            SetPanelAlpha("ActionRail", 0.80f);
+        }
+
         public void Bind(ShopTestController value)
         {
             if (value == null)
@@ -156,6 +165,21 @@ namespace SpireChess.UI.Shop
             rewardSkipButton.onClick.AddListener(
                 () => controller.SkipPendingReward());
             isBound = true;
+        }
+
+        private void SetPanelAlpha(string path, float alpha)
+        {
+            var image = safeArea == null
+                ? null
+                : safeArea.Find(path)?.GetComponent<Image>();
+            if (image == null)
+            {
+                return;
+            }
+
+            var color = image.color;
+            color.a = alpha;
+            image.color = color;
         }
 
         public void Render(ShopScreenState state)
