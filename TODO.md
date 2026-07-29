@@ -534,9 +534,11 @@
 - [x] 建立 `ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/`
   冻结包；离线校验覆盖文件哈希、图片尺寸、15 张卡亮度、费用结构、Prompt
   漂移词、裁切代码、护盾透明度和 Catalog 绑定，结果为 7 / 7 通过。
-- [ ] 在 Unity 2022.3.62f3c1 执行隔离 Catalog、卡框与 Battle UI 构建，
-  运行相关 EditMode/PlayMode 测试，复核 Additive 护盾过曝、Prefab 序列化和
-  正式 Runtime 未被覆盖；通过后将 v0.3.3 从“离线冻结”升级为“Unity 最终放行”。
+- [x] 在 Unity 2022.3.62f3c1 完成隔离 Catalog、卡框与 Battle UI 构建，
+  EditMode 359 / 359、PlayMode 30 / 30 通过；已复核 Additive 护盾对比度、
+  Prefab/Scene 序列化、交互与正式 Runtime 隔离，并将 v0.3.3 升级为
+  “Unity 最终放行”。证据见
+  `ui-concepts/phase-9c/light-storybook-production-v0.1/unity-release-v0.3.3/`。
 - [ ] Unity 最终放行后，按 v0.3.3 Prompt 与视觉回归基线批量生产剩余正式卡池
   和背景；任一冻结规则变化必须升版为 v0.3.4，不原地修改 v0.3.3。
 

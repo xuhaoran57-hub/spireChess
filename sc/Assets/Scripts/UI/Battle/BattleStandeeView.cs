@@ -24,6 +24,7 @@ namespace SpireChess.UI.Battle
         [SerializeField] private AspectRatioFitter portraitAspectFitter;
         [SerializeField] private Text portraitFallback;
         [SerializeField] private Image frame;
+        [SerializeField] private Image shieldContrastUnderlay;
         [SerializeField] private Image shieldOverlay;
         [SerializeField] private Image tauntBase;
         [SerializeField] private Image deathrattleSeal;
@@ -115,7 +116,7 @@ namespace SpireChess.UI.Battle
             healthText.text = value.Health.ToString();
             attackText.color = Color.white;
             healthText.color = Color.white;
-            shieldOverlay.gameObject.SetActive(value.HasShield);
+            SetShieldVisible(value.HasShield);
             tauntBase.gameObject.SetActive(HasKeyword(value, "嘲讽", "Taunt"));
             deathrattleSeal.gameObject.SetActive(
                 HasKeyword(value, "亡语", "Deathrattle"));
@@ -134,6 +135,10 @@ namespace SpireChess.UI.Battle
             if (shieldOverlay != null)
             {
                 shieldOverlay.gameObject.SetActive(visible);
+            }
+            if (shieldContrastUnderlay != null)
+            {
+                shieldContrastUnderlay.gameObject.SetActive(visible);
             }
         }
 
@@ -269,6 +274,13 @@ namespace SpireChess.UI.Battle
                 spriteCatalog.BattleAttackMedallion, true);
             ApplySprite(healthMedallion,
                 spriteCatalog.BattleHealthMedallion, true);
+            if (shieldContrastUnderlay != null)
+            {
+                ApplySprite(
+                    shieldContrastUnderlay,
+                    spriteCatalog.BattleStandeeShieldOverlay,
+                    true);
+            }
             ApplySprite(shieldOverlay,
                 spriteCatalog.BattleStandeeShieldOverlay, true);
             ApplySprite(tauntBase, spriteCatalog.BattleTauntBase, false);

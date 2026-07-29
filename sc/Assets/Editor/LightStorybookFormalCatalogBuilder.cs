@@ -377,6 +377,8 @@ namespace SpireChess.Editor
                 NewSceneMode.Single);
             var cameraObject = new GameObject("FormalCatalogCamera");
             var camera = cameraObject.AddComponent<Camera>();
+            cameraObject.AddComponent<AudioListener>();
+            cameraObject.tag = "MainCamera";
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor =
                 new Color(0.80f, 0.85f, 0.83f, 1f);
@@ -508,7 +510,7 @@ namespace SpireChess.Editor
                 Cost = spec.Kind == "Spell" ? spec.Cost : 3,
                 DisplayMode = CardDisplayMode.Compact,
                 IsMinion = spec.Kind == "Minion",
-                ShowCost = false,
+                ShowCost = true,
                 IsGolden = false,
                 IsInteractable = true,
                 IsAffordable = true,
@@ -598,10 +600,9 @@ namespace SpireChess.Editor
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.spritePixelsPerUnit = 100f;
-            var settings = new TextureImporterSettings
-            {
-                spriteMeshType = SpriteMeshType.FullRect
-            };
+            var settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            settings.spriteMeshType = SpriteMeshType.FullRect;
             importer.SetTextureSettings(settings);
             importer.SaveAndReimport();
             return AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);

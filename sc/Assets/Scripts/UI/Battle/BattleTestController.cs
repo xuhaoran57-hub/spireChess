@@ -182,6 +182,11 @@ namespace SpireChess.UI.Battle
         private bool skipPlaybackRequested;
         private bool battleCommitSaved = true;
         private bool resultFinalized;
+        [SerializeField] private string validationPresetName;
+        [SerializeField] private string[] validationPlayerIds = new string[0];
+        [SerializeField] private string[] validationEnemyIds = new string[0];
+        [SerializeField] private int[] validationPlayerGoldenSlots = new int[0];
+        [SerializeField] private int[] validationEnemyGoldenSlots = new int[0];
 
         public bool IsBattleLocked => battleRunning || battleResolved;
         public bool IsRunBattle => runBattle;
@@ -195,6 +200,24 @@ namespace SpireChess.UI.Battle
             screenView == null ? string.Empty : screenView.LogContents;
         public float PlaybackSpeed => playbackSpeed;
         public bool UsesFormalView => screenView != null;
+        public bool IsUsingValidationPreset => HasValidationPreset;
+        public string ActivePresetName => CurrentTestPreset.Name;
+
+        private bool HasValidationPreset =>
+            !string.IsNullOrWhiteSpace(validationPresetName) &&
+            validationPlayerIds != null &&
+            validationPlayerIds.Length == BattleBoardState.SlotCount &&
+            validationEnemyIds != null &&
+            validationEnemyIds.Length == BattleBoardState.SlotCount;
+
+        private BattlePreset CurrentTestPreset => HasValidationPreset
+            ? new BattlePreset(
+                validationPresetName,
+                validationPlayerIds,
+                validationEnemyIds,
+                validationPlayerGoldenSlots ?? new int[0],
+                validationEnemyGoldenSlots ?? new int[0])
+            : Presets[presetIndex];
 
         private void Start()
         {
@@ -242,7 +265,7 @@ namespace SpireChess.UI.Battle
             }
             else
             {
-                setupState = BuildInitialState(configs, Presets[presetIndex]);
+                setupState = BuildInitialState(configs, CurrentTestPreset);
             }
 
             initialSetupState = setupState.Clone();
@@ -265,6 +288,18 @@ namespace SpireChess.UI.Battle
                 currentStatus = BuildReadyStatus();
             }
             RenderFormalState();
+            if (HasValidationPreset)
+            {
+                var startButton = screenView.transform.Find(
+                        "SafeArea/TopBar/Actions/Start")
+                    ?.GetComponent<UnityEngine.UI.Button>();
+                Debug.Log(
+                    "[BattleTest] Validation preset ready. " +
+                    $"cards={screenView.RenderedCardCount}, " +
+                    "startInteractable=" +
+                    (startButton != null && startButton.interactable) +
+                    $", preset={CurrentTestPreset.Name}.");
+            }
             if (restoredResult != null)
             {
                 screenView.ShowCombatResult(
@@ -435,7 +470,7 @@ namespace SpireChess.UI.Battle
 
             setupState = runBattle
                 ? initialSetupState.Clone()
-                : BuildInitialState(GameApp.Instance.Configs, Presets[presetIndex]);
+                : BuildInitialState(GameApp.Instance.Configs, CurrentTestPreset);
             displayedState = setupState.Clone();
             displayedLog.Clear();
             battleRunning = false;
@@ -454,7 +489,7 @@ namespace SpireChess.UI.Battle
             {
                 runBattle
                     ? $"已重置遭遇：{encounterName}。"
-                    : $"已重置测试阵容：{Presets[presetIndex].Name}。"
+                    : $"已重置测试阵容：{CurrentTestPreset.Name}。"
             });
             SetStatus(BuildReadyStatus());
         }
@@ -463,6 +498,12 @@ namespace SpireChess.UI.Battle
         {
             if (battleRunning || runBattle)
             {
+                return;
+            }
+
+            if (HasValidationPreset)
+            {
+                SetStatus($"验收预设已锁定 · {CurrentTestPreset.Name}");
                 return;
             }
 
@@ -484,13 +525,14 @@ namespace SpireChess.UI.Battle
                     ? minion
                     : null);
             var result = runner.Run(setupState, 1000, simulationCount);
+            var preset = CurrentTestPreset;
 
             SetLog(new[]
             {
-                $"预设：{Presets[presetIndex].Name}",
+                $"预设：{preset.Name}",
                 $"固定种子 1000-1099：玩家 {result.PlayerWins} 胜，敌方 {result.EnemyWins} 胜，平局 {result.Draws} 场。"
             });
-            SetStatus($"批量模拟完成 · {Presets[presetIndex].Name}");
+            SetStatus($"批量模拟完成 · {preset.Name}");
         }
 
         private static BattleBoardState BuildInitialState(ConfigService configs, BattlePreset preset)
@@ -561,7 +603,7 @@ namespace SpireChess.UI.Battle
         {
             return runBattle
                 ? $"等待战斗 · {encounterName}"
-                : $"准备阶段 · {Presets[presetIndex].Name}";
+                : $"准备阶段 · {CurrentTestPreset.Name}";
         }
 
         private void RenderFormalState()
@@ -571,17 +613,27 @@ namespace SpireChess.UI.Battle
                 return;
             }
 
-            screenView.Render(BattleScreenStateBuilder.Build(
+            var state = BattleScreenStateBuilder.Build(
                 displayedState,
                 runBattle
                     ? $"战斗 · {encounterName}"
-                    : $"战斗测试 · {Presets[presetIndex].Name}",
+                    : $"战斗测试 · {CurrentTestPreset.Name}",
                 currentStatus ?? BuildReadyStatus(),
                 displayedLog,
                 runBattle,
                 battleRunning,
                 battleResolved,
-                playbackSpeed));
+                playbackSpeed);
+            if (HasValidationPreset)
+            {
+                state.Preset = new BattleButtonState
+                {
+                    Label = "明亮主题预设",
+                    IsVisible = true,
+                    IsInteractable = false
+                };
+            }
+            screenView.Render(state);
         }
 
         private void FinalizeBattle(BattleSimulationResult result)

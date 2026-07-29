@@ -1,7 +1,7 @@
 # 明亮主题 v0.3.3 冻结包
 
 - 日期：2026-07-29
-- 状态：离线冻结通过，Unity 运行时验收待执行
+- 状态：Unity 最终放行（见 `../unity-release-v0.3.3/`）
 - 视觉源：明亮旅行绘本 Style Tile
 - 内容源：正式卡池配置与单卡语义
 
@@ -31,6 +31,7 @@
 python ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/validate_freeze.py
 ```
 
-校验结果写入 `FREEZE-VALIDATION-REPORT-v0.3.3.json`。离线通过只代表冻结包与
-当前工作区一致；Unity Additive 材质、Prefab 序列化和 EditMode/PlayMode 仍须按
-交接清单验收。
+校验结果写入 `FREEZE-VALIDATION-REPORT-v0.3.3.json`。离线脚本的结果名保留为
+`PASS_OFFLINE_UNITY_PENDING`，表示它只负责冻结包一致性、不能替代 Unity
+验收。Unity Additive 材质、Prefab 序列化、EditMode/PlayMode 与人工视觉门禁已
+按交接清单通过，最终证据见 `../unity-release-v0.3.3/`。

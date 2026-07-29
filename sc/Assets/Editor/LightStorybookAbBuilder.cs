@@ -1,11 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using SpireChess.Battle;
+using SpireChess.Config;
 using SpireChess.UI;
 using SpireChess.UI.Battle;
+using SpireChess.Utils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace SpireChess.Editor
 {
@@ -24,10 +30,29 @@ namespace SpireChess.Editor
 
         private const string ArtFolder =
             "Assets/Art/Presentation/Calibration/LightStorybook";
-        private const string ForgeArtPath =
-            ArtFolder + "/forge-card-new-light.png";
         private const string BattleBackdropPath =
             ArtFolder + "/battle-backdrop-new-light.png";
+
+        private static readonly string[] BattlePreviewPlayerIds =
+        {
+            "forge_soul_shield_squire",
+            "rootbound_soul_guide",
+            "glimmer_mage",
+            "traveling_physician",
+            "mirrorsteel_duelist"
+        };
+
+        private static readonly string[] BattlePreviewEnemyIds =
+        {
+            "resonance_bell_guard",
+            "undying_furnace_king",
+            "young_deer_spirit",
+            "ancient_mountain_spirit",
+            "fate_track_recorder"
+        };
+
+        private static readonly int[] BattlePreviewPlayerGoldenSlots = { 4 };
+        private static readonly int[] BattlePreviewEnemyGoldenSlots = { 1 };
 
         [MenuItem("Spire Chess/UI/Build Light Storybook A-B Scene")]
         public static void Build()
@@ -37,15 +62,13 @@ namespace SpireChess.Editor
             EnsureFolder("Assets/Art/Presentation", "Calibration");
             EnsureFolder("Assets/Art/Presentation/Calibration", "LightStorybook");
 
-            CopyCalibrationImage("forge-card-new-light.png", ForgeArtPath);
             CopyCalibrationImage(
                 "battle-backdrop-new-light.png",
                 BattleBackdropPath);
 
-            var forgeArt = ConfigureSprite(ForgeArtPath);
             var battleBackdrop = ConfigureSprite(BattleBackdropPath);
             var theme = BuildTheme();
-            var catalog = BuildCatalog(forgeArt);
+            var catalog = BuildCatalog();
             var standeePrefab = BuildStandeePrefab(theme, catalog);
             var screenPrefab = BuildScreenPrefab(
                 theme,
@@ -116,49 +139,33 @@ namespace SpireChess.Editor
             return theme;
         }
 
-        private static PresentationSpriteCatalog BuildCatalog(Sprite forgeArt)
+        private static PresentationSpriteCatalog BuildCatalog()
         {
+            var source =
+                AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                    LightStorybookFormalCatalogBuilder.CatalogPath);
+            if (source == null)
+            {
+                throw new InvalidOperationException(
+                    "Build the Light Storybook formal catalog before the " +
+                    "battle validation scene.");
+            }
+
             var catalog =
                 AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
                     CatalogPath);
             if (catalog == null)
             {
-                var source =
-                    AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
-                        CardUiPrefabBuilder.SpriteCatalogPath);
-                if (source == null)
-                {
-                    throw new InvalidOperationException(
-                        "Build the production sprite catalog first.");
-                }
                 catalog = UnityEngine.Object.Instantiate(source);
                 catalog.name = "PresentationSpriteCatalog_LightStorybook";
                 AssetDatabase.CreateAsset(catalog, CatalogPath);
             }
+            else
+            {
+                EditorUtility.CopySerialized(source, catalog);
+                catalog.name = "PresentationSpriteCatalog_LightStorybook";
+            }
 
-            var serialized = new SerializedObject(catalog);
-            var artworks = serialized.FindProperty("artworks");
-            var replaced = false;
-            for (var index = 0; index < artworks.arraySize; index++)
-            {
-                var entry = artworks.GetArrayElementAtIndex(index);
-                if (entry.FindPropertyRelative("id").stringValue !=
-                    "placeholder_card_undying_furnace_king")
-                {
-                    continue;
-                }
-                entry.FindPropertyRelative("sprite").objectReferenceValue =
-                    forgeArt;
-                entry.FindPropertyRelative("focalPointY").floatValue = 0.28f;
-                replaced = true;
-                break;
-            }
-            if (!replaced)
-            {
-                throw new InvalidOperationException(
-                    "The Furnace King artwork entry is missing.");
-            }
-            serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(catalog);
             return catalog;
         }
@@ -171,10 +178,68 @@ namespace SpireChess.Editor
                 BattleUiPrefabBuilder.StandeePrefabPath,
                 StandeePrefabPath);
             var root = PrefabUtility.LoadPrefabContents(StandeePrefabPath);
-            ReplacePresentationReferences(root, theme, catalog);
-            PrefabUtility.SaveAsPrefabAsset(root, StandeePrefabPath);
-            PrefabUtility.UnloadPrefabContents(root);
+            try
+            {
+                ReplacePresentationReferences(root, theme, catalog);
+                ConfigureShieldContrast(root, catalog);
+                PrefabUtility.SaveAsPrefabAsset(root, StandeePrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
             return AssetDatabase.LoadAssetAtPath<GameObject>(StandeePrefabPath);
+        }
+
+        private static void ConfigureShieldContrast(
+            GameObject root,
+            PresentationSpriteCatalog catalog)
+        {
+            var view = root.GetComponent<BattleStandeeView>();
+            if (view == null)
+            {
+                throw new InvalidOperationException(
+                    "The Light Storybook standee has no BattleStandeeView.");
+            }
+
+            var serialized = new SerializedObject(view);
+            var shield = serialized.FindProperty("shieldOverlay")
+                .objectReferenceValue as Image;
+            if (shield == null)
+            {
+                throw new InvalidOperationException(
+                    "The Light Storybook standee shield overlay is missing.");
+            }
+
+            var underlayObject = new GameObject(
+                "ShieldContrastUnderlay",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image));
+            underlayObject.transform.SetParent(root.transform, false);
+            var underlayRect = underlayObject.GetComponent<RectTransform>();
+            underlayRect.anchorMin = Vector2.zero;
+            underlayRect.anchorMax = Vector2.zero;
+            underlayRect.pivot = Vector2.zero;
+            underlayRect.anchoredPosition = new Vector2(10f, 6f);
+            underlayRect.sizeDelta = new Vector2(140f, 230f);
+
+            var underlay = underlayObject.GetComponent<Image>();
+            underlay.sprite = catalog.BattleStandeeShieldOverlay;
+            underlay.type = Image.Type.Simple;
+            underlay.preserveAspect = true;
+            underlay.color = new Color(0.04f, 0.20f, 0.32f, 0.90f);
+            underlay.raycastTarget = false;
+            underlay.material = null;
+            underlayObject.SetActive(false);
+            underlay.transform.SetSiblingIndex(
+                shield.transform.GetSiblingIndex());
+
+            shield.color = new Color(0.22f, 0.68f, 1f, 0.66f);
+            shield.raycastTarget = false;
+            serialized.FindProperty("shieldContrastUnderlay")
+                .objectReferenceValue = underlay;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static GameObject BuildScreenPrefab(
@@ -205,6 +270,7 @@ namespace SpireChess.Editor
             var scene = EditorSceneManager.NewScene(
                 NewSceneSetup.EmptyScene,
                 NewSceneMode.Single);
+            CreateValidationCamera(scene);
             var screen = PrefabUtility.InstantiatePrefab(
                 screenPrefab,
                 scene) as GameObject;
@@ -215,15 +281,44 @@ namespace SpireChess.Editor
             }
             screen.name = "PF_BattleScreen_LightStorybook";
 
+            var view = screen.GetComponent<BattleScreenView>();
+            var state = CreateBattlePreviewState();
+            ValidateExactArtwork(state);
+            view.Render(state);
+            if (view.RenderedCardCount != 10)
+            {
+                throw new InvalidOperationException(
+                    "The Light Storybook battle preview must render exactly " +
+                    $"10 standees, rendered={view.RenderedCardCount}.");
+            }
+
             var controllerObject = new GameObject(
                 "BattleTestController",
                 typeof(BattleTestController));
             SceneManager.MoveGameObjectToScene(controllerObject, scene);
-            var controller = controllerObject.GetComponent<BattleTestController>();
-            var serialized = new SerializedObject(controller);
-            serialized.FindProperty("screenView").objectReferenceValue =
-                screen.GetComponent<BattleScreenView>();
-            serialized.ApplyModifiedPropertiesWithoutUndo();
+            var controllerSerialized = new SerializedObject(
+                controllerObject.GetComponent<BattleTestController>());
+            controllerSerialized.FindProperty("screenView")
+                .objectReferenceValue = view;
+            controllerSerialized.FindProperty("validationPresetName")
+                .stringValue = "明亮绘本正式卡池";
+            SetStringArray(
+                controllerSerialized,
+                "validationPlayerIds",
+                BattlePreviewPlayerIds);
+            SetStringArray(
+                controllerSerialized,
+                "validationEnemyIds",
+                BattlePreviewEnemyIds);
+            SetIntArray(
+                controllerSerialized,
+                "validationPlayerGoldenSlots",
+                BattlePreviewPlayerGoldenSlots);
+            SetIntArray(
+                controllerSerialized,
+                "validationEnemyGoldenSlots",
+                BattlePreviewEnemyGoldenSlots);
+            controllerSerialized.ApplyModifiedPropertiesWithoutUndo();
 
             var eventSystem = new GameObject(
                 "EventSystem",
@@ -231,6 +326,167 @@ namespace SpireChess.Editor
                 typeof(UnityEngine.EventSystems.StandaloneInputModule));
             SceneManager.MoveGameObjectToScene(eventSystem, scene);
             EditorSceneManager.SaveScene(scene, ScenePath);
+        }
+
+        private static void CreateValidationCamera(Scene scene)
+        {
+            var cameraObject = new GameObject(
+                "ValidationCamera",
+                typeof(Camera),
+                typeof(AudioListener));
+            SceneManager.MoveGameObjectToScene(cameraObject, scene);
+            cameraObject.tag = "MainCamera";
+
+            var camera = cameraObject.GetComponent<Camera>();
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.80f, 0.85f, 0.83f, 1f);
+            camera.cullingMask = 0;
+        }
+
+        private static BattleScreenState CreateBattlePreviewState()
+        {
+            var configs = new ConfigService(
+                new NewtonsoftJsonSerializer());
+            var validation = configs.LoadFromResources();
+            validation.ThrowIfInvalid();
+
+            var state = new BattleScreenState
+            {
+                Title = "战斗 · 明亮绘本正式卡池",
+                Status = "5 vs 5 · 静态材质与裁切验收",
+                RoundText = "v0.3.3",
+                LogText = string.Join("\n", new[]
+                {
+                    "检查人物主体居中覆盖裁切。",
+                    "检查护盾中心透明且边缘不过曝。",
+                    "检查金色框、攻击、生命与关键词标记。"
+                }),
+                Start = Button("开始战斗"),
+                Speed = Button("速度 1×"),
+                Skip = Button("跳过表现"),
+                Preset = Button("正式卡池"),
+                Reset = Button("重置"),
+                Return = Button("返回")
+            };
+
+            for (var index = 0; index < BattleBoardState.SlotCount; index++)
+            {
+                state.PlayerCards[index] = CreateBattleCard(
+                    configs,
+                    BattlePreviewPlayerIds[index],
+                    BattleSide.Player,
+                    index,
+                    BattlePreviewPlayerGoldenSlots.Contains(index),
+                    index == 0);
+                state.EnemyCards[index] = CreateBattleCard(
+                    configs,
+                    BattlePreviewEnemyIds[index],
+                    BattleSide.Enemy,
+                    index,
+                    BattlePreviewEnemyGoldenSlots.Contains(index),
+                    index == 1);
+            }
+
+            return state;
+        }
+
+        private static CardViewModel CreateBattleCard(
+            ConfigService configs,
+            string id,
+            BattleSide side,
+            int slotIndex,
+            bool golden,
+            bool shield)
+        {
+            if (!configs.TryGetMinion(id, out var config))
+            {
+                throw new InvalidOperationException(
+                    "The Light Storybook battle preview minion is missing: " +
+                    id);
+            }
+
+            var runtime = new BattleMinionRuntime(
+                config,
+                golden,
+                runtimeInstanceId:
+                    $"light-storybook-{side}-{slotIndex}-{id}");
+            var model = BattleCardViewModelFactory.FromRuntime(
+                runtime,
+                side,
+                slotIndex);
+            model.ShowCost = true;
+            model.HasShield = shield;
+            return model;
+        }
+
+        private static void ValidateExactArtwork(BattleScreenState state)
+        {
+            var catalog =
+                AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                    CatalogPath);
+            var models = state.PlayerCards
+                .Concat(state.EnemyCards)
+                .Where(value => value != null);
+            foreach (var model in models)
+            {
+                if (catalog == null ||
+                    string.IsNullOrWhiteSpace(model.ArtId) ||
+                    !catalog.TryGetArtwork(model.ArtId, out var sprite) ||
+                    sprite == null)
+                {
+                    throw new InvalidOperationException(
+                        "The Light Storybook battle preview requires exact " +
+                        "artwork for " + (model?.ArtId ?? "<null>"));
+                }
+            }
+        }
+
+        private static BattleButtonState Button(string label)
+        {
+            return new BattleButtonState
+            {
+                Label = label,
+                IsVisible = true,
+                IsInteractable = false
+            };
+        }
+
+        private static void SetStringArray(
+            SerializedObject serialized,
+            string propertyName,
+            IReadOnlyList<string> values)
+        {
+            var property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException(
+                    "Serialized property is missing: " + propertyName);
+            }
+            property.arraySize = values.Count;
+            for (var index = 0; index < values.Count; index++)
+            {
+                property.GetArrayElementAtIndex(index).stringValue =
+                    values[index];
+            }
+        }
+
+        private static void SetIntArray(
+            SerializedObject serialized,
+            string propertyName,
+            IReadOnlyList<int> values)
+        {
+            var property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException(
+                    "Serialized property is missing: " + propertyName);
+            }
+            property.arraySize = values.Count;
+            for (var index = 0; index < values.Count; index++)
+            {
+                property.GetArrayElementAtIndex(index).intValue =
+                    values[index];
+            }
         }
 
         private static void ReplacePresentationReferences(

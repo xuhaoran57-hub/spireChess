@@ -753,10 +753,9 @@ namespace SpireChess.Editor
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.spritePixelsPerUnit = 100f;
-            var settings = new TextureImporterSettings
-            {
-                spriteMeshType = SpriteMeshType.FullRect
-            };
+            var settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            settings.spriteMeshType = SpriteMeshType.FullRect;
             importer.SetTextureSettings(settings);
             importer.SaveAndReimport();
             return AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
