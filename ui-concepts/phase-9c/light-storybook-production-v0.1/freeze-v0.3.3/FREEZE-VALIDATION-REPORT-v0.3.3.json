@@ -1,0 +1,548 @@
+{
+  "version": "0.3.3",
+  "generatedAtUtc": "2026-07-29T09:53:21.779654+00:00",
+  "result": "PASS_OFFLINE_UNITY_PENDING",
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "unityStatus": "pending"
+  },
+  "checks": [
+    {
+      "id": "frozen-file-hashes",
+      "status": "pass",
+      "details": [
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/BRIGHT-STYLE-RULES-v0.3.3.md",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "06a4ef79c2aab0063f86a232766948d88812b51d3ec57cbf22456e79b4e66d9e"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/PRODUCTION-PROMPTS-v0.3.3.zh-CN.md",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "ae96662e11ee60d12d198eca5cd35f9c526eae7f56087ac575d11d35cd794517"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/UNITY-HANDOFF-v0.3.3.md",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "086564fbdfe935b4a4dee5e5489b99e3a3bffb8c4740e9cd0988dec084ec7777"
+        },
+        {
+          "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/FORMAL-CATALOG-SPECS-v0.3.2.json",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "1e258b8006d29801e270c3b7e0c6ee0923b65f2b669611b272fa1d7eae157281"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-compact.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "1d019ea4b31ca3c839f5894ad8343d8df125a8a6d9fcd224c7c16a574e3a041a"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-compact.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "ec8499d544699f6c99c1ee146ea42bf5d6571ea0da66d75dfa9fd0bb7a1c01ca"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-full.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "82cae7a606c24b9f325a1e3331c7c3178764755b3258373d9092897f0234ba46"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-full.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "b858d01b7e40ca5a732ec4c75892ca2fab92818ebd41da70e7731829131b3a4a"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/shop-pressure-1920x1080.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "e41a7cfb9c2a928c03dee52ad70ac49c12c220af21b6d2b39d13da3d8c60b7fa"
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/battle-pressure-v0.3.3-candidate-1920x1080.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "990e8bfa040df9e9bb754ef4fbb6a0b61e0701712836951219a8064534b07327"
+        },
+        {
+          "path": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "47598ba7394eaf97248cbedeb7dd3c121a3daa4b7ed5a64c6d771f10a60e6f31"
+        },
+        {
+          "path": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png.meta",
+          "exists": true,
+          "hashMatches": true,
+          "actualSha256": "350ceba818493ffc5e55a0b11f3fba6ca07f05a28b810c037f95903aa7c891c6"
+        }
+      ]
+    },
+    {
+      "id": "baseline-image-geometry",
+      "status": "pass",
+      "details": [
+        {
+          "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 1672,
+            "height": 941,
+            "mode": "RGB"
+          }
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-compact.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 1920,
+            "height": 934,
+            "mode": "RGB"
+          }
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-compact.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 1920,
+            "height": 934,
+            "mode": "RGB"
+          }
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-full.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 1920,
+            "height": 1310,
+            "mode": "RGB"
+          }
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-full.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 1920,
+            "height": 1310,
+            "mode": "RGB"
+          }
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/shop-pressure-1920x1080.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 1920,
+            "height": 1080,
+            "mode": "RGB"
+          }
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/battle-pressure-v0.3.3-candidate-1920x1080.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 1920,
+            "height": 1080,
+            "mode": "RGB"
+          }
+        },
+        {
+          "path": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png",
+          "exists": true,
+          "matches": true,
+          "actual": {
+            "width": 969,
+            "height": 1624,
+            "mode": "RGBA"
+          }
+        }
+      ]
+    },
+    {
+      "id": "formal-art-count-hash-aspect-brightness",
+      "status": "pass",
+      "details": {
+        "identitySetMatches": true,
+        "expectedCount": 15,
+        "actualCount": 15,
+        "cards": [
+          {
+            "id": "forge_soul_shield_squire",
+            "name": "铸魂盾侍",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 161.45,
+              "lightMidRatio": 0.90293,
+              "nearBlackRatio": 0.003271
+            },
+            "passes": true
+          },
+          {
+            "id": "resonance_bell_guard",
+            "name": "共鸣钟卫",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 160.27,
+              "lightMidRatio": 0.897461,
+              "nearBlackRatio": 0.001758
+            },
+            "passes": true
+          },
+          {
+            "id": "undying_furnace_king",
+            "name": "不熄炉王",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 176.44,
+              "lightMidRatio": 0.908105,
+              "nearBlackRatio": 0.000537
+            },
+            "passes": true
+          },
+          {
+            "id": "young_deer_spirit",
+            "name": "幼鹿灵",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 159.89,
+              "lightMidRatio": 0.971045,
+              "nearBlackRatio": 0.000342
+            },
+            "passes": true
+          },
+          {
+            "id": "rootbound_soul_guide",
+            "name": "归根引魂者",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1403,
+              1121
+            ],
+            "aspectRatio": 1.251561,
+            "brightness": {
+              "meanLuma": 154.12,
+              "lightMidRatio": 0.890527,
+              "nearBlackRatio": 0.000293
+            },
+            "passes": true
+          },
+          {
+            "id": "ancient_mountain_spirit",
+            "name": "群山古灵",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 175.92,
+              "lightMidRatio": 0.986914,
+              "nearBlackRatio": 4.9e-05
+            },
+            "passes": true
+          },
+          {
+            "id": "glimmer_mage",
+            "name": "微光术士",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 159.36,
+              "lightMidRatio": 0.860596,
+              "nearBlackRatio": 0.003516
+            },
+            "passes": true
+          },
+          {
+            "id": "fate_track_recorder",
+            "name": "命轨记录员",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 133.5,
+              "lightMidRatio": 0.762158,
+              "nearBlackRatio": 0.001807
+            },
+            "passes": true
+          },
+          {
+            "id": "moonwheel_dispatcher",
+            "name": "月轮调度者",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 142.13,
+              "lightMidRatio": 0.821094,
+              "nearBlackRatio": 0.017676
+            },
+            "passes": true
+          },
+          {
+            "id": "traveling_physician",
+            "name": "行脚医师",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1403,
+              1121
+            ],
+            "aspectRatio": 1.251561,
+            "brightness": {
+              "meanLuma": 124.02,
+              "lightMidRatio": 0.695215,
+              "nearBlackRatio": 0.001025
+            },
+            "passes": true
+          },
+          {
+            "id": "old_tower_guide",
+            "name": "旧塔向导",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 137.03,
+              "lightMidRatio": 0.752393,
+              "nearBlackRatio": 0.003906
+            },
+            "passes": true
+          },
+          {
+            "id": "mirrorsteel_duelist",
+            "name": "镜钢决斗家",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 160.85,
+              "lightMidRatio": 0.887158,
+              "nearBlackRatio": 0.001172
+            },
+            "passes": true
+          },
+          {
+            "id": "temporary_ward",
+            "name": "临时护符",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 164.3,
+              "lightMidRatio": 0.919678,
+              "nearBlackRatio": 0.0
+            },
+            "passes": true
+          },
+          {
+            "id": "starlight_rebate",
+            "name": "星辉回款",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 159.58,
+              "lightMidRatio": 0.915674,
+              "nearBlackRatio": 0.000684
+            },
+            "passes": true
+          },
+          {
+            "id": "legendary_recruitment",
+            "name": "传说招募",
+            "exists": true,
+            "hashMatches": true,
+            "size": [
+              1402,
+              1122
+            ],
+            "aspectRatio": 1.249554,
+            "brightness": {
+              "meanLuma": 163.09,
+              "lightMidRatio": 0.886328,
+              "nearBlackRatio": 4.9e-05
+            },
+            "passes": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "production-prompt-contract",
+      "status": "pass",
+      "details": {
+        "forbiddenHits": [],
+        "missingRequiredPhrases": []
+      }
+    },
+    {
+      "id": "source-structure-contracts",
+      "status": "pass",
+      "details": [
+        {
+          "id": "card-cost-renderer",
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/render_matrices.py",
+          "exists": true,
+          "missingTokens": []
+        },
+        {
+          "id": "card-cost-browser-preview",
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/index.html",
+          "exists": true,
+          "missingTokens": []
+        },
+        {
+          "id": "battle-center-crop",
+          "path": "sc/Assets/Scripts/UI/Battle/BattleStandeeView.cs",
+          "exists": true,
+          "missingTokens": []
+        },
+        {
+          "id": "battle-builder-center-crop",
+          "path": "sc/Assets/Editor/BattleUiPrefabBuilder.cs",
+          "exists": true,
+          "missingTokens": []
+        },
+        {
+          "id": "separate-standee-shield-property",
+          "path": "sc/Assets/Scripts/UI/Common/PresentationSpriteCatalog.cs",
+          "exists": true,
+          "missingTokens": []
+        },
+        {
+          "id": "battle-shield-test",
+          "path": "sc/Assets/Tests/EditMode/BattleUiPrefabTests.cs",
+          "exists": true,
+          "missingTokens": []
+        }
+      ]
+    },
+    {
+      "id": "catalog-shield-bindings",
+      "status": "pass",
+      "details": {
+        "cardShieldPreserved": true,
+        "standeeShieldSeparated": true,
+        "standeeMetaGuidMatches": true
+      }
+    },
+    {
+      "id": "standee-shield-alpha",
+      "status": "pass",
+      "details": {
+        "size": [
+          969,
+          1624
+        ],
+        "centerTransparentRatio": 1.0,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "nonZeroAlphaRatio": 0.2931
+      }
+    }
+  ],
+  "manualGates": [
+    {
+      "id": "formal-art-identity",
+      "status": "accepted",
+      "evidence": "validation-round-7-v0.3.2-formal-catalog/VALIDATION.md"
+    },
+    {
+      "id": "card-matrices",
+      "status": "accepted",
+      "evidence": "普通/金色 × 紧凑/完整矩阵已人工确认"
+    },
+    {
+      "id": "shop-and-battle-scenes",
+      "status": "accepted",
+      "evidence": "用户已确认场景模拟无问题"
+    }
+  ],
+  "unityGates": [
+    "Unity 2022.3.62f3c1 编译通过",
+    "EditMode 与 PlayMode 测试通过",
+    "Additive 护盾无过曝且中心透明",
+    "隔离 Catalog 未覆盖正式 Runtime 美术"
+  ]
+}

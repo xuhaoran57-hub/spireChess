@@ -1,5 +1,8 @@
 # Phase 9C 星契随从专用插画提示词记录 v0.1
 
+> 历史生成台账，已停止作为生产 Prompt。新任务使用
+> `../light-storybook-production-v0.1/RACE-VISUAL-RULES-v0.3.md`。
+
 - 日期：2026-07-26
 - 生成方式：Codex 内置 ImageGen
 - 本次实际保存：12 张
@@ -9,6 +12,18 @@
   `C:/Users/eden.xu/.codex/generated_images/019f940e-cdd2-7880-9b1a-01f68e8e0a61/`
 - 状态：母版已保存并完成单图目视检查；尚未复制到 Unity Runtime，也未取得
   项目负责人逐项生产许可
+
+## 明亮风格生产覆盖规则
+
+以下规则应用于本文所有 Prompt。以
+`../../phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png`
+作为风格、色板、光照和气质的唯一参考；角色参考只提供身份、服装、能力和构图。
+
+使用晨间至下午的漫射日光和彩色开放阴影。每张卡面至少 50% 保持亮部或中亮部，
+近黑面积不超过约 12%；保留浅纸色、天空蓝和明亮羊皮纸色。星契的靛蓝与紫色作为
+局部流派色，整体保持日光明亮色阶。背景通过简化形状和降低细节保持安静，不得
+整体降曝光。使用蓝灰、紫灰或暖褐色开放阴影；魔法光仅作为局部强调，漫射日光
+始终承担主光。
 
 ## 共同调用约束
 
@@ -30,8 +45,12 @@ Composition/framing: horizontal approximately 5:4; one dominant subject
 cluster inside the central 80% safe area; outer 7% contains no critical
 detail; background stays one to two contrast steps below the subject;
 readable at 160×128.
-Palette: indigo, dusk violet, parchment cream, muted pearl blue and tiny
+Palette: indigo, muted violet, parchment cream, muted pearl blue and tiny
 antique brass.
+Lighting/value: diffuse morning-to-afternoon daylight with open chromatic
+blue-gray and soft violet shadows. At least 50% remains light or middle-light;
+near-black stays below roughly 12%. Indigo and violet are accents within a
+daylit scene, without a deep monochrome grade.
 Constraints: no card frame, UI, title, label, text, letters, numbers,
 readable writing, runes, logo, signature, or watermark. Avoid copied
 reference identity, closed head halos, heavy machinery, gears, dense star
@@ -50,8 +69,9 @@ card art, photorealism, and childish mascot art.
 One clearly adult young novice in a short practical indigo jacket kneels by
 a small open brass arc. Exactly two pearl-blue spell motes hover at different
 heights; the first has unfolded into one thin translucent shield pane around
-a tiny dark seed-light, while the second remains a simple glow. Modest caravan
-observatory at blue hour; calm craft rather than combat magic.
+a tiny muted seed-light, while the second remains a simple glow. Modest open
+caravan observatory in diffuse afternoon daylight; calm craft rather than
+combat magic.
 ```
 
 ### 星尘随侍 / `stardust_attendant`
@@ -98,7 +118,7 @@ His brush hovers over the first low-tier choice.
 ```text
 One stocky middle-aged woman sits behind a thin kite-shaped translucent ward.
 She reads exactly two large suspended blank parchment leaves; two pearl-blue
-threads converge on one deliberately dim wooden constellation figurine and
+threads converge on one deliberately muted wooden constellation figurine and
 make it glow stronger.
 ```
 

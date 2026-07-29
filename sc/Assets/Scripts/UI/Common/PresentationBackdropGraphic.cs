@@ -22,6 +22,7 @@ namespace SpireChess.UI
             new Color(0.010f, 0.018f, 0.024f, 1f);
         [SerializeField] private Color accentColor =
             new Color(0.72f, 0.55f, 0.28f, 1f);
+        [SerializeField] private bool suppressProductionArtwork;
 
         private Image productionArtwork;
 
@@ -67,7 +68,9 @@ namespace SpireChess.UI
             productionArtwork = PresentationArtworkResources.EnsureImage(
                 transform,
                 "ProductionArtwork",
-                PresentationArtworkResources.LoadBackdrop(variant),
+                suppressProductionArtwork
+                    ? null
+                    : PresentationArtworkResources.LoadBackdrop(variant),
                 new Color(1f, 1f, 1f, ResolveArtworkAlpha(variant)),
                 true);
         }

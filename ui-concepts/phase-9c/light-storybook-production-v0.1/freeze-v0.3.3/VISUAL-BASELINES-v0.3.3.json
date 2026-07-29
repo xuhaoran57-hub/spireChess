@@ -1,0 +1,268 @@
+{
+  "version": "0.3.3",
+  "date": "2026-07-29",
+  "status": {
+    "offline": "frozen",
+    "unity": "pending"
+  },
+  "brightnessGate": {
+    "resize": [160, 128],
+    "lightMidLumaMin": 85,
+    "lightMidRatioMin": 0.5,
+    "nearBlackLumaMaxExclusive": 25,
+    "nearBlackRatioMaxExclusive": 0.12
+  },
+  "frozenDocuments": [
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/BRIGHT-STYLE-RULES-v0.3.3.md",
+      "hashMode": "text-lf",
+      "sha256": "06a4ef79c2aab0063f86a232766948d88812b51d3ec57cbf22456e79b4e66d9e"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/PRODUCTION-PROMPTS-v0.3.3.zh-CN.md",
+      "hashMode": "text-lf",
+      "sha256": "ae96662e11ee60d12d198eca5cd35f9c526eae7f56087ac575d11d35cd794517"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/UNITY-HANDOFF-v0.3.3.md",
+      "hashMode": "text-lf",
+      "sha256": "086564fbdfe935b4a4dee5e5489b99e3a3bffb8c4740e9cd0988dec084ec7777"
+    }
+  ],
+  "immutableFiles": [
+    {
+      "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+      "sha256": "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/FORMAL-CATALOG-SPECS-v0.3.2.json",
+      "hashMode": "text-lf",
+      "sha256": "1e258b8006d29801e270c3b7e0c6ee0923b65f2b669611b272fa1d7eae157281"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-compact.png",
+      "sha256": "1d019ea4b31ca3c839f5894ad8343d8df125a8a6d9fcd224c7c16a574e3a041a"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-compact.png",
+      "sha256": "ec8499d544699f6c99c1ee146ea42bf5d6571ea0da66d75dfa9fd0bb7a1c01ca"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-full.png",
+      "sha256": "82cae7a606c24b9f325a1e3331c7c3178764755b3258373d9092897f0234ba46"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-full.png",
+      "sha256": "b858d01b7e40ca5a732ec4c75892ca2fab92818ebd41da70e7731829131b3a4a"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/shop-pressure-1920x1080.png",
+      "sha256": "e41a7cfb9c2a928c03dee52ad70ac49c12c220af21b6d2b39d13da3d8c60b7fa"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/battle-pressure-v0.3.3-candidate-1920x1080.png",
+      "sha256": "990e8bfa040df9e9bb754ef4fbb6a0b61e0701712836951219a8064534b07327"
+    },
+    {
+      "path": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png",
+      "sha256": "47598ba7394eaf97248cbedeb7dd3c121a3daa4b7ed5a64c6d771f10a60e6f31"
+    },
+    {
+      "path": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png.meta",
+      "hashMode": "text-lf",
+      "sha256": "350ceba818493ffc5e55a0b11f3fba6ca07f05a28b810c037f95903aa7c891c6"
+    }
+  ],
+  "imageExpectations": [
+    {
+      "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-compact.png",
+      "width": 1920,
+      "height": 934,
+      "mode": "RGB"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-compact.png",
+      "width": 1920,
+      "height": 934,
+      "mode": "RGB"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-normal-full.png",
+      "width": 1920,
+      "height": 1310,
+      "mode": "RGB"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/matrices/matrix-golden-full.png",
+      "width": 1920,
+      "height": 1310,
+      "mode": "RGB"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/shop-pressure-1920x1080.png",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-scene-pressure-test-v0.1/scenes/battle-pressure-v0.3.3-candidate-1920x1080.png",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB"
+    },
+    {
+      "path": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png",
+      "width": 969,
+      "height": 1624,
+      "mode": "RGBA"
+    }
+  ],
+  "formalArt": {
+    "specPath": "ui-concepts/phase-9c/light-storybook-production-v0.1/FORMAL-CATALOG-SPECS-v0.3.2.json",
+    "root": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-7-v0.3.2-formal-catalog",
+    "expectedCount": 15,
+    "aspectRatioMin": 1.24,
+    "aspectRatioMax": 1.26,
+    "sha256ById": {
+      "forge_soul_shield_squire": "6a1651dcf99b2b3dd02da53bf07d3645cce982dccb4d8a297111477f8b7befb1",
+      "resonance_bell_guard": "efd8c4989feef65aaec936bb6758c92654be5f9389b28a216a6c120601f7a01a",
+      "undying_furnace_king": "4e2c803e4b0959080a7fbc4b7086e84bdfb27dadb22afe0fd5c6356a692cfa17",
+      "young_deer_spirit": "ebdc8b95458bf2317f0d78eeb2ba74da58471ef5cc148e894c507c3bc2b8e8c2",
+      "rootbound_soul_guide": "2f50c2a83a211be6cd9ed52b66149b3782766bbbb57384e79aff3275870eab94",
+      "ancient_mountain_spirit": "39608621b5e91e6f10aea8949ccc524dd11d7f1689180d696e8180a9e6cbccc3",
+      "glimmer_mage": "a8bd8ab9090ca7ec8cbc3faddc20c207a75c7d880e74e9b1238288fae3278740",
+      "fate_track_recorder": "04f98f3c5123787a2ddf74ca028c726c9f148b2e7b2b000dad7950c9187dbd78",
+      "moonwheel_dispatcher": "cf5263a697fdaa2102a6c6d1d1ee1842494140793551d2fa1761fd1b80877826",
+      "traveling_physician": "a426ffb01e19860f66d1080fdb7a4b8593b933d5c99f4ae3967f9cdad1740dca",
+      "old_tower_guide": "d48123b8ac757ec71bc087172d9a60574c1e132fc1a1ab9e4e03c8ab01a06a78",
+      "mirrorsteel_duelist": "a1c1c91acdfef44d04a16bed4b73c5762396c908308ba6bb9c1edf5d7f3b2923",
+      "temporary_ward": "026dc335a0e7eba16e37fea78a689d04331386dc13ddfb6e7fc376f2e3aaf40c",
+      "starlight_rebate": "cade45feec38f25653ff75b08ed7b94830b4943c73f51c5e767bd7830a2c9ac9",
+      "legendary_recruitment": "36bb16c7bb7ef842af6fa331caaa47b98ab90f742f147e526ac0fb78433b6091"
+    }
+  },
+  "promptContract": {
+    "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/PRODUCTION-PROMPTS-v0.3.3.zh-CN.md",
+    "forbiddenPhrases": [
+      "night",
+      "dusk",
+      "dark negative space",
+      "darker outer edges",
+      "forge-temple",
+      "soot haze",
+      "fire as primary light"
+    ],
+    "requiredPhrases": [
+      "图片 1 是唯一图像参考",
+      "亮部或中亮部至少占 50%",
+      "近黑面积低于",
+      "至少约 70%",
+      "铸魂",
+      "荒灵",
+      "星契",
+      "旅团",
+      "主菜单",
+      "商店",
+      "地图"
+    ]
+  },
+  "sourceContracts": [
+    {
+      "id": "card-cost-renderer",
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/render_matrices.py",
+      "requiredTokens": [
+        "cost=Rect(13, 12, 28, 29)",
+        "cost=Rect(9, 8, 19, 20)",
+        "canvas.alpha_composite(cost, (layout.cost.x, layout.cost.y))",
+        "str(spec.get(\"cost\", 3) if not is_minion else 3)"
+      ]
+    },
+    {
+      "id": "card-cost-browser-preview",
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/index.html",
+      "requiredTokens": [
+        "element(\"costBadge\").classList.remove(\"hidden\")",
+        "element(\"costNumber\").classList.remove(\"hidden\")",
+        "element(\"costNumber\").textContent = card.kind === \"Spell\" ? card.cost : 3"
+      ]
+    },
+    {
+      "id": "battle-center-crop",
+      "path": "sc/Assets/Scripts/UI/Battle/BattleStandeeView.cs",
+      "requiredTokens": [
+        "ConfigurePortraitCrop(sprite)",
+        "AspectRatioFitter.AspectMode.EnvelopeParent",
+        "portrait.rectTransform.anchoredPosition = Vector2.zero"
+      ]
+    },
+    {
+      "id": "battle-builder-center-crop",
+      "path": "sc/Assets/Editor/BattleUiPrefabBuilder.cs",
+      "requiredTokens": [
+        "portrait.gameObject.AddComponent<AspectRatioFitter>()",
+        "AspectRatioFitter.AspectMode.EnvelopeParent",
+        "new Color(1f, 1f, 1f, 0.78f)"
+      ]
+    },
+    {
+      "id": "separate-standee-shield-property",
+      "path": "sc/Assets/Scripts/UI/Common/PresentationSpriteCatalog.cs",
+      "requiredTokens": [
+        "battleShieldOverlay",
+        "battleStandeeShieldOverlay",
+        "BattleStandeeShieldOverlay"
+      ]
+    },
+    {
+      "id": "battle-shield-test",
+      "path": "sc/Assets/Tests/EditMode/BattleUiPrefabTests.cs",
+      "requiredTokens": [
+        "shield_overlay_bright_storybook_v1",
+        "AspectRatioFitter.AspectMode.EnvelopeParent"
+      ]
+    }
+  ],
+  "catalogBindings": {
+    "path": "sc/Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+    "cardShieldGuid": "6aa416ef7b4465d4bb24401527512422",
+    "standeeShieldGuid": "bb4e067074be4d50af3d0939990e4ecf",
+    "shieldMetaPath": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png.meta"
+  },
+  "shieldAlphaGate": {
+    "path": "sc/Assets/Art/Presentation/UI/Battle/Standee/shield_overlay_bright_storybook_v1.png",
+    "centerBox": [0.35, 0.35, 0.65, 0.65],
+    "centerTransparentRatioMin": 0.99,
+    "cornerAlphaMax": 0,
+    "nonZeroAlphaRatioMin": 0.15,
+    "nonZeroAlphaRatioMax": 0.45
+  },
+  "manualGates": [
+    {
+      "id": "formal-art-identity",
+      "status": "accepted",
+      "evidence": "validation-round-7-v0.3.2-formal-catalog/VALIDATION.md"
+    },
+    {
+      "id": "card-matrices",
+      "status": "accepted",
+      "evidence": "普通/金色 × 紧凑/完整矩阵已人工确认"
+    },
+    {
+      "id": "shop-and-battle-scenes",
+      "status": "accepted",
+      "evidence": "用户已确认场景模拟无问题"
+    }
+  ],
+  "unityGates": [
+    "Unity 2022.3.62f3c1 编译通过",
+    "EditMode 与 PlayMode 测试通过",
+    "Additive 护盾无过曝且中心透明",
+    "隔离 Catalog 未覆盖正式 Runtime 美术"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "version": "0.3.1",
+  "source": "sc/Assets/Resources/Configs/Json/minions.v0.1.json",
+  "purpose": "formal card-pool visual validation",
+  "cards": [
+    {
+      "id": "glimmer_mage",
+      "name": "微光术士",
+      "race": "Starbound",
+      "tier": 1,
+      "attack": 2,
+      "health": 1,
+      "artId": "placeholder_card_glimmer_mage",
+      "description": "每个商店阶段前 2 次使用法术后，永久获得 +1 生命；首次使用法术后，下一场战斗获得护盾。",
+      "output": "validation-round-6-v0.3.1-formal-pool/cards/starbound/glimmer-mage-v0.3.1.png"
+    },
+    {
+      "id": "fate_track_recorder",
+      "name": "命轨记录员",
+      "race": "Starbound",
+      "tier": 3,
+      "attack": 2,
+      "health": 5,
+      "artId": "placeholder_card_fate_track_recorder",
+      "description": "每个商店阶段第 3 次刷新后，获得一张临时 1 级法术。每个商店阶段最多触发 1 次。",
+      "output": "validation-round-6-v0.3.1-formal-pool/cards/starbound/fate-track-recorder-v0.3.1.png"
+    },
+    {
+      "id": "moonwheel_dispatcher",
+      "name": "月轮调度者",
+      "race": "Starbound",
+      "tier": 4,
+      "attack": 3,
+      "health": 6,
+      "artId": "placeholder_card_moonwheel_dispatcher",
+      "description": "每个商店阶段前 2 次刷新后，使一个随机友方随从永久获得 +1/+1。",
+      "output": "validation-round-6-v0.3.1-formal-pool/cards/starbound/moonwheel-dispatcher-v0.3.1.png"
+    },
+    {
+      "id": "young_deer_spirit",
+      "name": "幼鹿灵",
+      "race": "WildSpirit",
+      "tier": 1,
+      "attack": 1,
+      "health": 1,
+      "artId": "placeholder_card_young_deer_spirit",
+      "description": "亡语：召唤一个 1/1 幼灵；若没有空位，使一个随机友方荒灵本场获得 +1/+1。",
+      "output": "validation-round-6-v0.3.1-formal-pool/cards/wild-spirit/young-deer-spirit-v0.3.1.png"
+    },
+    {
+      "id": "rootbound_soul_guide",
+      "name": "归根引魂者",
+      "race": "WildSpirit",
+      "tier": 3,
+      "attack": 3,
+      "health": 5,
+      "artId": "placeholder_card_rootbound_soul_guide",
+      "description": "亡语：使攻击力最低的非召唤物友方荒灵永久获得 +1/+1，其他非召唤物友方荒灵本场获得 +1/+1。",
+      "output": "validation-round-6-v0.3.1-formal-pool/cards/wild-spirit/rootbound-soul-guide-v0.3.1.png"
+    },
+    {
+      "id": "ancient_mountain_spirit",
+      "name": "群山古灵",
+      "race": "WildSpirit",
+      "tier": 5,
+      "attack": 6,
+      "health": 9,
+      "artId": "placeholder_card_ancient_mountain_spirit",
+      "description": "每场战斗前 3 次非召唤物友方荒灵死亡时，所有荒灵永久获得 +1/+1。",
+      "output": "validation-round-6-v0.3.1-formal-pool/cards/wild-spirit/ancient-mountain-spirit-v0.3.1.png"
+    }
+  ]
+}

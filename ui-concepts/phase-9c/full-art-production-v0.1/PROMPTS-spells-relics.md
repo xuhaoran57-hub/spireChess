@@ -1,12 +1,33 @@
 # Phase 9C Spell / Relic Master Prompt Log
 
+> Historical generation ledger; no longer an active production prompt.
+> New work uses
+> `../light-storybook-production-v0.1/RACE-VISUAL-RULES-v0.3.md`.
+
 Status: partial production snapshot saved on 2026-07-26.
 
 - Saved spell masters: 12
 - Saved relic masters: 0
 - Relic generation was stopped before the first relic produced a source file; no relic entry is recorded below.
 - These files are concept masters only. They have not been copied into `sc/Assets` and have not been added to any runtime catalog.
-- Shared art direction: Wandering Storybook v0.3, watercolor and colored ink on fibrous ivory paper, no card frame/UI/text/letters/numbers/logo/watermark.
+- Shared art direction: use
+  `../../phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png`
+  as the sole reference for style, palette, lighting and mood; watercolor and
+  colored ink on fibrous ivory paper; no card
+  frame/UI/text/letters/numbers/logo/watermark.
+
+## Bright-style production override
+
+Apply this block to every prompt below. Use diffuse morning-to-afternoon
+daylight and open chromatic shadows. At least 50% of each card image must
+remain light or middle-light; near-black must stay below roughly 12%. Preserve
+pale paper and readable local colors. Keep backgrounds quiet through simpler
+shapes and softer detail, not reduced exposure. Magical glow remains a local
+accent and never becomes the sole primary/key light.
+
+Keep the whole scene in an airy daylight value range with pale paper, sky
+cyan, soft foliage green and warm parchment visible around the focal action.
+Use open chromatic shadows and restrained local glow.
 
 ## Saved spell masters
 
@@ -21,11 +42,13 @@ Status: partial production snapshot saved on 2026-07-26.
 Use case: stylized-concept
 Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Delayed Supply”: a weathered caravan supply chest waiting beside a small hourglass, with a tied coin pouch and a few loose old brass coins implying wealth that arrives at the next shop
-Scene/backdrop: quiet dusk caravan stop, canvas awning and wagon shapes softly suggested in the background
+Scene/backdrop: quiet caravan stop in diffuse afternoon daylight, with canvas
+awning and wagon shapes softly suggested in a middle-light background
 Subject: one readable supply chest, one small hourglass, one coin pouch; object cluster centered and clearly legible at thumbnail size
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile old wood, leather and brass; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile old wood, leather and brass; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; key objects entirely within the central 80% safe area, outer 7% free of essential details; broad primary silhouette, background one to two contrast steps quieter
-Lighting/mood: warm amber evening light, patient anticipation, restrained magical glow
+Lighting/mood: warm afternoon daylight, patient anticipation, restrained local
+magical glow
 Color palette: parchment ivory, walnut brown, muted ochre, aged brass, small accents of ember orange
 Constraints: no card border, no UI, no labels, no text, no letters, no numbers, no readable writing, no logo, no watermark, no signature; no characters; exactly one hourglass and one main supply chest
 Avoid: glossy digital card rendering, photorealism, anime, cute mascot style, neon particles, steampunk gear clutter, excessive coins, duplicated objects
@@ -44,9 +67,10 @@ Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate a temporary ward charm that grants a shield for the next battle, with a fallback suggestion of lasting vitality when the target is already protected
 Scene/backdrop: a quiet caravan worktable with soft cloth and distant camp shapes, background understated
 Subject: one worn oval protective charm at the center, opening a translucent blue watercolor shield around a simple wooden training figurine; a single small green leaf grows from the charm to suggest the alternate lasting health benefit
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile leather, carved wood and aged brass; mature illustrated game art
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile leather, carved wood and aged brass; mature illustrated game art
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; charm, shield and figurine fully inside the central 80% safe area; outer 7% carries no essential information; one broad readable silhouette, subdued background
-Lighting/mood: cool protective glow inside warm lamplight, reassuring and temporary rather than grand
+Lighting/mood: cool protective glow within warm diffuse daylight, reassuring
+and temporary rather than grand
 Color palette: parchment ivory, walnut, muted teal-blue, sage green, small aged-brass accents
 Constraints: no card border, no UI, no labels, no text, no letters, no numbers, no readable runes or writing, no logo, no watermark, no signature; exactly one main charm and one figurine
 Avoid: glossy digital shields, photorealism, anime, cute mascot style, neon magic, symmetrical magic circles, duplicated charms, excessive particles
@@ -68,7 +92,7 @@ Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Precise Training”: a disciplined weapons practice that grants lasting attack strength to one minion
 Scene/backdrop: a quiet caravan training corner with canvas screens and wooden racks softly suggested in the background
 Subject: one sturdy wooden training dummy at center, struck exactly on its painted-free bullseye knot by one balanced practice spear; a taut measuring cord and neatly placed whetstone imply careful permanent improvement
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile wood, rope and worn steel; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile wood, rope and worn steel; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; dummy and spear impact fully within the central 80% safe area, outer 7% free of essential detail; broad primary silhouette and subdued background
 Lighting/mood: clear morning workshop light, focused, exact and quietly confident
 Color palette: parchment ivory, walnut brown, muted rust, desaturated steel blue, small warm amber accents
@@ -95,9 +119,10 @@ Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Thickhide Potion”: a rugged tonic that permanently fortifies one minion’s health
 Scene/backdrop: a worn caravan apothecary bench, with blurred hide-working tools and tent cloth kept quiet in the background
 Subject: one squat corked potion bottle at center pouring a small amber-green stream onto one thick leather-and-bark protective pad; the pad visibly gains a second sturdy natural layer without showing any numeral
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile glass, leather, bark and cork; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile glass, leather, bark and cork; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; bottle, stream and reinforced pad entirely inside the central 80% safe area; outer 7% has no essential details; broad readable object cluster, subdued background
-Lighting/mood: warm practical lamplight, earthy resilience and dependable craft
+Lighting/mood: warm practical afternoon daylight, earthy resilience and
+dependable craft
 Color palette: parchment ivory, walnut brown, moss green, muted amber, dusty terracotta
 Constraints: no card border, no UI, no labels, no text, no letters, no numbers, no readable writing, no logo, no watermark, no signature; exactly one main potion bottle and one protective pad; no character
 Avoid: medical cross icons, glossy digital rendering, photorealism, anime, cute mascot style, neon liquid, explosive particles, duplicated bottles, cluttered laboratory
@@ -117,9 +142,10 @@ Initial generation prompt:
 Use case: stylized-concept
 Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Warband Forging”: a forge ritual that permanently strengthens all minions of one chosen ancestry
-Scene/backdrop: an open caravan smithy at evening, with tent canvas and a low coal glow softly suggested behind the focal object
+Scene/backdrop: an open caravan smithy in diffuse afternoon daylight, with
+tent canvas and a small unlit coal bed softly suggested behind the focal object
 Subject: one broad anvil at center bearing a single blank shield-shaped clan badge under one raised smithing hammer; four small unmarked wooden ancestry tokens rest nearby, but only one token shares the badge’s warm forge glow, implying a chosen lineage without readable symbols
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile hammered iron, charcoal, wood and aged brass; mature illustrated game art
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile hammered iron, charcoal, wood and aged brass; mature illustrated game art
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; anvil, hammer, badge and token group fully within the central 80% safe area; outer 7% carries no essential detail; strong forge silhouette, restrained background
 Lighting/mood: communal determination, ember warmth, practical ritual rather than spectacular magic
 Color palette: parchment ivory, charcoal brown, iron gray, muted ember orange, aged brass
@@ -144,11 +170,13 @@ Controlled framing correction only. Preserve the existing Wandering Storybook wa
 Use case: stylized-concept
 Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Starlight Rebate”: two shop refreshes return value under a gentle celestial bargain
-Scene/backdrop: a moonlit caravan merchant table beneath a soft cloth canopy, distant shelves reduced to low-contrast shapes
+Scene/backdrop: a daylight caravan merchant table beneath a soft cloth canopy,
+with distant shelves reduced to simple middle-light shapes
 Subject: one closed blank merchant ledger at center with exactly two separate looped blue ribbons orbiting above it; exactly three old brass coins rest in a neat visible group beside a tiny star-shaped glass glint, communicating repeated refresh and rebate through countable objects rather than characters
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile paper, cloth and aged brass; mature illustrated game art
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile paper, cloth and aged brass; mature illustrated game art
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; ledger, both complete ribbon loops and all three coins inside the central 80% safe area; outer 7% has no essential detail; clean broad silhouette, subdued background
-Lighting/mood: quiet midnight commerce, restrained wonder, cool starlight balanced by warm lamplight
+Lighting/mood: quiet afternoon commerce and restrained wonder, with soft
+sky-blue reflected light balanced by warm daylight
 Color palette: parchment ivory, walnut, muted indigo, dusty turquoise, aged brass, small pale-blue highlight
 Constraints: no card border, no UI, no labels, no text, no letters, no numbers, no readable writing, no logo, no watermark, no signature; exactly two distinct ribbon loops and exactly three visible coins; no character
 Avoid: infinity symbols, written price marks, equations, glossy digital effects, photorealism, anime, cute mascot style, neon galaxies, excessive stars, duplicated ledgers, clutter
@@ -167,7 +195,7 @@ Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Prototype Copy”: a low-tier minion prototype is duplicated into a usable copy
 Scene/backdrop: a modest caravan tinkerer’s workbench, jars and tools only as soft low-contrast silhouettes
 Subject: one small hand-carved wooden minion figurine standing on a blank parchment plan with no marks; beside it, exactly one fresh matching figurine emerges from an open two-part clay mold, linked by a thin pale-blue tracing thread
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile carved wood, clay and parchment; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile carved wood, clay and parchment; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; both complete figurines, mold and blank plan fully inside the central 80% safe area; outer 7% contains no essential information; thumbnail-readable pair and subdued background
 Lighting/mood: curious workshop discovery, practical modest magic, gentle amber-blue contrast
 Color palette: parchment ivory, walnut, muted clay red, dusty teal, pale blue highlight
@@ -186,9 +214,10 @@ Avoid: photocopier imagery, computer interfaces, glossy digital effects, photore
 Use case: stylized-concept
 Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Bloodline Awakening”: the dominant ancestry of a warband erupts into lasting shared power
-Scene/backdrop: a dusk caravan clearing with distant tents and trees washed into low-contrast watercolor
+Scene/backdrop: an afternoon caravan clearing with distant tents and trees
+washed into soft middle-light watercolor
 Subject: one old branching lineage totem at center, its carved animal-free faces blank and nonverbal; strong red-gold roots spread beneath it toward a compact semicircle of four matching plain wooden minion figurines, all illuminated by the same awakening glow
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile carved wood, roots and worn cloth; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile carved wood, roots and worn cloth; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; complete totem, root network and all four figurines fully inside the central 80% safe area; outer 7% has no essential detail; broad rising silhouette and quiet background
 Lighting/mood: ancestral, solemn and powerful, warm inner glow without explosive spectacle
 Color palette: parchment ivory, walnut brown, muted crimson, burnt gold, shadowed moss green
@@ -207,9 +236,10 @@ Avoid: family-tree diagrams, DNA imagery, blood gore, readable symbols, glossy d
 Use case: stylized-concept
 Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Fate Reforging”: one chosen minion’s destiny is reforged into a rare golden state
-Scene/backdrop: a dim caravan forge with hanging cloth and embers softly dissolved into the background
+Scene/backdrop: a bright open caravan forge with hanging cloth and a few
+restrained ember accents softly dissolved into a middle-light background
 Subject: one small plain wooden minion figurine at the center of a low anvil, wrapped by three loose fate threads that pass through a single brass shuttle; one side of the figurine remains worn wood while the other side transforms into luminous hammered gold
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile wood, iron, thread and aged gold; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile wood, iron, thread and aged gold; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; complete anvil, figurine, all three threads and shuttle fully within the central 80% safe area; outer 7% free of essential detail; singular readable transformation silhouette, restrained background
 Lighting/mood: consequential, mysterious and crafted, concentrated gold glow rather than explosive magic
 Color palette: parchment ivory, charcoal walnut, muted crimson thread, aged brass, soft molten gold
@@ -230,7 +260,7 @@ Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Army Ascension”: every minion of one chosen ancestry rises together into permanent strength
 Scene/backdrop: a windswept caravan muster ground at sunrise, distant wagons and hills kept soft and low contrast
 Subject: one tall blank warband standard at center made of deep red cloth with no emblem; exactly five matching carved wooden minion figurines advance beneath it in a shallow arc while a broad gold watercolor wash lifts from their bases upward through the banner
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile cloth, wood, rope and worn brass; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile cloth, wood, rope and worn brass; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; complete banner and all five figurines inside the central 80% safe area, outer 7% free of essential details; strong triangular group silhouette, subdued background
 Lighting/mood: resolute communal triumph, warm dawn, grounded rather than explosive
 Color palette: parchment ivory, walnut brown, muted oxblood red, dusty gold, cool slate shadows
@@ -252,9 +282,10 @@ Initial generation prompt:
 Use case: stylized-concept
 Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Legendary Recruitment”: a high-tier recruitment ritual reveals three legendary choices, with a fourth golden opportunity when the warband already holds a golden minion
-Scene/backdrop: a deep-blue twilight caravan pavilion, curtains and lanterns softly suggested with low contrast
+Scene/backdrop: an open blue-cloth caravan pavilion in diffuse afternoon
+daylight, with curtains and lanterns softly suggested using restrained detail
 Subject: exactly four complete small arched recruitment doorways arranged in a shallow fan on one tabletop; three contain distinct dark heroic wooden silhouettes, while the fourth doorway is slightly smaller, edged in hammered gold and contains a gold figurine, clearly a conditional bonus; no written marks
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile wood, cloth and aged gold; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile wood, cloth and aged gold; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; all four complete doorways and figurines inside the central 80% safe area with clear separation for counting; outer 7% free of essential detail; clean fan silhouette and subdued background
 Lighting/mood: rare opportunity, ceremonial anticipation, controlled gold and indigo glow
 Color palette: parchment ivory, walnut, muted indigo, plum shadow, aged gold, small amber lantern accents
@@ -282,9 +313,10 @@ Initial generation prompt:
 Use case: stylized-concept
 Asset type: dedicated game spell-card artwork for Spire Chess, no card frame
 Primary request: illustrate the spell “Triple Discovery Reward”: completing a trio opens a valuable discovery choice
-Scene/backdrop: a quiet midnight caravan divination table, curtains and shelves kept soft and low contrast
+Scene/backdrop: a quiet daylight caravan divination table, with curtains and
+shelves kept soft, simple and middle-light
 Subject: exactly three identical small wooden minion figurines arranged around one faceted golden discovery prism; their three narrow amber streams converge into the prism, which opens into exactly three distinct fan-shaped paths of colored light beyond it, communicating trio completion and a three-way reward through countable objects
-Style/medium: Wandering Storybook v0.3; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile carved wood, old brass and paper; mature illustrated game art, not photorealistic
+Style/medium: Light Wandering Storybook v0.1; warm hand-painted watercolor and colored ink on fibrous ivory paper, deep walnut outlines, irregular brush edges, tactile carved wood, old brass and paper; mature illustrated game art, not photorealistic
 Composition/framing: horizontal approximately 5:4, neither square nor panoramic; all three figurines, prism and three complete light paths fully inside the central 80% safe area; outer 7% free of essential detail; clear radial thumbnail silhouette, subdued background
 Lighting/mood: satisfying culmination, mysterious choice, restrained jewel-like glow
 Color palette: parchment ivory, walnut, aged gold, muted teal, dusty violet, ember red

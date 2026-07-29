@@ -21,6 +21,7 @@ namespace SpireChess.UI.Battle
         [SerializeField] private PresentationSpriteCatalog spriteCatalog;
         [SerializeField] private PresentationTheme theme;
         [SerializeField] private Image portrait;
+        [SerializeField] private AspectRatioFitter portraitAspectFitter;
         [SerializeField] private Text portraitFallback;
         [SerializeField] private Image frame;
         [SerializeField] private Image shieldOverlay;
@@ -269,7 +270,7 @@ namespace SpireChess.UI.Battle
             ApplySprite(healthMedallion,
                 spriteCatalog.BattleHealthMedallion, true);
             ApplySprite(shieldOverlay,
-                spriteCatalog.BattleShieldOverlay, true);
+                spriteCatalog.BattleStandeeShieldOverlay, true);
             ApplySprite(tauntBase, spriteCatalog.BattleTauntBase, false);
             ApplySprite(deathrattleSeal,
                 spriteCatalog.BattleDeathrattleSeal, true);
@@ -287,6 +288,7 @@ namespace SpireChess.UI.Battle
             LastArtworkResolution = resolution;
             if (resolution != ArtworkResolution.Missing)
             {
+                ConfigurePortraitCrop(sprite);
                 portrait.sprite = sprite;
                 portrait.color = Color.white;
                 portrait.type = Image.Type.Simple;
@@ -297,10 +299,33 @@ namespace SpireChess.UI.Battle
 
             portrait.sprite = null;
             portrait.color = theme.GetPortraitTint(value.RaceText);
+            ConfigurePortraitCrop(null);
             portraitFallback.text = string.IsNullOrWhiteSpace(value.Name)
                 ? "?"
                 : value.Name.Substring(0, 1);
             portraitFallback.gameObject.SetActive(true);
+        }
+
+        private void ConfigurePortraitCrop(Sprite sprite)
+        {
+            if (portraitAspectFitter == null)
+            {
+                portraitAspectFitter =
+                    portrait.GetComponent<AspectRatioFitter>();
+            }
+            if (portraitAspectFitter == null)
+            {
+                portraitAspectFitter =
+                    portrait.gameObject.AddComponent<AspectRatioFitter>();
+            }
+
+            portraitAspectFitter.aspectMode =
+                AspectRatioFitter.AspectMode.EnvelopeParent;
+            portraitAspectFitter.aspectRatio =
+                sprite != null && sprite.rect.height > 0f
+                    ? sprite.rect.width / sprite.rect.height
+                    : 120f / 192f;
+            portrait.rectTransform.anchoredPosition = Vector2.zero;
         }
 
         private void ApplyTargetState(CardViewModel value)

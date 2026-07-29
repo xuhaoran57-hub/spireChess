@@ -324,6 +324,11 @@ namespace SpireChess.Editor
                 LoadSprite(StandeeArtRoot + "/health_medallion.png", true));
             SetReference(serialized, "battleShieldOverlay",
                 LoadSprite(StandeeArtRoot + "/shield_overlay_screen.png", false));
+            SetReference(serialized, "battleStandeeShieldOverlay",
+                LoadSprite(
+                    StandeeArtRoot +
+                    "/shield_overlay_bright_storybook_v1.png",
+                    false));
             SetReference(serialized, "battleTauntBase",
                 LoadSprite(StandeeArtRoot + "/taunt_base.png", true));
             SetReference(serialized, "battleDeathrattleSeal",
@@ -475,6 +480,11 @@ namespace SpireChess.Editor
                     portraitMask,
                     new Color(0.30f, 0.27f, 0.33f, 1f));
                 Stretch(portrait.rectTransform, Vector2.zero, Vector2.zero);
+                var portraitAspectFitter =
+                    portrait.gameObject.AddComponent<AspectRatioFitter>();
+                portraitAspectFitter.aspectMode =
+                    AspectRatioFitter.AspectMode.EnvelopeParent;
+                portraitAspectFitter.aspectRatio = 120f / 192f;
                 var fallback = CreateText(
                     "PortraitFallback",
                     portraitMask,
@@ -489,7 +499,7 @@ namespace SpireChess.Editor
                 var shield = CreateImage(
                     "ShieldOverlay",
                     root.transform,
-                    new Color(0.78f, 0.96f, 1f, 0.78f));
+                    new Color(1f, 1f, 1f, 0.78f));
                 SetRect(shield.rectTransform, 14f, 10f, 132f, 222f);
                 shield.material = shieldMaterial;
                 shield.preserveAspect = true;
@@ -548,6 +558,10 @@ namespace SpireChess.Editor
                 SetReference(serialized, "spriteCatalog", catalog);
                 SetReference(serialized, "theme", theme);
                 SetReference(serialized, "portrait", portrait);
+                SetReference(
+                    serialized,
+                    "portraitAspectFitter",
+                    portraitAspectFitter);
                 SetReference(serialized, "portraitFallback", fallback);
                 SetReference(serialized, "frame", frame);
                 SetReference(serialized, "shieldOverlay", shield);

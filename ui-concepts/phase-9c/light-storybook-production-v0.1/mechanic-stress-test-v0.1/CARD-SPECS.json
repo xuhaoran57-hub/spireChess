@@ -1,0 +1,123 @@
+{
+  "version": "0.1",
+  "purpose": "Light Storybook race and mechanic stress validation only",
+  "cards": [
+    {
+      "id": "stress_forge_oath_shield_artisan",
+      "artId": "calibration_stress_forge_oath_shield_artisan",
+      "artFile": "cards/forge-soul/oath-shield-artisan-v0.1.png",
+      "name": "契盾工匠",
+      "race": "ForgeSoul",
+      "tier": 2,
+      "attack": 2,
+      "health": 4,
+      "keywords": ["Battlecry", "Shield"],
+      "description": "战吼：使相邻随从下一场战斗获得护盾。",
+      "goldenDescription": "战吼：使相邻随从下一场战斗获得护盾，并永久获得 +2 生命。"
+    },
+    {
+      "id": "stress_forge_crack_resonance_guard",
+      "artId": "calibration_stress_forge_crack_resonance_guard",
+      "artFile": "cards/forge-soul/crack-resonance-guard-v0.1.png",
+      "name": "裂响钟卫",
+      "race": "ForgeSoul",
+      "tier": 3,
+      "attack": 3,
+      "health": 6,
+      "keywords": ["Taunt", "Shield"],
+      "description": "嘲讽。每当相邻随从失去护盾，使其本场获得 +1/+1。",
+      "goldenDescription": "嘲讽。每当相邻随从失去护盾，使其本场获得 +2/+2。"
+    },
+    {
+      "id": "stress_forge_ember_reliquary",
+      "artId": "calibration_stress_forge_ember_reliquary",
+      "artFile": "cards/forge-soul/ember-reliquary-v0.1.png",
+      "name": "余烬遗甲",
+      "race": "ForgeSoul",
+      "tier": 5,
+      "attack": 5,
+      "health": 8,
+      "keywords": ["Deathrattle"],
+      "description": "亡语：使所有存活友方获得护盾；非召唤物额外永久获得 +1/+1。",
+      "goldenDescription": "亡语：使所有存活友方获得护盾；非召唤物额外永久获得 +2/+2。"
+    },
+    {
+      "id": "stress_wild_mountain_gate_horn_spirit",
+      "artId": "calibration_stress_wild_mountain_gate_horn_spirit",
+      "artFile": "cards/wild-spirit/mountain-gate-horn-spirit-v0.1.png",
+      "name": "山门角灵",
+      "race": "WildSpirit",
+      "tier": 2,
+      "attack": 3,
+      "health": 7,
+      "keywords": ["Taunt"],
+      "description": "嘲讽。首次有友方荒灵死亡时，本场获得 +2 生命。",
+      "goldenDescription": "嘲讽。每当友方荒灵死亡时，本场获得 +2 生命。"
+    },
+    {
+      "id": "stress_wild_falling_leaf_fox_matriarch",
+      "artId": "calibration_stress_wild_falling_leaf_fox_matriarch",
+      "artFile": "cards/wild-spirit/falling-leaf-fox-matriarch-v0.1.png",
+      "name": "落叶狐母",
+      "race": "WildSpirit",
+      "tier": 3,
+      "attack": 4,
+      "health": 4,
+      "keywords": ["Deathrattle"],
+      "description": "亡语：召唤叶狐灵；若位置不足，改为强化一个友方荒灵。",
+      "goldenDescription": "亡语：召唤强化叶狐灵；若位置不足，改为永久强化一个友方荒灵。"
+    },
+    {
+      "id": "stress_wild_ancient_root_inheritor",
+      "artId": "calibration_stress_wild_ancient_root_inheritor",
+      "artFile": "cards/wild-spirit/ancient-root-inheritor-v0.1.png",
+      "name": "古根承生者",
+      "race": "WildSpirit",
+      "tier": 5,
+      "attack": 6,
+      "health": 9,
+      "keywords": ["Deathrattle"],
+      "description": "每当友方荒灵死亡，使一个召唤物本场获得 +1/+1；首次额外永久成长。",
+      "goldenDescription": "每当友方荒灵死亡，使召唤物本场获得 +2/+2；前两次额外永久成长。"
+    },
+    {
+      "id": "stress_star_glimmer_contract_mage",
+      "artId": "calibration_stress_star_glimmer_contract_mage",
+      "artFile": "cards/starbound/glimmer-contract-mage-v0.1.png",
+      "name": "微光契术师",
+      "race": "Starbound",
+      "tier": 2,
+      "attack": 2,
+      "health": 3,
+      "keywords": ["Shield"],
+      "description": "每阶段首次使用法术后，下一场战斗获得护盾。",
+      "goldenDescription": "每阶段前两次使用法术后，下一场战斗获得护盾并永久获得 +1 生命。"
+    },
+    {
+      "id": "stress_star_moonwheel_seeker",
+      "artId": "calibration_stress_star_moonwheel_seeker",
+      "artFile": "cards/starbound/moonwheel-seeker-v0.1.png",
+      "name": "月轮寻秘者",
+      "race": "Starbound",
+      "tier": 3,
+      "attack": 3,
+      "health": 5,
+      "keywords": ["Battlecry"],
+      "description": "战吼：若本阶段刷新过商店，发现一张法术。",
+      "goldenDescription": "战吼：若本阶段刷新过商店，发现两张法术并保留一张。"
+    },
+    {
+      "id": "stress_star_fate_reclaimer",
+      "artId": "calibration_stress_star_fate_reclaimer",
+      "artFile": "cards/starbound/fate-reclaimer-v0.1.png",
+      "name": "命约回收师",
+      "race": "Starbound",
+      "tier": 4,
+      "attack": 4,
+      "health": 6,
+      "keywords": ["Splash", "Shield"],
+      "description": "出售友方随从后，下一场战斗获得溅射；若其有护盾，保留护盾。",
+      "goldenDescription": "出售友方随从后，下一场战斗获得强化溅射并获得护盾。"
+    }
+  ]
+}

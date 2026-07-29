@@ -123,6 +123,9 @@ namespace SpireChess.Tests.EditMode
             Assert.That(catalog.BattleGoldenStandeeFrame, Is.Not.Null);
             Assert.That(catalog.BattleNormalStandeeFrame,
                 Is.Not.SameAs(catalog.BattleGoldenStandeeFrame));
+            Assert.That(
+                catalog.BattleStandeeShieldOverlay.name,
+                Is.EqualTo("shield_overlay_bright_storybook_v1"));
             Assert.That(theme, Is.Not.Null);
             Assert.That(view, Is.Not.Null);
             Assert.That(view.HasCompleteBindings, Is.True);
@@ -420,6 +423,20 @@ namespace SpireChess.Tests.EditMode
             Assert.That(standee.IsDeathrattleVisible, Is.True);
             Assert.That(standee.IsSplashVisible, Is.True);
             Assert.That(standee.IsTargetHighlighted, Is.True);
+            var portraitAspectFitter =
+                standee.GetComponentInChildren<AspectRatioFitter>();
+            Assert.That(portraitAspectFitter, Is.Not.Null);
+            Assert.That(
+                portraitAspectFitter.aspectMode,
+                Is.EqualTo(AspectRatioFitter.AspectMode.EnvelopeParent));
+            var portraitImage = standee.transform
+                .Find("PortraitMask/Portrait")
+                .GetComponent<Image>();
+            Assert.That(
+                portraitAspectFitter.aspectRatio,
+                Is.EqualTo(
+                    portraitImage.sprite.rect.width /
+                    portraitImage.sprite.rect.height).Within(0.001f));
 
             standee.OnPointerEnter(null);
             Assert.That(view.IsStandeeDetailVisible, Is.True);

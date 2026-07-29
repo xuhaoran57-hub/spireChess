@@ -1,5 +1,8 @@
 # Phase 9C 铸魂随从专用插画提示词记录 v0.1
 
+> 历史生成台账，已停止作为生产 Prompt。新任务使用
+> `../light-storybook-production-v0.1/RACE-VISUAL-RULES-v0.3.md`。
+
 - 日期：2026-07-26
 - 生成方式：Codex 内置 ImageGen
 - 范围：剩余 13 个铸魂随从；不包含校准项 `hearth_core_spark`
@@ -13,14 +16,16 @@
 
 每项均为一次独立 ImageGen 调用。四张输入图片在所有调用中只作为参考：
 
-1. `../../phase-9b/style-tiles/style-tile-wandering-storybook-v0.3.png`：
-   媒介、纸纹、色彩与笔触参考。
+1. `../../phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png`：
+   风格、媒介、纸纹、色板、光照与气质的唯一参考。
 2. `../../phase-9b/archetype-anchor-illustrations-v0.2/masters/forge-soul-shield-squire.png`：
-   小型铸魂空壳与锻铁材质参考。
+   小型铸魂身份、能力、体量与手工锻铁文化的内容参考。
 3. `../../phase-9b/archetype-anchor-illustrations-v0.2/masters/forge-undying-furnace-king.png`：
-   高阶铸魂空壳与体量上限参考。
+   高阶铸魂身份、阶级、能力与体量上限的内容参考。
 4. `masters/minions/forge-soul/hearth-core-spark.png`：
-   本轮约 5:4 横构图、纸纹和非人结构校准参考。
+   本轮约 5:4 横构图和内容尺度参考。
+
+第 2 至 4 张不得提供色板、光照、曝光、气氛或全族身体结构约束。
 
 下列每项的“最终调用提示词”均包含该项代码块以及以下共同要求；生成时共同要求
 已完整展开到单次调用中：
@@ -28,30 +33,37 @@
 ```text
 Use case: stylized-concept
 Asset type: landscape game-card illustration master for the named Forge Soul minion
-Input images: Image 1 is style-only reference for warm Wandering Storybook
-watercolor, walnut/colored ink, fibrous ivory paper and irregular painted
-edges. Images 2 and 3 are species/material references only for living empty
-forged shells. Image 4 is the current production calibration for horizontal
-framing, paper texture and non-human anatomy. Do not copy, recolor, trace, or
-reuse any reference subject, pose, shield silhouette, crown, round furnace
-body, or scene.
+Input images: Image 1, style-tile-d-wandering-storybook-v0.1.png, is the sole
+reference for style, palette, lighting and mood. Images 2 through 4 are content
+references only for Forge Soul identity, rank, ability, forge culture, scale
+and composition. They must not influence exposure, color grading, atmosphere
+or impose universal anatomy. Do not copy, recolor, trace, or reuse any
+reference subject, pose, shield silhouette, crown, round furnace body, or
+scene.
 Style/medium: warm hand-painted storybook watercolor with deep walnut and
 colored ink contours, visible ivory paper fibers, irregular brush edges,
-tactile blackened iron and restrained ember orange; background one to two
-contrast steps below the subject.
+tactile hand-worked iron and restrained ember orange; background one contrast
+step quieter through simpler detail, not reduced exposure.
 Composition/framing: horizontal approximately 5:4; exactly one main creature;
 broad thumbnail-readable silhouette; all mechanism-critical details fully
 inside the central 80%; outer 7% contains no essential detail; generous
 breathing room; no crop.
-Constraints: the armor shell itself is non-human life. No wearer, skin, face,
-eyes, hair, flesh, five-finger hands, human waist or hips, boots, clothing,
-robe, or human anatomy. Use empty cavities, separated forged plates,
-restrained ember soul-filaments, furnace grates, three-pronged clamps and
-wedge-shaped supports. Avoid robot styling, pistons, wiring, gear piles,
-steampunk, demon traits, gothic spikes, humanoid knights or workers,
-symmetry-heavy mech design, and reference-subject duplication. No card frame,
-UI, title strip, text, letters, numbers, legible writing, runes, heraldry,
-emblem, logo, signature, or watermark.
+Lighting/value: diffuse morning-to-afternoon daylight with open chromatic
+blue-gray, rust, warm-brown or cool-steel shadows, never near-black. At least
+50% of the image remains light or middle-light; near-black stays below roughly
+12%. Pale paper and sky remain visible. Ember/fire is a small local accent,
+never primary/key light.
+Constraints: Forge Souls are forged living beings animated by furnace spirit;
+preserve the named character's role, rank, ability and forge/shield/repair/oath
+culture. Do not require three-pronged clamps, hollow shells, disconnected
+plates, furnace grilles, wedge feet or any other universal anatomy. Avoid
+robot styling, pistons, wiring, gear piles, steampunk, demon traits, gothic
+spikes, and reference-subject duplication. No card frame, UI, title strip,
+text, letters, numbers, legible writing, runes, heraldry, emblem, logo,
+signature, or watermark.
+Keep pale paper, daylight sky color and open chromatic shadows visible
+throughout the composition. Furnace glow stays a restrained local accent;
+diffuse daylight remains the primary/key light.
 ```
 
 ## 1. 铜环学徒 / `copper_ring_apprentice`
@@ -73,8 +85,9 @@ toward a small abstract allied shield-stone on the left, visually expressing
 riveting peg. Use two uneven wedge-shaped supports and restrained ember
 soul-filaments between separated plates. The creature should feel diligent,
 modest, and newly forged, never humanoid.
-Scene/backdrop: quiet caravan forge workbench at dusk, low-contrast bellows,
-copper scraps and a soft kiln glow; no banners or readable marks.
+Scene/backdrop: quiet open caravan forge workbench in diffuse afternoon
+daylight, with low-detail bellows, copper scraps and a small unlit kiln; no
+banners or readable marks.
 Additional constraints: do not copy any anchor shield body. The allied
 shield-stone is a subordinate mechanism prop, not another creature.
 ```
@@ -99,8 +112,8 @@ supports, a distinctive sloped back plate, and restrained ember
 soul-filaments joining the parts. The creature should read as patient
 precision and restoration, not combat.
 Scene/backdrop: quiet soot-marked engraving corner of a caravan forge,
-low-contrast trays of blank metal slivers and a dim kiln; no extra creatures
-and no readable marks.
+middle-light trays of blank metal slivers and a small inactive kiln; keep the
+background simple, with no extra creatures and no readable marks.
 Additional constraints: avoid a humanoid blacksmith, apron, ordinary hand, or
 tool-wielding person.
 ```
@@ -125,9 +138,9 @@ expressing “Shield; on death, all allies that still have shield gain attack.�
 Use two low asymmetrical wedge supports and one compact three-pronged clamp
 gripping a plain quenching tong; maintain a heavy, blunt, workshop-made
 silhouette distinct from a knight or sword-wielding humanoid.
-Scene/backdrop: low-contrast quenching yard beside a caravan forge, dark water
-trough and cooling iron slabs, dusk smoke; no other creatures and no readable
-marks.
+Scene/backdrop: open quenching yard beside a caravan forge in diffuse
+daylight, blue-gray water trough and cooling iron slabs kept simple and
+middle-light; no smoke, other creatures or readable marks.
 Additional constraints: avoid an ordinary floating sword or humanoid knight.
 The distant shield shapes are low-contrast props only.
 ```
@@ -152,8 +165,9 @@ furnace into both slabs, expressing “the first adjacent ally to lose shield
 gains +1/+2 this battle.” Keep the two shield props low and subordinate, never
 full creatures. Add one tall soot vent plate on only one side for asymmetry and
 recognition.
-Scene/backdrop: low-contrast defensive forge lane with stacked blank plates
-and muted kiln smoke at dusk; no other creatures and no readable banners.
+Scene/backdrop: sunlit defensive forge lane with stacked blank plates and
+clear air; keep the background quiet through broad simple shapes, with no
+other creatures or readable banners.
 Additional constraints: avoid tank styling and do not copy the shield-squire
 body.
 ```
@@ -178,8 +192,9 @@ give a forward-leaning silhouette. The reverse molten stream first illuminates
 the creature’s hammer edge, then the repaired shield, expressing “the first
 two allied shield losses grant stats; the first also permanently strengthens
 the smith.”
-Scene/backdrop: low-contrast channel-forge floor with shallow cooling grooves
-and a muted ember basin, dusk haze; no other creatures and no readable marks.
+Scene/backdrop: daylight channel-forge floor with shallow blue-gray cooling
+grooves and a small muted ember basin; clear air, no other creatures and no
+readable marks.
 Additional constraints: avoid a humanoid blacksmith, apron, ordinary person
 holding tools, or closed robotic torso.
 ```
@@ -204,8 +219,9 @@ effect, it permanently gains attack.” Give the pylon three widely spaced wedge
 feet and one compact three-pronged service clamp folded against the side. The
 blank metal standard must have no symbol, writing, heraldry, cloth, or human
 proportions.
-Scene/backdrop: low-contrast forge mustering yard with rows of plain shield
-slabs and smoky sunset, no other living creatures and no readable banners.
+Scene/backdrop: open forge mustering yard in diffuse afternoon daylight with
+rows of plain shield slabs and clear air, no other living creatures and no
+readable banners.
 Additional constraints: avoid a humanoid standard bearer or ordinary
 flagpole.
 ```
@@ -229,9 +245,9 @@ The blade must be part of the living shell, not held by a humanoid. Use three
 low wedge supports arranged in an offset tripod and one small three-pronged
 stabilizer clamp. Give the silhouette a distinctive open crescent and
 side-sprung blade, unlike the shield squire or blade blank.
-Scene/backdrop: low-contrast oath-forge alcove with plain chain links and an
-unmarked stone testing block, warm dusk furnace haze; no other creatures,
-shrines with writing, or banners.
+Scene/backdrop: open-sided oath-forge alcove in diffuse afternoon daylight,
+with plain chain links and an unmarked pale-stone testing block; clear air, no
+other creatures, shrines with writing, or banners.
 Additional constraints: avoid a humanoid armor suit, knight pose, or ordinary
 floating weapon.
 ```
@@ -255,8 +271,9 @@ both sides, and the props’ cracks visibly close, expressing “when an adjacen
 ally loses shield and survives, it gains +1/+1 this battle.” Add one folded
 three-pronged tuning clamp to the shorter wing. Keep the subject solemn, heavy,
 and asymmetrical, not a humanoid bell knight.
-Scene/backdrop: low-contrast bell-testing bay in a caravan forge with muted
-hanging blank bells and smoke, no other creatures and no inscriptions.
+Scene/backdrop: open bell-testing bay in a caravan forge with muted hanging
+blank bells, pale stone and clear daylight, no other creatures and no
+inscriptions.
 Additional constraints: avoid church symbols, an ordinary bell tower, or a
 humanoid guard.
 ```
@@ -280,9 +297,9 @@ band, conveying “after the third allied shield loss, permanently gain +2/+1.�
 The rivet-seals are physical fasteners, not numbers or runes. One short
 three-pronged clamp holds a broken shield shard like evidence; three uneven
 wedge feet give a judicial but clearly non-humanoid silhouette.
-Scene/backdrop: low-contrast forge judgment platform with plain stacked armor
-plates and three dim braziers, smoky dusk; no people, extra creatures, writing,
-throne, or banners.
+Scene/backdrop: open forge judgment platform in diffuse daylight with plain
+stacked armor plates and three unlit braziers; clear air, no people, extra
+creatures, writing, throne, or banners.
 Additional constraints: avoid a humanoid judge or knight and avoid a
 scales-of-justice symbol.
 ```
@@ -308,9 +325,9 @@ copper channel and blooms around a different small shield-stone, expressing
 “when an allied Forge Soul dies, another is strengthened.” Props must remain
 abstract and non-living. Use three offset wedge supports, one rear
 counterweight plate, and a compact three-pronged signal clamp; no weapon.
-Scene/backdrop: low-contrast command lane of a caravan forge with plain shield
-racks and smoke, warm dusk; no people, other creatures, writing, insignia, or
-banners.
+Scene/backdrop: bright open command lane of a caravan forge with plain shield
+racks and clear afternoon air; keep detail restrained, with no people, other
+creatures, writing, insignia, or banners.
 Additional constraints: avoid cannon or tank styling, a humanoid officer,
 knight pose, or ordinary shield bearer.
 ```
@@ -334,8 +351,9 @@ pressing plates close around them as if permanently reforging both neighbors,
 expressing “Taunt; battlecry permanently gives adjacent minions +3/+3.” Use
 four wedge buttress feet, but no legs, throne, face, or crown. The arched bridge
 silhouette must be unmistakably different from the Furnace King.
-Scene/backdrop: low-contrast open reforging yard with plain anvils and soot
-smoke, no other living creatures, banners, towers, or readable marks.
+Scene/backdrop: open reforging yard in diffuse daylight with plain anvils,
+pale stone and clear air, no other living creatures, banners, towers, or
+readable marks.
 Additional constraints: avoid robot or tank styling, humanoid knight, throne,
 crown, or castle façade.
 ```
@@ -361,8 +379,9 @@ and re-form a new shield-shell around the central grate, expressing “after
 killing an enemy, regain shield.” Support the hovering chain with three small
 wedge anchor-stones; add one compact three-pronged clamp integrated near the
 central segment.
-Scene/backdrop: low-contrast scorched forge dueling lane at dusk, heat haze and
-plain iron debris; no people, other creatures, bodies, writing, or banners.
+Scene/backdrop: open forge dueling lane in clear afternoon daylight, pale
+scorched stone and a small amount of plain iron debris; no haze, people, other
+creatures, bodies, writing, or banners.
 Additional constraints: avoid a humanoid swordsman, ordinary floating sword,
 mechanical snake, animal skull, dragon head, or excessive fire.
 ```
@@ -388,9 +407,9 @@ distant plain armor slabs, expressing “on death, shield two surviving allies
 and permanently strengthen all surviving non-token allies.” Give the chassis
 four squat wedge buttresses and two folded three-pronged clamps tucked under
 the side rings. Keep all ring surfaces blank, worn, and non-symbolic.
-Scene/backdrop: low-contrast forge necropolis yard with plain stone plinths,
-cooled slag and dusk smoke; no bones, corpses, people, other creatures,
-readable tombs, banners, or gothic architecture.
+Scene/backdrop: open memorial forge yard in diffuse daylight with plain pale
+stone plinths, cooled slag and clear air; no bones, corpses, people, other
+creatures, readable tombs, banners, or gothic architecture.
 Additional constraints: avoid robot or vehicle styling, skulls, humanoid tomb
 knight, throne, crown, or castle façade.
 ```

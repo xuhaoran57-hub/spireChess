@@ -1,7 +1,8 @@
 # G4 正式视觉样板闭环 v0.1
 
 - 日期：2026-07-27
-- 风格基线：`style-tiles/style-tile-wandering-storybook-v0.3.png`
+- 当前生产 Prompt 风格基线：
+  `style-tiles/style-tile-d-wandering-storybook-v0.1.png`
 - 角色/材质参考：
   `ui-concepts/phase-9c/full-art-production-v0.1/masters/minions/forge-soul/cinder-armor-arbiter.png`
 - 工具：Codex 内置 ImageGen；后端模型版本与种子不可获得
@@ -22,7 +23,8 @@
 
 - 主菜单：尖塔位于右侧，左/中区域允许标题和菜单卡保持高对比。
 - 地图：同一画面具有林地、商旅桥梁、熔岩门三个进程区；不烘焙节点、连线或文字。
-- 商店：左右/上方提供环境叙事，中下方保持可承载卡牌的平整暗台面。
+- 商店：左右/上方提供环境叙事，中下方以低细节浅木与羊皮纸台面承载卡牌，
+  不通过降低曝光制造留白。
 - 事件：静谧林地具有唯一焦点；插画和选择项并排，不把图烘焙进 UI。
 - 战斗：敌我两层平台清楚分离，五单位横排区域不放前景角色或文字。
 

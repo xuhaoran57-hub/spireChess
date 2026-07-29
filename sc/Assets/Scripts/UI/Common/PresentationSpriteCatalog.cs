@@ -42,6 +42,7 @@ namespace SpireChess.UI
         [SerializeField] private Sprite battleAttackMedallion;
         [SerializeField] private Sprite battleHealthMedallion;
         [SerializeField] private Sprite battleShieldOverlay;
+        [SerializeField] private Sprite battleStandeeShieldOverlay;
         [SerializeField] private Sprite battleTauntBase;
         [SerializeField] private Sprite battleDeathrattleSeal;
         [SerializeField] private Sprite battleSplashMark;
@@ -64,6 +65,10 @@ namespace SpireChess.UI
         public Sprite BattleAttackMedallion => battleAttackMedallion;
         public Sprite BattleHealthMedallion => battleHealthMedallion;
         public Sprite BattleShieldOverlay => battleShieldOverlay;
+        public Sprite BattleStandeeShieldOverlay =>
+            battleStandeeShieldOverlay != null
+                ? battleStandeeShieldOverlay
+                : battleShieldOverlay;
         public Sprite BattleTauntBase => battleTauntBase;
         public Sprite BattleDeathrattleSeal => battleDeathrattleSeal;
         public Sprite BattleSplashMark => battleSplashMark;
@@ -77,7 +82,7 @@ namespace SpireChess.UI
             battleStandeeFrame != null &&
             battleAttackMedallion != null &&
             battleHealthMedallion != null &&
-            battleShieldOverlay != null &&
+            BattleStandeeShieldOverlay != null &&
             battleTauntBase != null &&
             battleDeathrattleSeal != null &&
             battleSplashMark != null;

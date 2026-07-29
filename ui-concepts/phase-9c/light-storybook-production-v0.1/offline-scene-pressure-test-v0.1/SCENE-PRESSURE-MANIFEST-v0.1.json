@@ -1,0 +1,29 @@
+{
+  "version": "0.1",
+  "resolution": [1920, 1080],
+  "catalog": "FORMAL-CATALOG-SPECS-v0.3.2.json",
+  "shop": {
+    "status": "freeze-candidate",
+    "minionOffers": 4,
+    "spellOffers": 1,
+    "battleSlots": 5,
+    "handSlots": 5,
+    "screenshot": "scenes/shop-pressure-1920x1080.png"
+  },
+  "battle": {
+    "status": "offline-pass-awaiting-unity",
+    "slotsPerSide": 5,
+    "runtimeScreenshot": "scenes/battle-pressure-runtime-stretch-1920x1080.png",
+    "recommendedCropScreenshot": "scenes/battle-pressure-center-crop-1920x1080.png",
+    "candidateScreenshot": "scenes/battle-pressure-v0.3.3-candidate-1920x1080.png",
+    "implementedChanges": [
+      "aspect-preserving center crop with AspectRatioFitter.EnvelopeParent",
+      "bright edge-only storybook shield with transparent center"
+    ],
+    "unityValidation": [
+      "rebuild battle catalog and prefabs",
+      "check additive shield brightness",
+      "run EditMode and PlayMode tests"
+    ]
+  }
+}

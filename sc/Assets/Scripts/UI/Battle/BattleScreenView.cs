@@ -49,6 +49,7 @@ namespace SpireChess.UI.Battle
         [SerializeField] private Text returnButtonText;
 
         [Header("Board")]
+        [SerializeField] private Sprite backdropOverride;
         [SerializeField] private BattleSlotView[] enemySlots =
             Array.Empty<BattleSlotView>();
         [SerializeField] private BattleSlotView[] playerSlots =
@@ -141,8 +142,10 @@ namespace SpireChess.UI.Battle
             productionBackdrop = PresentationArtworkResources.EnsureImage(
                 board,
                 "ProductionArtwork",
-                PresentationArtworkResources.LoadBackdrop(
-                    PresentationBackdropVariant.Battle),
+                backdropOverride != null
+                    ? backdropOverride
+                    : PresentationArtworkResources.LoadBackdrop(
+                        PresentationBackdropVariant.Battle),
                 new Color(0.72f, 0.72f, 0.68f, 0.86f),
                 true);
             if (productionBackdrop == null ||

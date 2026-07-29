@@ -23,6 +23,7 @@ MonoBehaviour:
   battleAttackMedallion: {fileID: 21300000, guid: 63ae31ca2eafdb647ba6104466d8dc15, type: 3}
   battleHealthMedallion: {fileID: 21300000, guid: e2b510c1accb45b42816124a3c2239b0, type: 3}
   battleShieldOverlay: {fileID: 21300000, guid: 6aa416ef7b4465d4bb24401527512422, type: 3}
+  battleStandeeShieldOverlay: {fileID: 21300000, guid: bb4e067074be4d50af3d0939990e4ecf, type: 3}
   battleTauntBase: {fileID: 21300000, guid: 36e016ee380bc8348b9e181554262016, type: 3}
   battleDeathrattleSeal: {fileID: 21300000, guid: 9fa01ac256f3d5d46a64cf4f5196f0e0, type: 3}
   battleSplashMark: {fileID: 21300000, guid: 3246fa79b12192f459d465670fdd70b8, type: 3}

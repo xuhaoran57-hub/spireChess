@@ -1,11 +1,26 @@
 # WildSpirit 荒灵随从生成台账
 
+> 历史生成台账，已停止作为生产 Prompt。本文的荒灵身体材质描述只用于重现旧图，
+> 不再代表种族规则。新任务使用
+> `../light-storybook-production-v0.1/RACE-VISUAL-RULES-v0.3.md`。
+
 - 生成方式：Codex 内置 ImageGen
 - 收尾日期：2026-07-26
 - 本次已保存：8 项
 - 母版规格：`1402x1122`、RGB PNG、约 5:4 横构图
 - 保存边界：仅保存于 `masters/minions/wild-spirit/`，未复制到 Unity Runtime
 - 未记录项：尚未生成或尚未保存的项目不进入本台账
+
+## 明亮风格生产覆盖规则
+
+以下规则应用于本文所有 Prompt。以
+`../../phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png`
+作为风格、色板、光照和气质的唯一参考；角色参考只提供身份、解剖、能力和构图。
+
+使用晨间至下午的漫射日光和彩色开放阴影。每张卡面至少 50% 保持亮部或中亮部，
+近黑面积不超过约 12%；保留浅纸色、天空或亮色植被。背景通过简化形状和降低细节
+保持比主体安静一个层级，不得整体降曝光。使用蓝灰、青绿、紫灰或暖褐色阴影；
+火焰和魔法仅作为局部强调，漫射日光始终承担主光。
 
 ## moss_mark_seedling / 苔痕守苗
 
@@ -111,7 +126,8 @@ Subject: exactly one mature forest hawk in a hard banking dive, built on accurat
 Style/medium: warm hand-painted storybook watercolor with deep walnut and colored ink outlines, fibrous ivory paper texture, visible washes and irregular brush edges; premium wandering storybook fantasy card art.
 Composition/framing: horizontal 5:4-ish composition; diagonal banking pose but the entire one-bird silhouette, both wing tips, head and talons remain inside the middle 80%; strong readable hawk silhouette; background one to two contrast steps quieter.
 Lighting/mood: pale amber shafts through canopy, swift vigilant mood.
-Color palette: bark umber, tawny ochre, muted fern green, gray-blue forest haze, parchment cream; no neon green.
+Color palette: bark umber, tawny ochre, muted fern green, soft gray-blue
+distance, parchment cream; no neon green.
 Materials/textures: real layered feathers, split bark veins, small leaves and moss organically fused.
 Constraints: exactly one hawk, exactly two wings and two legs; accurate non-humanoid raptor anatomy; branched broken-edge organic curves; no humanoid body, no treant costume, no cute mascot, no symmetrical magic circle, no card frame, no UI, no title bar, no text, no letters, no numbers, no readable writing, no logo, no watermark, no signature.
 Avoid: photorealism, anime/gacha styling, glossy digital rendering, owl face, eagle heraldry, extra birds, magical glyphs, neon glow, particle cloud.
@@ -142,12 +158,15 @@ Constraints: preserve exactly the same single hawk, accurate anatomy, banking po
 Use case: stylized-concept
 Asset type: landscape game-card minion illustration, approximately 5:4
 Primary request: create the dedicated WildSpirit minion art for “Two-Tailed Fox Spirit”, a mid-tier deathrattle summoner that releases two young spirits when it falls.
-Scene/backdrop: a narrow root bridge over a dusky woodland stream, distant blue-gray trees soft and low contrast.
+Scene/backdrop: a narrow root bridge over a clear daylight woodland stream,
+with distant blue-gray and leaf-green trees simplified and middle-light.
 Subject: exactly one lean adult fox spirit, distinct from a large den matriarch: small athletic frame, alert narrow face, one body, four legs, and exactly two separate tails clearly visible from base to tip. Both tails are long branching root-and-leaf structures, one swept high and one low, never merging and never multiplying. Its russet fur transitions into bark scales and sparse olive leaves; two unopened seed pods hang beneath its chest as a restrained hint of the two future young spirits, but there are no pups or other creatures.
 Style/medium: warm hand-painted storybook watercolor with deep walnut and colored ink outlines, fibrous ivory paper texture, visible washes and irregular brush edges; premium wandering storybook fantasy card art.
 Composition/framing: horizontal 5:4-ish composition; poised side-three-quarter stance centered within the middle 80%; complete ears, four paws, and both full tails inside the safe area; tails form asymmetrical organic curves; background one to two contrast steps quieter.
-Lighting/mood: muted moonlit blue balanced by warm russet rim light, watchful and transient rather than cute.
-Color palette: russet bark, walnut brown, muted olive, dusk blue-gray, parchment cream; no neon green.
+Lighting/mood: diffuse woodland daylight with open blue-gray shade and warm
+russet reflected light, watchful and transient rather than cute.
+Color palette: russet bark, walnut brown, muted olive, soft sky blue-gray,
+parchment cream; no neon green.
 Materials/textures: natural fox fur, split bark, root fibers, small dry leaves, soft moss.
 Constraints: exactly one fox, exactly two tails, exactly two unopened seed pods, no additional animal; natural quadruped anatomy; no humanoid body, no treant costume, no cute mascot proportions, no symmetrical magic circle, no card frame, no UI, no title bar, no text, no letters, no numbers, no readable writing, no logo, no watermark, no signature.
 Avoid: photorealism, anime/gacha kitsune, glowing magical orbs, extra tails, extra foxes, den scene, maternal pose, jewelry, clothes, neon glow, glossy digital rendering.
@@ -245,12 +264,16 @@ Avoid: photorealism, anime/gacha styling, owl, hawk, deer, antlers, staff, robes
 Use case: stylized-concept
 Asset type: landscape game-card minion illustration, approximately 5:4
 Primary request: create the dedicated WildSpirit minion art for “Rootbound Soul Guide”, an elder deathrattle spirit that guides lasting strength into the weakest surviving forest ally.
-Scene/backdrop: twilight grove where a fallen ancient tree exposes a descending root passage, distant forest shapes soft and subdued.
+Scene/backdrop: filtered daytime grove where a fallen ancient tree exposes a
+descending root passage, with distant forest shapes soft, chromatic and
+middle-light.
 Subject: exactly one aged giant anteater spirit on believable four-legged anatomy, long low snout and heavy brush tail. Its back is layered with trailing bark strips, fern fronds and moss; old roots gently bind around its ankles and continue into the earth rather than forming chains. The anteater lowers its snout toward exactly one pale closed seed resting in a shallow root cradle, while one thin root path carries a restrained warm glow away toward the distant grove. No humanoid guide, staff, lantern, skull, ghost figure, or other animal.
 Style/medium: warm hand-painted storybook watercolor with deep walnut and colored ink outlines, fibrous ivory paper texture, transparent washes and irregular brush edges; premium wandering storybook fantasy card art.
 Composition/framing: horizontal 5:4-ish composition; one long sweeping animal silhouette centered inside the middle 80%; head, four feet, full brush tail, root cradle and single seed all safely clear of the outer 7%; asymmetric downward gesture; background one to two contrast steps quieter.
-Lighting/mood: dusk blue shadows with one restrained amber seed light, solemn gentle passage rather than horror.
-Color palette: walnut bark, muted fern olive, smoke blue-gray, old gold, parchment cream; no neon green.
+Lighting/mood: open blue-gray daylight shadows with one restrained amber seed
+accent, a solemn gentle passage rather than horror.
+Color palette: walnut bark, muted fern olive, soft blue-gray, old gold,
+parchment cream; no neon green.
 Materials/textures: coarse anteater fur, peeled bark, roots, moss and paper grain organically integrated.
 Constraints: exactly one creature and exactly one closed seed; natural anteater anatomy; branched broken-edge organic curves; no humanoid body, no treant costume, no cute mascot, no symmetrical magic circle, no card frame, no UI, no title bar, no text, no letters, no numbers, no readable writing, no logo, no watermark, no signature.
 Avoid: photorealism, anime/gacha styling, deer or fox silhouette, robed priest, staff, visible ghost people, skulls, cemetery, bright magic beam, floating particle cloud, glossy digital rendering.

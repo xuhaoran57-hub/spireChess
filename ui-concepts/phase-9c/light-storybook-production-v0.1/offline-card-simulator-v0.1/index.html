@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>明亮绘本卡框离线模拟器</title>
+  <style>
+    @font-face {
+      font-family: "Noto Sans CJK SC";
+      src: url("../../../../sc/Assets/Art/Fonts/NotoSansCJKsc-Regular.otf");
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #3d2e22;
+      --muted: #6d6258;
+      --paper: #f5eedf;
+      --panel: #ead8ae;
+      --line: #cbb58c;
+      --sage: #cfddd8;
+      --white: #fffdf8;
+      font-family: "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 1120px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(255, 255, 255, .8), transparent 30rem),
+        var(--sage);
+    }
+
+    button, select, input { font: inherit; }
+
+    .shell {
+      width: min(1440px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 30px 0 42px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 7px;
+      font-size: 30px;
+      font-weight: 650;
+      letter-spacing: .02em;
+    }
+
+    header p, .footnote, .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .badge {
+      padding: 7px 11px;
+      border: 1px solid rgba(61, 46, 34, .2);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, .62);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(250px, 1fr) auto auto minmax(230px, 1fr);
+      gap: 14px;
+      align-items: end;
+      padding: 16px;
+      border: 1px solid rgba(61, 46, 34, .14);
+      border-radius: 16px;
+      background: rgba(255, 253, 248, .76);
+      box-shadow: 0 12px 38px rgba(61, 46, 34, .08);
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    select {
+      width: 100%;
+      height: 40px;
+      padding: 0 34px 0 12px;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--white);
+    }
+
+    .segmented {
+      display: flex;
+      height: 40px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #e8dfcc;
+    }
+
+    .segmented button {
+      min-width: 70px;
+      padding: 0 13px;
+      color: var(--muted);
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .segmented button[aria-pressed="true"] {
+      color: var(--ink);
+      background: var(--white);
+      box-shadow: 0 2px 8px rgba(61, 46, 34, .13);
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 46px;
+      gap: 10px;
+      align-items: center;
+      height: 40px;
+    }
+
+    input[type="range"] { width: 100%; accent-color: #a76e2b; }
+
+    output {
+      color: var(--ink);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .preview-panel, .matrix-panel {
+      border: 1px solid rgba(61, 46, 34, .14);
+      border-radius: 18px;
+      background: rgba(255, 253, 248, .76);
+      box-shadow: 0 12px 38px rgba(61, 46, 34, .08);
+    }
+
+    .preview-panel {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 660px;
+      padding: 18px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 620;
+    }
+
+    .panel-meta {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    #cardStage {
+      display: grid;
+      place-items: center;
+      min-height: 560px;
+      overflow: hidden;
+      border: 1px dashed rgba(61, 46, 34, .18);
+      border-radius: 13px;
+      background:
+        linear-gradient(45deg, rgba(255,255,255,.34) 25%, transparent 25%) 0 0/20px 20px,
+        linear-gradient(-45deg, rgba(255,255,255,.34) 25%, transparent 25%) 0 10px/20px 20px,
+        rgba(202, 217, 210, .65);
+    }
+
+    .card-zoom {
+      transform-origin: center;
+      filter: drop-shadow(0 16px 14px rgba(61, 46, 34, .22));
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      color: #3d2e22;
+      background: #d0ccc1;
+    }
+
+    .layer {
+      position: absolute;
+      display: block;
+    }
+
+    .art-window { overflow: hidden; }
+    .art-window img { position: absolute; max-width: none; }
+    .frame { z-index: 5; width: 100%; height: 100%; }
+    .golden-frame { filter: sepia(.25) saturate(1.55) brightness(1.1); }
+    .spell-frame { filter: sepia(.08) saturate(.75) hue-rotate(165deg) brightness(1.04); }
+    .paper-panel { background: rgba(233, 215, 174, .98); }
+    .name-plate { border-radius: 2px; }
+
+    .card-text {
+      z-index: 6;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .card-name, .card-race, .number {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .card-name { color: #fffdf3; }
+    .card-name.golden { color: #ffd766; }
+    .card-race { color: #644b37; }
+    .description {
+      color: #3d2e22;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+    }
+
+    .numeric {
+      z-index: 7;
+      pointer-events: none;
+    }
+
+    .number {
+      z-index: 8;
+      color: #fff7e8;
+      text-shadow: 0 1px 1px #2f221a;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tier-number { color: #4f351d; text-shadow: none; }
+    .cost-number { color: #fff6d7; }
+    .hidden { display: none !important; }
+
+    .preview-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .matrix-panel {
+      min-width: 0;
+      padding: 18px;
+    }
+
+    .matrix-viewport {
+      height: 650px;
+      overflow: auto;
+      border: 1px solid rgba(61, 46, 34, .13);
+      border-radius: 13px;
+      background: #cddbd6;
+    }
+
+    #matrixImage {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .footnote {
+      margin-top: 12px;
+      line-height: 1.65;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>明亮绘本卡框离线模拟器</h1>
+        <p>Round 7 正式卡池样本 · 真实项目框体资源 · 无需 Unity</p>
+      </div>
+      <span class="badge">v0.1 · 15 cards</span>
+    </header>
+
+    <section class="toolbar" aria-label="模拟器控制">
+      <label>
+        预览卡牌
+        <select id="cardSelect"></select>
+      </label>
+
+      <label>
+        形态
+        <span class="segmented" id="variantControl">
+          <button type="button" data-value="normal" aria-pressed="true">普通</button>
+          <button type="button" data-value="golden" aria-pressed="false">金色</button>
+        </span>
+      </label>
+
+      <label>
+        布局
+        <span class="segmented" id="modeControl">
+          <button type="button" data-value="compact" aria-pressed="true">紧凑</button>
+          <button type="button" data-value="full" aria-pressed="false">完整</button>
+        </span>
+      </label>
+
+      <label>
+        主体焦点 Y
+        <span class="range-row">
+          <input id="focalRange" type="range" min="0" max="1" step="0.01" value="0.5">
+          <output id="focalValue">0.50</output>
+        </span>
+      </label>
+    </section>
+
+    <section class="workspace">
+      <article class="preview-panel">
+        <div class="panel-head">
+          <h2>单卡裁切检查</h2>
+          <span class="panel-meta" id="previewMeta"></span>
+        </div>
+        <div id="cardStage">
+          <div class="card-zoom" id="cardZoom">
+            <div class="card" id="card">
+              <div class="layer art-window" id="artWindow"><img id="artImage" alt=""></div>
+              <div class="layer paper-panel" id="paperPanel"></div>
+              <div class="layer name-plate" id="namePlate"></div>
+              <img class="layer frame" id="frameImage" alt="">
+              <div class="layer card-text card-name" id="cardName"></div>
+              <div class="layer card-text card-race" id="cardRace"></div>
+              <div class="layer card-text description" id="description"></div>
+              <img class="layer numeric" id="costBadge" alt="">
+              <div class="layer number cost-number" id="costNumber"></div>
+              <img class="layer numeric" id="tierBadge" alt="">
+              <div class="layer number tier-number" id="tierNumber"></div>
+              <img class="layer numeric" id="attackBadge" alt="">
+              <div class="layer number" id="attackNumber"></div>
+              <img class="layer numeric" id="healthBadge" alt="">
+              <div class="layer number" id="healthNumber"></div>
+            </div>
+          </div>
+        </div>
+        <p class="preview-note" id="previewNote"></p>
+      </article>
+
+      <article class="matrix-panel">
+        <div class="panel-head">
+          <h2>15 张卡矩阵</h2>
+          <span class="panel-meta" id="matrixMeta"></span>
+        </div>
+        <div class="matrix-viewport">
+          <img id="matrixImage" alt="15 张卡矩阵">
+        </div>
+        <p class="footnote">
+          排列顺序固定为铸魂、荒灵、星契、旅团、法术，每列 3 张。
+          四张矩阵由同一规格脚本生成，便于直接并排检查主体裁切、规则密度与金框亮度。
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const ASSETS = {
+      normalFrame: "../../../../sc/Assets/Art/Presentation/UI/Common/card_frame_storybook_normal_v2.png",
+      goldenFrame: "../../../../sc/Assets/Art/Presentation/UI/Common/card_frame_storybook_golden_v2.png",
+      cost: "../../../../sc/Assets/Art/Presentation/UI/Card/card_cost_coin_v1.png",
+      tier: "../../../../sc/Assets/Art/Presentation/UI/Card/card_tier_bookmark_v1.png",
+      attack: "../../../../sc/Assets/Art/Presentation/UI/Card/card_attack_tag_v1.png",
+      health: "../../../../sc/Assets/Art/Presentation/UI/Card/card_health_tag_v1.png",
+      artRoot: "../validation-round-7-v0.3.2-formal-catalog/"
+    };
+
+    const GROUP_LABELS = {
+      ForgeSoul: "铸魂",
+      WildSpirit: "荒灵",
+      Starbound: "星契",
+      Wayfarer: "旅团",
+      Spell: "法术"
+    };
+
+    const PLATE_COLORS = {
+      ForgeSoul: "#873d26",
+      WildSpirit: "#34733d",
+      Starbound: "#315da8",
+      Wayfarer: "#805638",
+      Spell: "#5a505f"
+    };
+
+    const SKIN_COLORS = {
+      ForgeSoul: "#bd8877",
+      WildSpirit: "#84a9a1",
+      Starbound: "#7896cc",
+      Wayfarer: "#a59686",
+      Spell: "#939aaa"
+    };
+
+    const TIER_COLORS = {
+      1: "#d0ccc1",
+      2: "#8cc799",
+      3: "#85ade6",
+      4: "#b395e0",
+      5: "#efb35c"
+    };
+
+    const LAYOUTS = {
+      full: {
+        root: [0, 0, 240, 360], frame: [6, 6, 228, 348], art: [12, 12, 216, 184],
+        name: [24, 181, 192, 32], info: [12, 199, 216, 149], race: [36, 232, 168, 24],
+        description: [30, 256, 180, 64], attack: [10, 321, 68, 30],
+        health: [162, 321, 68, 30], cost: [13, 12, 28, 29], tier: [198, 9, 32, 40],
+        attackNumber: [27, 323, 46, 26], healthNumber: [167, 323, 46, 26],
+        nameFont: 22, raceFont: 16, descriptionFont: 14, lineHeight: 18,
+        numberFont: 18, tierFont: 18, descriptionLines: 3, zoom: 1.45
+      },
+      compact: {
+        root: [0, 0, 160, 240], frame: [4, 4, 152, 232], art: [8, 8, 144, 112],
+        name: [16, 108, 128, 26], info: [8, 122, 144, 110], race: [24, 152, 112, 19],
+        description: [20, 172, 120, 33], attack: [7, 213, 46, 21],
+        health: [107, 213, 46, 21], cost: [9, 8, 19, 20], tier: [132, 6, 22, 28],
+        attackNumber: [18, 214, 31, 19], healthNumber: [110, 214, 31, 19],
+        nameFont: 16, raceFont: 13, descriptionFont: 12, lineHeight: 15,
+        numberFont: 13, tierFont: 13, descriptionLines: 2, zoom: 2
+      }
+    };
+
+    const CARDS = [
+      {kind:"Minion", id:"forge_soul_shield_squire", name:"铸魂盾侍", race:"ForgeSoul", tier:1, attack:1, health:3, goldenAttack:2, goldenHealth:6, description:"战斗开始：获得护盾。", goldenDescription:"战斗开始：获得护盾，并使左侧友方随从获得护盾。", artFile:"cards/forge-soul/forge-soul-shield-squire-v0.3.2.png"},
+      {kind:"Minion", id:"resonance_bell_guard", name:"共鸣钟卫", race:"ForgeSoul", tier:3, attack:2, health:5, goldenAttack:4, goldenHealth:10, description:"每当相邻友方随从失去护盾，若其仍存活，使其本场获得 +1/+1。", goldenDescription:"每当相邻友方随从失去护盾，若其仍存活，使其本场获得 +2/+4。", artFile:"cards/forge-soul/resonance-bell-guard-v0.3.2.png"},
+      {kind:"Minion", id:"undying_furnace_king", name:"不熄炉王", race:"ForgeSoul", tier:5, attack:6, health:8, goldenAttack:12, goldenHealth:16, description:"战斗开始：获得护盾。每当一个友方铸魂失去护盾，使另一个无护盾友方铸魂获得护盾。每场战斗最多触发 2 次。", goldenDescription:"战斗开始：获得护盾。每当一个友方铸魂失去护盾，使另一个无护盾友方铸魂获得护盾。每场战斗最多触发 4 次。", artFile:"cards/forge-soul/undying-furnace-king-v0.3.2.png"},
+      {kind:"Minion", id:"young_deer_spirit", name:"幼鹿灵", race:"WildSpirit", tier:1, attack:1, health:1, goldenAttack:2, goldenHealth:2, description:"亡语：召唤一个 1/1 幼灵；若没有空位，使一个随机友方荒灵本场获得 +1/+1。", goldenDescription:"亡语：召唤两个 1/1 幼灵；每有一个未能召唤，使一个随机友方荒灵本场获得 +1/+1。", artFile:"cards/wild-spirit/young-deer-spirit-v0.3.2.png"},
+      {kind:"Minion", id:"rootbound_soul_guide", name:"归根引魂者", race:"WildSpirit", tier:3, attack:3, health:5, goldenAttack:6, goldenHealth:10, description:"亡语：使攻击力最低的非召唤物友方荒灵永久获得 +1/+1，其他非召唤物友方荒灵本场获得 +1/+1。", goldenDescription:"亡语：使攻击力最低的两个非召唤物友方荒灵永久获得 +1/+1，其他非召唤物友方荒灵本场获得 +2/+2。", artFile:"cards/wild-spirit/rootbound-soul-guide-v0.3.2.png"},
+      {kind:"Minion", id:"ancient_mountain_spirit", name:"群山古灵", race:"WildSpirit", tier:5, attack:6, health:9, goldenAttack:12, goldenHealth:18, description:"每场战斗前 3 次非召唤物友方荒灵死亡时，所有荒灵永久获得 +1/+1。", goldenDescription:"每场战斗前 3 次非召唤物友方荒灵死亡时，所有荒灵永久获得 +2/+2。", artFile:"cards/wild-spirit/ancient-mountain-spirit-v0.3.2.png"},
+      {kind:"Minion", id:"glimmer_mage", name:"微光术士", race:"Starbound", tier:1, attack:2, health:1, goldenAttack:4, goldenHealth:2, description:"每个商店阶段前 2 次使用法术后，永久获得 +1 生命；首次使用法术后，下一场战斗获得护盾。", goldenDescription:"每个商店阶段前 2 次使用法术后，永久获得 +2 生命；首次使用法术后，下一场战斗获得护盾。", artFile:"cards/starbound/glimmer-mage-v0.3.2.png"},
+      {kind:"Minion", id:"fate_track_recorder", name:"命轨记录员", race:"Starbound", tier:3, attack:2, health:5, goldenAttack:4, goldenHealth:10, description:"每个商店阶段第 3 次刷新后，获得一张临时 1 级法术。每个商店阶段最多触发 1 次。", goldenDescription:"每个商店阶段第 3 次和第 5 次刷新后，各获得一张临时 1 级法术。每个商店阶段最多触发 2 次。", artFile:"cards/starbound/fate-track-recorder-v0.3.2.png"},
+      {kind:"Minion", id:"moonwheel_dispatcher", name:"月轮调度者", race:"Starbound", tier:4, attack:3, health:6, goldenAttack:6, goldenHealth:12, description:"每个商店阶段前 2 次刷新后，使一个随机友方随从永久获得 +1/+1。", goldenDescription:"每个商店阶段前 2 次刷新后，使两个随机友方随从永久获得 +1/+1。", artFile:"cards/starbound/moonwheel-dispatcher-v0.3.2.png"},
+      {kind:"Minion", id:"traveling_physician", name:"行脚医师", race:"Wayfarer", tier:1, attack:1, health:3, goldenAttack:2, goldenHealth:6, description:"战吼：使另一个友方随从永久获得 +1 生命。", goldenDescription:"战吼：使另一个友方随从永久获得 +2 生命。", artFile:"cards/wayfarer/traveling-physician-v0.3.2.png"},
+      {kind:"Minion", id:"old_tower_guide", name:"旧塔向导", race:"Wayfarer", tier:3, attack:3, health:3, goldenAttack:6, goldenHealth:6, description:"战吼：发现一个等级低于当前酒馆等级、属于你场上数量最多主种族的其他随从；若没有主种族，改为其他旅团随从。", goldenDescription:"战吼：进行两次随从发现，候选均为等级低于当前酒馆等级、属于你场上数量最多主种族的其他随从；若没有主种族，改为其他旅团随从。", artFile:"cards/wayfarer/old-tower-guide-v0.3.2.png"},
+      {kind:"Minion", id:"mirrorsteel_duelist", name:"镜钢决斗家", race:"Wayfarer", tier:5, attack:7, health:9, goldenAttack:14, goldenHealth:18, description:"护盾。战斗开始：本场获得与敌方最高攻击力之差的攻击，最多 +8。", goldenDescription:"护盾。战斗开始：本场获得与敌方最高攻击力之差的攻击，最多 +16；实际获得至少 8 攻击时获得溅射。", artFile:"cards/wayfarer/mirrorsteel-duelist-v0.3.2.png"},
+      {kind:"Spell", id:"temporary_ward", name:"临时护符", tier:1, cost:1, description:"使一个随从下一场战斗获得护盾；若它已有护盾，改为永久获得 +1 生命。", artFile:"spells/temporary-ward-v0.3.2.png"},
+      {kind:"Spell", id:"starlight_rebate", name:"星辉回款", tier:3, cost:1, description:"使用后，本商店阶段每再刷新 2 次，获得 1 金币，最多获得 3 金币。", artFile:"spells/starlight-rebate-v0.3.2.png"},
+      {kind:"Spell", id:"legendary_recruitment", name:"传说招募", tier:5, cost:1, description:"从 3 个 5 级随从中发现一个；若你已有金色随从，改为从 4 个中发现一个。", artFile:"spells/legendary-recruitment-v0.3.2.png"}
+    ];
+
+    const state = { cardIndex: 0, mode: "compact", variant: "normal", focal: 0.5 };
+    const element = id => document.getElementById(id);
+
+    function setRect(target, rect) {
+      const [x, y, width, height] = rect;
+      Object.assign(target.style, {
+        left: `${x}px`, top: `${y}px`, width: `${width}px`, height: `${height}px`
+      });
+    }
+
+    function groupOf(card) {
+      return card.kind === "Spell" ? "Spell" : card.race;
+    }
+
+    function isGolden(card) {
+      return state.variant === "golden" && card.kind === "Minion";
+    }
+
+    function fitArt() {
+      const image = element("artImage");
+      if (!image.naturalWidth) return;
+      const viewport = LAYOUTS[state.mode].art;
+      const viewportAspect = viewport[2] / viewport[3];
+      const sourceAspect = image.naturalWidth / image.naturalHeight;
+      let width, height, left, top;
+
+      if (sourceAspect >= viewportAspect) {
+        height = viewport[3];
+        width = height * sourceAspect;
+        left = (viewport[2] - width) / 2;
+        top = 0;
+      } else {
+        width = viewport[2];
+        height = width / sourceAspect;
+        left = 0;
+        top = -state.focal * Math.max(0, height - viewport[3]);
+      }
+
+      Object.assign(image.style, {
+        width: `${width}px`, height: `${height}px`,
+        left: `${left}px`, top: `${top}px`
+      });
+    }
+
+    function render() {
+      const card = CARDS[state.cardIndex];
+      const layout = LAYOUTS[state.mode];
+      const group = groupOf(card);
+      const golden = isGolden(card);
+      const root = layout.root;
+
+      setRect(element("card"), root);
+      element("card").style.background = TIER_COLORS[card.tier] || TIER_COLORS[1];
+      element("cardZoom").style.width = `${root[2]}px`;
+      element("cardZoom").style.height = `${root[3]}px`;
+      element("cardZoom").style.transform = `scale(${layout.zoom})`;
+      element("card").style.boxShadow = `inset 0 0 0 999px ${SKIN_COLORS[group]}33`;
+
+      setRect(element("artWindow"), layout.art);
+      setRect(element("paperPanel"), layout.info);
+      setRect(element("namePlate"), layout.name);
+      element("namePlate").style.background = PLATE_COLORS[group];
+
+      setRect(element("frameImage"), layout.frame);
+      element("frameImage").src = golden ? ASSETS.goldenFrame : ASSETS.normalFrame;
+      element("frameImage").className = `layer frame ${golden ? "golden-frame" : card.kind === "Spell" ? "spell-frame" : ""}`;
+
+      setRect(element("cardName"), layout.name);
+      element("cardName").textContent = card.name;
+      element("cardName").style.fontSize = `${layout.nameFont}px`;
+      element("cardName").className = `layer card-text card-name ${golden ? "golden" : ""}`;
+
+      setRect(element("cardRace"), layout.race);
+      element("cardRace").textContent = card.kind === "Spell" ? "法术 · 商店法术" : GROUP_LABELS[group];
+      element("cardRace").style.fontSize = `${layout.raceFont}px`;
+
+      setRect(element("description"), layout.description);
+      element("description").textContent = golden ? card.goldenDescription : card.description;
+      element("description").style.fontSize = `${layout.descriptionFont}px`;
+      element("description").style.lineHeight = `${layout.lineHeight}px`;
+      element("description").style.webkitLineClamp = layout.descriptionLines;
+
+      element("artImage").alt = card.name;
+      element("artImage").src = ASSETS.artRoot + card.artFile;
+
+      setRect(element("tierBadge"), layout.tier);
+      element("tierBadge").src = ASSETS.tier;
+      setRect(element("tierNumber"), layout.tier);
+      element("tierNumber").textContent = card.tier;
+      element("tierNumber").style.fontSize = `${layout.tierFont}px`;
+
+      element("costBadge").classList.remove("hidden");
+      element("costNumber").classList.remove("hidden");
+      setRect(element("costBadge"), layout.cost);
+      element("costBadge").src = ASSETS.cost;
+      setRect(element("costNumber"), layout.cost);
+      element("costNumber").textContent = card.kind === "Spell" ? card.cost : 3;
+      element("costNumber").style.fontSize = `${layout.numberFont}px`;
+
+      const showStats = card.kind === "Minion";
+      ["attackBadge", "attackNumber", "healthBadge", "healthNumber"].forEach(id => {
+        element(id).classList.toggle("hidden", !showStats);
+      });
+      if (showStats) {
+        setRect(element("attackBadge"), layout.attack);
+        element("attackBadge").src = ASSETS.attack;
+        setRect(element("healthBadge"), layout.health);
+        element("healthBadge").src = ASSETS.health;
+        setRect(element("attackNumber"), layout.attackNumber);
+        setRect(element("healthNumber"), layout.healthNumber);
+        element("attackNumber").style.fontSize = `${layout.numberFont}px`;
+        element("healthNumber").style.fontSize = `${layout.numberFont}px`;
+        element("attackNumber").textContent = golden ? card.goldenAttack : card.attack;
+        element("healthNumber").textContent = golden ? card.goldenHealth : card.health;
+      }
+
+      element("previewMeta").textContent =
+        `${GROUP_LABELS[group]} · T${card.tier} · ${root[2]}×${root[3]}`;
+      element("previewNote").textContent = card.kind === "Spell" && state.variant === "golden"
+        ? "Runtime 规则：法术没有金色形态，因此金色矩阵中仍使用普通法术卡框。"
+        : "主体焦点只影响纵向溢出裁切；当前样本较接近横向裁切，滑杆变化可能很轻微。";
+
+      const matrixFile = `matrices/matrix-${state.variant}-${state.mode}.png`;
+      element("matrixImage").src = matrixFile;
+      element("matrixMeta").textContent =
+        `${state.variant === "golden" ? "金色" : "普通"} · ${state.mode === "compact" ? "紧凑 160×240" : "完整 240×360"}`;
+      fitArt();
+    }
+
+    function bindSegmented(controlId, key) {
+      element(controlId).addEventListener("click", event => {
+        const button = event.target.closest("button[data-value]");
+        if (!button) return;
+        state[key] = button.dataset.value;
+        element(controlId).querySelectorAll("button").forEach(candidate => {
+          candidate.setAttribute("aria-pressed", String(candidate === button));
+        });
+        render();
+      });
+    }
+
+    const select = element("cardSelect");
+    CARDS.forEach((card, index) => {
+      const option = document.createElement("option");
+      option.value = index;
+      option.textContent = `${GROUP_LABELS[groupOf(card)]} · ${card.name}`;
+      select.append(option);
+    });
+
+    select.addEventListener("change", () => {
+      state.cardIndex = Number(select.value);
+      state.focal = 0.5;
+      element("focalRange").value = "0.5";
+      element("focalValue").textContent = "0.50";
+      render();
+    });
+
+    element("focalRange").addEventListener("input", event => {
+      state.focal = Number(event.target.value);
+      element("focalValue").textContent = state.focal.toFixed(2);
+      fitArt();
+    });
+
+    element("artImage").addEventListener("load", fitArt);
+    bindSegmented("variantControl", "variant");
+    bindSegmented("modeControl", "mode");
+
+    render();
+  </script>
+</body>
+</html>

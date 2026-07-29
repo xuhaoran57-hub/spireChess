@@ -60,6 +60,7 @@ namespace SpireChess.UI.Run
         [SerializeField] private ScrollRect mapScrollRect;
         [SerializeField] private RectTransform mapContent;
         [SerializeField] private Image mapBackdrop;
+        [SerializeField] private bool suppressProductionBackdrop;
         [SerializeField] private RectTransform edgeLayer;
         [SerializeField] private RectTransform nodeLayer;
         [SerializeField] private GameObject mapNodePrefab;
@@ -223,8 +224,10 @@ namespace SpireChess.UI.Run
             var maximumColumn = Math.Max(1, state.MaximumColumn);
             var width = Math.Max(1900f, NodeStartX * 2f + maximumColumn * NodeColumnGap);
             mapContent.sizeDelta = new Vector2(width, 620f);
-            var productionBackdrop = PresentationArtworkResources.LoadBackdrop(
-                PresentationBackdropVariant.RunMap);
+            var productionBackdrop = suppressProductionBackdrop
+                ? null
+                : PresentationArtworkResources.LoadBackdrop(
+                    PresentationBackdropVariant.RunMap);
             mapBackdrop.sprite = productionBackdrop;
             mapBackdrop.type = Image.Type.Simple;
             mapBackdrop.preserveAspect = false;
