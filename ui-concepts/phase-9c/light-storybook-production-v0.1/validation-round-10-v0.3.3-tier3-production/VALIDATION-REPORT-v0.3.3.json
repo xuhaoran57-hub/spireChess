@@ -1,7 +1,7 @@
 {
   "version": "0.3.3",
   "batchId": "batch-03-tier3",
-  "generatedAtUtc": "2026-07-30T10:28:23.876322+00:00",
+  "generatedAtUtc": "2026-07-30T14:07:18.158260+00:00",
   "result": "PASS_OFFLINE_UNITY_PENDING",
   "checks": [
     {

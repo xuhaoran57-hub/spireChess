@@ -567,9 +567,12 @@
   为基线扩展为 86 项，9 / 9 大图、亮度、哈希、Unity 副本和 Catalog GUID
   绑定离线通过，Batch 05、v0.3.2 冻结 Catalog 与正式 Runtime Catalog 均未修改；
   剩余 51 项量产清单达到 51 / 51 已生成。
-- [ ] 在 Unity 2022.3.62f3c1 执行 Batch 01 / 02 / 03 / 04 / 05 / 06 构建器，完成普通/金色 ×
-  Compact/Full 对应卡矩阵、商店/战斗裁切、全量 EditMode/PlayMode 与人工视觉
-  复核；通过前状态保持 `PASS_OFFLINE_UNITY_PENDING`。
+- [x] 在 Unity 2022.3.62f3c1 完成 Batch 01 / 02 / 03 / 04 / 05 / 06 构建器、
+  普通/金色 × Compact/Full 卡矩阵、商店/战斗裁切、全量 EditMode/PlayMode
+  与人工视觉复核；42 张双分辨率截图、EditMode 373 / 373、PlayMode 30 / 30、
+  10 / 10 受保护资产哈希均通过，状态提升为 `UNITY_BATCH_RELEASE`。证据见
+  `ui-concepts/phase-9c/light-storybook-production-v0.1/unity-batch-release-v0.3.3/`；
+  本次仍不提升 Runtime Catalog。
 - [x] 按 v0.3.3 Prompt 与视觉回归基线完成剩余 9 张正式法术资产；量产清单无待
   生成项。任一后续冻结规则变化必须升版为 v0.3.4，不原地修改 v0.3.3。
 

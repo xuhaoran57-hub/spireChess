@@ -9,7 +9,8 @@ v0.3 更新：2026-07-29
 ## v0.3.3 冻结包
 
 `freeze-v0.3.3/` 已收束现行风格规则、生产 Prompt、视觉基线、离线校验脚本和
-Unity 交接清单。当前状态为“离线冻结通过 / Unity 运行时验收待执行”。
+Unity 交接清单。Batch 01–06 已完成 Unity 2022.3.62f3c1 批次验收，当前状态为
+`UNITY_BATCH_RELEASE`；候选仍保持隔离，未提升到 Runtime Catalog。
 
 ## 唯一共同风格参考
 
@@ -190,8 +191,8 @@ Prefab。当前机器没有项目指定的 Unity Editor，因此本轮只完成�
 - 旅团：流浪剑客。
 
 大图、亮度、哈希、Unity 副本和隔离 Catalog 绑定离线门禁通过；新 ArtId 未进入
-v0.3.2 冻结 Catalog 或正式 Runtime Catalog。当前状态为
-`PASS_OFFLINE_UNITY_PENDING`，完整记录见
+v0.3.2 冻结 Catalog 或正式 Runtime Catalog。Unity 批次状态为
+`UNITY_BATCH_RELEASE`，完整记录见
 `validation-round-8-v0.3.3-tier1-production/`。
 
 ## Round 9：v0.3.3 二级随从量产
@@ -204,9 +205,9 @@ v0.3.2 冻结 Catalog 或正式 Runtime Catalog。当前状态为
 - 荒灵：根须吞噬者、疾羽林隼、双尾狐灵。
 
 Batch 02 隔离 Catalog 以 Batch 01 为基线累计扩展，总计 53 个条目；本批 11 个
-ArtId 未写入 Batch 01、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
-当前为 18 项已生成、33 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
-离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+ArtId 未写入 Batch 01、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。当批完成时
+量产清单为 18 项已生成、33 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
+离线门禁通过，最终 Unity 批次状态为 `UNITY_BATCH_RELEASE`，完整记录见
 `validation-round-9-v0.3.3-tier2-production/`。
 
 ## Round 10：v0.3.3 三级随从量产
@@ -218,9 +219,9 @@ ArtId 未写入 Batch 01、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量
 - 荒灵：古苔巨幼体、群枝唤灵者、獠牙领奔者。
 
 Batch 03 隔离 Catalog 以 Batch 02 为基线累计扩展，总计 60 个条目；本批 7 个
-ArtId 未写入 Batch 02、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
-当前为 25 项已生成、26 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
-离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+ArtId 未写入 Batch 02、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。当批完成时
+量产清单为 25 项已生成、26 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
+离线门禁通过，最终 Unity 批次状态为 `UNITY_BATCH_RELEASE`，完整记录见
 `validation-round-10-v0.3.3-tier3-production/`。
 
 ## Round 11：v0.3.3 四级随从量产
@@ -233,9 +234,9 @@ ArtId 未写入 Batch 02、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量
 - 荒灵：百鸣兽群、山腹吞灵者、藤冠祭司。
 
 Batch 04 隔离 Catalog 以 Batch 03 为基线累计扩展，总计 71 个条目；本批 11 个
-ArtId 未写入 Batch 03、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
-当前为 36 项已生成、15 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
-离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+ArtId 未写入 Batch 03、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。当批完成时
+量产清单为 36 项已生成、15 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
+离线门禁通过，最终 Unity 批次状态为 `UNITY_BATCH_RELEASE`，完整记录见
 `validation-round-11-v0.3.3-tier4-production/`。
 
 ## Round 12：v0.3.3 五级随从量产
@@ -248,9 +249,9 @@ ArtId 未写入 Batch 03、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量
 - 荒灵：终花吞世者。
 
 Batch 05 隔离 Catalog 以 Batch 04 为基线累计扩展，总计 77 个条目；本批 6 个
-ArtId 未写入 Batch 04、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
-当前为 42 项已生成、9 项待生成，剩余内容全部为法术。大图、亮度、哈希、Unity
-副本和 Catalog GUID 离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，
+ArtId 未写入 Batch 04、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。当批完成时
+量产清单为 42 项已生成、9 项待生成，剩余内容全部为法术。大图、亮度、哈希、Unity
+副本和 Catalog GUID 离线门禁通过，最终 Unity 批次状态为 `UNITY_BATCH_RELEASE`，
 完整记录见 `validation-round-12-v0.3.3-tier5-production/`。
 
 ## Round 13：v0.3.3 法术量产
@@ -266,8 +267,17 @@ ArtId 未写入 Batch 04、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量
 Batch 06 隔离 Catalog 以 Batch 05 为基线累计扩展，总计 86 个条目；本批 9 个
 ArtId 未写入 Batch 05、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。剩余 51 项
 量产清单当前为 51 项已生成、0 项待生成。大图、亮度、哈希、Unity 副本和 Catalog
-GUID 离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+GUID 离线门禁通过，最终 Unity 批次状态为 `UNITY_BATCH_RELEASE`，完整记录见
 `validation-round-13-v0.3.3-spell-production/`。
+
+## Unity Batch 01–06 放行
+
+`unity-batch-release-v0.3.3/` 保存最终 Batch 06 隔离候选的 Unity 放行证据：
+86 个 Catalog 条目、83 个配置 ArtId Exact、51 / 51 量产图、42 张
+1920×1080/1920×1200 截图、EditMode 373 / 373、PlayMode 30 / 30，以及
+Runtime/Formal Catalog 和正式 UI Prefab 的 10 / 10 前后哈希一致。人工视觉
+复核覆盖普通/金色 × Full/Compact、法术、商店与 5v5 战斗立牌，结论为
+`UNITY_BATCH_RELEASE`。本轮不执行 Runtime 提升。
 
 ## v0.2 机制压力测试归档
 

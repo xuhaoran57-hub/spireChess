@@ -1,7 +1,7 @@
 # Round 8 一级随从量产验证
 
 - 日期：2026-07-30
-- 结论：`PASS_OFFLINE_UNITY_PENDING`
+- 结论：`UNITY_BATCH_RELEASE`
 - 自动结果：3 / 3 检查通过
 - Runtime：未修改
 
@@ -33,11 +33,15 @@
 该预审只覆盖大图身份、构图和明显生成瑕疵，不代替 Unity 160×240 Compact、
 240×360 Full、金色卡框、商店和 5v5 战斗裁切复核。
 
-## 待 Unity 完成
+## Unity 批次放行
 
-1. 执行
-   `Spire Chess/UI/Build Light Storybook Production v0.3.3 Batch 01`；
-2. 运行新增 Catalog EditMode 测试及全量 EditMode/PlayMode；
-3. 生成普通/金色 × Compact/Full 七卡矩阵；
-4. 复核商店和战斗立牌的主体裁切；
-5. 通过后将本轮状态升级为 `UNITY_BATCH_RELEASE`，仍不修改 Runtime Catalog。
+1. Batch 01 Builder 在 Unity 2022.3.62f3c1 中重建通过，7 / 7 Sprite
+   导入策略与 Catalog 绑定通过；
+2. 普通/金色 × Compact/Full 双分辨率矩阵通过人工视觉复核；
+3. Shop 与 5v5 Battle 裁切通过；
+4. 全量 EditMode 373 / 373、PlayMode 30 / 30 通过；
+5. Runtime/Formal 受保护资产哈希保持不变。
+
+统一证据见
+[`../unity-batch-release-v0.3.3/`](../unity-batch-release-v0.3.3/README.md)。
+状态提升为 `UNITY_BATCH_RELEASE`，仍不修改 Runtime Catalog。

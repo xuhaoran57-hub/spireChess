@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using SpireChess.Editor;
 using SpireChess.UI;
@@ -507,6 +508,123 @@ namespace SpireChess.Tests.EditMode
                     Is.False,
                     artId);
             }
+        }
+
+        [Test]
+        public void BatchCatalogs_PreservePinnedIdentity_AndFinalCatalogIsComplete()
+        {
+            var catalogIdentities = new[]
+            {
+                new
+                {
+                    Path = LightStorybookProductionBatch1Builder.CatalogPath,
+                    Guid = "d9212ca6f5e4c7bb20693784d5abfc97"
+                },
+                new
+                {
+                    Path = LightStorybookProductionBatch2Builder.CatalogPath,
+                    Guid = "1200000000000000000000000000000c"
+                },
+                new
+                {
+                    Path = LightStorybookProductionBatch3Builder.CatalogPath,
+                    Guid = "13000000000000000000000000000008"
+                },
+                new
+                {
+                    Path = LightStorybookProductionBatch4Builder.CatalogPath,
+                    Guid = "1400000000000000000000000000000c"
+                },
+                new
+                {
+                    Path = LightStorybookProductionBatch5Builder.CatalogPath,
+                    Guid = "15000000000000000000000000000007"
+                },
+                new
+                {
+                    Path = LightStorybookProductionBatch6Builder.CatalogPath,
+                    Guid = "1600000000000000000000000000000a"
+                }
+            };
+            foreach (var identity in catalogIdentities)
+            {
+                Assert.That(
+                    AssetDatabase.AssetPathToGUID(identity.Path),
+                    Is.EqualTo(identity.Guid),
+                    identity.Path);
+            }
+
+            var catalog =
+                AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                    LightStorybookProductionBatch6Builder.CatalogPath);
+            var runtime =
+                AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                    "Assets/Configs/Presentation/" +
+                    "PresentationSpriteCatalog.asset");
+
+            Assert.That(catalog, Is.Not.Null);
+            Assert.That(runtime, Is.Not.Null);
+            var serializedCatalog = new SerializedObject(catalog);
+            var artworks = serializedCatalog.FindProperty("artworks");
+            Assert.That(artworks, Is.Not.Null);
+            Assert.That(artworks.arraySize, Is.EqualTo(86));
+
+            var productionArtIds = AllProductionArtIds();
+            Assert.That(productionArtIds.Length, Is.EqualTo(51));
+            Assert.That(
+                productionArtIds.Distinct(StringComparer.Ordinal).Count(),
+                Is.EqualTo(productionArtIds.Length));
+            foreach (var artId in productionArtIds)
+            {
+                Assert.That(
+                    catalog.TryGetArtwork(artId, out var sprite),
+                    Is.True,
+                    artId);
+                Assert.That(sprite, Is.Not.Null, artId);
+                Assert.That(
+                    runtime.TryGetArtwork(artId, out _),
+                    Is.False,
+                    artId);
+            }
+        }
+
+        [Test]
+        public void BatchSixProductionTextures_UsePinnedImportPolicy()
+        {
+            var catalog =
+                AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
+                    LightStorybookProductionBatch6Builder.CatalogPath);
+
+            Assert.That(catalog, Is.Not.Null);
+            foreach (var artId in AllProductionArtIds())
+            {
+                Assert.That(
+                    catalog.TryGetArtwork(artId, out var sprite),
+                    Is.True,
+                    artId);
+                var path = AssetDatabase.GetAssetPath(sprite);
+                var importer =
+                    AssetImporter.GetAtPath(path) as TextureImporter;
+                Assert.That(importer, Is.Not.Null, artId);
+                Assert.That(importer.mipmapEnabled, Is.False, artId);
+                Assert.That(
+                    importer.textureCompression,
+                    Is.EqualTo(TextureImporterCompression.Uncompressed),
+                    artId);
+                Assert.That(importer.maxTextureSize, Is.EqualTo(2048), artId);
+                Assert.That(importer.isReadable, Is.False, artId);
+            }
+        }
+
+        private static string[] AllProductionArtIds()
+        {
+            return BatchOneArtIds
+                .Concat(BatchTwoArtIds)
+                .Concat(BatchThreeArtIds)
+                .Concat(BatchFourArtIds)
+                .Concat(BatchFiveArtIds)
+                .Concat(BatchSixArtIds)
+                .ToArray();
         }
     }
 }

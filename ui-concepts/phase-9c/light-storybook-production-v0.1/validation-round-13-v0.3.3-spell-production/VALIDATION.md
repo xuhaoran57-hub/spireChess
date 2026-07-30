@@ -2,7 +2,7 @@
 
 ## 结论
 
-`PASS_OFFLINE_UNITY_PENDING`
+`UNITY_BATCH_RELEASE`
 
 9 / 9 张法术完成以下离线门禁：
 
@@ -29,10 +29,16 @@
 - 命运重铸以单一金色目标、命运锻造装置和更强固定光痕表达金色额外收益。
 - 全部图片无施法者肖像、卡牌选择 UI、可读文字、Logo、签名或水印。
 
-## 待 Unity 执行
+## Unity 批次放行
 
-- 运行 Batch 06 Builder 并确认 9 个 Sprite 的导入设置；
-- 生成 Compact/Full 法术卡矩阵；
-- 检查商店法术卡裁切与费用显示；
-- 运行全量 EditMode / PlayMode；
-- 完成人工视觉复核后再决定是否提升状态。
+- Batch 06 Builder 在 Unity 2022.3.62f3c1 中重建通过，9 / 9 Sprite
+  导入策略与 Catalog 绑定通过；
+- Compact/Full 双分辨率法术矩阵通过人工视觉复核，费用、等级、类型和规则
+  文本可辨；
+- Shop 法术卡与候选美术裁切通过；
+- 全量 EditMode 373 / 373、PlayMode 30 / 30 通过；
+- Runtime/Formal 受保护资产哈希保持不变。
+
+统一证据见
+[`../unity-batch-release-v0.3.3/`](../unity-batch-release-v0.3.3/README.md)。
+状态提升为 `UNITY_BATCH_RELEASE`，仍不修改 Runtime Catalog。

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using SpireChess.Config;
 using SpireChess.UI;
 using SpireChess.UI.Shop;
@@ -42,6 +43,16 @@ namespace SpireChess.Editor
             "advanced_discovery",
             "prebattle_benediction"
         };
+
+        private static readonly FieldInfo CardCatalogField =
+            typeof(CardView).GetField(
+                "spriteCatalog",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+
+        private static readonly FieldInfo CardArtworkField =
+            typeof(CardView).GetField(
+                "artwork",
+                BindingFlags.Instance | BindingFlags.NonPublic);
 
         [MenuItem("Spire Chess/UI/Capture G2 Card Matrix")]
         public static void CaptureValidationScreenshots()
@@ -467,12 +478,13 @@ namespace SpireChess.Editor
                 "g2-all-compact");
         }
 
-        private static CaptureContext CreateScene(
+        internal static CaptureContext CreateScene(
             Font font,
             string title,
             string subtitle,
             float annotationX = 60f)
         {
+            var fontAssetPath = AssetDatabase.GetAssetPath(font);
             EditorSceneManager.NewScene(
                 NewSceneSetup.EmptyScene,
                 NewSceneMode.Single);
@@ -498,13 +510,19 @@ namespace SpireChess.Editor
             canvasRect.sizeDelta = new Vector2(1920f, 1080f);
             canvasRect.position = Vector3.zero;
             canvasRect.localScale = Vector3.one;
-            var cardFont = UnityEngine.Object.Instantiate(font);
-            cardFont.name = "G2CardMatrixCardFont";
+
+            var cardFont = AssetDatabase.LoadAssetAtPath<Font>(fontAssetPath);
+            if (cardFont == null)
+            {
+                throw new InvalidOperationException(
+                    "Pinned card font could not be reloaded after scene creation: " +
+                    fontAssetPath);
+            }
+
             var annotationSource =
-                Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? font;
-            var annotationFont =
-                UnityEngine.Object.Instantiate(annotationSource);
-            annotationFont.name = "G2CardMatrixAnnotationFont";
+                Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ??
+                cardFont;
+            var annotationFont = annotationSource;
 
             CreateText(
                 canvasRect,
@@ -536,7 +554,7 @@ namespace SpireChess.Editor
                 annotationFont);
         }
 
-        private static void CreateLabel(
+        internal static void CreateLabel(
             RectTransform canvas,
             Font font,
             string value,
@@ -557,7 +575,7 @@ namespace SpireChess.Editor
                 new Color(0.91f, 0.78f, 0.47f, 1f));
         }
 
-        private static void CreateFooter(
+        internal static void CreateFooter(
             RectTransform canvas,
             Font font,
             string value,
@@ -615,7 +633,7 @@ namespace SpireChess.Editor
             return text;
         }
 
-        private static float CenteredRowStart(
+        internal static float CenteredRowStart(
             int count,
             float cardWidth,
             float gap)
@@ -624,12 +642,13 @@ namespace SpireChess.Editor
             return (1920f - rowWidth) * 0.5f;
         }
 
-        private static void CreatePreviewCard(
+        internal static void CreatePreviewCard(
             GameObject prefab,
             CaptureContext context,
             CardViewModel model,
             float x,
-            float y)
+            float y,
+            PresentationSpriteCatalog catalogOverride = null)
         {
             var card = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             if (card == null)
@@ -638,13 +657,58 @@ namespace SpireChess.Editor
                     "Failed to instantiate PF_Card.");
             }
 
+            var cardView = card.GetComponent<CardView>();
+            if (!ReferenceEquals(catalogOverride, null))
+            {
+                if (CardCatalogField == null || CardArtworkField == null)
+                {
+                    throw new InvalidOperationException(
+                        "CardView presentation fields are unavailable.");
+                }
+                CardCatalogField.SetValue(cardView, catalogOverride);
+                if (!ReferenceEquals(
+                        CardCatalogField.GetValue(cardView),
+                        catalogOverride))
+                {
+                    throw new InvalidOperationException(
+                        "PF_Card rejected the catalog override.");
+                }
+            }
+
             card.name = "Card_" + model.InstanceId;
             card.transform.SetParent(context.Canvas, false);
             foreach (var text in card.GetComponentsInChildren<Text>(true))
             {
                 text.font = context.CardFont;
             }
-            card.GetComponent<CardView>().Render(model);
+            cardView.Render(model);
+            if (!ReferenceEquals(catalogOverride, null))
+            {
+                if (cardView.LastArtworkResolution !=
+                    ArtworkResolution.Exact)
+                {
+                    throw new InvalidOperationException(
+                        "Card matrix rendered non-exact artwork: " +
+                        model.ArtId);
+                }
+                if (!catalogOverride.TryGetArtwork(
+                        model.ArtId,
+                        out var expectedSprite) ||
+                    expectedSprite == null)
+                {
+                    throw new InvalidOperationException(
+                        "Card matrix catalog lookup failed: " + model.ArtId);
+                }
+                var artworkImage =
+                    CardArtworkField.GetValue(cardView) as Image;
+                if (artworkImage == null ||
+                    artworkImage.sprite != expectedSprite)
+                {
+                    throw new InvalidOperationException(
+                        "Card matrix rendered the wrong sprite: " +
+                        model.ArtId);
+                }
+            }
             var rect = card.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(0f, 1f);
             rect.anchorMax = new Vector2(0f, 1f);
@@ -653,7 +717,7 @@ namespace SpireChess.Editor
             rect.localScale = Vector3.one;
         }
 
-        private static CardViewModel CreateMinionModel(
+        internal static CardViewModel CreateMinionModel(
             MinionConfig config,
             bool isGolden,
             CardDisplayMode mode)
@@ -677,7 +741,7 @@ namespace SpireChess.Editor
             return model;
         }
 
-        private static CardViewModel CreateSpellModel(
+        internal static CardViewModel CreateSpellModel(
             SpellConfig config,
             CardDisplayMode mode)
         {
@@ -690,7 +754,7 @@ namespace SpireChess.Editor
             return model;
         }
 
-        private static void CaptureBothResolutions(
+        internal static void CaptureBothResolutions(
             CaptureContext context,
             string outputDirectory,
             string fileStem)
@@ -720,7 +784,7 @@ namespace SpireChess.Editor
             }
         }
 
-        private static void CaptureFrame(
+        internal static void CaptureFrame(
             Camera camera,
             RectTransform canvas,
             int width,
@@ -821,7 +885,7 @@ namespace SpireChess.Editor
             }
         }
 
-        private sealed class CaptureContext
+        internal sealed class CaptureContext
         {
             public CaptureContext(
                 Camera camera,
@@ -842,8 +906,8 @@ namespace SpireChess.Editor
 
             public void ReleaseTransientResources()
             {
-                UnityEngine.Object.DestroyImmediate(CardFont);
-                UnityEngine.Object.DestroyImmediate(AnnotationFont);
+                // Fonts are shared assets reloaded after the temporary scene is
+                // created, so no transient font resources need destruction.
             }
         }
     }

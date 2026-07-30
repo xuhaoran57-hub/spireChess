@@ -46,7 +46,8 @@ python ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v
 - 图片 `.meta` GUID 与隔离 Catalog 精确绑定；
 - 新增 7 个 ArtId 不进入 v0.3.2 冻结 Catalog 和正式 Runtime Catalog。
 
-离线通过不代替 Unity 导入、卡框裁切、EditMode/PlayMode 和人工视觉复核。
-
-当前离线结果为 `PASS_OFFLINE_UNITY_PENDING`，详见
-`VALIDATION-REPORT-v0.3.3.json`。
+离线报告结果仍为 `PASS_OFFLINE_UNITY_PENDING`，详见
+`VALIDATION-REPORT-v0.3.3.json`；它只表示离线脚本不能替代 Unity。Batch 01–06
+已完成 Unity 导入、卡框裁切、EditMode/PlayMode 和人工视觉复核，最终状态为
+`UNITY_BATCH_RELEASE`，统一证据见
+[`../unity-batch-release-v0.3.3/`](../unity-batch-release-v0.3.3/README.md)。

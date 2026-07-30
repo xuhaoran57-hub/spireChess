@@ -75,13 +75,13 @@ namespace SpireChess.Editor
                     value.Status != "generated" ||
                     string.IsNullOrWhiteSpace(value.Id) ||
                     string.IsNullOrWhiteSpace(value.Name) ||
-                    string.IsNullOrWhiteSpace(value.Race) ||
                     string.IsNullOrWhiteSpace(value.ArtId) ||
                     string.IsNullOrWhiteSpace(value.ArtFile) ||
+                    string.IsNullOrWhiteSpace(value.Description) ||
                     string.IsNullOrWhiteSpace(value.Sha256)))
             {
                 throw new InvalidOperationException(
-                    "Batch 06 requires nine generated tier-1–5 spells " +
+                    "Batch 06 requires nine generated tier 1-5 spells " +
                     "with complete identity and hash fields.");
             }
 
@@ -177,10 +177,19 @@ namespace SpireChess.Editor
                     destinationAssetPath.Replace(
                         '/',
                         Path.DirectorySeparatorChar));
-                File.Copy(sourcePath, destinationPath, true);
-                AssetDatabase.ImportAsset(
-                    destinationAssetPath,
-                    ImportAssetOptions.ForceSynchronousImport);
+                var requiresCopy =
+                    !File.Exists(destinationPath) ||
+                    !string.Equals(
+                        ComputeSha256(destinationPath),
+                        actualSha256,
+                        StringComparison.OrdinalIgnoreCase);
+                if (requiresCopy)
+                {
+                    File.Copy(sourcePath, destinationPath, true);
+                    AssetDatabase.ImportAsset(
+                        destinationAssetPath,
+                        ImportAssetOptions.ForceSynchronousImport);
+                }
                 sprites[index] = ConfigureSprite(destinationAssetPath);
             }
             return sprites;
@@ -256,23 +265,40 @@ namespace SpireChess.Editor
                 throw new InvalidOperationException(
                     "Unable to configure sprite at " + assetPath);
             }
-            importer.textureType = TextureImporterType.Sprite;
-            importer.spriteImportMode = SpriteImportMode.Single;
-            importer.mipmapEnabled = false;
-            importer.sRGBTexture = true;
-            importer.alphaIsTransparency = false;
-            importer.textureCompression =
-                TextureImporterCompression.Uncompressed;
-            importer.maxTextureSize = 2048;
-            importer.isReadable = false;
-            importer.filterMode = FilterMode.Bilinear;
-            importer.wrapMode = TextureWrapMode.Clamp;
-            importer.spritePixelsPerUnit = 100f;
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);
-            settings.spriteMeshType = SpriteMeshType.FullRect;
-            importer.SetTextureSettings(settings);
-            importer.SaveAndReimport();
+            var requiresReimport =
+                importer.textureType != TextureImporterType.Sprite ||
+                importer.spriteImportMode != SpriteImportMode.Single ||
+                importer.mipmapEnabled ||
+                !importer.sRGBTexture ||
+                importer.alphaIsTransparency ||
+                importer.textureCompression !=
+                TextureImporterCompression.Uncompressed ||
+                importer.maxTextureSize != 2048 ||
+                importer.isReadable ||
+                importer.filterMode != FilterMode.Bilinear ||
+                importer.wrapMode != TextureWrapMode.Clamp ||
+                !Mathf.Approximately(importer.spritePixelsPerUnit, 100f) ||
+                settings.spriteMeshType != SpriteMeshType.FullRect;
+            if (requiresReimport)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.mipmapEnabled = false;
+                importer.sRGBTexture = true;
+                importer.alphaIsTransparency = false;
+                importer.textureCompression =
+                    TextureImporterCompression.Uncompressed;
+                importer.maxTextureSize = 2048;
+                importer.isReadable = false;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.spritePixelsPerUnit = 100f;
+                settings.spriteMeshType = SpriteMeshType.FullRect;
+                importer.SetTextureSettings(settings);
+                importer.SaveAndReimport();
+            }
             return AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
         }
 
@@ -333,15 +359,36 @@ namespace SpireChess.Editor
             string source,
             string destination)
         {
-            if (AssetDatabase.LoadMainAssetAtPath(destination) != null)
-            {
-                AssetDatabase.DeleteAsset(destination);
-            }
-            if (!AssetDatabase.CopyAsset(source, destination))
+            var sourceAsset = AssetDatabase.LoadMainAssetAtPath(source);
+            if (sourceAsset == null)
             {
                 throw new InvalidOperationException(
-                    $"Failed to copy '{source}' to '{destination}'.");
+                    $"Source asset does not exist: '{source}'.");
             }
+
+            var destinationAsset =
+                AssetDatabase.LoadMainAssetAtPath(destination);
+            if (destinationAsset == null)
+            {
+                if (!AssetDatabase.CopyAsset(source, destination))
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to copy '{source}' to '{destination}'.");
+                }
+                return;
+            }
+
+            if (sourceAsset.GetType() != destinationAsset.GetType())
+            {
+                throw new InvalidOperationException(
+                    $"Asset type mismatch for '{destination}'.");
+            }
+
+            EditorUtility.CopySerialized(sourceAsset, destinationAsset);
+            destinationAsset.name = Path.GetFileNameWithoutExtension(
+                destination);
+            EditorUtility.SetDirty(destinationAsset);
+            AssetDatabase.SaveAssets();
         }
 
         private static string ResolveRepositoryRoot()

@@ -1,0 +1,226 @@
+{
+  "version": "0.3.3",
+  "status": "UNITY_CAPTURE_COMPLETE",
+  "generatedAtUtc": "2026-07-30T14:17:50.7833931Z",
+  "unityVersion": "2022.3.62f3c1",
+  "catalogPath": "Assets/Configs/Presentation/PresentationSpriteCatalog_LightStorybookProductionV033Batch06.asset",
+  "catalogGuid": "1600000000000000000000000000000a",
+  "runtimeCatalogPath": "Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+  "runtimeCatalogGuid": "75d638606a8084146524a35a317a2cca",
+  "catalogEntryCount": 86,
+  "configuredArtworkCount": 83,
+  "productionArtworkCount": 51,
+  "screenshotCount": 42,
+  "screenshots": [
+    {
+      "path": "screenshots/batch-01-tier1-compact-page-01-1920x1080.png",
+      "sha256": "a4edb51859ae02c6ba05c3ad4313d38c4bcba4e780d9133540725cb33ac9a755",
+      "bytes": 762161
+    },
+    {
+      "path": "screenshots/batch-01-tier1-compact-page-01-1920x1200.png",
+      "sha256": "2875a423f6b9e71313c6bb4c0045a05fb59d7abcdfa91768e50d484afe2207ce",
+      "bytes": 766656
+    },
+    {
+      "path": "screenshots/batch-01-tier1-full-page-01-1920x1080.png",
+      "sha256": "9dfb8e622ec884bbfa591946adb4c4af94d3c027eb3a5714cdb7c275c84dc6f7",
+      "bytes": 1396901
+    },
+    {
+      "path": "screenshots/batch-01-tier1-full-page-01-1920x1200.png",
+      "sha256": "7068dfc3be5437080b8cabd096531d5a8f1a0e5009c289dc1f28ce8e84ca1e98",
+      "bytes": 1401480
+    },
+    {
+      "path": "screenshots/batch-01-tier1-full-page-02-1920x1080.png",
+      "sha256": "09f5198a7f6f257009f37c75efb908b6e8be265ce2aed7a9660c6ba2935a45df",
+      "bytes": 421180
+    },
+    {
+      "path": "screenshots/batch-01-tier1-full-page-02-1920x1200.png",
+      "sha256": "235727da8a7a89f7be6daf9ded922c5f914bc9b8b0e03966a6e3f8135e3c2b2d",
+      "bytes": 425714
+    },
+    {
+      "path": "screenshots/batch-02-tier2-compact-page-01-1920x1080.png",
+      "sha256": "eb14fd9358267ed3ea801dcb8736db808857c7602265611c9d21df374550c98e",
+      "bytes": 946447
+    },
+    {
+      "path": "screenshots/batch-02-tier2-compact-page-01-1920x1200.png",
+      "sha256": "3dda899186536d1826f5b7d39d22329ecea2712c3c594d27896db84bfd0c9860",
+      "bytes": 951008
+    },
+    {
+      "path": "screenshots/batch-02-tier2-compact-page-02-1920x1080.png",
+      "sha256": "1da3730570d85d6e6bf77791d3d1c3c26f11ef542048c781fbbad4e92bd38234",
+      "bytes": 322142
+    },
+    {
+      "path": "screenshots/batch-02-tier2-compact-page-02-1920x1200.png",
+      "sha256": "f4804e377988ab17104aa1772236044b674cfa3db493f35405db2fc404037018",
+      "bytes": 326583
+    },
+    {
+      "path": "screenshots/batch-02-tier2-full-page-01-1920x1080.png",
+      "sha256": "9759e17bcff76c2190ce8651486bf352ba629ec949edda3648564ab904536aa4",
+      "bytes": 1406487
+    },
+    {
+      "path": "screenshots/batch-02-tier2-full-page-01-1920x1200.png",
+      "sha256": "f9fef32b19b74288aea4598775af9dad4b4c363e8a3a3b581582836b82384900",
+      "bytes": 1411045
+    },
+    {
+      "path": "screenshots/batch-02-tier2-full-page-02-1920x1080.png",
+      "sha256": "d057d757c6ec38ddd0aebeb87ab3338f63e08ff1bee06987076cf3b62d123cfe",
+      "bytes": 1208779
+    },
+    {
+      "path": "screenshots/batch-02-tier2-full-page-02-1920x1200.png",
+      "sha256": "6c57c7c9cc40b5b1cbbf835ceb841583920335e8721c272a713c01ab55e32bcc",
+      "bytes": 1213345
+    },
+    {
+      "path": "screenshots/batch-03-tier3-compact-page-01-1920x1080.png",
+      "sha256": "277eeed76fa80fab2ddedfce8299697cafe916a655b072803d48fa9b18bf3b15",
+      "bytes": 765836
+    },
+    {
+      "path": "screenshots/batch-03-tier3-compact-page-01-1920x1200.png",
+      "sha256": "f08032cc26a24a563060fbc322320ca259175f3b07cd5ef8939774770af8bc92",
+      "bytes": 770306
+    },
+    {
+      "path": "screenshots/batch-03-tier3-full-page-01-1920x1080.png",
+      "sha256": "4ce3011856529d4db0576707940dce17a96c12a46884d7b98881bff70becbc69",
+      "bytes": 1416130
+    },
+    {
+      "path": "screenshots/batch-03-tier3-full-page-01-1920x1200.png",
+      "sha256": "ca5b05c2e15650102aecaa618e2a38431c60b805aec7441df032fe818a65a904",
+      "bytes": 1420669
+    },
+    {
+      "path": "screenshots/batch-03-tier3-full-page-02-1920x1080.png",
+      "sha256": "dd5a0bf8970cc794c5ff69e9958c478809232309d70f00fddd3513b7eefeac82",
+      "bytes": 414216
+    },
+    {
+      "path": "screenshots/batch-03-tier3-full-page-02-1920x1200.png",
+      "sha256": "83620443728d020fd414bf1ae8889405558ae5e1b509d6587aeffac9fe3f9073",
+      "bytes": 418787
+    },
+    {
+      "path": "screenshots/batch-04-tier4-compact-page-01-1920x1080.png",
+      "sha256": "a9fcc512bcce88f58005acf85632d2d66dc7e14340d1f29ea290452d95d48801",
+      "bytes": 957090
+    },
+    {
+      "path": "screenshots/batch-04-tier4-compact-page-01-1920x1200.png",
+      "sha256": "e0f96e1d84fbd330d3129aee06dc5d30cf33c79d5fe209522e32a5156035718d",
+      "bytes": 961650
+    },
+    {
+      "path": "screenshots/batch-04-tier4-compact-page-02-1920x1080.png",
+      "sha256": "2c370022b678e0db9072781cbc8a6c0183063e53f17ffe425355242dbfc5a2f4",
+      "bytes": 322251
+    },
+    {
+      "path": "screenshots/batch-04-tier4-compact-page-02-1920x1200.png",
+      "sha256": "cb8a157f9d7e73aa3bb8f9397685ec3599bb96d76385a47e4bc5b35ef08affe1",
+      "bytes": 326837
+    },
+    {
+      "path": "screenshots/batch-04-tier4-full-page-01-1920x1080.png",
+      "sha256": "cae3d111abc0ffe31082fb5a1495411977216141a0d7e9722d94e0f4b2140857",
+      "bytes": 1429113
+    },
+    {
+      "path": "screenshots/batch-04-tier4-full-page-01-1920x1200.png",
+      "sha256": "73bc75994c4d677cdc1fed1833820fb58dc4d80a32a96bba33081e58ec8907eb",
+      "bytes": 1433523
+    },
+    {
+      "path": "screenshots/batch-04-tier4-full-page-02-1920x1080.png",
+      "sha256": "64fb11df8a77943fc822d29450effb4ea23c3d9b621efc905251e243c324e887",
+      "bytes": 1258222
+    },
+    {
+      "path": "screenshots/batch-04-tier4-full-page-02-1920x1200.png",
+      "sha256": "088f25f642d71a75a4bcec7f496dc37e468b4e37021982054a9ac306b96b83a4",
+      "bytes": 1262755
+    },
+    {
+      "path": "screenshots/batch-05-tier5-compact-page-01-1920x1080.png",
+      "sha256": "56b66c904f32eece7ea8a8d884fd752cafc3974af92c123178ca6719f64044d9",
+      "bytes": 717030
+    },
+    {
+      "path": "screenshots/batch-05-tier5-compact-page-01-1920x1200.png",
+      "sha256": "134b37a3849e02a9b7f237cdbcc95e10ec0bd295befe64238c9251ca220df24c",
+      "bytes": 721552
+    },
+    {
+      "path": "screenshots/batch-05-tier5-full-page-01-1920x1080.png",
+      "sha256": "03d6728629612e8c68ae34de68aeb274afb1085d60201eb95ae45f4d4c630ce8",
+      "bytes": 1504056
+    },
+    {
+      "path": "screenshots/batch-05-tier5-full-page-01-1920x1200.png",
+      "sha256": "c09ebb9d0017e20f139c1a6d44b9b9a807d6c946bc9812f83f0de9cd723c9bef",
+      "bytes": 1508631
+    },
+    {
+      "path": "screenshots/batch-06-spells-compact-page-01-1920x1080.png",
+      "sha256": "ce0a3fe9040348b46b2ee8f8c99dd273fedeb81616dd00f3b4048f8b6fed012e",
+      "bytes": 507037
+    },
+    {
+      "path": "screenshots/batch-06-spells-compact-page-01-1920x1200.png",
+      "sha256": "3948e4c70802cde0867ecc99127685cf35cb00c04a2d85fff25eae621e5022f6",
+      "bytes": 511655
+    },
+    {
+      "path": "screenshots/batch-06-spells-full-page-01-1920x1080.png",
+      "sha256": "14a8165f603a02eec2b6d09f903efb5e0abb91eabdc67e9931254059bd96046e",
+      "bytes": 713582
+    },
+    {
+      "path": "screenshots/batch-06-spells-full-page-01-1920x1200.png",
+      "sha256": "1144cb69b6877e27f0e245a3c9366e1dc0c26fa1dab252230e1df885a303379d",
+      "bytes": 718197
+    },
+    {
+      "path": "screenshots/batch-06-spells-full-page-02-1920x1080.png",
+      "sha256": "67845b28cac52616014466fe79a7f509755812283fd84171972b932b8a81986b",
+      "bytes": 453020
+    },
+    {
+      "path": "screenshots/batch-06-spells-full-page-02-1920x1200.png",
+      "sha256": "3bf705c70b8503a6814d33de5911c7a6f556bdcaa77df42c692feec1f1030ec3",
+      "bytes": 457623
+    },
+    {
+      "path": "screenshots/battle-production-crop-1920x1080.png",
+      "sha256": "53bf3ce578aa77f324d06545ff33f000c283bf0358873d5bcb755096a047a780",
+      "bytes": 794992
+    },
+    {
+      "path": "screenshots/battle-production-crop-1920x1200.png",
+      "sha256": "01a3895104a1c3f822af5bae03d2b81e3e8683be57d415168477cb692e08f7e4",
+      "bytes": 799990
+    },
+    {
+      "path": "screenshots/shop-production-crop-1920x1080.png",
+      "sha256": "da3125b3e0672cf4aa9bd909c3be4560fcba7bc0dd1d1f80c2336b92746614e5",
+      "bytes": 1755005
+    },
+    {
+      "path": "screenshots/shop-production-crop-1920x1200.png",
+      "sha256": "6029ea44f11a7d405886751b489876e78cf511c0f19dabcce4bcf194f0067d2c",
+      "bytes": 2077233
+    }
+  ]
+}

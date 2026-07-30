@@ -41,5 +41,7 @@ Unity 图片副本：
 python ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/validate.py
 ```
 
-当前结果为 `PASS_OFFLINE_UNITY_PENDING`。离线通过不替代 Unity 导入、法术卡框
-裁切、EditMode/PlayMode 与人工视觉复核。
+离线报告结果仍为 `PASS_OFFLINE_UNITY_PENDING`；它只表示离线脚本不能替代
+Unity。Batch 01–06 已完成 Unity 导入、法术卡框裁切、EditMode/PlayMode 与
+人工视觉复核，最终状态为 `UNITY_BATCH_RELEASE`，统一证据见
+[`../unity-batch-release-v0.3.3/`](../unity-batch-release-v0.3.3/README.md)。

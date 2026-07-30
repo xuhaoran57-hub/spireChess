@@ -2,7 +2,7 @@
 
 ## 结论
 
-`PASS_OFFLINE_UNITY_PENDING`
+`UNITY_BATCH_RELEASE`
 
 11 / 11 张二级随从完成以下离线门禁：
 
@@ -24,10 +24,15 @@
 - 荒灵三张均保持自然动物解剖；疾羽林隼为两翼两足，双尾狐灵严格双尾。
 - 全部图片无可读文字、卡框、UI、Logo、签名或水印。
 
-## 待 Unity 执行
+## Unity 批次放行
 
-- 运行 Batch 02 Builder 并确认 11 个 Sprite 的导入设置；
-- 生成普通/金色 × Compact/Full 十一卡矩阵；
-- 检查商店与战斗立牌裁切；
-- 运行全量 EditMode / PlayMode；
-- 完成人工视觉复核后再决定是否提升状态。
+- Batch 02 Builder 在 Unity 2022.3.62f3c1 中重建通过，11 / 11 Sprite
+  导入策略与 Catalog 绑定通过；
+- 普通/金色 × Compact/Full 双分辨率矩阵通过人工视觉复核；
+- Shop 与 5v5 Battle 裁切通过；
+- 全量 EditMode 373 / 373、PlayMode 30 / 30 通过；
+- Runtime/Formal 受保护资产哈希保持不变。
+
+统一证据见
+[`../unity-batch-release-v0.3.3/`](../unity-batch-release-v0.3.3/README.md)。
+状态提升为 `UNITY_BATCH_RELEASE`，仍不修改 Runtime Catalog。

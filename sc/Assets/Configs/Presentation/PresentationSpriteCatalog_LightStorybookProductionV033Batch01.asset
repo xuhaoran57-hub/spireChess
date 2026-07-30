@@ -149,9 +149,9 @@ MonoBehaviour:
   - id: placeholder_card_wandering_swordsman
     sprite: {fileID: 21300000, guid: f507e862b1a08377ec25f340916db853, type: 3}
     focalPointY: 0.5
-  - id: placeholder_card_rending_cub
-    sprite: {fileID: 21300000, guid: a608f973c2b19488fd360451a27ec964, type: 3}
-    focalPointY: 0.5
   - id: placeholder_card_moss_mark_seedling
     sprite: {fileID: 21300000, guid: b7090a84d3c2a5990e471562b38fda75, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_rending_cub
+    sprite: {fileID: 21300000, guid: a608f973c2b19488fd360451a27ec964, type: 3}
     focalPointY: 0.5
