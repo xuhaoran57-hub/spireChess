@@ -1,0 +1,341 @@
+{
+  "version": "0.3.3",
+  "batchId": "batch-04-tier4",
+  "generatedAtUtc": "2026-07-30T10:28:23.359274+00:00",
+  "result": "PASS_OFFLINE_UNITY_PENDING",
+  "checks": [
+    {
+      "id": "batch-identity",
+      "status": "pass",
+      "details": {
+        "count": 11,
+        "ids": [
+          "cinder_armor_arbiter",
+          "hearth_core_aegis_officer",
+          "ringing_iron_bastion",
+          "falling_light_arbiter",
+          "star_ring_treasurer",
+          "stargate_lecturer",
+          "formation_breaker_mercenary",
+          "pack_hunt_inspector",
+          "hundred_song_herd",
+          "mountain_belly_soul_eater",
+          "vinecrown_priest"
+        ]
+      }
+    },
+    {
+      "id": "art-hash-aspect-brightness",
+      "status": "pass",
+      "details": [
+        {
+          "id": "cinder_armor_arbiter",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 157.75,
+            "lightMidRatio": 0.861621,
+            "nearBlackRatio": 0.001221
+          },
+          "sha256": "558cf8266e94f572e23485a6bb586b4d4cc9f66f6c2b684b3518ce6e86cb5d6d",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "hearth_core_aegis_officer",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 172.61,
+            "lightMidRatio": 0.943164,
+            "nearBlackRatio": 9.8e-05
+          },
+          "sha256": "276a8424ad2a6e4706f88de30f08680e985e0e518e85056ed864e2462865730c",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "ringing_iron_bastion",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 157.32,
+            "lightMidRatio": 0.874854,
+            "nearBlackRatio": 0.000146
+          },
+          "sha256": "3c6141797066eb92d3cc21cd550e9a3291a963c2871299c8645a6c68ddffae55",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "falling_light_arbiter",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 173.04,
+            "lightMidRatio": 0.946191,
+            "nearBlackRatio": 0.000244
+          },
+          "sha256": "66c68a8bf0c706bb6ca4e785a0296dfdfc4a4a9ff4d4b310be52dca46c21001f",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "star_ring_treasurer",
+          "exists": true,
+          "size": [
+            1405,
+            1120
+          ],
+          "aspectRatio": 1.254464,
+          "luma": {
+            "meanLuma": 138.34,
+            "lightMidRatio": 0.775488,
+            "nearBlackRatio": 0.002881
+          },
+          "sha256": "cca1032da04fb4502c489b3692ebae3c561006b4db3b054162d54994f64f1cbb",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "stargate_lecturer",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 166.64,
+            "lightMidRatio": 0.940674,
+            "nearBlackRatio": 0.000244
+          },
+          "sha256": "0fbc3fd6d8a4c7e87d187fb9d1e67baecc2fd0e95f9bae54dfe9ea9eac87c9ed",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "formation_breaker_mercenary",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 166.26,
+            "lightMidRatio": 0.933545,
+            "nearBlackRatio": 0.000146
+          },
+          "sha256": "5c9c0dad4ab9c19c263765a8abf7c229c435d4f3b5fd0440d608f5268877d87e",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "pack_hunt_inspector",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 131.62,
+            "lightMidRatio": 0.771484,
+            "nearBlackRatio": 0.004297
+          },
+          "sha256": "7503457ba2229715b1c4eeec9677120af5c761d06273c54f84a0fea573e81f75",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "hundred_song_herd",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 175.31,
+            "lightMidRatio": 0.992432,
+            "nearBlackRatio": 0.0
+          },
+          "sha256": "8d6fe3f451d4446744d776a949734509364ffff4601507e565efb82ed1ccbefc",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "mountain_belly_soul_eater",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 144.41,
+            "lightMidRatio": 0.82124,
+            "nearBlackRatio": 0.000439
+          },
+          "sha256": "7a8f2a30ba495f503d367f336a9e5f95e80821cef62ad4bde05a636c1446382b",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "vinecrown_priest",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 161.59,
+            "lightMidRatio": 0.966553,
+            "nearBlackRatio": 0.0
+          },
+          "sha256": "1240c24ad256f7f15a934e87d08e5b03395bc07870f6143fe9acc9b77f665540",
+          "unityCopyMatches": true,
+          "passes": true
+        }
+      ]
+    },
+    {
+      "id": "isolated-catalog-bindings",
+      "status": "pass",
+      "details": {
+        "isolatedCatalogEntries": 71,
+        "containsAllPreviousCatalogEntries": true,
+        "cards": [
+          {
+            "id": "cinder_armor_arbiter",
+            "artId": "placeholder_card_cinder_armor_arbiter",
+            "metaGuid": "14000000000000000000000000000001",
+            "isolatedCatalogGuid": "14000000000000000000000000000001",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "hearth_core_aegis_officer",
+            "artId": "placeholder_card_hearth_core_aegis_officer",
+            "metaGuid": "14000000000000000000000000000002",
+            "isolatedCatalogGuid": "14000000000000000000000000000002",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "ringing_iron_bastion",
+            "artId": "placeholder_card_ringing_iron_bastion",
+            "metaGuid": "14000000000000000000000000000003",
+            "isolatedCatalogGuid": "14000000000000000000000000000003",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "falling_light_arbiter",
+            "artId": "placeholder_card_falling_light_arbiter",
+            "metaGuid": "14000000000000000000000000000004",
+            "isolatedCatalogGuid": "14000000000000000000000000000004",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "star_ring_treasurer",
+            "artId": "placeholder_card_star_ring_treasurer",
+            "metaGuid": "14000000000000000000000000000005",
+            "isolatedCatalogGuid": "14000000000000000000000000000005",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "stargate_lecturer",
+            "artId": "placeholder_card_stargate_lecturer",
+            "metaGuid": "14000000000000000000000000000006",
+            "isolatedCatalogGuid": "14000000000000000000000000000006",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "formation_breaker_mercenary",
+            "artId": "placeholder_card_formation_breaker_mercenary",
+            "metaGuid": "14000000000000000000000000000007",
+            "isolatedCatalogGuid": "14000000000000000000000000000007",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "pack_hunt_inspector",
+            "artId": "placeholder_card_pack_hunt_inspector",
+            "metaGuid": "14000000000000000000000000000008",
+            "isolatedCatalogGuid": "14000000000000000000000000000008",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "hundred_song_herd",
+            "artId": "placeholder_card_hundred_song_herd",
+            "metaGuid": "14000000000000000000000000000009",
+            "isolatedCatalogGuid": "14000000000000000000000000000009",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "mountain_belly_soul_eater",
+            "artId": "placeholder_card_mountain_belly_soul_eater",
+            "metaGuid": "1400000000000000000000000000000a",
+            "isolatedCatalogGuid": "1400000000000000000000000000000a",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "vinecrown_priest",
+            "artId": "placeholder_card_vinecrown_priest",
+            "metaGuid": "1400000000000000000000000000000b",
+            "isolatedCatalogGuid": "1400000000000000000000000000000b",
+            "absentFromBatchThree": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "version": "0.3.3",
+  "batchId": "batch-05-tier5",
+  "generatedAtUtc": "2026-07-30T10:28:23.259345+00:00",
+  "result": "PASS_OFFLINE_UNITY_PENDING",
+  "checks": [
+    {
+      "id": "batch-identity",
+      "status": "pass",
+      "details": {
+        "count": 6,
+        "ids": [
+          "oathbroken_blade_soul",
+          "thousand_ring_tomb_guardian",
+          "falling_star_prophet",
+          "fate_shuffler",
+          "royal_bounty_hunter",
+          "world_eating_final_bloom"
+        ]
+      }
+    },
+    {
+      "id": "art-hash-aspect-brightness",
+      "status": "pass",
+      "details": [
+        {
+          "id": "oathbroken_blade_soul",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 169.83,
+            "lightMidRatio": 0.954346,
+            "nearBlackRatio": 0.0
+          },
+          "sha256": "aa32d56abb03ae46c878168128744552abcd7fed49fafdb2f8e04383395283c0",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "thousand_ring_tomb_guardian",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 158.76,
+            "lightMidRatio": 0.933154,
+            "nearBlackRatio": 0.0
+          },
+          "sha256": "d4f8183449b54788ae6145eb7cd3a5440792159d648b6831ab25bb39ca79f76f",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "falling_star_prophet",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 155.32,
+            "lightMidRatio": 0.863672,
+            "nearBlackRatio": 0.000488
+          },
+          "sha256": "5b68ddf3c42722ba8274d904b733405669c771ae41b47a2a577a1796a77d540d",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "fate_shuffler",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 141.29,
+            "lightMidRatio": 0.766943,
+            "nearBlackRatio": 0.002295
+          },
+          "sha256": "859a7602631b0ee204120e48c596ad9c58d30a07d5b7fcc1b84efb5722ed9cbf",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "royal_bounty_hunter",
+          "exists": true,
+          "size": [
+            1401,
+            1123
+          ],
+          "aspectRatio": 1.247551,
+          "luma": {
+            "meanLuma": 153.59,
+            "lightMidRatio": 0.8271,
+            "nearBlackRatio": 0.001953
+          },
+          "sha256": "628edaa837d42edc5e56840e2c010a6ac4ee7d020f739ba961f408b224d3da56",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "world_eating_final_bloom",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 163.27,
+            "lightMidRatio": 0.932666,
+            "nearBlackRatio": 9.8e-05
+          },
+          "sha256": "51e75969c9dfc54eee3d7b860208cec6e9f286463af39a006fee1115b5dc3b6c",
+          "unityCopyMatches": true,
+          "passes": true
+        }
+      ]
+    },
+    {
+      "id": "isolated-catalog-bindings",
+      "status": "pass",
+      "details": {
+        "isolatedCatalogEntries": 77,
+        "containsAllPreviousCatalogEntries": true,
+        "cards": [
+          {
+            "id": "oathbroken_blade_soul",
+            "artId": "placeholder_card_oathbroken_blade_soul",
+            "metaGuid": "15000000000000000000000000000001",
+            "isolatedCatalogGuid": "15000000000000000000000000000001",
+            "absentFromBatchFour": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "thousand_ring_tomb_guardian",
+            "artId": "placeholder_card_thousand_ring_tomb_guardian",
+            "metaGuid": "15000000000000000000000000000002",
+            "isolatedCatalogGuid": "15000000000000000000000000000002",
+            "absentFromBatchFour": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "falling_star_prophet",
+            "artId": "placeholder_card_falling_star_prophet",
+            "metaGuid": "15000000000000000000000000000003",
+            "isolatedCatalogGuid": "15000000000000000000000000000003",
+            "absentFromBatchFour": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "fate_shuffler",
+            "artId": "placeholder_card_fate_shuffler",
+            "metaGuid": "15000000000000000000000000000004",
+            "isolatedCatalogGuid": "15000000000000000000000000000004",
+            "absentFromBatchFour": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "royal_bounty_hunter",
+            "artId": "placeholder_card_royal_bounty_hunter",
+            "metaGuid": "15000000000000000000000000000005",
+            "isolatedCatalogGuid": "15000000000000000000000000000005",
+            "absentFromBatchFour": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "world_eating_final_bloom",
+            "artId": "placeholder_card_world_eating_final_bloom",
+            "metaGuid": "15000000000000000000000000000006",
+            "isolatedCatalogGuid": "15000000000000000000000000000006",
+            "absentFromBatchFour": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          }
+        ]
+      }
+    }
+  ]
+}

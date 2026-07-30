@@ -1,0 +1,229 @@
+{
+  "version": "0.3.3",
+  "batchId": "batch-03-tier3",
+  "generatedAtUtc": "2026-07-30T10:28:23.876322+00:00",
+  "result": "PASS_OFFLINE_UNITY_PENDING",
+  "checks": [
+    {
+      "id": "batch-identity",
+      "status": "pass",
+      "details": {
+        "count": 7,
+        "ids": [
+          "counterflow_smith",
+          "molten_core_standard",
+          "oathblade_armor",
+          "echo_starchanter",
+          "ancient_moss_hatchling",
+          "many_branch_invoker",
+          "tuskherd_pathrunner"
+        ]
+      }
+    },
+    {
+      "id": "art-hash-aspect-brightness",
+      "status": "pass",
+      "details": [
+        {
+          "id": "counterflow_smith",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 152.97,
+            "lightMidRatio": 0.856982,
+            "nearBlackRatio": 0.00083
+          },
+          "sha256": "6f6fc56fce77336ee42a72c1a1f0511532927cab9d0e7189c1571768f2c21da2",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "molten_core_standard",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 167.08,
+            "lightMidRatio": 0.914111,
+            "nearBlackRatio": 0.002881
+          },
+          "sha256": "45d80d35b3d0a006b5bc2133638e6387237b3479fa54f80fa70b8ba8d16335e4",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "oathblade_armor",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 162.99,
+            "lightMidRatio": 0.905566,
+            "nearBlackRatio": 0.001074
+          },
+          "sha256": "3b8356c8cbe580a92178292e61de45c0273b3bc7268e388dbaa253add373fd00",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "echo_starchanter",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 156.72,
+            "lightMidRatio": 0.895654,
+            "nearBlackRatio": 0.000146
+          },
+          "sha256": "cd77d14cf0f24a5381109f42bf32c124ccefb7e76a7496e9ced93c3e87d75181",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "ancient_moss_hatchling",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 131.45,
+            "lightMidRatio": 0.820801,
+            "nearBlackRatio": 0.002734
+          },
+          "sha256": "38cf0fca3401585d3a6c02223941dbcb8a4f25f0405c7e6607aff0e22d75a9d9",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "many_branch_invoker",
+          "exists": true,
+          "size": [
+            1392,
+            1130
+          ],
+          "aspectRatio": 1.231858,
+          "luma": {
+            "meanLuma": 177.58,
+            "lightMidRatio": 0.972119,
+            "nearBlackRatio": 4.9e-05
+          },
+          "sha256": "a6e8c30f41fb858aa7d7897487790e4961c313fb8c4adda8a7b9cbc4244e1c22",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "tuskherd_pathrunner",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 164.13,
+            "lightMidRatio": 0.887451,
+            "nearBlackRatio": 0.001611
+          },
+          "sha256": "b6a9ff49e81cea3846646c5161f3eaac7f652665a38432deafe116a3cfd0cee3",
+          "unityCopyMatches": true,
+          "passes": true
+        }
+      ]
+    },
+    {
+      "id": "isolated-catalog-bindings",
+      "status": "pass",
+      "details": {
+        "isolatedCatalogEntries": 60,
+        "containsAllPreviousArtIds": true,
+        "cards": [
+          {
+            "id": "counterflow_smith",
+            "artId": "placeholder_card_counterflow_smith",
+            "metaGuid": "13000000000000000000000000000001",
+            "isolatedCatalogGuid": "13000000000000000000000000000001",
+            "absentFromBatchTwo": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "molten_core_standard",
+            "artId": "placeholder_card_molten_core_standard",
+            "metaGuid": "13000000000000000000000000000002",
+            "isolatedCatalogGuid": "13000000000000000000000000000002",
+            "absentFromBatchTwo": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "oathblade_armor",
+            "artId": "placeholder_card_oathblade_armor",
+            "metaGuid": "13000000000000000000000000000003",
+            "isolatedCatalogGuid": "13000000000000000000000000000003",
+            "absentFromBatchTwo": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "echo_starchanter",
+            "artId": "placeholder_card_echo_starchanter",
+            "metaGuid": "13000000000000000000000000000004",
+            "isolatedCatalogGuid": "13000000000000000000000000000004",
+            "absentFromBatchTwo": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "ancient_moss_hatchling",
+            "artId": "placeholder_card_ancient_moss_hatchling",
+            "metaGuid": "13000000000000000000000000000005",
+            "isolatedCatalogGuid": "13000000000000000000000000000005",
+            "absentFromBatchTwo": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "many_branch_invoker",
+            "artId": "placeholder_card_many_branch_invoker",
+            "metaGuid": "13000000000000000000000000000006",
+            "isolatedCatalogGuid": "13000000000000000000000000000006",
+            "absentFromBatchTwo": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "tuskherd_pathrunner",
+            "artId": "placeholder_card_tuskherd_pathrunner",
+            "metaGuid": "13000000000000000000000000000007",
+            "isolatedCatalogGuid": "13000000000000000000000000000007",
+            "absentFromBatchTwo": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          }
+        ]
+      }
+    }
+  ]
+}

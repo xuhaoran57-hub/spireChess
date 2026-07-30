@@ -539,11 +539,42 @@
   Prefab/Scene 序列化、交互与正式 Runtime 隔离，并将 v0.3.3 升级为
   “Unity 最终放行”。证据见
   `ui-concepts/phase-9c/light-storybook-production-v0.1/unity-release-v0.3.3/`。
-- [ ] Unity 最终放行后，按 v0.3.3 Prompt 与视觉回归基线批量生产剩余正式卡池
-  和背景；任一冻结规则变化必须升版为 v0.3.4，不原地修改 v0.3.3。
+- [x] 建立剩余 51 项量产清单：以 v0.3.2 隔离 Formal Catalog 为覆盖基线，
+  精确列出 42 张随从与 9 张法术；按一级 7、二级 11、三级 7、四级 11、
+  五级 6、法术 9 分为六批，并冻结配置、Style Tile、Prompt 与 Catalog 哈希。
+- [x] 完成 v0.3.3 Batch 01 的 7 张剩余一级随从候选，并接入新的隔离
+  `PresentationSpriteCatalog_LightStorybookProductionV033Batch01`；7 / 7 大图
+  哈希、约 5:4 画幅、亮度和 Catalog GUID 绑定离线通过，v0.3.2 冻结 Catalog
+  与正式 Runtime Catalog 均未修改。
+- [x] 完成 v0.3.3 Batch 02 的 11 张剩余二级随从候选；累计隔离
+  `PresentationSpriteCatalog_LightStorybookProductionV033Batch02` 以 Batch 01
+  为基线扩展为 53 项，11 / 11 大图、亮度、哈希、Unity 副本和 Catalog GUID
+  绑定离线通过，Batch 01、v0.3.2 冻结 Catalog 与正式 Runtime Catalog 均未修改。
+- [x] 完成 v0.3.3 Batch 03 的 7 张剩余三级随从候选；累计隔离
+  `PresentationSpriteCatalog_LightStorybookProductionV033Batch03` 以 Batch 02
+  为基线扩展为 60 项，7 / 7 大图、亮度、哈希、Unity 副本和 Catalog GUID
+  绑定离线通过，Batch 02、v0.3.2 冻结 Catalog 与正式 Runtime Catalog 均未修改。
+- [x] 完成 v0.3.3 Batch 04 的 11 张剩余四级随从候选；累计隔离
+  `PresentationSpriteCatalog_LightStorybookProductionV033Batch04` 以 Batch 03
+  为基线扩展为 71 项，11 / 11 大图、亮度、哈希、Unity 副本和 Catalog GUID
+  绑定离线通过，Batch 03、v0.3.2 冻结 Catalog 与正式 Runtime Catalog 均未修改。
+- [x] 完成 v0.3.3 Batch 05 的 6 张剩余五级随从候选；累计隔离
+  `PresentationSpriteCatalog_LightStorybookProductionV033Batch05` 以 Batch 04
+  为基线扩展为 77 项，6 / 6 大图、亮度、哈希、Unity 副本和 Catalog GUID
+  绑定离线通过，Batch 04、v0.3.2 冻结 Catalog 与正式 Runtime Catalog 均未修改。
+- [x] 完成 v0.3.3 Batch 06 的 9 张剩余法术候选；最终累计隔离
+  `PresentationSpriteCatalog_LightStorybookProductionV033Batch06` 以 Batch 05
+  为基线扩展为 86 项，9 / 9 大图、亮度、哈希、Unity 副本和 Catalog GUID
+  绑定离线通过，Batch 05、v0.3.2 冻结 Catalog 与正式 Runtime Catalog 均未修改；
+  剩余 51 项量产清单达到 51 / 51 已生成。
+- [ ] 在 Unity 2022.3.62f3c1 执行 Batch 01 / 02 / 03 / 04 / 05 / 06 构建器，完成普通/金色 ×
+  Compact/Full 对应卡矩阵、商店/战斗裁切、全量 EditMode/PlayMode 与人工视觉
+  复核；通过前状态保持 `PASS_OFFLINE_UNITY_PENDING`。
+- [x] 按 v0.3.3 Prompt 与视觉回归基线完成剩余 9 张正式法术资产；量产清单无待
+  生成项。任一后续冻结规则变化必须升版为 v0.3.4，不原地修改 v0.3.3。
 
 ## 暂缓
 
 - [ ] 超出阶段 5 白名单的任意脚本化效果 DSL。
 - [ ] 微信小游戏打包。
-- [ ] 全量正式美术和动画（暂缓；Phase 9B 样板范围已启用）。
+- [ ] Phase 9C 静态卡牌与背景之外的全量正式美术和动画。

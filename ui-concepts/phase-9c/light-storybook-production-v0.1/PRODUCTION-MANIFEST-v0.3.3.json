@@ -1,0 +1,1242 @@
+{
+  "version": "0.3.3",
+  "purpose": "remaining formal card-art production after the isolated v0.3.2 catalog baseline",
+  "runtimePolicy": "Calibration only. Do not modify the Runtime catalog until the promoted candidate is explicitly approved.",
+  "sources": {
+    "minions": {
+      "path": "sc/Assets/Resources/Configs/Json/minions.v0.1.json",
+      "sha256": "b487bd2055cfbee1e3ce3f88728e0702bc4af6ff8f6d40c686600a6838f2cac7"
+    },
+    "spells": {
+      "path": "sc/Assets/Resources/Configs/Json/spells.v0.1.json",
+      "sha256": "96713ac43d4fdd88d882b69a3ea59c8661decbc850fcf62ed493b9716b0f6826"
+    },
+    "baselineCatalog": {
+      "path": "sc/Assets/Configs/Presentation/PresentationSpriteCatalog_LightStorybookFormalCatalogV032.asset",
+      "sha256": "5bd7d35dae35e3cedb6f13507a2cb700c981094c1d02a1e3b571ec87c341ed36"
+    },
+    "styleTile": {
+      "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+      "sha256": "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed"
+    },
+    "productionPrompt": {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/PRODUCTION-PROMPTS-v0.3.3.zh-CN.md",
+      "sha256": "ae96662e11ee60d12d198eca5cd35f9c526eae7f56087ac575d11d35cd794517"
+    }
+  },
+  "counts": {
+    "content": 83,
+    "baselineCatalogEntries": 35,
+    "coveredContent": 32,
+    "remaining": 51,
+    "remainingMinions": 42,
+    "remainingSpells": 9,
+    "generated": 51,
+    "pending": 0
+  },
+  "batchCounts": {
+    "batch-01-tier1": 7,
+    "batch-02-tier2": 11,
+    "batch-03-tier3": 7,
+    "batch-04-tier4": 11,
+    "batch-05-tier5": 6,
+    "batch-06-spells": 9
+  },
+  "items": [
+    {
+      "kind": "Minion",
+      "id": "copper_ring_apprentice",
+      "name": "铜环学徒",
+      "tier": 1,
+      "artId": "placeholder_card_copper_ring_apprentice",
+      "batchId": "batch-01-tier1",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/cards/forge-soul/copper-ring-apprentice-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战斗开始：使左侧友方随从本场获得 +1 生命。",
+      "tags": [
+        "position"
+      ],
+      "race": "ForgeSoul",
+      "attack": 1,
+      "health": 2,
+      "goldenAttack": 2,
+      "goldenHealth": 4,
+      "keywords": [],
+      "goldenDescription": "战斗开始：使左侧友方随从本场获得 +2 生命。",
+      "sha256": "8c39754fca7a78b2b1a9bd292a318ea8809e5bc527817b80132cae93791a6fe6"
+    },
+    {
+      "kind": "Minion",
+      "id": "hearth_core_spark",
+      "name": "炉心火种",
+      "tier": 1,
+      "artId": "placeholder_card_hearth_core_spark",
+      "batchId": "batch-01-tier1",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/cards/forge-soul/hearth-core-spark-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当本随从失去护盾，本场获得 +1 攻击。",
+      "tags": [
+        "shield_break"
+      ],
+      "race": "ForgeSoul",
+      "attack": 2,
+      "health": 1,
+      "goldenAttack": 4,
+      "goldenHealth": 2,
+      "keywords": [
+        "Shield"
+      ],
+      "goldenDescription": "每当本随从失去护盾，本场获得 +2 攻击。",
+      "sha256": "bff4048dd31c7c4e9d4da82798234c64e198586435f00b7ddb35fd4bd620401e"
+    },
+    {
+      "kind": "Minion",
+      "id": "stardust_attendant",
+      "name": "星尘随侍",
+      "tier": 1,
+      "artId": "placeholder_card_stardust_attendant",
+      "batchId": "batch-01-tier1",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/cards/starbound/stardust-attendant-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每个商店阶段第 2 次刷新后，永久获得 +1/+1。",
+      "tags": [
+        "refresh_growth"
+      ],
+      "race": "Starbound",
+      "attack": 1,
+      "health": 3,
+      "goldenAttack": 2,
+      "goldenHealth": 6,
+      "keywords": [],
+      "goldenDescription": "每个商店阶段第 2 次刷新后，永久获得 +2/+2。",
+      "sha256": "0ab849b3b666759b038d6f53270ea953bfdcb0e0986e7ac8b060bf6eebcdabf8"
+    },
+    {
+      "kind": "Minion",
+      "id": "stargazing_apprentice",
+      "name": "观星学徒",
+      "tier": 1,
+      "artId": "placeholder_card_stargazing_apprentice",
+      "batchId": "batch-01-tier1",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/cards/starbound/stargazing-apprentice-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战吼：本商店阶段下一次刷新免费。",
+      "tags": [
+        "refresh"
+      ],
+      "race": "Starbound",
+      "attack": 1,
+      "health": 2,
+      "goldenAttack": 2,
+      "goldenHealth": 4,
+      "keywords": [
+        "Battlecry"
+      ],
+      "goldenDescription": "战吼：本商店阶段下 2 次刷新免费。",
+      "sha256": "ad7b091e1348bed318e2e07b64b07c11fa6e031eff252f4906959621bad1a335"
+    },
+    {
+      "kind": "Minion",
+      "id": "wandering_swordsman",
+      "name": "流浪剑客",
+      "tier": 1,
+      "artId": "placeholder_card_wandering_swordsman",
+      "batchId": "batch-01-tier1",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/cards/wayfarer/wandering-swordsman-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "出售此随从时，额外获得 1 金币。",
+      "tags": [
+        "sell"
+      ],
+      "race": "Wayfarer",
+      "attack": 2,
+      "health": 2,
+      "goldenAttack": 4,
+      "goldenHealth": 4,
+      "keywords": [],
+      "goldenDescription": "出售此随从时，额外获得 2 金币。",
+      "sha256": "947c4a1e7e88cbdabb04fe39bdcfc9e080a37feb716164a35b58a8d0de012eb7"
+    },
+    {
+      "kind": "Minion",
+      "id": "moss_mark_seedling",
+      "name": "苔痕守苗",
+      "tier": 1,
+      "artId": "placeholder_card_moss_mark_seedling",
+      "batchId": "batch-01-tier1",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/cards/wild-spirit/moss-mark-seedling-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当一个非召唤物友方荒灵死亡，本场获得 +1 生命；每场第一次额外永久获得 +1 生命。",
+      "tags": [
+        "death_growth"
+      ],
+      "race": "WildSpirit",
+      "attack": 1,
+      "health": 3,
+      "goldenAttack": 2,
+      "goldenHealth": 6,
+      "keywords": [],
+      "goldenDescription": "每当一个非召唤物友方荒灵死亡，本场获得 +2 生命；每场前两次额外永久获得 +1 生命。",
+      "sha256": "dc6b913ba3f1d8cf258540ed12bbbaffbbf1352fce1224abd70c91de6384c929"
+    },
+    {
+      "kind": "Minion",
+      "id": "rending_cub",
+      "name": "裂爪幼兽",
+      "tier": 1,
+      "artId": "placeholder_card_rending_cub",
+      "batchId": "batch-01-tier1",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/cards/wild-spirit/rending-cub-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当你召唤一个随从，本场获得 +1 攻击；每场第一次额外永久获得 +1 攻击。",
+      "tags": [
+        "summon"
+      ],
+      "race": "WildSpirit",
+      "attack": 2,
+      "health": 1,
+      "goldenAttack": 4,
+      "goldenHealth": 2,
+      "keywords": [],
+      "goldenDescription": "每当你召唤一个随从，本场获得 +2 攻击；每场前两次额外永久获得 +1 攻击。",
+      "sha256": "d4c93f6c40bd65b223c04e3273ae822ba2afa9485c8b0987c107d812ab1b1211"
+    },
+    {
+      "kind": "Minion",
+      "id": "ember_engraver",
+      "name": "余烬刻师",
+      "tier": 2,
+      "artId": "placeholder_card_ember_engraver",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/forge-soul/ember-engraver-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "友方铸魂失去护盾时，使其本场获得 +1 生命；每场第一次额外永久获得 +1 生命。",
+      "tags": [
+        "shield_break",
+        "permanent_growth"
+      ],
+      "race": "ForgeSoul",
+      "attack": 2,
+      "health": 3,
+      "goldenAttack": 4,
+      "goldenHealth": 6,
+      "keywords": [],
+      "goldenDescription": "友方铸魂失去护盾时，使其本场获得 +2 生命；每场前两次额外永久获得 +1 生命。",
+      "sha256": "9c010ef4485300a32ba4df32b4c11367f049a71a95a34b4f413fcd75a05f6c97"
+    },
+    {
+      "kind": "Minion",
+      "id": "shieldbreaker_blade_blank",
+      "name": "破盾刃胚",
+      "tier": 2,
+      "artId": "placeholder_card_shieldbreaker_blade_blank",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/forge-soul/shieldbreaker-blade-blank-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "护盾。亡语：使所有仍有护盾的友方随从本场获得 +2 攻击。",
+      "tags": [
+        "shield",
+        "deathrattle"
+      ],
+      "race": "ForgeSoul",
+      "attack": 3,
+      "health": 2,
+      "goldenAttack": 6,
+      "goldenHealth": 4,
+      "keywords": [
+        "Shield",
+        "Deathrattle"
+      ],
+      "goldenDescription": "护盾。亡语：使所有仍有护盾的友方随从本场获得 +4 攻击。",
+      "sha256": "fd2a637c8b283e1f7ce6f716aeceab9861e611ab6796d0ac6f6e7cca0caa17ff"
+    },
+    {
+      "kind": "Minion",
+      "id": "shieldwall_furnace_keeper",
+      "name": "盾墙执炉者",
+      "tier": 2,
+      "artId": "placeholder_card_shieldwall_furnace_keeper",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/forge-soul/shieldwall-furnace-keeper-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每场战斗第一次有相邻友方随从失去护盾时，使其本场获得 +1/+2。",
+      "tags": [
+        "adjacent",
+        "shield_break",
+        "survival"
+      ],
+      "race": "ForgeSoul",
+      "attack": 1,
+      "health": 4,
+      "goldenAttack": 2,
+      "goldenHealth": 8,
+      "keywords": [
+        "Taunt"
+      ],
+      "goldenDescription": "每场战斗前 2 次有相邻友方随从失去护盾时，使其本场获得 +2/+4。",
+      "sha256": "d0e768bc540da3010ceacd5b3bc875e7cb7b500127c47844b18e1059e14cd494"
+    },
+    {
+      "kind": "Minion",
+      "id": "moon_phase_scribe",
+      "name": "月相抄写员",
+      "tier": 2,
+      "artId": "placeholder_card_moon_phase_scribe",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/starbound/moon-phase-scribe-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战吼：发现一张 1 级法术。",
+      "tags": [
+        "discover_spell"
+      ],
+      "race": "Starbound",
+      "attack": 2,
+      "health": 3,
+      "goldenAttack": 4,
+      "goldenHealth": 6,
+      "keywords": [
+        "Battlecry"
+      ],
+      "goldenDescription": "战吼：发现一张 1 级法术，并使攻击力最低的友方星契永久获得 +1/+1。",
+      "sha256": "2da31797ae72587cea554c1b792dff14df70959f4b187c67ddfa97699a268202"
+    },
+    {
+      "kind": "Minion",
+      "id": "rune_ward_reader",
+      "name": "符文护读者",
+      "tier": 2,
+      "artId": "placeholder_card_rune_ward_reader",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/starbound/rune-ward-reader-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每个商店阶段前 2 次使用法术后，使攻击力最低的友方随从永久获得 +1 攻击。",
+      "tags": [
+        "spell"
+      ],
+      "race": "Starbound",
+      "attack": 1,
+      "health": 4,
+      "goldenAttack": 2,
+      "goldenHealth": 8,
+      "keywords": [
+        "Shield"
+      ],
+      "goldenDescription": "每个商店阶段前 2 次使用法术后，使攻击力最低的友方随从永久获得 +2 攻击。",
+      "sha256": "4db00a8ad39617d3f7113caeb04d1ffff37a37bd4334566be36dbf9373c27b12"
+    },
+    {
+      "kind": "Minion",
+      "id": "star_etched_timekeeper",
+      "name": "星刻计时员",
+      "tier": 2,
+      "artId": "placeholder_card_star_etched_timekeeper",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/starbound/star-etched-timekeeper-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每个商店阶段第 2 次刷新后，获得 1 次免费刷新，最多触发 1 次。",
+      "tags": [
+        "refresh",
+        "economy"
+      ],
+      "race": "Starbound",
+      "attack": 2,
+      "health": 3,
+      "goldenAttack": 4,
+      "goldenHealth": 6,
+      "keywords": [],
+      "goldenDescription": "每个商店阶段第 2、4 次刷新后，各获得 1 次免费刷新。",
+      "sha256": "85cf78937c89dab013d190b6dc96557014dcac5ee0560147ed16480aa082e4ce"
+    },
+    {
+      "kind": "Minion",
+      "id": "black_market_vendor",
+      "name": "黑市小贩",
+      "tier": 2,
+      "artId": "placeholder_card_black_market_vendor",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/wayfarer/black-market-vendor-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战吼：获得 1 金币。",
+      "tags": [
+        "gold",
+        "battlecry"
+      ],
+      "race": "Wayfarer",
+      "attack": 2,
+      "health": 2,
+      "goldenAttack": 4,
+      "goldenHealth": 4,
+      "keywords": [
+        "Battlecry"
+      ],
+      "goldenDescription": "战吼：获得 2 金币。",
+      "sha256": "b413fea4da13d474a4e21312144bf6475d5cf4e498299b514a5cd42d8c622e6e"
+    },
+    {
+      "kind": "Minion",
+      "id": "mercenary_shieldbearer",
+      "name": "雇佣盾手",
+      "tier": 2,
+      "artId": "placeholder_card_mercenary_shieldbearer",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/wayfarer/mercenary-shieldbearer-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "嘲讽。战斗开始：若相邻有非旅团随从，获得护盾。",
+      "tags": [
+        "taunt",
+        "shield"
+      ],
+      "race": "Wayfarer",
+      "attack": 2,
+      "health": 5,
+      "goldenAttack": 4,
+      "goldenHealth": 10,
+      "keywords": [
+        "Taunt"
+      ],
+      "goldenDescription": "嘲讽。战斗开始：若相邻有非旅团随从，自身及一个相邻非旅团随从获得护盾。",
+      "sha256": "7361e00b8e70d599beb98f48098d567ca820be93d20f6f6954553c719c4dfc78"
+    },
+    {
+      "kind": "Minion",
+      "id": "root_devourer",
+      "name": "根须吞噬者",
+      "tier": 2,
+      "artId": "placeholder_card_root_devourer",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/wild-spirit/root-devourer-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当一个非召唤物友方荒灵死亡，本场获得 +1/+1；每场第一次额外永久获得 +1/+1。",
+      "tags": [
+        "death_growth"
+      ],
+      "race": "WildSpirit",
+      "attack": 2,
+      "health": 4,
+      "goldenAttack": 4,
+      "goldenHealth": 8,
+      "keywords": [],
+      "goldenDescription": "每当一个非召唤物友方荒灵死亡，本场获得 +2/+2；每场前两次额外永久获得 +1/+1。",
+      "sha256": "bd6c928a48e1de464291a1047e1a35c475a586bf9e84352642cf339112bb7e58"
+    },
+    {
+      "kind": "Minion",
+      "id": "swiftwing_forest_hawk",
+      "name": "疾羽林隼",
+      "tier": 2,
+      "artId": "placeholder_card_swiftwing_forest_hawk",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/wild-spirit/swiftwing-forest-hawk-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当一个友方召唤物死亡，本场获得 +1 攻击。",
+      "tags": [
+        "summon_death"
+      ],
+      "race": "WildSpirit",
+      "attack": 2,
+      "health": 4,
+      "goldenAttack": 4,
+      "goldenHealth": 8,
+      "keywords": [],
+      "goldenDescription": "每当一个友方召唤物死亡，本场获得 +2 攻击。",
+      "sha256": "dca5689b0768ee70476b49bcbd9847344dcabe56a35fed818511627d49c78aec"
+    },
+    {
+      "kind": "Minion",
+      "id": "two_tailed_fox_spirit",
+      "name": "双尾狐灵",
+      "tier": 2,
+      "artId": "placeholder_card_two_tailed_fox_spirit",
+      "batchId": "batch-02-tier2",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/cards/wild-spirit/two-tailed-fox-spirit-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "亡语：召唤两个 1/1 幼灵；每有一个未能召唤，使一个随机友方荒灵本场获得 +1 攻击。",
+      "tags": [
+        "summon"
+      ],
+      "race": "WildSpirit",
+      "attack": 2,
+      "health": 2,
+      "goldenAttack": 4,
+      "goldenHealth": 4,
+      "keywords": [
+        "Deathrattle"
+      ],
+      "goldenDescription": "亡语：召唤两个 2/2 幼灵；每有一个未能召唤，使一个随机友方荒灵本场获得 +2 攻击。",
+      "sha256": "e5b6ee9eff52bef87d77ada43845ecb74b699e9c1bd402fda69f861858068aff"
+    },
+    {
+      "kind": "Minion",
+      "id": "counterflow_smith",
+      "name": "逆流铸师",
+      "tier": 3,
+      "artId": "placeholder_card_counterflow_smith",
+      "batchId": "batch-03-tier3",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/cards/forge-soul/counterflow-smith-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每场前两次友方铸魂失去护盾时，使其本场获得 +1/+1；第一次额外使自身永久获得 +1 攻击。",
+      "tags": [
+        "shield_break",
+        "permanent_growth"
+      ],
+      "race": "ForgeSoul",
+      "attack": 3,
+      "health": 4,
+      "goldenAttack": 6,
+      "goldenHealth": 8,
+      "keywords": [],
+      "goldenDescription": "每场前三次友方铸魂失去护盾时，使其本场获得 +2/+2；前两次额外使自身永久获得 +1 攻击。",
+      "sha256": "6f6fc56fce77336ee42a72c1a1f0511532927cab9d0e7189c1571768f2c21da2"
+    },
+    {
+      "kind": "Minion",
+      "id": "molten_core_standard",
+      "name": "熔核执旗手",
+      "tier": 3,
+      "artId": "placeholder_card_molten_core_standard",
+      "batchId": "batch-03-tier3",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/cards/forge-soul/molten-core-standard-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当一个非召唤物友方随从因效果获得护盾，使其永久获得 +1 攻击。",
+      "tags": [
+        "shield_gain"
+      ],
+      "race": "ForgeSoul",
+      "attack": 3,
+      "health": 4,
+      "goldenAttack": 6,
+      "goldenHealth": 8,
+      "keywords": [],
+      "goldenDescription": "每当一个非召唤物友方随从因效果获得护盾，使其永久获得 +2 攻击。",
+      "sha256": "45d80d35b3d0a006b5bc2133638e6387237b3479fa54f80fa70b8ba8d16335e4"
+    },
+    {
+      "kind": "Minion",
+      "id": "oathblade_armor",
+      "name": "誓刃甲胄",
+      "tier": 3,
+      "artId": "placeholder_card_oathblade_armor",
+      "batchId": "batch-03-tier3",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/cards/forge-soul/oathblade-armor-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当本随从失去护盾，对攻击者造成 2 点伤害。",
+      "tags": [
+        "shield_break",
+        "damage"
+      ],
+      "race": "ForgeSoul",
+      "attack": 4,
+      "health": 3,
+      "goldenAttack": 8,
+      "goldenHealth": 6,
+      "keywords": [
+        "Shield"
+      ],
+      "goldenDescription": "每当本随从失去护盾，对攻击者造成 4 点伤害。",
+      "sha256": "3b8356c8cbe580a92178292e61de45c0273b3bc7268e388dbaa253add373fd00"
+    },
+    {
+      "kind": "Minion",
+      "id": "echo_starchanter",
+      "name": "回响咏星师",
+      "tier": 3,
+      "artId": "placeholder_card_echo_starchanter",
+      "batchId": "batch-03-tier3",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/cards/starbound/echo-starchanter-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每个商店阶段前 2 次使用法术后，使一个随机友方星契永久获得 +1/+1。",
+      "tags": [
+        "spell_growth"
+      ],
+      "race": "Starbound",
+      "attack": 3,
+      "health": 3,
+      "goldenAttack": 6,
+      "goldenHealth": 6,
+      "keywords": [],
+      "goldenDescription": "每个商店阶段前 2 次使用法术后，使两个随机友方星契永久获得 +1/+1。",
+      "sha256": "cd77d14cf0f24a5381109f42bf32c124ccefb7e76a7496e9ced93c3e87d75181"
+    },
+    {
+      "kind": "Minion",
+      "id": "ancient_moss_hatchling",
+      "name": "古苔巨幼体",
+      "tier": 3,
+      "artId": "placeholder_card_ancient_moss_hatchling",
+      "batchId": "batch-03-tier3",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/cards/wild-spirit/ancient-moss-hatchling-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当一个非召唤物友方荒灵死亡，本场获得 +2/+2；每场第一次额外永久获得 +1/+1。",
+      "tags": [
+        "death_growth"
+      ],
+      "race": "WildSpirit",
+      "attack": 3,
+      "health": 5,
+      "goldenAttack": 6,
+      "goldenHealth": 10,
+      "keywords": [],
+      "goldenDescription": "每当一个非召唤物友方荒灵死亡，本场获得 +4/+4；每场前两次额外永久获得 +1/+1。",
+      "sha256": "38cf0fca3401585d3a6c02223941dbcb8a4f25f0405c7e6607aff0e22d75a9d9"
+    },
+    {
+      "kind": "Minion",
+      "id": "many_branch_invoker",
+      "name": "群枝唤灵者",
+      "tier": 3,
+      "artId": "placeholder_card_many_branch_invoker",
+      "batchId": "batch-03-tier3",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/cards/wild-spirit/many-branch-invoker-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当你召唤一个随从，使其本场获得 +1/+1；每场第一次召唤后自身永久获得 +1/+1。",
+      "tags": [
+        "summon_buff"
+      ],
+      "race": "WildSpirit",
+      "attack": 2,
+      "health": 4,
+      "goldenAttack": 4,
+      "goldenHealth": 8,
+      "keywords": [],
+      "goldenDescription": "每当你召唤一个随从，使其本场获得 +2/+2；每场前两次召唤后自身永久获得 +1/+1。",
+      "sha256": "a6e8c30f41fb858aa7d7897487790e4961c313fb8c4adda8a7b9cbc4244e1c22"
+    },
+    {
+      "kind": "Minion",
+      "id": "tuskherd_pathrunner",
+      "name": "獠牙领奔者",
+      "tier": 3,
+      "artId": "placeholder_card_tuskherd_pathrunner",
+      "batchId": "batch-03-tier3",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/cards/wild-spirit/tuskherd-pathrunner-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当一个友方召唤物死亡，使一个随机友方随从本场获得 +1/+1。",
+      "tags": [
+        "summon_death"
+      ],
+      "race": "WildSpirit",
+      "attack": 4,
+      "health": 3,
+      "goldenAttack": 8,
+      "goldenHealth": 6,
+      "keywords": [],
+      "goldenDescription": "每当一个友方召唤物死亡，随机两个友方随从本场获得 +1/+1。",
+      "sha256": "b6a9ff49e81cea3846646c5161f3eaac7f652665a38432deafe116a3cfd0cee3"
+    },
+    {
+      "kind": "Minion",
+      "id": "cinder_armor_arbiter",
+      "name": "烬甲裁决者",
+      "tier": 4,
+      "artId": "placeholder_card_cinder_armor_arbiter",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/forge-soul/cinder-armor-arbiter-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "护盾。失去护盾时本场获得 +2 攻击；每场第 3 次友方失盾后永久获得 +2/+1。",
+      "tags": [
+        "shield_break",
+        "permanent_growth"
+      ],
+      "race": "ForgeSoul",
+      "attack": 6,
+      "health": 5,
+      "goldenAttack": 12,
+      "goldenHealth": 10,
+      "keywords": [
+        "Shield"
+      ],
+      "goldenDescription": "护盾。失去护盾时本场获得 +4 攻击；每场第 2 次友方失盾后永久获得 +4/+2。",
+      "sha256": "558cf8266e94f572e23485a6bb586b4d4cc9f66f6c2b684b3518ce6e86cb5d6d"
+    },
+    {
+      "kind": "Minion",
+      "id": "hearth_core_aegis_officer",
+      "name": "炉心圣盾官",
+      "tier": 4,
+      "artId": "placeholder_card_hearth_core_aegis_officer",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/forge-soul/hearth-core-aegis-officer-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战斗开始：使最左友方随从获得护盾。每当一个友方铸魂死亡，使一个随机友方铸魂本场获得 +2/+2。",
+      "tags": [
+        "shield",
+        "death_buff"
+      ],
+      "race": "ForgeSoul",
+      "attack": 4,
+      "health": 6,
+      "goldenAttack": 8,
+      "goldenHealth": 12,
+      "keywords": [
+        "Taunt"
+      ],
+      "goldenDescription": "战斗开始：使最左和最右友方随从获得护盾。每当一个友方铸魂死亡，使两个随机友方铸魂本场获得 +2/+2。",
+      "sha256": "276a8424ad2a6e4706f88de30f08680e985e0e518e85056ed864e2462865730c"
+    },
+    {
+      "kind": "Minion",
+      "id": "ringing_iron_bastion",
+      "name": "鸣铁堡垒",
+      "tier": 4,
+      "artId": "placeholder_card_ringing_iron_bastion",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/forge-soul/ringing-iron-bastion-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "嘲讽。战吼：使相邻随从永久获得 +3/+3。",
+      "tags": [
+        "battlecry",
+        "adjacent"
+      ],
+      "race": "ForgeSoul",
+      "attack": 3,
+      "health": 8,
+      "goldenAttack": 6,
+      "goldenHealth": 16,
+      "keywords": [
+        "Taunt",
+        "Battlecry"
+      ],
+      "goldenDescription": "嘲讽。战吼：使相邻随从永久获得 +6/+6。",
+      "sha256": "3c6141797066eb92d3cc21cd550e9a3291a963c2871299c8645a6c68ddffae55"
+    },
+    {
+      "kind": "Minion",
+      "id": "falling_light_arbiter",
+      "name": "陨光裁定者",
+      "tier": 4,
+      "artId": "placeholder_card_falling_light_arbiter",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/starbound/falling-light-arbiter-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "下一场战斗开始时，若本商店阶段使用过法术，获得 +2 攻击；若使用过 2 张以上法术，获得溅射。",
+      "tags": [
+        "spell",
+        "cleave"
+      ],
+      "race": "Starbound",
+      "attack": 5,
+      "health": 4,
+      "goldenAttack": 10,
+      "goldenHealth": 8,
+      "keywords": [],
+      "goldenDescription": "下一场战斗开始时，若本商店阶段使用过法术，获得 +4 攻击；若使用过 2 张以上法术，获得溅射和护盾。",
+      "sha256": "66c68a8bf0c706bb6ca4e785a0296dfdfc4a4a9ff4d4b310be52dca46c21001f"
+    },
+    {
+      "kind": "Minion",
+      "id": "star_ring_treasurer",
+      "name": "星环司库",
+      "tier": 4,
+      "artId": "placeholder_card_star_ring_treasurer",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/starbound/star-ring-treasurer-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每个商店阶段第 4 次刷新后，获得 1 金币，并使一个随机友方星契下一场战斗获得护盾。",
+      "tags": [
+        "refresh",
+        "economy",
+        "shield"
+      ],
+      "race": "Starbound",
+      "attack": 4,
+      "health": 6,
+      "goldenAttack": 8,
+      "goldenHealth": 12,
+      "keywords": [],
+      "goldenDescription": "每个商店阶段第 4 次刷新后，获得 2 金币，并使两个随机友方星契下一场战斗获得护盾。",
+      "sha256": "cca1032da04fb4502c489b3692ebae3c561006b4db3b054162d54994f64f1cbb"
+    },
+    {
+      "kind": "Minion",
+      "id": "stargate_lecturer",
+      "name": "星门讲师",
+      "tier": 4,
+      "artId": "placeholder_card_stargate_lecturer",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/starbound/stargate-lecturer-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战吼：发现一张等级不高于当前酒馆等级的法术；下一场战斗开始时，若本商店阶段使用过法术，获得护盾。",
+      "tags": [
+        "discover_spell"
+      ],
+      "race": "Starbound",
+      "attack": 4,
+      "health": 5,
+      "goldenAttack": 8,
+      "goldenHealth": 10,
+      "keywords": [
+        "Battlecry"
+      ],
+      "goldenDescription": "战吼：进行两次法术发现，候选等级均不高于当前酒馆等级；下一场战斗开始时，若本商店阶段使用过法术，获得护盾。",
+      "sha256": "0fbc3fd6d8a4c7e87d187fb9d1e67baecc2fd0e95f9bae54dfe9ea9eac87c9ed"
+    },
+    {
+      "kind": "Minion",
+      "id": "formation_breaker_mercenary",
+      "name": "破阵佣兵",
+      "tier": 4,
+      "artId": "placeholder_card_formation_breaker_mercenary",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/wayfarer/formation-breaker-mercenary-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "攻击前，移除目标的护盾。",
+      "tags": [
+        "counter",
+        "shield"
+      ],
+      "race": "Wayfarer",
+      "attack": 5,
+      "health": 5,
+      "goldenAttack": 10,
+      "goldenHealth": 10,
+      "keywords": [
+        "Cleave"
+      ],
+      "goldenDescription": "攻击有护盾的目标时，先移除目标及相邻敌人的护盾，然后造成伤害。",
+      "sha256": "5c9c0dad4ab9c19c263765a8abf7c229c435d4f3b5fd0440d608f5268877d87e"
+    },
+    {
+      "kind": "Minion",
+      "id": "pack_hunt_inspector",
+      "name": "猎群监察官",
+      "tier": 4,
+      "artId": "placeholder_card_pack_hunt_inspector",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/wayfarer/pack-hunt-inspector-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当敌方召唤一个召唤物，本场获得 +2 攻击，最多 3 次；第一次获得溅射。",
+      "tags": [
+        "counter",
+        "summon"
+      ],
+      "race": "Wayfarer",
+      "attack": 5,
+      "health": 6,
+      "goldenAttack": 10,
+      "goldenHealth": 12,
+      "keywords": [],
+      "goldenDescription": "每当敌方召唤一个召唤物，本场获得 +4 攻击，最多 3 次；第一次获得溅射和护盾。",
+      "sha256": "7503457ba2229715b1c4eeec9677120af5c761d06273c54f84a0fea573e81f75"
+    },
+    {
+      "kind": "Minion",
+      "id": "hundred_song_herd",
+      "name": "百鸣兽群",
+      "tier": 4,
+      "artId": "placeholder_card_hundred_song_herd",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/wild-spirit/hundred-song-herd-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "亡语：获得 1 层繁茂，并召唤两个 2/1 迅捷幼灵，它们会立即攻击一次。",
+      "tags": [
+        "summon",
+        "immediate_attack"
+      ],
+      "race": "WildSpirit",
+      "attack": 4,
+      "health": 4,
+      "goldenAttack": 8,
+      "goldenHealth": 8,
+      "keywords": [
+        "Deathrattle"
+      ],
+      "goldenDescription": "亡语：获得 1 层繁茂，并召唤四个 2/1 迅捷幼灵，它们会立即攻击一次。",
+      "sha256": "8d6fe3f451d4446744d776a949734509364ffff4601507e565efb82ed1ccbefc"
+    },
+    {
+      "kind": "Minion",
+      "id": "mountain_belly_soul_eater",
+      "name": "山腹吞灵者",
+      "tier": 4,
+      "artId": "placeholder_card_mountain_belly_soul_eater",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/wild-spirit/mountain-belly-soul-eater-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当友方荒灵死亡，本场获得 +2 生命；若此时本随从攻击力低于生命，再于本场获得 +1 攻击。战斗胜利后，永久获得 +1/+2。",
+      "tags": [
+        "death_growth"
+      ],
+      "race": "WildSpirit",
+      "attack": 5,
+      "health": 6,
+      "goldenAttack": 10,
+      "goldenHealth": 12,
+      "keywords": [],
+      "goldenDescription": "每当友方荒灵死亡，本场获得 +4 生命；若此时本随从攻击力低于生命，再于本场获得 +2 攻击。战斗胜利后，永久获得 +2/+4。",
+      "sha256": "7a8f2a30ba495f503d367f336a9e5f95e80821cef62ad4bde05a636c1446382b"
+    },
+    {
+      "kind": "Minion",
+      "id": "vinecrown_priest",
+      "name": "藤冠祭司",
+      "tier": 4,
+      "artId": "placeholder_card_vinecrown_priest",
+      "batchId": "batch-04-tier4",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/cards/wild-spirit/vinecrown-priest-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "本场每有 4 个友方随从死亡，获得 1 层繁茂。每层繁茂使所有友方荒灵获得 +1 攻击，整局永久生效。",
+      "tags": [
+        "global_growth",
+        "death_growth"
+      ],
+      "race": "WildSpirit",
+      "attack": 3,
+      "health": 6,
+      "goldenAttack": 6,
+      "goldenHealth": 12,
+      "keywords": [],
+      "goldenDescription": "本场每有 3 个友方随从死亡，获得 1 层繁茂。每层繁茂使所有友方荒灵获得 +1 攻击，整局永久生效。",
+      "sha256": "1240c24ad256f7f15a934e87d08e5b03395bc07870f6143fe9acc9b77f665540"
+    },
+    {
+      "kind": "Minion",
+      "id": "oathbroken_blade_soul",
+      "name": "断誓刃魂",
+      "tier": 5,
+      "artId": "placeholder_card_oathbroken_blade_soul",
+      "batchId": "batch-05-tier5",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-12-v0.3.3-tier5-production/cards/forge-soul/oathbroken-blade-soul-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当本随从失去护盾，本场获得 +2 攻击。每当本随从击杀敌人，重新获得护盾。",
+      "tags": [
+        "shield_break",
+        "shield_loop"
+      ],
+      "race": "ForgeSoul",
+      "attack": 8,
+      "health": 5,
+      "goldenAttack": 16,
+      "goldenHealth": 10,
+      "keywords": [
+        "Shield"
+      ],
+      "goldenDescription": "每当本随从失去护盾，本场获得 +3 攻击。每当本随从击杀敌人，重新获得护盾并永久获得 +2 攻击。",
+      "sha256": "aa32d56abb03ae46c878168128744552abcd7fed49fafdb2f8e04383395283c0"
+    },
+    {
+      "kind": "Minion",
+      "id": "thousand_ring_tomb_guardian",
+      "name": "千环守墓者",
+      "tier": 5,
+      "artId": "placeholder_card_thousand_ring_tomb_guardian",
+      "batchId": "batch-05-tier5",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-12-v0.3.3-tier5-production/cards/forge-soul/thousand-ring-tomb-guardian-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "嘲讽。亡语：使两个随机存活友方随从获得护盾，并使所有存活的非召唤物友方随从永久获得 +1/+1。",
+      "tags": [
+        "deathrattle",
+        "permanent_growth"
+      ],
+      "race": "ForgeSoul",
+      "attack": 5,
+      "health": 10,
+      "goldenAttack": 10,
+      "goldenHealth": 20,
+      "keywords": [
+        "Taunt",
+        "Deathrattle"
+      ],
+      "goldenDescription": "嘲讽。亡语：使所有存活友方随从获得护盾，并使所有存活的非召唤物友方随从永久获得 +2/+2。",
+      "sha256": "d4f8183449b54788ae6145eb7cd3a5440792159d648b6831ab25bb39ca79f76f"
+    },
+    {
+      "kind": "Minion",
+      "id": "falling_star_prophet",
+      "name": "陨星先知",
+      "tier": 5,
+      "artId": "placeholder_card_falling_star_prophet",
+      "batchId": "batch-05-tier5",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-12-v0.3.3-tier5-production/cards/starbound/falling-star-prophet-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每个商店阶段前 2 次使用法术后，使攻击力最低的 2 个友方星契永久获得 +1/+1。",
+      "tags": [
+        "spell_growth",
+        "permanent_growth"
+      ],
+      "race": "Starbound",
+      "attack": 6,
+      "health": 6,
+      "goldenAttack": 12,
+      "goldenHealth": 12,
+      "keywords": [],
+      "goldenDescription": "每个商店阶段前 2 次使用法术后，使攻击力最低的 4 个友方星契永久获得 +1/+1。",
+      "sha256": "5b68ddf3c42722ba8274d904b733405669c771ae41b47a2a577a1796a77d540d"
+    },
+    {
+      "kind": "Minion",
+      "id": "fate_shuffler",
+      "name": "命运洗牌师",
+      "tier": 5,
+      "artId": "placeholder_card_fate_shuffler",
+      "batchId": "batch-05-tier5",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-12-v0.3.3-tier5-production/cards/starbound/fate-shuffler-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战吼：发现一个当前酒馆等级的其他随从。若本商店阶段刷新过 3 次，候选仅限星契，并获得 1 金币。",
+      "tags": [
+        "discover_minion",
+        "refresh"
+      ],
+      "race": "Starbound",
+      "attack": 5,
+      "health": 7,
+      "goldenAttack": 10,
+      "goldenHealth": 14,
+      "keywords": [
+        "Battlecry"
+      ],
+      "goldenDescription": "战吼：发现一个当前酒馆等级的其他随从。若本商店阶段刷新过 3 次，候选仅限星契，并获得 2 金币。",
+      "sha256": "859a7602631b0ee204120e48c596ad9c58d30a07d5b7fcc1b84efb5722ed9cbf"
+    },
+    {
+      "kind": "Minion",
+      "id": "royal_bounty_hunter",
+      "name": "王庭赏金客",
+      "tier": 5,
+      "artId": "placeholder_card_royal_bounty_hunter",
+      "batchId": "batch-05-tier5",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-12-v0.3.3-tier5-production/cards/wayfarer/royal-bounty-hunter-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "战斗开始：对所有敌方随从造成 1 点伤害；若敌方至少有 3 个同主种族随从，对该主种族随从改为造成 2 点伤害。",
+      "tags": [
+        "counter",
+        "aoe"
+      ],
+      "race": "Wayfarer",
+      "attack": 7,
+      "health": 7,
+      "goldenAttack": 14,
+      "goldenHealth": 14,
+      "keywords": [],
+      "goldenDescription": "战斗开始：对所有敌方随从造成 2 点伤害；若敌方至少有 3 个同主种族随从，对该主种族随从改为造成 4 点伤害。",
+      "sha256": "628edaa837d42edc5e56840e2c010a6ac4ee7d020f739ba961f408b224d3da56"
+    },
+    {
+      "kind": "Minion",
+      "id": "world_eating_final_bloom",
+      "name": "终花吞世者",
+      "tier": 5,
+      "artId": "placeholder_card_world_eating_final_bloom",
+      "batchId": "batch-05-tier5",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-12-v0.3.3-tier5-production/cards/wild-spirit/world-eating-final-bloom-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "每当非召唤物友方荒灵死亡，本场获得其当前攻击力；每场前两个额外永久获得 +1/+1。",
+      "tags": [
+        "death_growth",
+        "permanent_growth"
+      ],
+      "race": "WildSpirit",
+      "attack": 4,
+      "health": 12,
+      "goldenAttack": 8,
+      "goldenHealth": 24,
+      "keywords": [],
+      "goldenDescription": "每当非召唤物友方荒灵死亡，本场获得其当前攻击力；每场前两个还会使本随从在本场获得等同于其生命上限的生命，并永久获得 +2/+2。",
+      "sha256": "51e75969c9dfc54eee3d7b860208cec6e9f286463af39a006fee1115b5dc3b6c"
+    },
+    {
+      "kind": "Spell",
+      "id": "delayed_supply",
+      "name": "应急补给",
+      "tier": 1,
+      "artId": "placeholder_spell_delayed_supply",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/delayed-supply-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "下个商店阶段开始时，获得 2 金币。",
+      "tags": [
+        "economy",
+        "delayed"
+      ],
+      "cost": 1,
+      "sha256": "671f252f610eee7e11653c0387322ccdf0f32eaf69c786956ca21e91f853f690"
+    },
+    {
+      "kind": "Spell",
+      "id": "triple_discovery_reward",
+      "name": "三连发现",
+      "tier": 1,
+      "artId": "placeholder_spell_triple_discovery_reward",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/triple-discovery-reward-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "发现一个与你当前酒馆等级相同的随从。",
+      "tags": [
+        "discover_minion",
+        "triple_reward",
+        "system_reward"
+      ],
+      "cost": 1,
+      "sha256": "d8da03ec46ef780b9c18f6f34a9ae4530500a07b7a56941d8c528ddd817e0367"
+    },
+    {
+      "kind": "Spell",
+      "id": "precise_training",
+      "name": "精准训练",
+      "tier": 2,
+      "artId": "placeholder_spell_precise_training",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/precise-training-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "使一个随从永久获得 +2 攻击。",
+      "tags": [
+        "permanent_growth",
+        "attack"
+      ],
+      "cost": 1,
+      "sha256": "d43822230525733841c24258cc3356a82681519efdd533a1a4a6ae5510bb2505"
+    },
+    {
+      "kind": "Spell",
+      "id": "thickhide_potion",
+      "name": "厚皮药剂",
+      "tier": 2,
+      "artId": "placeholder_spell_thickhide_potion",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/thickhide-potion-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "使一个随从永久获得 +3 生命。",
+      "tags": [
+        "permanent_growth",
+        "health"
+      ],
+      "cost": 1,
+      "sha256": "818b6c2cb1677029357c0689ebb5aa8b9a803d161c8469c4bee3f9629e6cdf7c"
+    },
+    {
+      "kind": "Spell",
+      "id": "prototype_copy",
+      "name": "复制雏形",
+      "tier": 3,
+      "artId": "placeholder_spell_prototype_copy",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/prototype-copy-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "选择一个己方 1–2 级随从，获得它的一张复制。",
+      "tags": [
+        "copy",
+        "triple_helper"
+      ],
+      "cost": 1,
+      "sha256": "4ca13666575326b003d448ad3d06ffbf3a0a12cce7444efb908556466a7f2b76"
+    },
+    {
+      "kind": "Spell",
+      "id": "warband_forging",
+      "name": "战团锻造",
+      "tier": 3,
+      "artId": "placeholder_spell_warband_forging",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/warband-forging-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "选择一个种族，使你所有该种族随从永久获得 +1/+1。",
+      "tags": [
+        "permanent_growth",
+        "race"
+      ],
+      "cost": 1,
+      "sha256": "3731863ec63294db773434888c8d81d94718b3e639cae2138425e73f39ff62c8"
+    },
+    {
+      "kind": "Spell",
+      "id": "bloodline_awakening",
+      "name": "血脉觉醒",
+      "tier": 4,
+      "artId": "placeholder_spell_bloodline_awakening",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/bloodline-awakening-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "使一个随从永久获得 +4/+4；若其属于你场上数量最多的主种族，再永久获得 +2/+2。",
+      "tags": [
+        "permanent_growth",
+        "race"
+      ],
+      "cost": 1,
+      "sha256": "04ffcebab8e79c376388865539ab0f6ff1df82d72b1819e8834c3fb16580d07a"
+    },
+    {
+      "kind": "Spell",
+      "id": "army_ascension",
+      "name": "全军升格",
+      "tier": 5,
+      "artId": "placeholder_spell_army_ascension",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/army-ascension-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "选择一个种族，使你所有该种族随从永久获得 +3/+3。",
+      "tags": [
+        "permanent_growth",
+        "race"
+      ],
+      "cost": 1,
+      "sha256": "aff4b04cc298d3127669d5d8f4e6cc9ca0023e0642d5a2a3f6b3621c80cbc744"
+    },
+    {
+      "kind": "Spell",
+      "id": "fate_reforging",
+      "name": "命运重铸",
+      "tier": 5,
+      "artId": "placeholder_spell_fate_reforging",
+      "batchId": "batch-06-spells",
+      "status": "generated",
+      "artFile": "ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-13-v0.3.3-spell-production/spells/fate-reforging-v0.3.3.png",
+      "focalPointY": 0.5,
+      "description": "选择一个随从，使其永久获得 +8/+8；若它是金色随从，改为永久获得 +12/+12。",
+      "tags": [
+        "permanent_growth",
+        "golden_bonus"
+      ],
+      "cost": 1,
+      "sha256": "a4bfa7a52961c017ca6fec06ed8d18adc7f7e51c16caf347c75eadc4d83efbc4"
+    }
+  ]
+}

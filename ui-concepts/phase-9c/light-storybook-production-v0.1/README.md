@@ -175,6 +175,100 @@ B 组继续复用各自原有测试控制器与数据。
 Prefab。当前机器没有项目指定的 Unity Editor，因此本轮只完成资源准备、构建器与
 静态验证，Unity 序列化产物需在有 Unity 2022.3.62f3c1 的机器上生成。
 
+## Round 8：v0.3.3 一级随从量产
+
+`PRODUCTION-MANIFEST-v0.3.3.json` 以 v0.3.2 隔离 Formal Catalog 为覆盖基线，
+从当前 67 张随从与 16 张法术配置中精确列出剩余 51 项：42 张随从与 9 张法术。
+清单固定为一级 7、二级 11、三级 7、四级 11、五级 6、法术 9 六个批次，
+并记录配置、Style Tile、生产 Prompt、基线 Catalog 哈希和逐项状态。
+
+首批 7 张一级随从已使用 v0.3.3 冻结规则生成并接入新的隔离 Catalog：
+
+- 铸魂：铜环学徒、炉心火种；
+- 荒灵：裂爪幼兽、苔痕守苗；
+- 星契：星尘随侍、观星学徒；
+- 旅团：流浪剑客。
+
+大图、亮度、哈希、Unity 副本和隔离 Catalog 绑定离线门禁通过；新 ArtId 未进入
+v0.3.2 冻结 Catalog 或正式 Runtime Catalog。当前状态为
+`PASS_OFFLINE_UNITY_PENDING`，完整记录见
+`validation-round-8-v0.3.3-tier1-production/`。
+
+## Round 9：v0.3.3 二级随从量产
+
+第二批 11 张二级随从已使用同一 v0.3.3 冻结规则生成：
+
+- 铸魂：余烬刻师、破盾刃胚、盾墙执炉者；
+- 星契：月相抄写员、符文护读者、星刻计时员；
+- 旅团：黑市小贩、雇佣盾手；
+- 荒灵：根须吞噬者、疾羽林隼、双尾狐灵。
+
+Batch 02 隔离 Catalog 以 Batch 01 为基线累计扩展，总计 53 个条目；本批 11 个
+ArtId 未写入 Batch 01、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
+当前为 18 项已生成、33 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
+离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+`validation-round-9-v0.3.3-tier2-production/`。
+
+## Round 10：v0.3.3 三级随从量产
+
+第三批 7 张三级随从已使用同一 v0.3.3 冻结规则生成：
+
+- 铸魂：逆流铸师、熔核执旗手、誓刃甲胄；
+- 星契：回响咏星师；
+- 荒灵：古苔巨幼体、群枝唤灵者、獠牙领奔者。
+
+Batch 03 隔离 Catalog 以 Batch 02 为基线累计扩展，总计 60 个条目；本批 7 个
+ArtId 未写入 Batch 02、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
+当前为 25 项已生成、26 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
+离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+`validation-round-10-v0.3.3-tier3-production/`。
+
+## Round 11：v0.3.3 四级随从量产
+
+第四批 11 张四级随从已使用同一 v0.3.3 冻结规则生成：
+
+- 铸魂：烬甲裁决者、炉心圣盾官、鸣铁堡垒；
+- 星契：陨光裁定者、星环司库、星门讲师；
+- 旅团：破阵佣兵、猎群监察官；
+- 荒灵：百鸣兽群、山腹吞灵者、藤冠祭司。
+
+Batch 04 隔离 Catalog 以 Batch 03 为基线累计扩展，总计 71 个条目；本批 11 个
+ArtId 未写入 Batch 03、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
+当前为 36 项已生成、15 项待生成。大图、亮度、哈希、Unity 副本和 Catalog GUID
+离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+`validation-round-11-v0.3.3-tier4-production/`。
+
+## Round 12：v0.3.3 五级随从量产
+
+第五批 6 张五级随从已使用同一 v0.3.3 冻结规则生成：
+
+- 铸魂：断誓刃魂、千环守墓者；
+- 星契：陨星先知、命运洗牌师；
+- 旅团：王庭赏金客；
+- 荒灵：终花吞世者。
+
+Batch 05 隔离 Catalog 以 Batch 04 为基线累计扩展，总计 77 个条目；本批 6 个
+ArtId 未写入 Batch 04、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。量产清单
+当前为 42 项已生成、9 项待生成，剩余内容全部为法术。大图、亮度、哈希、Unity
+副本和 Catalog GUID 离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，
+完整记录见 `validation-round-12-v0.3.3-tier5-production/`。
+
+## Round 13：v0.3.3 法术量产
+
+第六批也是最后一批，共 9 张法术，已使用同一 v0.3.3 冻结规则生成：
+
+- 一级：应急补给、三连发现；
+- 二级：精准训练、厚皮药剂；
+- 三级：复制雏形、战团锻造；
+- 四级：血脉觉醒；
+- 五级：全军升格、命运重铸。
+
+Batch 06 隔离 Catalog 以 Batch 05 为基线累计扩展，总计 86 个条目；本批 9 个
+ArtId 未写入 Batch 05、v0.3.2 冻结 Catalog 或正式 Runtime Catalog。剩余 51 项
+量产清单当前为 51 项已生成、0 项待生成。大图、亮度、哈希、Unity 副本和 Catalog
+GUID 离线门禁通过，状态为 `PASS_OFFLINE_UNITY_PENDING`，完整记录见
+`validation-round-13-v0.3.3-spell-production/`。
+
 ## v0.2 机制压力测试归档
 
 `mechanic-stress-test-v0.1/` 使用 v0.2 生成九张校准卡。自动画幅与整体亮度检查

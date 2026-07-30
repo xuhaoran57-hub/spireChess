@@ -1,0 +1,285 @@
+{
+  "version": "0.3.3",
+  "batchId": "batch-06-spells",
+  "generatedAtUtc": "2026-07-30T10:28:23.710383+00:00",
+  "result": "PASS_OFFLINE_UNITY_PENDING",
+  "checks": [
+    {
+      "id": "batch-identity",
+      "status": "pass",
+      "details": {
+        "count": 9,
+        "ids": [
+          "delayed_supply",
+          "triple_discovery_reward",
+          "precise_training",
+          "thickhide_potion",
+          "prototype_copy",
+          "warband_forging",
+          "bloodline_awakening",
+          "army_ascension",
+          "fate_reforging"
+        ]
+      }
+    },
+    {
+      "id": "art-hash-aspect-brightness",
+      "status": "pass",
+      "details": [
+        {
+          "id": "delayed_supply",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 140.27,
+            "lightMidRatio": 0.811914,
+            "nearBlackRatio": 0.002637
+          },
+          "sha256": "671f252f610eee7e11653c0387322ccdf0f32eaf69c786956ca21e91f853f690",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "triple_discovery_reward",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 166.87,
+            "lightMidRatio": 0.947656,
+            "nearBlackRatio": 0.0
+          },
+          "sha256": "d8da03ec46ef780b9c18f6f34a9ae4530500a07b7a56941d8c528ddd817e0367",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "precise_training",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 171.89,
+            "lightMidRatio": 0.915234,
+            "nearBlackRatio": 0.000146
+          },
+          "sha256": "d43822230525733841c24258cc3356a82681519efdd533a1a4a6ae5510bb2505",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "thickhide_potion",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 166.57,
+            "lightMidRatio": 0.960498,
+            "nearBlackRatio": 4.9e-05
+          },
+          "sha256": "818b6c2cb1677029357c0689ebb5aa8b9a803d161c8469c4bee3f9629e6cdf7c",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "prototype_copy",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 155.42,
+            "lightMidRatio": 0.907715,
+            "nearBlackRatio": 0.000537
+          },
+          "sha256": "4ca13666575326b003d448ad3d06ffbf3a0a12cce7444efb908556466a7f2b76",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "warband_forging",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 145.32,
+            "lightMidRatio": 0.802637,
+            "nearBlackRatio": 0.000439
+          },
+          "sha256": "3731863ec63294db773434888c8d81d94718b3e639cae2138425e73f39ff62c8",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "bloodline_awakening",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 138.98,
+            "lightMidRatio": 0.824561,
+            "nearBlackRatio": 0.000146
+          },
+          "sha256": "04ffcebab8e79c376388865539ab0f6ff1df82d72b1819e8834c3fb16580d07a",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "army_ascension",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 171.39,
+            "lightMidRatio": 0.962842,
+            "nearBlackRatio": 4.9e-05
+          },
+          "sha256": "aff4b04cc298d3127669d5d8f4e6cc9ca0023e0642d5a2a3f6b3621c80cbc744",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "fate_reforging",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 155.97,
+            "lightMidRatio": 0.887012,
+            "nearBlackRatio": 0.000195
+          },
+          "sha256": "a4bfa7a52961c017ca6fec06ed8d18adc7f7e51c16caf347c75eadc4d83efbc4",
+          "unityCopyMatches": true,
+          "passes": true
+        }
+      ]
+    },
+    {
+      "id": "isolated-catalog-bindings",
+      "status": "pass",
+      "details": {
+        "isolatedCatalogEntries": 86,
+        "containsAllPreviousCatalogEntries": true,
+        "cards": [
+          {
+            "id": "delayed_supply",
+            "artId": "placeholder_spell_delayed_supply",
+            "metaGuid": "16000000000000000000000000000001",
+            "isolatedCatalogGuid": "16000000000000000000000000000001",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "triple_discovery_reward",
+            "artId": "placeholder_spell_triple_discovery_reward",
+            "metaGuid": "16000000000000000000000000000002",
+            "isolatedCatalogGuid": "16000000000000000000000000000002",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "precise_training",
+            "artId": "placeholder_spell_precise_training",
+            "metaGuid": "16000000000000000000000000000003",
+            "isolatedCatalogGuid": "16000000000000000000000000000003",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "thickhide_potion",
+            "artId": "placeholder_spell_thickhide_potion",
+            "metaGuid": "16000000000000000000000000000004",
+            "isolatedCatalogGuid": "16000000000000000000000000000004",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "prototype_copy",
+            "artId": "placeholder_spell_prototype_copy",
+            "metaGuid": "16000000000000000000000000000005",
+            "isolatedCatalogGuid": "16000000000000000000000000000005",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "warband_forging",
+            "artId": "placeholder_spell_warband_forging",
+            "metaGuid": "16000000000000000000000000000006",
+            "isolatedCatalogGuid": "16000000000000000000000000000006",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "bloodline_awakening",
+            "artId": "placeholder_spell_bloodline_awakening",
+            "metaGuid": "16000000000000000000000000000007",
+            "isolatedCatalogGuid": "16000000000000000000000000000007",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "army_ascension",
+            "artId": "placeholder_spell_army_ascension",
+            "metaGuid": "16000000000000000000000000000008",
+            "isolatedCatalogGuid": "16000000000000000000000000000008",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "fate_reforging",
+            "artId": "placeholder_spell_fate_reforging",
+            "metaGuid": "16000000000000000000000000000009",
+            "isolatedCatalogGuid": "16000000000000000000000000000009",
+            "absentFromBatchFive": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          }
+        ]
+      }
+    }
+  ]
+}

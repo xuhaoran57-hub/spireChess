@@ -1,0 +1,341 @@
+{
+  "version": "0.3.3",
+  "batchId": "batch-02-tier2",
+  "generatedAtUtc": "2026-07-30T10:28:22.914064+00:00",
+  "result": "PASS_OFFLINE_UNITY_PENDING",
+  "checks": [
+    {
+      "id": "batch-identity",
+      "status": "pass",
+      "details": {
+        "count": 11,
+        "ids": [
+          "ember_engraver",
+          "shieldbreaker_blade_blank",
+          "shieldwall_furnace_keeper",
+          "moon_phase_scribe",
+          "rune_ward_reader",
+          "star_etched_timekeeper",
+          "black_market_vendor",
+          "mercenary_shieldbearer",
+          "root_devourer",
+          "swiftwing_forest_hawk",
+          "two_tailed_fox_spirit"
+        ]
+      }
+    },
+    {
+      "id": "art-hash-aspect-brightness",
+      "status": "pass",
+      "details": [
+        {
+          "id": "ember_engraver",
+          "exists": true,
+          "size": [
+            1410,
+            1115
+          ],
+          "aspectRatio": 1.264574,
+          "luma": {
+            "meanLuma": 149.49,
+            "lightMidRatio": 0.84917,
+            "nearBlackRatio": 0.001318
+          },
+          "sha256": "9c010ef4485300a32ba4df32b4c11367f049a71a95a34b4f413fcd75a05f6c97",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "shieldbreaker_blade_blank",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 179.19,
+            "lightMidRatio": 0.954443,
+            "nearBlackRatio": 4.9e-05
+          },
+          "sha256": "fd2a637c8b283e1f7ce6f716aeceab9861e611ab6796d0ac6f6e7cca0caa17ff",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "shieldwall_furnace_keeper",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 164.94,
+            "lightMidRatio": 0.881494,
+            "nearBlackRatio": 0.00083
+          },
+          "sha256": "d0e768bc540da3010ceacd5b3bc875e7cb7b500127c47844b18e1059e14cd494",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "moon_phase_scribe",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 168.13,
+            "lightMidRatio": 0.93501,
+            "nearBlackRatio": 0.000342
+          },
+          "sha256": "2da31797ae72587cea554c1b792dff14df70959f4b187c67ddfa97699a268202",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "rune_ward_reader",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 151.92,
+            "lightMidRatio": 0.872314,
+            "nearBlackRatio": 0.000342
+          },
+          "sha256": "4db00a8ad39617d3f7113caeb04d1ffff37a37bd4334566be36dbf9373c27b12",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "star_etched_timekeeper",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 156.74,
+            "lightMidRatio": 0.860352,
+            "nearBlackRatio": 0.001025
+          },
+          "sha256": "85cf78937c89dab013d190b6dc96557014dcac5ee0560147ed16480aa082e4ce",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "black_market_vendor",
+          "exists": true,
+          "size": [
+            1403,
+            1121
+          ],
+          "aspectRatio": 1.251561,
+          "luma": {
+            "meanLuma": 116.32,
+            "lightMidRatio": 0.55127,
+            "nearBlackRatio": 0.004541
+          },
+          "sha256": "b413fea4da13d474a4e21312144bf6475d5cf4e498299b514a5cd42d8c622e6e",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "mercenary_shieldbearer",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 167.32,
+            "lightMidRatio": 0.887451,
+            "nearBlackRatio": 0.0
+          },
+          "sha256": "7361e00b8e70d599beb98f48098d567ca820be93d20f6f6954553c719c4dfc78",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "root_devourer",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 138.43,
+            "lightMidRatio": 0.84375,
+            "nearBlackRatio": 0.001025
+          },
+          "sha256": "bd6c928a48e1de464291a1047e1a35c475a586bf9e84352642cf339112bb7e58",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "swiftwing_forest_hawk",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 173.6,
+            "lightMidRatio": 0.963184,
+            "nearBlackRatio": 4.9e-05
+          },
+          "sha256": "dca5689b0768ee70476b49bcbd9847344dcabe56a35fed818511627d49c78aec",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "two_tailed_fox_spirit",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 173.4,
+            "lightMidRatio": 0.987402,
+            "nearBlackRatio": 4.9e-05
+          },
+          "sha256": "e5b6ee9eff52bef87d77ada43845ecb74b699e9c1bd402fda69f861858068aff",
+          "unityCopyMatches": true,
+          "passes": true
+        }
+      ]
+    },
+    {
+      "id": "isolated-catalog-bindings",
+      "status": "pass",
+      "details": {
+        "isolatedCatalogEntries": 53,
+        "containsAllBatchOneArtIds": true,
+        "cards": [
+          {
+            "id": "ember_engraver",
+            "artId": "placeholder_card_ember_engraver",
+            "metaGuid": "12000000000000000000000000000001",
+            "isolatedCatalogGuid": "12000000000000000000000000000001",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "shieldbreaker_blade_blank",
+            "artId": "placeholder_card_shieldbreaker_blade_blank",
+            "metaGuid": "12000000000000000000000000000002",
+            "isolatedCatalogGuid": "12000000000000000000000000000002",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "shieldwall_furnace_keeper",
+            "artId": "placeholder_card_shieldwall_furnace_keeper",
+            "metaGuid": "12000000000000000000000000000003",
+            "isolatedCatalogGuid": "12000000000000000000000000000003",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "moon_phase_scribe",
+            "artId": "placeholder_card_moon_phase_scribe",
+            "metaGuid": "12000000000000000000000000000004",
+            "isolatedCatalogGuid": "12000000000000000000000000000004",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "rune_ward_reader",
+            "artId": "placeholder_card_rune_ward_reader",
+            "metaGuid": "12000000000000000000000000000005",
+            "isolatedCatalogGuid": "12000000000000000000000000000005",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "star_etched_timekeeper",
+            "artId": "placeholder_card_star_etched_timekeeper",
+            "metaGuid": "12000000000000000000000000000006",
+            "isolatedCatalogGuid": "12000000000000000000000000000006",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "black_market_vendor",
+            "artId": "placeholder_card_black_market_vendor",
+            "metaGuid": "12000000000000000000000000000007",
+            "isolatedCatalogGuid": "12000000000000000000000000000007",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "mercenary_shieldbearer",
+            "artId": "placeholder_card_mercenary_shieldbearer",
+            "metaGuid": "12000000000000000000000000000008",
+            "isolatedCatalogGuid": "12000000000000000000000000000008",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "root_devourer",
+            "artId": "placeholder_card_root_devourer",
+            "metaGuid": "12000000000000000000000000000009",
+            "isolatedCatalogGuid": "12000000000000000000000000000009",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "swiftwing_forest_hawk",
+            "artId": "placeholder_card_swiftwing_forest_hawk",
+            "metaGuid": "1200000000000000000000000000000a",
+            "isolatedCatalogGuid": "1200000000000000000000000000000a",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "two_tailed_fox_spirit",
+            "artId": "placeholder_card_two_tailed_fox_spirit",
+            "metaGuid": "1200000000000000000000000000000b",
+            "isolatedCatalogGuid": "1200000000000000000000000000000b",
+            "absentFromBatchOne": true,
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          }
+        ]
+      }
+    }
+  ]
+}

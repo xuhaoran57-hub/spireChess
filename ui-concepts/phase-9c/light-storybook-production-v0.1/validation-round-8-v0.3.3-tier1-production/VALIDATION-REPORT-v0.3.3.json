@@ -1,0 +1,221 @@
+{
+  "version": "0.3.3",
+  "batchId": "batch-01-tier1",
+  "generatedAtUtc": "2026-07-30T10:28:23.679772+00:00",
+  "result": "PASS_OFFLINE_UNITY_PENDING",
+  "checks": [
+    {
+      "id": "batch-identity",
+      "status": "pass",
+      "details": {
+        "count": 7,
+        "ids": [
+          "copper_ring_apprentice",
+          "hearth_core_spark",
+          "stardust_attendant",
+          "stargazing_apprentice",
+          "wandering_swordsman",
+          "moss_mark_seedling",
+          "rending_cub"
+        ]
+      }
+    },
+    {
+      "id": "art-hash-aspect-brightness",
+      "status": "pass",
+      "details": [
+        {
+          "id": "copper_ring_apprentice",
+          "exists": true,
+          "size": [
+            1403,
+            1121
+          ],
+          "aspectRatio": 1.251561,
+          "luma": {
+            "meanLuma": 163.71,
+            "lightMidRatio": 0.910059,
+            "nearBlackRatio": 0.002783
+          },
+          "sha256": "8c39754fca7a78b2b1a9bd292a318ea8809e5bc527817b80132cae93791a6fe6",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "hearth_core_spark",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 169.9,
+            "lightMidRatio": 0.94707,
+            "nearBlackRatio": 0.001074
+          },
+          "sha256": "bff4048dd31c7c4e9d4da82798234c64e198586435f00b7ddb35fd4bd620401e",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "stardust_attendant",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 153.73,
+            "lightMidRatio": 0.838037,
+            "nearBlackRatio": 0.000879
+          },
+          "sha256": "0ab849b3b666759b038d6f53270ea953bfdcb0e0986e7ac8b060bf6eebcdabf8",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "stargazing_apprentice",
+          "exists": true,
+          "size": [
+            1399,
+            1124
+          ],
+          "aspectRatio": 1.244662,
+          "luma": {
+            "meanLuma": 156.97,
+            "lightMidRatio": 0.853467,
+            "nearBlackRatio": 0.001074
+          },
+          "sha256": "ad7b091e1348bed318e2e07b64b07c11fa6e031eff252f4906959621bad1a335",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "wandering_swordsman",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 163.25,
+            "lightMidRatio": 0.892236,
+            "nearBlackRatio": 0.000244
+          },
+          "sha256": "947c4a1e7e88cbdabb04fe39bdcfc9e080a37feb716164a35b58a8d0de012eb7",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "moss_mark_seedling",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 183.15,
+            "lightMidRatio": 0.973096,
+            "nearBlackRatio": 0.0
+          },
+          "sha256": "dc6b913ba3f1d8cf258540ed12bbbaffbbf1352fce1224abd70c91de6384c929",
+          "unityCopyMatches": true,
+          "passes": true
+        },
+        {
+          "id": "rending_cub",
+          "exists": true,
+          "size": [
+            1402,
+            1122
+          ],
+          "aspectRatio": 1.249554,
+          "luma": {
+            "meanLuma": 170.2,
+            "lightMidRatio": 0.971436,
+            "nearBlackRatio": 0.000537
+          },
+          "sha256": "d4c93f6c40bd65b223c04e3273ae822ba2afa9485c8b0987c107d812ab1b1211",
+          "unityCopyMatches": true,
+          "passes": true
+        }
+      ]
+    },
+    {
+      "id": "isolated-catalog-bindings",
+      "status": "pass",
+      "details": {
+        "isolatedCatalogEntries": 42,
+        "cards": [
+          {
+            "id": "copper_ring_apprentice",
+            "artId": "placeholder_card_copper_ring_apprentice",
+            "metaGuid": "b103a42e7d6c4f33a8e1b90c5d2f7419",
+            "isolatedCatalogGuid": "b103a42e7d6c4f33a8e1b90c5d2f7419",
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "hearth_core_spark",
+            "artId": "placeholder_card_hearth_core_spark",
+            "metaGuid": "c204b53f8e7d5044b9f2c01d6e3a8520",
+            "isolatedCatalogGuid": "c204b53f8e7d5044b9f2c01d6e3a8520",
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "stardust_attendant",
+            "artId": "placeholder_card_stardust_attendant",
+            "metaGuid": "d305c6409f8e6155ca03d12e7f4b9631",
+            "isolatedCatalogGuid": "d305c6409f8e6155ca03d12e7f4b9631",
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "stargazing_apprentice",
+            "artId": "placeholder_card_stargazing_apprentice",
+            "metaGuid": "e406d751a09f7266db14e23f805ca742",
+            "isolatedCatalogGuid": "e406d751a09f7266db14e23f805ca742",
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "wandering_swordsman",
+            "artId": "placeholder_card_wandering_swordsman",
+            "metaGuid": "f507e862b1a08377ec25f340916db853",
+            "isolatedCatalogGuid": "f507e862b1a08377ec25f340916db853",
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "moss_mark_seedling",
+            "artId": "placeholder_card_moss_mark_seedling",
+            "metaGuid": "b7090a84d3c2a5990e471562b38fda75",
+            "isolatedCatalogGuid": "b7090a84d3c2a5990e471562b38fda75",
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          },
+          {
+            "id": "rending_cub",
+            "artId": "placeholder_card_rending_cub",
+            "metaGuid": "a608f973c2b19488fd360451a27ec964",
+            "isolatedCatalogGuid": "a608f973c2b19488fd360451a27ec964",
+            "absentFromFrozenV032": true,
+            "absentFromRuntime": true,
+            "passes": true
+          }
+        ]
+      }
+    }
+  ]
+}
