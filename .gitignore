@@ -30,6 +30,11 @@ test
 __pycache__/
 *.py[cod]
 
+# Expanded local payload of the 2026-07-31 cleanup archive.
+# The complete, hash-verified copy is tracked as the sibling ZIP.
+archive/deprecated-temp-20260731/payload/generated-check-harnesses/
+archive/deprecated-temp-20260731/payload/python-bytecode/
+
 # Reproducible Phase 9B G3 local audio placeholders
 sc/Assets/Audio/Presentation/Music/Placeholder/*.wav
 sc/Assets/Audio/Presentation/Music/Placeholder/*.wav.meta

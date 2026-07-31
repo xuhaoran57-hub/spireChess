@@ -342,7 +342,8 @@
 
 - [x] 完成正式商店 UI 技术实施方案，见 `phase-7-ui-vertical-slice-technical-design-v0.1.md`。
 - [x] 完成天穹契约者完整卡面 v0.1 概念稿，见 `ui-concepts/card-ui-sky-covenant-v0.1.svg` 和 PNG 预览。
-- [x] 验证 AI 位图生成流程并保留第一版独立探索稿，见 `ui-concepts/card-ui-generated-initial-draft-v0.1.png`。
+- [x] 验证 AI 位图生成流程并归档第一版独立探索稿，见
+  `archive/deprecated-temp-20260731/payload/deprecated-drafts/card-ui-generated-initial-draft-v0.1.png`。
 - [x] 确认完整随从卡 UI v0.2 的视觉语言和信息骨架：
   - 普通天穹契约者验证银黑公共框架、星契种族皮肤、两项能力标签和可选刷新进度，见 `ui-concepts/card-ui-sky-covenant-normal-v0.2.png`；
   - 金色天穹契约者验证金色框架、流光和高稀有度表现，见 `ui-concepts/card-ui-sky-covenant-golden-style-v0.2.png`；该图只作为金色风格参考，正式数据必须使用 8/16、每 3 次刷新和对应的三段进度；
@@ -503,6 +504,10 @@
 - [ ] G4：完成全量自动化、正式链路双分辨率、存档恢复、跳过/2×、两机性能基线和至少 5 名外部试玩者验收。
   - [x] G4-E 工程集成门禁关闭：以 `f377497` 的 351 / 351 EditMode、30 / 30 PlayMode、26 次正式 Player 运行、完整链路/存档/等价性/清理/性能证据为边界；G4-V、第二机、试玩和正式音频不再混入工程退出条件，见 `phase-9b-g4e-engineering-gate-closure-v0.1.md`。
   - [x] 接入一套代表最终效果的视觉闭环：主菜单主视觉、楼层地图、商店环境、静谧林地事件插画与配置/UI 接线、战斗背景；继续复用当前 22 项 Exact 卡牌/法术/遗珍样板，资源与提示词见 `ui-concepts/phase-9b/g4-visual-slice-v0.1/`。
+  - [x] 按 v0.3.3 明亮旅行绘本规范重做上述五张背景/事件资产并原路径替换；
+    `.meta`、GUID、Resources 路径与事件 `artId` 保持不变，五张离线亮度和近黑
+    门槛通过；记录见
+    `ui-concepts/phase-9c/light-storybook-production-v0.1/background-refresh-v0.3.3/`。
   - [x] 实现 `tools/run_g4v_visual_acceptance.ps1` 一键链路：全量 EditMode/PlayMode、Clean Windows Player 构建、seed=10 指定事件夹具、双分辨率五画面精确采集与 10 图聚合 SHA-256 清单；协议见 `phase-9b-g4v-one-click-acceptance-v0.1.md`。
   - [ ] G4-V：在 Unity 2022.3.62f3c1 运行新增资源导入/事件接线门禁，复跑 EditMode、PlayMode 和 Windows 正式链，并完成 1920×1080 / 1920×1200 五画面复核及负责人生产许可/视觉签字；签字前新增五图保持 `工程样板`，不得标记 `Runtime Ready`。
   - [x] 完成 G4 隔离 Player 构建、真实 UI 点击与遮挡射线门禁、独立存档根、完整构建文件 SHA-256、启动/无进展/总时限 watchdog，以及失败路径精确进程回收。
@@ -588,6 +593,9 @@
   Max 1024 / Quality 50 导入策略；支持新建资源及 Catalog 事务回滚、幂等复验、
   确定性晋级清单和 Unity 菜单/PowerShell 入口。实现阶段未执行晋级，Runtime
   Catalog 仍保持原状。
+- [x] 按同一 v0.3.3 冻结 Style Tile 与亮度规则完成主菜单、商店、地图、战斗和
+  静谧林地事件背景更新；保留现有 Runtime 资源标识和接线，离线五图门槛通过，
+  Unity G4-V 复验仍保持未完成。
 - [ ] 在干净工作树中用 Unity 2022.3.62f3c1 执行 Promotion Builder，提交生成的
   Runtime 资源与晋级清单；随后完成全量 EditMode/PlayMode、Clean Player、
   G4 双分辨率视觉和内存/首次 Shop 尖峰证据，才能标记 `Runtime Ready`。

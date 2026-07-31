@@ -279,6 +279,17 @@ Runtime/Formal Catalog 和正式 UI Prefab 的 10 / 10 前后哈希一致。人�
 复核覆盖普通/金色 × Full/Compact、法术、商店与 5v5 战斗立牌，结论为
 `UNITY_BATCH_RELEASE`。本轮不执行 Runtime 提升。
 
+## v0.3.3 背景更新
+
+主菜单、商店、楼层地图、战斗和静谧林地事件五张旧版暗色资产已按冻结 Style Tile
+与 v0.3.3 明亮背景规则重新生成，并在保留 `.meta`、GUID、Resources 路径和事件
+`artId` 的前提下原位替换。五张图的 160×128 Rec.709 亮/中亮占比为
+95.57%–99.38%，近黑均为 0%，离线门槛通过。
+
+当前状态为 `Runtime Connected / Pending Unity G4-V`，尚未标记
+`Runtime Ready`。Prompt、逐文件哈希、亮度统计和构图记录见
+`background-refresh-v0.3.3/`。
+
 ## v0.3.3 Runtime 晋级门禁
 
 仓库根目录的 `phase-9c-v0.3.3-runtime-promotion-contract.json`、

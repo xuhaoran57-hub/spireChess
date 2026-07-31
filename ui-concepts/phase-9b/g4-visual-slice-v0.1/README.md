@@ -1,5 +1,10 @@
 # G4 正式视觉样板闭环 v0.1
 
+> 历史快照：下列图片与哈希记录的是 2026-07-27 的 v0.1 样板。2026-07-31
+> 五个 Runtime 路径已由 v0.3.3 明亮绘本背景更新原位替换；当前资产、Prompt、
+> 哈希和状态见
+> `../../phase-9c/light-storybook-production-v0.1/background-refresh-v0.3.3/`。
+
 - 日期：2026-07-27
 - 当前生产 Prompt 风格基线：
   `style-tiles/style-tile-d-wandering-storybook-v0.1.png`
@@ -9,7 +14,7 @@
 - 状态：正式效果候选，当前按 `工程样板` 管理；待 Unity G4-V 双分辨率复验和
   项目负责人生产许可签字，不得标记 `Runtime Ready`
 
-## 资产清单
+## 历史资产清单
 
 | Asset ID | Runtime 路径 | 像素 | SHA-256 |
 | --- | --- | --- | --- |
@@ -28,5 +33,6 @@
 - 事件：静谧林地具有唯一焦点；插画和选择项并排，不把图烘焙进 UI。
 - 战斗：敌我两层平台清楚分离，五单位横排区域不放前景角色或文字。
 
-完整提示词见 `PROMPTS.md`。原始 ImageGen 输出保留在 Codex 生成目录，Runtime 文件
-为未经二次像素编辑的直接复制；Unity 仅通过 Sprite 导入和运行时颜色/透明度合成。
+完整历史提示词见 `PROMPTS.md`。当时的原始 ImageGen 输出保留在 Codex 生成目录，
+Runtime 文件曾为未经二次像素编辑的直接复制；当前 Runtime 文件已由 v0.3.3 更新
+替代。

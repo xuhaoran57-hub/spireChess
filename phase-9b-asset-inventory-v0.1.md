@@ -71,7 +71,7 @@
 | 天穹契约者普通 | `ui-concepts/card-ui-sky-covenant-normal-v0.2.png` | 2:3 卡面、星契色彩和信息骨架 | 不是 Unity Artwork Sprite，未经过 9B 统一风格与来源验收 |
 | 天穹契约者金色 | `ui-concepts/card-ui-sky-covenant-golden-style-v0.2.png` | 金色框架、角饰和流光方向 | 图中数据只作风格参考，正式数据必须来自配置 |
 | 万蹄奔潮普通 | `ui-concepts/card-ui-ten-thousand-hoof-normal-v0.2.png` | 荒灵皮肤、三标签与长文案压力 | 未拆分插画、框架和状态层 |
-| AI 初稿 | `ui-concepts/card-ui-generated-initial-draft-v0.1.png` | 仅用于比较插画气质 | 风格、来源台账和运行时规格未冻结 |
+| AI 初稿 | `archive/deprecated-temp-20260731/payload/deprecated-drafts/card-ui-generated-initial-draft-v0.1.png` | 仅用于比较插画气质；已归档 | 风格、来源台账和运行时规格未冻结 |
 | 商店线框 | `ui-concepts/shop-ui-wireframe-v0.1.png` | 信息架构已冻结 | 低保真，不代表最终材质和美术 |
 
 ## 3. 12 张样板随从

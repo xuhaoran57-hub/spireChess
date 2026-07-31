@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "packageId": "phase-9c-background-refresh-v0.3.3",
+  "version": "0.3.3",
+  "generatedOn": "2026-07-31",
+  "status": "runtime_connected_pending_unity_g4v",
+  "generator": {
+    "tool": "Codex built-in ImageGen",
+    "modelVersion": "unavailable",
+    "seed": "unavailable",
+    "mode": "generate",
+    "callsPerAsset": 1
+  },
+  "styleReference": {
+    "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+    "sha256": "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed",
+    "role": "sole reference for medium, palette, lighting, paper texture and mood"
+  },
+  "frozenSources": [
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/BRIGHT-STYLE-RULES-v0.3.3.md",
+      "sha256": "06a4ef79c2aab0063f86a232766948d88812b51d3ec57cbf22456e79b4e66d9e"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/PRODUCTION-PROMPTS-v0.3.3.zh-CN.md",
+      "sha256": "ae96662e11ee60d12d198eca5cd35f9c526eae7f56087ac575d11d35cd794517"
+    }
+  ],
+  "measurement": {
+    "thumbnailWidth": 160,
+    "thumbnailHeight": 128,
+    "formula": "Rec.709 luma",
+    "lightOrMiddleLightThresholdInclusive": 85,
+    "nearBlackThresholdExclusive": 25,
+    "recommendedMinimumLightOrMiddleLightPercent": 60,
+    "recommendedMaximumNearBlackPercent": 8
+  },
+  "integration": {
+    "strategy": "replace_runtime_png_in_place",
+    "resourcePathsChanged": false,
+    "unityMetaFilesChanged": false,
+    "eventArtIdChanged": false
+  },
+  "assets": [
+    {
+      "id": "backdrop_main_menu",
+      "path": "sc/Assets/Resources/Presentation/Backdrops/backdrop_main_menu.png",
+      "width": 1672,
+      "height": 941,
+      "lightOrMiddleLightPercent": 98.54,
+      "nearBlackPercent": 0.0,
+      "sha256": "7a77c9d196b5fbe61943b7e908d4b05aa5bc24a77782680a4e3e10430eb79d7b"
+    },
+    {
+      "id": "backdrop_shop",
+      "path": "sc/Assets/Resources/Presentation/Backdrops/backdrop_shop.png",
+      "width": 1672,
+      "height": 941,
+      "lightOrMiddleLightPercent": 95.77,
+      "nearBlackPercent": 0.0,
+      "sha256": "d3931517c12b7f3af33fb523fab0e6e4a427d232030791b840c2588a96b90a22"
+    },
+    {
+      "id": "backdrop_floor_map",
+      "path": "sc/Assets/Resources/Presentation/Backdrops/backdrop_floor_map.png",
+      "width": 1672,
+      "height": 941,
+      "lightOrMiddleLightPercent": 99.38,
+      "nearBlackPercent": 0.0,
+      "sha256": "7fdd4f205a3b119718f9f5977a58a1c82ded1cb06d3a1502cebf0b15ac2723a0"
+    },
+    {
+      "id": "backdrop_battle",
+      "path": "sc/Assets/Resources/Presentation/Backdrops/backdrop_battle.png",
+      "width": 1672,
+      "height": 941,
+      "lightOrMiddleLightPercent": 95.57,
+      "nearBlackPercent": 0.0,
+      "sha256": "51f913ca2793512063c8863f2d9af31a5a2ffda03adfe27b40e2bf9ea35b080a"
+    },
+    {
+      "id": "event_tranquil_grove",
+      "path": "sc/Assets/Resources/Presentation/Events/event_tranquil_grove.png",
+      "width": 1448,
+      "height": 1086,
+      "lightOrMiddleLightPercent": 96.78,
+      "nearBlackPercent": 0.0,
+      "sha256": "adcb71e599c541a4b68e32f1c2d7bd4f6a2591c569b8c6d5a018f750e9f77d70"
+    }
+  ]
+}

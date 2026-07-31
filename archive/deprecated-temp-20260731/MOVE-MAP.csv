@@ -1,0 +1,23 @@
+category,originalPath,archivedPath,reason
+temporary-check,sc/Temp/codex-syntaxcheck,payload/generated-check-harnesses/codex-syntaxcheck,ignored generated syntax-check output with no active reference
+temporary-check,sc/Temp/CompileCheck,payload/generated-check-harnesses/CompileCheck,ignored compile-check harness with no active reference
+temporary-check,sc/Temp/compilecheck-out,payload/generated-check-harnesses/compilecheck-out,ignored compile-check output with no active reference
+temporary-check,sc/Temp/FlourishCheck,payload/generated-check-harnesses/FlourishCheck,ignored one-off simulation harness with no active reference
+temporary-check,sc/Temp/FullCompile,payload/generated-check-harnesses/FullCompile,ignored compile harness with no active reference
+temporary-check,sc/Temp/GrowthSim,payload/generated-check-harnesses/GrowthSim,ignored one-off simulation harness with no active reference
+temporary-check,sc/Temp/RelicCompile,payload/generated-check-harnesses/RelicCompile,ignored compile harness with no active reference
+temporary-check,sc/Temp/RelicSmoke,payload/generated-check-harnesses/RelicSmoke,ignored smoke-test harness with no active reference
+temporary-check,sc/Temp/S0Sim,payload/generated-check-harnesses/S0Sim,ignored one-off simulation harness with no active reference
+temporary-check,sc/Temp/SyntaxCheck,payload/generated-check-harnesses/SyntaxCheck,ignored syntax-check harness with no active reference
+python-cache,tools/__pycache__,payload/python-bytecode/tools-cache,reproducible Python bytecode cache
+python-cache,ui-concepts/phase-9c/light-storybook-production-v0.1/offline-card-simulator-v0.1/__pycache__,payload/python-bytecode/offline-card-simulator-v0.1-cache,reproducible Python bytecode cache
+python-cache,ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-8-v0.3.3-tier1-production/__pycache__,payload/python-bytecode/validation-round-8-cache,reproducible Python bytecode cache
+python-cache,ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-9-v0.3.3-tier2-production/__pycache__,payload/python-bytecode/validation-round-9-cache,reproducible Python bytecode cache
+python-cache,ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-10-v0.3.3-tier3-production/__pycache__,payload/python-bytecode/validation-round-10-cache,reproducible Python bytecode cache
+python-cache,ui-concepts/phase-9c/light-storybook-production-v0.1/validation-round-11-v0.3.3-tier4-production/__pycache__,payload/python-bytecode/validation-round-11-cache,reproducible Python bytecode cache
+redundant-copy,minions.v0.1.json,payload/redundant-root-copies/minions.v0.1.json,byte-identical to active Unity Resources config and not referenced at root
+redundant-copy,spells.v0.1.json,payload/redundant-root-copies/spells.v0.1.json,byte-identical to active Unity Resources config and not referenced at root
+superseded-document,minion-catalog-v5.1.0.md,payload/superseded-catalogs/minion-catalog-v5.1.0.md,replaced by current minion-catalog-v5.3.1.md
+superseded-document,minion-catalog-v5.3.0.md,payload/superseded-catalogs/minion-catalog-v5.3.0.md,replaced by current minion-catalog-v5.3.1.md
+deprecated-draft,ui-concepts/card-ui-generated-initial-draft-v0.1.png,payload/deprecated-drafts/card-ui-generated-initial-draft-v0.1.png,early comparison-only draft not used by runtime
+deprecated-draft,ui-concepts/phase-9b/archetype-anchor-illustrations-v0.2/revisions/forge-seated-sovereign-v0.4/draft-a-shield-ring-puppet.png,payload/deprecated-drafts/forge-seated-sovereign-v0.4/draft-a-shield-ring-puppet.png,unreferenced draft with retained final sibling
