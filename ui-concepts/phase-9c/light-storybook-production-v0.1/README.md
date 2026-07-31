@@ -286,9 +286,10 @@ Runtime/Formal Catalog 和正式 UI Prefab 的 10 / 10 前后哈希一致。人�
 `artId` 的前提下原位替换。五张图的 160×128 Rec.709 亮/中亮占比为
 95.57%–99.38%，近黑均为 0%，离线门槛通过。
 
-当前状态为 `Runtime Connected / Pending Unity G4-V`，尚未标记
-`Runtime Ready`。Prompt、逐文件哈希、亮度统计和构图记录见
-`background-refresh-v0.3.3/`。
+当前状态为 `Runtime Connected / G4-V Technical Pass / Pending Production
+License`，尚未标记 `Runtime Ready`。双分辨率正式 Player 技术复验已通过，
+但背景生产许可仍与卡牌 Runtime 晋级分开签字。Prompt、逐文件哈希、亮度统计和
+构图记录见 `background-refresh-v0.3.3/`。
 
 ## v0.3.3 Runtime 晋级门禁
 
@@ -315,10 +316,16 @@ Promotion Builder 已实现，Unity 菜单入口为
 .\tools\run_phase9c_runtime_promotion.ps1
 ```
 
-Builder 会复制候选的全部 Calibration 引用、应用冻结导入策略、保留正式 Catalog
-GUID，并输出确定性晋级清单；当前实现阶段未执行，Runtime Catalog 仍保持晋级前
-状态。Builder 执行不等同于 `Runtime Ready`，晋级后仍必须复跑全量测试、Clean
-Player、G4 双分辨率视觉和内存/首次 Shop 尖峰证据。
+Builder 已在干净工作树执行并提交为 `8fc61a5`：正式 Catalog GUID 保持不变，
+Runtime Catalog 为 86 条，83 个配置 ArtId 全部 Exact，51 / 51 量产资产已晋级，
+Calibration 引用为 0。晋级后的 EditMode 383 / 383、PlayMode 30 / 30、Clean
+Windows Player、双分辨率 10 图和 10 次 Stress 均通过；未发现视觉阻断项或单调
+内存增长。首次 10 卡 Shop 的 0.49–0.55 秒激活尖峰作为本次晋级的已知事实接受，
+不关闭全局两机性能门槛。
+
+v0.3.3 的 42 张非 Token 随从与 9 张法术现为 `Runtime Ready`，本晋级已关闭。
+完整构建身份、哈希、性能数据和范围边界见
+`runtime-promotion-v0.3.3/acceptance-summary.md`。
 
 ## v0.2 机制压力测试归档
 

@@ -1,8 +1,8 @@
 # 阶段 9B 视听表现资产盘点表 v0.1
 
 - 日期：2026-07-22
-- 更新：2026-07-26（G3 本地程序合成占位音频已接入；正式音频改由项目负责人使用 AI 自制）
-- 状态：G1、G2 已通过并关闭；G3 工程与本地播放链路为 `Commissioning Ready`，音频严格门禁与 G3 总门禁未关闭
+- 更新：2026-07-31（v0.3.3 的 42 张非 Token 随从与 9 张法术已完成 Runtime 晋级）
+- 状态：G1、G2 与 v0.3.3 卡牌美术 Runtime 晋级已关闭；G3 工程与本地播放链路为 `Commissioning Ready`，音频严格门禁、背景生产许可与 G3/G4 总门禁未关闭
 - 对应方案：`phase-9b-presentation-vertical-slice-technical-design-v0.1.md`
 - 内容基线：5.5.0 / 8B.1
 - 配置真源：`sc/Assets/Resources/Configs/Json/`
@@ -43,9 +43,9 @@
 
 | 类别 | 当前数量 | 当前可用资源 | 缺口 | 9B 处理 |
 | --- | ---: | --- | --- | --- |
-| 非 Token 随从 | 64 | 配置、名称、文案、数值和语义 `artId`；12 张核心样板与 2 张旅团附加锚点均已进入 Runtime/Catalog，14 个 ID 精确命中通过；新增 6 张核心样板的专门卡面双分辨率视觉矩阵通过 | 50 张无 Runtime 专属 Sprite；`audioId` 全空 | 三主种族 12 张核心样板；两张旅团只作 G1 附加盲测锚点；其余保留种族回退机制，4 张精美回退图本轮暂缓 |
+| 非 Token 随从 | 64 | 64 张专属插画均已进入正式 Runtime Catalog 并精确命中；v0.3.3 晋级资产为 `Runtime Ready` | 美术缺口 0；`audioId` 全空 | G1/G2 样板与 v0.3.2/v0.3.3 量产资产合并后，64 / 64 配置 ArtId Exact |
 | Token | 3 | 配置、语义 `artId`；3 张专属插画均为 `Runtime Ready`，精确命中及专门卡面双分辨率视觉矩阵通过 | `audioId` 全空；P0 通用事件音效走 G3 AI 自制流程 | 3 张全部制作并由样板精确命中门禁保护 |
-| 法术 | 16 | 配置、法术类型和语义 `artId/iconId`；4 张专属样板插画均为 `Runtime Ready`，精确命中及专门卡面双分辨率视觉矩阵通过 | 其余 12 张仍无专属插画；`audioId` 全空 | 4 张专属样板由精确命中门禁保护；其余保留法术类型回退机制，4 张精美回退图本轮暂缓 |
+| 法术 | 16 | 16 张专属插画均已进入正式 Runtime Catalog 并精确命中；v0.3.3 晋级资产为 `Runtime Ready` | 美术缺口 0；`audioId` 全空 | G2 样板与 v0.3.2/v0.3.3 量产资产合并后，16 / 16 配置 ArtId Exact |
 | 遗珍 | 15 | 15 个 `uiIconId`；3 个样板图标均为 `Runtime Ready`，精确命中及 Run UI 双分辨率视觉检查通过 | 其余 12 个无对应 Sprite | 3 个样板图标由精确命中门禁保护 |
 | 事件 | 14 | 文案与效果配置 | 无事件插画 | 9B 使用统一事件面板与类型图标；专属插画进入 9C |
 | 遭遇 | 51 | 阵容、名称和三层曲线 | 无遭遇/敌方主题背景 | 9B 制作一套普通战斗背景；楼层/Boss 差异进入 9C |
@@ -59,7 +59,7 @@
 | UI Prefab | 13 + 运行时 System Menu | G3 统一皮肤与序列化接线完成 | Card、Shop、Battle、Run、MainMenu、选择/确认层均已重建；System Menu 与音频设置运行时复用 |
 | 正式/预览 Scene | 11 | 可运行 | 包含 Boot、MainMenu、Shop、Battle、Run 及对应 Preview |
 | 正式字体 | 1 | Runtime Ready | Noto Sans CJK SC Regular，已有 OFL 许可证 |
-| 位图/Sprite | 39 | 39 项活动生产 Sprite 均为 `Runtime Ready`；G2 已关闭 | 14 张随从插画、4 个轻量数值组件、8 张立牌部件与 2 张绘本 v2 卡框沿用 G1 许可结论；新增 3 张 Token、4 张法术、3 个遗珍图标和 1 张诊断图由 G2 签字包确认，均已通过 Unity 导入、自动化与适用视觉检查；旧框 2 张只保留历史证据 |
+| 位图/Sprite | Runtime Catalog 86 条 | 83 个配置 ArtId 全部 Exact；v0.3.3 卡牌美术为 `Runtime Ready` | 66 张晋级 PNG 位于 `Assets/Art/Presentation/Runtime/LightStorybookV033/`；51 / 51 v0.3.3 量产图与 15 张 v0.3.2 Formal 图采用冻结导入策略，Calibration 引用为 0；其余公共组件、Token、遗珍和诊断图沿用 G1/G2 许可结论 |
 | Material/Shader/VFX | 1 Material + 程序化表现组件 | G3 工程完成 | 护盾 `M_BattleShieldAdditive`、程序化背景、容量受限 `PresentationFxPool`、Shop/Battle 结构化反馈与清理门禁均完成 |
 | AudioClip/AudioMixer | 67 / 1 | 67 个 WAV 均为 `Local Synth Placeholder`；Mixer 与 Catalog 工程完成 | `SpireChessAudio.mixer` 已含 Master/Music/SFX/UI；28 Cue 可播放但没有 `ProductionApproved` Clip，`ProductionStrict` 精确报告 28 个占位错误 |
 | 概念/验证图 | 既有方向图 + G3 28 张双分辨率截图 | G3 验证证据已归档 | G3 截图位于 `ui-concepts/unity-validation/g3-*-v0.1/`；截图证据不等于音频 Runtime Ready |
@@ -322,11 +322,11 @@ VFX Runtime Ready 还要求完成对象复用、并发上限、跳过清理和�
 | --- | --- | --- | --- | --- |
 | D-01 | `CardViewModel.ArtId` | 已完成 | 字符串语义字段，不传 Unity 对象 | P0 |
 | D-02 | Minion/Spell Factory 映射 | 已完成 | 从配置复制到 ViewModel | P0 |
-| D-03 | `PresentationSpriteCatalog` | G2 样板技术门禁通过 | `CardUiPrefabBuilder` / `RunUiPrefabBuilder` 成功；14 张随从、3 张 Token、4 张法术、3 个遗珍共 24 个语义 ID 精确命中通过，真实非法 ID 命中诊断图；精确命中 → 语义回退 → 缺失诊断机制保留，4+4 张精美回退图按本轮决策暂缓 | P0 |
+| D-03 | `PresentationSpriteCatalog` | v0.3.3 Runtime 晋级通过 | 正式 Catalog 86 条、83 个配置 ArtId Exact；正式 GUID 保持 `75d638606a8084146524a35a317a2cca`，51 项量产资产无 Calibration 引用；非法 ID 诊断机制继续保留 | P0 |
 | D-04 | `PresentationTheme` | G3 统一主题完成 | 屏幕、地图、流派回退色、金色立牌 Tint、合法目标与选中状态色均已接入 | P0 |
 | D-05 | `PresentationAudioCatalog` | 28 Cue / 67 Placeholder Clip 已精确挂接 | ID/Bus/循环/数值/Mixer Group 与 `Commissioning` 通过；`ProductionStrict` 因 28 Cue 均为 Placeholder，以退出码 1 按设计拒绝 | P0 |
 | D-06 | AudioService/MusicDirector | G3 工程与占位播放链路完成 | 常驻唯一、设置持久化、淡入淡出、并发/冷却、跨场景上下文映射已覆盖；正式 AI 音频的音质、循环与峰值人工听审待完成 | P0 |
-| D-07 | 资产来源台账 | G1 28 项与 G2 新增 11 项的源文件、Runtime 路径、工具、哈希和签字边界均已补齐 | 39 项活动生产 Sprite 均为 `Runtime Ready`；G2 签字范围见 `phase-9b-g2-production-license-signoff-v0.1.md` | P0 |
+| D-07 | 资产来源台账 | G1/G2 与 Phase 9C v0.3.3 的源文件、Runtime 路径、工具、哈希和签字边界均已补齐 | v0.3.3 的 51 项量产资产晋级证据见 `phase-9c-v0.3.3-runtime-promotion-signoff.md` 与 `ui-concepts/phase-9c/light-storybook-production-v0.1/runtime-promotion-v0.3.3/acceptance-summary.md` | P0 |
 
 9B 保留配置中现有 `placeholder_*` ArtId 作为稳定键，避免单纯改名改变完整配置哈希。是否在后续 schema 中把表现身份排除出玩法兼容哈希，需要单独技术决策，不在本阶段顺手修改。
 
@@ -345,17 +345,17 @@ VFX Runtime Ready 还要求完成对象复用、并发上限、跳过清理和�
 
 生成式资产还必须保存固定风格参考、提示词、负面提示、种子/模型版本（若工具提供）、生成后人工修改记录。素材库资产必须保留购买凭证或许可文本。
 
-## 11. 9C 全量生产余量
+## 11. 9C 全量生产余量（2026-07-31 复算）
 
-9B 全部完成后，按当前 5.5.0 内容仍至少剩余：
+v0.3.3 卡牌美术 Runtime 晋级关闭后，按当前 5.5.0 内容复算：
 
-| 类别 | 总量 | 9B 专属完成 | 9C 最低剩余 | 备注 |
+| 类别 | 总量 | 当前专属完成 | 当前最低剩余 | 备注 |
 | --- | ---: | ---: | ---: | --- |
-| 非 Token 随从专属插画 | 64 | 14 | 50 | 12 张核心样板与 2 张旅团附加锚点已完成；其余在 9B 期间由已冻结的回退/诊断机制覆盖 |
+| 非 Token 随从专属插画 | 64 | 64 | 0 | 64 / 64 配置 ArtId 已在正式 Runtime Catalog Exact |
 | Token 专属插画 | 3 | 3 | 0 | 新增 Token 另计 |
-| 法术专属插画 | 16 | 4 | 12 | 9B 期间由法术类型回退覆盖 |
+| 法术专属插画 | 16 | 16 | 0 | 16 / 16 配置 ArtId 已在正式 Runtime Catalog Exact |
 | 遗珍正式图标 | 15 | 3 | 12 | 冠冕与奇物需要统一等级语言 |
-| 事件专属插画 | 14 | 0 | 14 | 是否每事件独立插画在 9C 决策 |
+| 事件专属插画 | 14 | 1 个工程候选 | 13 + 生产许可 | 静谧林地已接线并通过 G4-V 技术复验，生产许可仍独立开放 |
 | 楼层地图背景 | 3 | 1 | 2 | 节点和连线不随背景复制 |
 | Boss/精英战斗主题 | 待定 | 0 | 待定 | 51 个遭遇不等于 51 张背景，先定义复用策略 |
 | 专属卡牌 VFX/音效 | 待定 | 0 | 待定 | 只给高辨识度核心卡立项，禁止默认每卡一套 |
@@ -373,4 +373,4 @@ VFX Runtime Ready 还要求完成对象复用、并发上限、跳过清理和�
 7. 卡牌公共框架和状态/关键词图标已完成并沿用 G1/G2 门禁。
 8. Card → Shop → Run/Map → Battle → MainMenu/弹窗换肤已完成；G3 四组双分辨率证据归档。
 9. VFX、AudioMixer、28 Cue 工程契约和运行时接线已完成；3 首完整 BGM 与 25 个 P0 Cue / 64 个 SFX 变体的本地占位包已接入，文件门禁和 Unity 346 / 346 EditMode、25 / 25 PlayMode 通过；正式 AI Clip 仍待生成、筛选与后期处理。
-10. 正式 AI 音频完成生成台账、严格门禁与人工听审后关闭 G3；再完成 G4 正式链路、存档恢复、真实性能和外部试玩，把状态更新为已验收并据实计算 9C 余量。
+10. v0.3.3 的 42 张非 Token 随从与 9 张法术已晋级为 `Runtime Ready`；后续完成正式 AI 音频、背景生产许可、G3 严格门禁、G4 第二机与外部试玩后，再更新全局状态为已验收。

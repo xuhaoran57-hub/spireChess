@@ -2,7 +2,10 @@
 
 - 候选：`PresentationSpriteCatalog_LightStorybookProductionV033Batch06`
 - 候选状态：`UNITY_BATCH_RELEASE`
-- 晋级状态：`Approved`
+- 晋级状态：`Runtime Ready`
+- 关闭时间：`2026-07-31T22:10:48+08:00`
+- 验收摘要：
+  `ui-concepts/phase-9c/light-storybook-production-v0.1/runtime-promotion-v0.3.3/acceptance-summary.md`
 - 机器契约：`phase-9c-v0.3.3-runtime-promotion-contract.json`
 - 技术门禁：`Spire Chess/Release/Validate Phase 9C v0.3.3 Runtime Promotion Gate`
 
@@ -89,15 +92,32 @@ phase-9c-v0.3.3-runtime-promotion-signoff.md 第 3 节策略建立正式 Runtime
 该回复构成对本签字包第 4 节全部项目的明确确认；机器契约的 `approval` 已更新为
 `Approved`，RPG-06 关闭。
 
-## 5. Builder 实现状态
+## 5. Runtime 晋级关闭
 
-Promotion Builder 已实现但尚未执行。它会在 RPG-01–06 全部通过后复制候选中的
-全部 Calibration 图片、应用冻结导入策略，并在保留正式 Catalog GUID 的前提下
-建立 86 项 Runtime Catalog。正式执行入口为：
+项目负责人于 2026-07-31 在 Codex 任务中指示：
 
-```powershell
-.\tools\run_phase9c_runtime_promotion.ps1
+```text
+关闭 v0.3.3 Runtime 晋级
 ```
 
-执行必须从干净工作树开始。晋级生成物、全量回归、Clean Player、G4 双分辨率视觉
-和内存证据未完成前，不得标记 `Runtime Ready`。
+Promotion Builder 已从干净工作树执行，生成物与晋级清单提交为
+`8fc61a5472b2ca4eb14e02b88c427e1dd8b089fb`。复核结论：
+
+- 晋级清单状态为 `PROMOTED`；正式 Catalog GUID 保持
+  `75d638606a8084146524a35a317a2cca`；
+- Runtime Catalog 为 86 条，当前 83 个配置 ArtId 全部 Exact；
+- 51 / 51 量产资产已进入
+  `Assets/Art/Presentation/Runtime/LightStorybookV033/`，Calibration 引用为 0；
+- 66 张晋级纹理全部满足 Windows DXT1、Max 1024、Quality 50、Mipmap/Readable
+  关闭的冻结策略；
+- EditMode 383 / 383、PlayMode 30 / 30 通过；
+- 干净 Windows Development Player、双分辨率 10 图、内存与 10 次 Stress
+  证据通过，未发现本次晋级引入的视觉阻断项或单调内存增长。
+
+首次 10 卡 Shop 仍有 0.49–0.55 秒的一次性激活尖峰，已作为本次 Runtime 晋级的
+已知性能事实接受；不据此关闭 G4 第二机/跨机器门槛。完整构建身份、证据哈希和范围
+边界见验收摘要。
+
+据此，v0.3.3 的 42 张非 Token 随从与 9 张法术状态更新为
+`Runtime Ready`，本 Runtime 晋级关闭。正式音频、背景生产许可及 G3/G4 总门禁
+保持开放。

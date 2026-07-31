@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；G4-E 已依据提交 `f377497` 的干净工程自动化候选与 DEV-A 性能基线关闭，正式视觉样板闭环已接入并转入 G4-V，仍需 Unity 双分辨率复验、负责人视觉/许可签字、第二机/两机门槛、五人试玩与正式音频门禁。
+当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；v0.3.3 卡牌美术 Runtime 晋级已关闭；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；G4-E 已依据提交 `f377497` 关闭，G4-V 技术复验已在晋级提交 `8fc61a5` 上通过，仍需五张背景的负责人生产许可/视觉签字、第二机/两机门槛、五人试玩与正式音频门禁。
 
 ## 已完成：阶段 0 项目准备
 
@@ -509,7 +509,8 @@
     门槛通过；记录见
     `ui-concepts/phase-9c/light-storybook-production-v0.1/background-refresh-v0.3.3/`。
   - [x] 实现 `tools/run_g4v_visual_acceptance.ps1` 一键链路：全量 EditMode/PlayMode、Clean Windows Player 构建、seed=10 指定事件夹具、双分辨率五画面精确采集与 10 图聚合 SHA-256 清单；协议见 `phase-9b-g4v-one-click-acceptance-v0.1.md`。
-  - [ ] G4-V：在 Unity 2022.3.62f3c1 运行新增资源导入/事件接线门禁，复跑 EditMode、PlayMode 和 Windows 正式链，并完成 1920×1080 / 1920×1200 五画面复核及负责人生产许可/视觉签字；签字前新增五图保持 `工程样板`，不得标记 `Runtime Ready`。
+  - [x] G4-V 技术复验：在 Unity 2022.3.62f3c1 的干净晋级提交 `8fc61a5` 上完成资源导入/事件接线门禁、383 / 383 EditMode、30 / 30 PlayMode、Clean Windows Player 与 1920×1080 / 1920×1200 五画面复核；10 图无缺失/回退/诊断资源和本次晋级引入的视觉阻断项。
+  - [ ] G4-V 负责人签字：完成新增五张背景的生产许可/视觉签字；签字前五图保持 `工程样板`，不得标记 `Runtime Ready`。本项不影响已独立关闭的 v0.3.3 卡牌美术 Runtime 晋级。
   - [x] 完成 G4 隔离 Player 构建、真实 UI 点击与遮挡射线门禁、独立存档根、完整构建文件 SHA-256、启动/无进展/总时限 watchdog，以及失败路径精确进程回收。
   - [x] 完成核心 `MainMenu → Run → Shop → Run → Battle → Run → MainMenu → Continue` 链、Run 指纹恢复、1×/2×/跳过等价、单次结算、召唤动态帧、22 / 22 样板 Catalog Exact 与清理归零门禁。
   - [x] 当前全量回归 EditMode 351 / 351（6.7499407 s）、PlayMode 30 / 30（33.5135665 s），0 失败、0 跳过、0 inconclusive、`ForcedShutdown=false`。
@@ -520,7 +521,7 @@
   - [ ] 项目负责人完成 80 张双分辨率截图逐图复核并签字；独立审核未发现 P0/P1，3 个非阻塞 P2 已记录在 G4 证据 Manifest。
   - [x] Core/Stress 先行 visual 1×2 轮已透明指定为不计入汇总的完整预热，随后 performance 5×2 与逐轮/30 秒稳定期趋势审查通过，DEV-A G4-P02 完成。
   - [x] 第二机执行包与固定顺序说明已生成并完成归档读取校验；ZIP SHA-256 为 `83699817f774b8736cc3852eb17e8fb391c480bffc7f2829788c4d1c79fa796d`，见 `phase-9b-g4-second-machine-execution-v0.1.md`。
-  - [ ] Stress 十卡 Shop 的 516–617 ms 初始化尖峰需由项目负责人在两机门槛冻结时明确接受或要求优化。
+  - [ ] Stress 十卡 Shop 的一次性初始化尖峰需由项目负责人在两机门槛冻结时明确接受或要求优化；历史候选为 516–617 ms，v0.3.3 晋级候选的激活为 488.75–554.07 ms、最大帧最高 633.35 ms。本次只在卡牌美术 Runtime 晋级范围内接受，不关闭跨机器门槛。
   - [ ] 项目负责人提供第二台不同配置 Windows x64 机器，运行同一冻结构建并签字冻结两机门槛。
   - [ ] 项目负责人组织至少 5 名未参与实现者完成非音频试玩记录；正式 AI 音频完成后再做音频专项运行基线与听审。
 
@@ -591,14 +592,18 @@
 - [x] 实现独立 Promotion Builder：门禁通过后动态复制候选中的全部 Calibration
   美术到正式 Runtime 目录，保留正式 Catalog GUID，应用 Windows DXT1 /
   Max 1024 / Quality 50 导入策略；支持新建资源及 Catalog 事务回滚、幂等复验、
-  确定性晋级清单和 Unity 菜单/PowerShell 入口。实现阶段未执行晋级，Runtime
-  Catalog 仍保持原状。
+  确定性晋级清单和 Unity 菜单/PowerShell 入口。Builder 已从干净工作树执行，
+  生成资源与晋级清单提交为 `8fc61a5`。
 - [x] 按同一 v0.3.3 冻结 Style Tile 与亮度规则完成主菜单、商店、地图、战斗和
   静谧林地事件背景更新；保留现有 Runtime 资源标识和接线，离线五图门槛通过，
-  Unity G4-V 复验仍保持未完成。
-- [ ] 在干净工作树中用 Unity 2022.3.62f3c1 执行 Promotion Builder，提交生成的
+  Unity G4-V 技术复验已完成；背景生产许可/视觉签字仍独立保持开放。
+- [x] 在干净工作树中用 Unity 2022.3.62f3c1 执行 Promotion Builder，提交生成的
   Runtime 资源与晋级清单；随后完成全量 EditMode/PlayMode、Clean Player、
-  G4 双分辨率视觉和内存/首次 Shop 尖峰证据，才能标记 `Runtime Ready`。
+  G4 双分辨率视觉和内存/首次 Shop 尖峰证据。提交 `8fc61a5` 上 EditMode
+  383 / 383、PlayMode 30 / 30、双分辨率 10 图及 10 / 10 Stress 通过；86 条
+  Runtime Catalog 精确覆盖 83 个配置 ArtId，51 / 51 量产资产标记
+  `Runtime Ready`，v0.3.3 Runtime 晋级关闭。证据见
+  `ui-concepts/phase-9c/light-storybook-production-v0.1/runtime-promotion-v0.3.3/acceptance-summary.md`。
 
 ## 暂缓
 
