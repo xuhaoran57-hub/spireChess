@@ -1,8 +1,8 @@
 # 阶段 9B 视听表现资产盘点表 v0.1
 
 - 日期：2026-07-22
-- 更新：2026-07-31（v0.3.3 的 42 张非 Token 随从与 9 张法术已完成 Runtime 晋级）
-- 状态：G1、G2 与 v0.3.3 卡牌美术 Runtime 晋级已关闭；G3 工程与本地播放链路为 `Commissioning Ready`，音频严格门禁、背景生产许可与 G3/G4 总门禁未关闭
+- 更新：2026-07-31（补记 3 张旧 G2 Token 未使用 v0.3.3 冻结风格；v0.3.4 候选待批准）
+- 状态：G1、G2 与 v0.3.3 的 42 张非 Token 随从 / 9 张法术 Runtime 晋级已关闭；3 张 v0.3.4 Token Refresh 候选待视觉批准和 Runtime 晋级；G3 工程与本地播放链路为 `Commissioning Ready`，音频严格门禁、背景生产许可与 G3/G4 总门禁未关闭
 - 对应方案：`phase-9b-presentation-vertical-slice-technical-design-v0.1.md`
 - 内容基线：5.5.0 / 8B.1
 - 配置真源：`sc/Assets/Resources/Configs/Json/`
@@ -44,7 +44,7 @@
 | 类别 | 当前数量 | 当前可用资源 | 缺口 | 9B 处理 |
 | --- | ---: | --- | --- | --- |
 | 非 Token 随从 | 64 | 64 张专属插画均已进入正式 Runtime Catalog 并精确命中；v0.3.3 晋级资产为 `Runtime Ready` | 美术缺口 0；`audioId` 全空 | G1/G2 样板与 v0.3.2/v0.3.3 量产资产合并后，64 / 64 配置 ArtId Exact |
-| Token | 3 | 配置、语义 `artId`；3 张专属插画均为 `Runtime Ready`，精确命中及专门卡面双分辨率视觉矩阵通过 | `audioId` 全空；P0 通用事件音效走 G3 AI 自制流程 | 3 张全部制作并由样板精确命中门禁保护 |
+| Token | 3 | 配置、语义 `artId`；3 张旧 G2 专属插画仍为现行 Runtime，精确命中及旧版专门卡面矩阵通过 | 3 张旧图未使用 v0.3.3 冻结 Style Tile；v0.3.4 新风格候选待视觉批准和 Runtime 晋级；`audioId` 全空 | Catalog Exact 只保护接线；新风格完成由独立 Token Refresh 门禁判断 |
 | 法术 | 16 | 16 张专属插画均已进入正式 Runtime Catalog 并精确命中；v0.3.3 晋级资产为 `Runtime Ready` | 美术缺口 0；`audioId` 全空 | G2 样板与 v0.3.2/v0.3.3 量产资产合并后，16 / 16 配置 ArtId Exact |
 | 遗珍 | 15 | 15 个 `uiIconId`；3 个样板图标均为 `Runtime Ready`，精确命中及 Run UI 双分辨率视觉检查通过 | 其余 12 个无对应 Sprite | 3 个样板图标由精确命中门禁保护 |
 | 事件 | 14 | 文案与效果配置 | 无事件插画 | 9B 使用统一事件面板与类型图标；专属插画进入 9C |
@@ -59,7 +59,7 @@
 | UI Prefab | 13 + 运行时 System Menu | G3 统一皮肤与序列化接线完成 | Card、Shop、Battle、Run、MainMenu、选择/确认层均已重建；System Menu 与音频设置运行时复用 |
 | 正式/预览 Scene | 11 | 可运行 | 包含 Boot、MainMenu、Shop、Battle、Run 及对应 Preview |
 | 正式字体 | 1 | Runtime Ready | Noto Sans CJK SC Regular，已有 OFL 许可证 |
-| 位图/Sprite | Runtime Catalog 86 条 | 83 个配置 ArtId 全部 Exact；v0.3.3 卡牌美术为 `Runtime Ready` | 66 张晋级 PNG 位于 `Assets/Art/Presentation/Runtime/LightStorybookV033/`；51 / 51 v0.3.3 量产图与 15 张 v0.3.2 Formal 图采用冻结导入策略，Calibration 引用为 0；其余公共组件、Token、遗珍和诊断图沿用 G1/G2 许可结论 |
+| 位图/Sprite | Runtime Catalog 86 条 | 83 个配置 ArtId 全部 Exact；v0.3.3 的 51 项卡牌美术为 `Runtime Ready` | 66 张晋级 PNG 位于 `Assets/Art/Presentation/Runtime/LightStorybookV033/`；51 / 51 v0.3.3 量产图与 15 张 v0.3.2 Formal 图采用冻结导入策略，Calibration 引用为 0；公共组件、遗珍和诊断图沿用 G1/G2 许可结论；3 张 Token 仍是旧 G2 Runtime，v0.3.4 候选未晋级 |
 | Material/Shader/VFX | 1 Material + 程序化表现组件 | G3 工程完成 | 护盾 `M_BattleShieldAdditive`、程序化背景、容量受限 `PresentationFxPool`、Shop/Battle 结构化反馈与清理门禁均完成 |
 | AudioClip/AudioMixer | 67 / 1 | 67 个 WAV 均为 `Local Synth Placeholder`；Mixer 与 Catalog 工程完成 | `SpireChessAudio.mixer` 已含 Master/Music/SFX/UI；28 Cue 可播放但没有 `ProductionApproved` Clip，`ProductionStrict` 精确报告 28 个占位错误 |
 | 概念/验证图 | 既有方向图 + G3 28 张双分辨率截图 | G3 验证证据已归档 | G3 截图位于 `ui-concepts/unity-validation/g3-*-v0.1/`；截图证据不等于音频 Runtime Ready |
@@ -322,11 +322,11 @@ VFX Runtime Ready 还要求完成对象复用、并发上限、跳过清理和�
 | --- | --- | --- | --- | --- |
 | D-01 | `CardViewModel.ArtId` | 已完成 | 字符串语义字段，不传 Unity 对象 | P0 |
 | D-02 | Minion/Spell Factory 映射 | 已完成 | 从配置复制到 ViewModel | P0 |
-| D-03 | `PresentationSpriteCatalog` | v0.3.3 Runtime 晋级通过 | 正式 Catalog 86 条、83 个配置 ArtId Exact；正式 GUID 保持 `75d638606a8084146524a35a317a2cca`，51 项量产资产无 Calibration 引用；非法 ID 诊断机制继续保留 | P0 |
+| D-03 | `PresentationSpriteCatalog` | v0.3.3 Runtime 晋级通过；Token Refresh 待晋级 | 正式 Catalog 86 条、83 个配置 ArtId Exact；正式 GUID 保持 `75d638606a8084146524a35a317a2cca`，51 项量产资产无 Calibration 引用；3 张 Token Exact 仅证明旧图接线，不能证明新风格完成；非法 ID 诊断机制继续保留 | P0 |
 | D-04 | `PresentationTheme` | G3 统一主题完成 | 屏幕、地图、流派回退色、金色立牌 Tint、合法目标与选中状态色均已接入 | P0 |
 | D-05 | `PresentationAudioCatalog` | 28 Cue / 67 Placeholder Clip 已精确挂接 | ID/Bus/循环/数值/Mixer Group 与 `Commissioning` 通过；`ProductionStrict` 因 28 Cue 均为 Placeholder，以退出码 1 按设计拒绝 | P0 |
 | D-06 | AudioService/MusicDirector | G3 工程与占位播放链路完成 | 常驻唯一、设置持久化、淡入淡出、并发/冷却、跨场景上下文映射已覆盖；正式 AI 音频的音质、循环与峰值人工听审待完成 | P0 |
-| D-07 | 资产来源台账 | G1/G2 与 Phase 9C v0.3.3 的源文件、Runtime 路径、工具、哈希和签字边界均已补齐 | v0.3.3 的 51 项量产资产晋级证据见 `phase-9c-v0.3.3-runtime-promotion-signoff.md` 与 `ui-concepts/phase-9c/light-storybook-production-v0.1/runtime-promotion-v0.3.3/acceptance-summary.md` | P0 |
+| D-07 | 资产来源台账 | G1/G2、Phase 9C v0.3.3 及 v0.3.4 Token 候选的源文件、工具和哈希边界已补齐 | v0.3.3 的 51 项量产资产晋级证据见签字包与验收摘要；3 张 Token 候选见 `ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/`，生产许可/视觉签字与 Runtime 导出仍待完成 | P0 |
 
 9B 保留配置中现有 `placeholder_*` ArtId 作为稳定键，避免单纯改名改变完整配置哈希。是否在后续 schema 中把表现身份排除出玩法兼容哈希，需要单独技术决策，不在本阶段顺手修改。
 
@@ -352,7 +352,7 @@ v0.3.3 卡牌美术 Runtime 晋级关闭后，按当前 5.5.0 内容复算：
 | 类别 | 总量 | 当前专属完成 | 当前最低剩余 | 备注 |
 | --- | ---: | ---: | ---: | --- |
 | 非 Token 随从专属插画 | 64 | 64 | 0 | 64 / 64 配置 ArtId 已在正式 Runtime Catalog Exact |
-| Token 专属插画 | 3 | 3 | 0 | 新增 Token 另计 |
+| Token 专属插画 | 3 | 3（旧 G2 Runtime） | 3 张新风格晋级 | v0.3.4 候选已生成；视觉批准、Runtime 覆盖、导入策略和 Unity 复验待完成 |
 | 法术专属插画 | 16 | 16 | 0 | 16 / 16 配置 ArtId 已在正式 Runtime Catalog Exact |
 | 遗珍正式图标 | 15 | 3 | 12 | 冠冕与奇物需要统一等级语言 |
 | 事件专属插画 | 14 | 1 个工程候选 | 13 + 生产许可 | 静谧林地已接线并通过 G4-V 技术复验，生产许可仍独立开放 |
@@ -368,8 +368,8 @@ v0.3.3 卡牌美术 Runtime 晋级关闭后，按当前 5.5.0 内容复算：
 2. 输出两套 Style Tile；不制作其余样板卡。
 3. 三主种族锚点与两张旅团附加盲测锚点已完成；旅团不计入 12 张 G2 核心样板。
 4. 按本轮优先级只制作并接入一张高可见缺失诊断图；4 张种族与 4 张法术类型精美回退图明确暂缓，已实现的回退代码机制继续保留。
-5. 12 张核心样板随从、2 张旅团附加锚点、3 个 Token、4 张法术、3 件遗珍、1 张诊断图与 4 个轻量组件已进入 Sprite Catalog；两套 Builder、EditMode 294 / 294、PlayMode 22 / 22、24 个语义 ID 精确命中、真实非法 ID 诊断及遗珍 Run UI 双分辨率检查均通过。
-6. 新增 6 张随从、3 张 Token、4 张法术的专门卡面视觉矩阵已通过；项目负责人已单独复核并确认新增 11 项生产使用许可，11 项均为 `Runtime Ready`，G2 关闭。
+5. 12 张核心样板随从、2 张旅团附加锚点、3 个旧 G2 Token、4 张法术、3 件遗珍、1 张诊断图与 4 个轻量组件已进入 Sprite Catalog；两套 Builder、EditMode 294 / 294、PlayMode 22 / 22、24 个语义 ID 精确命中、真实非法 ID 诊断及遗珍 Run UI 双分辨率检查均通过。
+6. 新增 6 张随从、3 张旧 G2 Token、4 张法术的专门卡面视觉矩阵已通过；项目负责人已单独复核并确认新增 11 项生产使用许可，11 项在 G2 范围内均为 `Runtime Ready`，G2 关闭。该历史结论不表示 Token 已采用后来冻结的 v0.3.3 Style Tile；新风格更新由 v0.3.4 Token Refresh 单独管理。
 7. 卡牌公共框架和状态/关键词图标已完成并沿用 G1/G2 门禁。
 8. Card → Shop → Run/Map → Battle → MainMenu/弹窗换肤已完成；G3 四组双分辨率证据归档。
 9. VFX、AudioMixer、28 Cue 工程契约和运行时接线已完成；3 首完整 BGM 与 25 个 P0 Cue / 64 个 SFX 变体的本地占位包已接入，文件门禁和 Unity 346 / 346 EditMode、25 / 25 PlayMode 通过；正式 AI Clip 仍待生成、筛选与后期处理。

@@ -1,7 +1,7 @@
 # 项目待办
 
 版本：0.1
-当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；v0.3.3 卡牌美术 Runtime 晋级已关闭；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；G4-E 已依据提交 `f377497` 关闭，G4-V 技术复验已在晋级提交 `8fc61a5` 上通过，仍需五张背景的负责人生产许可/视觉签字、第二机/两机门槛、五人试玩与正式音频门禁。
+当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；v0.3.3 的 42 张非 Token 随从与 9 张法术 Runtime 晋级已关闭；3 张旧 G2 Token 尚未使用冻结的新美术风格，v0.3.4 Token Refresh 候选已生成并等待视觉批准；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；G4-E 已依据提交 `f377497` 关闭，G4-V 技术复验已在晋级提交 `8fc61a5` 上通过，仍需 Token Refresh 视觉批准/晋级、五张背景的负责人生产许可/视觉签字、第二机/两机门槛、五人试玩与正式音频门禁。
 
 ## 已完成：阶段 0 项目准备
 
@@ -604,6 +604,17 @@
   Runtime Catalog 精确覆盖 83 个配置 ArtId，51 / 51 量产资产标记
   `Runtime Ready`，v0.3.3 Runtime 晋级关闭。证据见
   `ui-concepts/phase-9c/light-storybook-production-v0.1/runtime-promotion-v0.3.3/acceptance-summary.md`。
+- [x] 复核 3 张 Token：确认它们虽在 Runtime Catalog 精确命中并通过旧 G2
+  专项验收，但没有进入 v0.3.3 的 51 项量产范围，也没有使用冻结 Style Tile
+  重制；Catalog Exact 不再作为新风格完成证据。
+- [x] 使用冻结 Style Tile 作为唯一图像参考，独立生成幼灵、迅捷幼灵和双尾狐影
+  的 `v0.3.4 Token Refresh` 候选；3 / 3 哈希、约 5:4 画幅、亮度和旧 Runtime
+  隔离门禁通过，Prompt、来源与报告见
+  `ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/`。
+- [ ] 项目负责人完成 3 张 v0.3.4 Token 候选的视觉、输入权利与生产使用确认。
+- [ ] 获批后保留现有 `.meta` GUID 覆盖 3 张 Runtime Token，统一 DXT1 / Max
+  1024 / Mipmap 与 Read/Write 关闭策略，并复跑全量 EditMode/PlayMode、卡框
+  裁切截图与 Runtime 证据；完成前不得标记新风格 Token 为 `Runtime Ready`。
 
 ## 暂缓
 

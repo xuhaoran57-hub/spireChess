@@ -1,0 +1,122 @@
+{
+  "version": "0.3.4",
+  "releaseId": "token-refresh-v0.3.4",
+  "status": "CANDIDATE_VISUAL_APPROVAL_PENDING",
+  "purpose": "Regenerate the three Runtime token illustrations in the frozen light-storybook style.",
+  "runtimePolicy": "Do not replace Runtime files until the three candidates receive explicit visual approval.",
+  "generation": {
+    "tool": "Codex built-in ImageGen",
+    "mode": "five independent new-image generations; fox r1 and r2 were rejected and regenerated as r3",
+    "imageReferencePolicy": "Only the frozen Style Tile was passed as an image reference. Old Runtime token art and prior outputs were not passed.",
+    "styleReference": {
+      "role": "style-only",
+      "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+      "sha256": "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed"
+    },
+    "promptArchive": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/PROMPTS-v0.3.4.zh-CN.md"
+  },
+  "inheritedRules": [
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/BRIGHT-STYLE-RULES-v0.3.3.md",
+      "sha256": "09e91440a4e68d3338fcc811518d28df3acf06ac5c4f1f94a2e3613617ecf992"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/PRODUCTION-PROMPTS-v0.3.3.zh-CN.md",
+      "sha256": "84292d09ba3fd6c1692fd4e988eba1f78eb338da830fc3bfd623544e2f97babc"
+    },
+    {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/RACE-VISUAL-RULES-v0.3.md",
+      "sha256": "70edac128d6586adb4d7b9c0c191bc1770c1505dc1a09e0f42e3ef049101bc3c"
+    }
+  ],
+  "sources": {
+    "minions": {
+      "path": "sc/Assets/Resources/Configs/Json/minions.v0.1.json",
+      "sha256": "4eaa125eb1008422c15ee5437a4dc93ab84bd36adbb9572b9b438a67a5b0fa94"
+    },
+    "runtimeCatalog": {
+      "path": "sc/Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+      "sha256BeforePromotion": "4f319dc36ca77ea2c70c03b54eb52c963f6f10b86b5040c4d10dc90c6aa8d14b"
+    }
+  },
+  "counts": {
+    "tokens": 3,
+    "generationCalls": 5,
+    "currentCandidates": 3,
+    "rejectedCandidates": 2,
+    "runtimePromoted": 0
+  },
+  "items": [
+    {
+      "id": "token_young_spirit",
+      "name": "幼灵",
+      "kind": "Token",
+      "race": "WildSpirit",
+      "attack": 1,
+      "health": 1,
+      "description": "战斗结束后消失。",
+      "artId": "placeholder_token_young_spirit",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-young-spirit-v0.3.4.png",
+      "candidateSha256": "e7eecf493dccc2b86bb798e2a9313dc9a0f375934c64b7c6c53808c1bcdd36c1",
+      "runtimePath": "sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_young_spirit.png",
+      "oldRuntimeSha256": "78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218",
+      "runtimeGuid": "cb13c5e0516cc6b4fa0ad202ede3ff59",
+      "focalPointY": 0.31
+    },
+    {
+      "id": "token_swift_young_spirit",
+      "name": "迅捷幼灵",
+      "kind": "Token",
+      "race": "WildSpirit",
+      "attack": 2,
+      "health": 1,
+      "description": "召唤后立即攻击一次，战斗结束后消失。",
+      "artId": "placeholder_token_swift_young_spirit",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-swift-young-spirit-v0.3.4.png",
+      "candidateSha256": "ea6ff92d95fa0a1ec149594f62fa32387e43ae8f9fd3f813aed93bc772e5563c",
+      "runtimePath": "sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_swift_young_spirit.png",
+      "oldRuntimeSha256": "261cd67e14a819b849a7d0fef665ba8c92b29129702b2b6b5c31917dc26ced54",
+      "runtimeGuid": "d189b173395fb3d4db872486c8710606",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "token_two_tailed_fox_shadow",
+      "name": "双尾狐影",
+      "kind": "Token",
+      "race": "WildSpirit",
+      "attack": 2,
+      "health": 2,
+      "description": "亡语：依次召唤两个幼灵。战斗结束后消失。",
+      "artId": "placeholder_token_two_tailed_fox_shadow",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-two-tailed-fox-shadow-v0.3.4-r3.png",
+      "candidateSha256": "9d67ff3fdb159c1560c25003a94baeeb9d99beca4ba10ffe2d62001c38f2406f",
+      "revision": "r3",
+      "manualAnatomyReview": {
+        "visibleFrontLegs": 2,
+        "visibleHindLegs": 2,
+        "visiblePaws": 4,
+        "tails": 2,
+        "tailRootsAtPelvis": true,
+        "amberMotes": 2
+      },
+      "rejectedCandidates": [
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-two-tailed-fox-shadow-v0.3.4.png",
+          "sha256": "da4896d63c3496bdaebec45f1ba5bbf281ea6e0f2b95feb27d6f97600f7cb736",
+          "status": "REJECTED_BY_USER",
+          "reason": "The two tails appeared to emerge from the shoulder/back area and formed an unnatural arch around the head."
+        },
+        {
+          "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-two-tailed-fox-shadow-v0.3.4-r2.png",
+          "sha256": "88aef93f35041468a7473628d51a0a2254263dc00d225b509597f6de44126a25",
+          "status": "REJECTED_BY_USER",
+          "reason": "The image contained five legs: two front legs and three hind legs."
+        }
+      ],
+      "runtimePath": "sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_two_tailed_fox_shadow.png",
+      "oldRuntimeSha256": "6fa213e471af861a23cbf21c95fe2a566f9b4bebe08f90819a46932974cb1010",
+      "runtimeGuid": "a94c860707ffa1d42a57c039ec358fcd",
+      "focalPointY": 0.5
+    }
+  ]
+}

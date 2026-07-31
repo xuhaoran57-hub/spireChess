@@ -1,0 +1,152 @@
+{
+    "version":  "0.3.4",
+    "releaseId":  "token-refresh-v0.3.4",
+    "generatedAtUtc":  "2026-07-31T15:19:08.3548519Z",
+    "result":  "PASS_CANDIDATE_RUNTIME_PENDING",
+    "visualApproval":  "pending",
+    "checks":  [
+                   {
+                       "id":  "candidate-identity",
+                       "status":  "pass",
+                       "details":  {
+                                       "count":  3,
+                                       "ids":  [
+                                                   "token_young_spirit",
+                                                   "token_swift_young_spirit",
+                                                   "token_two_tailed_fox_shadow"
+                                               ],
+                                       "runtimePromoted":  0
+                                   }
+                   },
+                   {
+                       "id":  "frozen-reference-provenance",
+                       "status":  "pass",
+                       "details":  [
+                                       {
+                                           "path":  "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+                                           "exists":  true,
+                                           "expectedSha256":  "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed",
+                                           "actualSha256":  "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed",
+                                           "passes":  true
+                                       },
+                                       {
+                                           "path":  "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/BRIGHT-STYLE-RULES-v0.3.3.md",
+                                           "exists":  true,
+                                           "expectedSha256":  "09e91440a4e68d3338fcc811518d28df3acf06ac5c4f1f94a2e3613617ecf992",
+                                           "actualSha256":  "09e91440a4e68d3338fcc811518d28df3acf06ac5c4f1f94a2e3613617ecf992",
+                                           "passes":  true
+                                       },
+                                       {
+                                           "path":  "ui-concepts/phase-9c/light-storybook-production-v0.1/freeze-v0.3.3/PRODUCTION-PROMPTS-v0.3.3.zh-CN.md",
+                                           "exists":  true,
+                                           "expectedSha256":  "84292d09ba3fd6c1692fd4e988eba1f78eb338da830fc3bfd623544e2f97babc",
+                                           "actualSha256":  "84292d09ba3fd6c1692fd4e988eba1f78eb338da830fc3bfd623544e2f97babc",
+                                           "passes":  true
+                                       },
+                                       {
+                                           "path":  "ui-concepts/phase-9c/light-storybook-production-v0.1/RACE-VISUAL-RULES-v0.3.md",
+                                           "exists":  true,
+                                           "expectedSha256":  "70edac128d6586adb4d7b9c0c191bc1770c1505dc1a09e0f42e3ef049101bc3c",
+                                           "actualSha256":  "70edac128d6586adb4d7b9c0c191bc1770c1505dc1a09e0f42e3ef049101bc3c",
+                                           "passes":  true
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "candidate-hash-aspect-brightness",
+                       "status":  "pass",
+                       "details":  [
+                                       {
+                                           "id":  "token_young_spirit",
+                                           "exists":  true,
+                                           "size":  [
+                                                        1402,
+                                                        1122
+                                                    ],
+                                           "aspectRatio":  1.249554,
+                                           "luma":  {
+                                                        "meanLuma":  198.2,
+                                                        "lightMidRatio":  0.998438,
+                                                        "nearBlackRatio":  4.9E-05
+                                                    },
+                                           "sha256":  "e7eecf493dccc2b86bb798e2a9313dc9a0f375934c64b7c6c53808c1bcdd36c1",
+                                           "differsFromOldRuntime":  true,
+                                           "passes":  true
+                                       },
+                                       {
+                                           "id":  "token_swift_young_spirit",
+                                           "exists":  true,
+                                           "size":  [
+                                                        1402,
+                                                        1122
+                                                    ],
+                                           "aspectRatio":  1.249554,
+                                           "luma":  {
+                                                        "meanLuma":  196.67,
+                                                        "lightMidRatio":  0.997852,
+                                                        "nearBlackRatio":  0
+                                                    },
+                                           "sha256":  "ea6ff92d95fa0a1ec149594f62fa32387e43ae8f9fd3f813aed93bc772e5563c",
+                                           "differsFromOldRuntime":  true,
+                                           "passes":  true
+                                       },
+                                       {
+                                           "id":  "token_two_tailed_fox_shadow",
+                                           "exists":  true,
+                                           "size":  [
+                                                        1402,
+                                                        1122
+                                                    ],
+                                           "aspectRatio":  1.249554,
+                                           "luma":  {
+                                                        "meanLuma":  181.13,
+                                                        "lightMidRatio":  0.997168,
+                                                        "nearBlackRatio":  0.000195
+                                                    },
+                                           "sha256":  "9d67ff3fdb159c1560c25003a94baeeb9d99beca4ba10ffe2d62001c38f2406f",
+                                           "differsFromOldRuntime":  true,
+                                           "passes":  true
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "runtime-baseline-unchanged",
+                       "status":  "pass",
+                       "details":  {
+                                       "catalogPath":  "sc/Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+                                       "tokens":  [
+                                                      {
+                                                          "id":  "token_young_spirit",
+                                                          "artId":  "placeholder_token_young_spirit",
+                                                          "runtimeSha256":  "78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218",
+                                                          "expectedOldRuntimeSha256":  "78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218",
+                                                          "metaGuid":  "cb13c5e0516cc6b4fa0ad202ede3ff59",
+                                                          "catalogGuid":  "cb13c5e0516cc6b4fa0ad202ede3ff59",
+                                                          "candidateNotPromoted":  true,
+                                                          "passes":  true
+                                                      },
+                                                      {
+                                                          "id":  "token_swift_young_spirit",
+                                                          "artId":  "placeholder_token_swift_young_spirit",
+                                                          "runtimeSha256":  "261cd67e14a819b849a7d0fef665ba8c92b29129702b2b6b5c31917dc26ced54",
+                                                          "expectedOldRuntimeSha256":  "261cd67e14a819b849a7d0fef665ba8c92b29129702b2b6b5c31917dc26ced54",
+                                                          "metaGuid":  "d189b173395fb3d4db872486c8710606",
+                                                          "catalogGuid":  "d189b173395fb3d4db872486c8710606",
+                                                          "candidateNotPromoted":  true,
+                                                          "passes":  true
+                                                      },
+                                                      {
+                                                          "id":  "token_two_tailed_fox_shadow",
+                                                          "artId":  "placeholder_token_two_tailed_fox_shadow",
+                                                          "runtimeSha256":  "6fa213e471af861a23cbf21c95fe2a566f9b4bebe08f90819a46932974cb1010",
+                                                          "expectedOldRuntimeSha256":  "6fa213e471af861a23cbf21c95fe2a566f9b4bebe08f90819a46932974cb1010",
+                                                          "metaGuid":  "a94c860707ffa1d42a57c039ec358fcd",
+                                                          "catalogGuid":  "a94c860707ffa1d42a57c039ec358fcd",
+                                                          "candidateNotPromoted":  true,
+                                                          "passes":  true
+                                                      }
+                                                  ]
+                                   }
+                   }
+               ]
+}

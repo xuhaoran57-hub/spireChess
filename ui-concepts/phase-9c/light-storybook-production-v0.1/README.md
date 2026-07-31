@@ -4,13 +4,15 @@
 
 v0.3 更新：2026-07-29
 
-状态：已冻结的明亮绘本生产规则；A/B 验证期间不替换正式 Runtime 资源。
+状态：v0.3.3 规则已冻结；42 张非 Token 随从与 9 张法术已完成 Runtime 晋级。
+3 张既有 G2 Token 不属于该晋级范围，v0.3.4 新风格候选等待视觉批准。
 
 ## v0.3.3 冻结包
 
 `freeze-v0.3.3/` 已收束现行风格规则、生产 Prompt、视觉基线、离线校验脚本和
-Unity 交接清单。Batch 01–06 已完成 Unity 2022.3.62f3c1 批次验收，当前状态为
-`UNITY_BATCH_RELEASE`；候选仍保持隔离，未提升到 Runtime Catalog。
+Unity 交接清单。Batch 01–06 已完成 Unity 2022.3.62f3c1 批次验收；其中 42 张
+非 Token 随从和 9 张法术已经晋级 Runtime。3 张旧 G2 Token 虽然 Catalog 接线
+精确，但不属于 v0.3.3 量产范围，也未使用本冻结风格生成。
 
 ## 唯一共同风格参考
 
@@ -326,6 +328,17 @@ Windows Player、双分辨率 10 图和 10 次 Stress 均通过；未发现视�
 v0.3.3 的 42 张非 Token 随从与 9 张法术现为 `Runtime Ready`，本晋级已关闭。
 完整构建身份、哈希、性能数据和范围边界见
 `runtime-promotion-v0.3.3/acceptance-summary.md`。
+
+## v0.3.4 Token Refresh
+
+幼灵、迅捷幼灵和双尾狐影的旧 G2 图仍在 Runtime；它们的精确 `artId` / GUID
+接线不等于新风格完成。三张图已经以冻结 Style Tile 为唯一图像参考重新生成，
+离线哈希、5:4 画幅和亮度门禁为 3 / 3 通过，当前状态为
+`CANDIDATE_VISUAL_APPROVAL_PENDING`。
+
+候选图、完整 Prompt、来源清单和验证报告见
+`token-refresh-v0.3.4/`。视觉批准前不覆盖 Runtime；获批后保留现有 GUID，
+应用 DXT1 / Max 1024 导入策略并重新执行 Unity 全量与卡框裁切验收。
 
 ## v0.2 机制压力测试归档
 
