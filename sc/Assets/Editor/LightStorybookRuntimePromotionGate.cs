@@ -423,7 +423,7 @@ namespace SpireChess.Editor
                 var source = property.Value as JObject;
                 var path = RequireString(source, "path");
                 var sha256 = RequireString(source, "sha256");
-                if (!HashesMatch(
+                if (!SourceHashMatches(
                         ResolvePath(repositoryRoot, path),
                         sha256))
                 {
@@ -834,6 +834,68 @@ namespace SpireChess.Editor
                        ComputeSha256(path),
                        expectedSha256,
                        StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool SourceHashMatches(
+            string path,
+            string expectedSha256)
+        {
+            if (HashesMatch(path, expectedSha256))
+            {
+                return true;
+            }
+
+            var extension = Path.GetExtension(path);
+            if (!string.Equals(
+                    extension,
+                    ".json",
+                    StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(
+                    extension,
+                    ".asset",
+                    StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(
+                    extension,
+                    ".md",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            try
+            {
+                var text = File.ReadAllText(
+                    path,
+                    new UTF8Encoding(false, true));
+                var normalized = text
+                    .Replace("\r\n", "\n")
+                    .Replace("\r", "\n");
+                return HashText(normalized, expectedSha256) ||
+                       HashText(
+                           normalized.Replace("\n", "\r\n"),
+                           expectedSha256);
+            }
+            catch (DecoderFallbackException)
+            {
+                return false;
+            }
+        }
+
+        private static bool HashText(
+            string text,
+            string expectedSha256)
+        {
+            using (var algorithm = SHA256.Create())
+            {
+                var bytes = new UTF8Encoding(false).GetBytes(text);
+                var actual = string.Concat(
+                    algorithm.ComputeHash(bytes)
+                        .Select(value => value.ToString("x2")));
+                return string.Equals(
+                    actual,
+                    expectedSha256,
+                    StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         private static string ComputeSha256(string path)

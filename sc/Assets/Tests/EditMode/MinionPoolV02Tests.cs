@@ -63,7 +63,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void RootAndResourcesMinionConfigs_AreExactMirrors()
+        public void MinionConfig_UsesResourcesAsSingleActiveSource()
         {
             var resourcesPath = Path.Combine(
                 Application.dataPath,
@@ -76,13 +76,25 @@ namespace SpireChess.Tests.EditMode
                 "..",
                 "..",
                 "minions.v0.1.json"));
+            var archivedPath = Path.Combine(
+                Path.GetDirectoryName(rootPath),
+                "archive",
+                "deprecated-temp-20260731",
+                "payload",
+                "redundant-root-copies",
+                "minions.v0.1.json");
 
-            Assert.That(File.Exists(rootPath), Is.True);
-            Assert.That(File.ReadAllText(rootPath), Is.EqualTo(File.ReadAllText(resourcesPath)));
+            Assert.That(File.Exists(rootPath), Is.False);
+            Assert.That(File.Exists(archivedPath), Is.True);
+            Assert.That(
+                NormalizeLineEndings(File.ReadAllText(archivedPath)),
+                Is.EqualTo(
+                    NormalizeLineEndings(
+                        File.ReadAllText(resourcesPath))));
         }
 
         [Test]
-        public void RootAndResourcesSpellConfigs_AreExactMirrors()
+        public void SpellConfig_UsesResourcesAsSingleActiveSource()
         {
             var resourcesPath = Path.Combine(
                 Application.dataPath,
@@ -95,9 +107,28 @@ namespace SpireChess.Tests.EditMode
                 "..",
                 "..",
                 "spells.v0.1.json"));
+            var archivedPath = Path.Combine(
+                Path.GetDirectoryName(rootPath),
+                "archive",
+                "deprecated-temp-20260731",
+                "payload",
+                "redundant-root-copies",
+                "spells.v0.1.json");
 
-            Assert.That(File.Exists(rootPath), Is.True);
-            Assert.That(File.ReadAllText(rootPath), Is.EqualTo(File.ReadAllText(resourcesPath)));
+            Assert.That(File.Exists(rootPath), Is.False);
+            Assert.That(File.Exists(archivedPath), Is.True);
+            Assert.That(
+                NormalizeLineEndings(File.ReadAllText(archivedPath)),
+                Is.EqualTo(
+                    NormalizeLineEndings(
+                        File.ReadAllText(resourcesPath))));
+        }
+
+        private static string NormalizeLineEndings(string value)
+        {
+            return value
+                .Replace("\r\n", "\n")
+                .Replace("\r", "\n");
         }
 
         [Test]

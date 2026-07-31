@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using SpireChess.Editor;
 using UnityEngine;
@@ -102,12 +101,23 @@ namespace SpireChess.Tests.EditMode
                 "phase-9c",
                 "light-storybook-production-v0.1",
                 "PRODUCTION-MANIFEST-v0.3.3.json");
-            var manifest = JObject.Parse(File.ReadAllText(path));
+            var manifest = JsonUtility.FromJson<ProductionManifest>(
+                File.ReadAllText(path));
             return new HashSet<string>(
-                ((JArray)manifest["items"])
-                    .OfType<JObject>()
-                    .Select(value => (string)value["artId"]),
+                manifest.items.Select(value => value.artId),
                 StringComparer.Ordinal);
+        }
+
+        [Serializable]
+        private sealed class ProductionManifest
+        {
+            public ProductionManifestItem[] items;
+        }
+
+        [Serializable]
+        private sealed class ProductionManifestItem
+        {
+            public string artId;
         }
     }
 }
