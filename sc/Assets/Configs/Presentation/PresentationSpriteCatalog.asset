@@ -30,14 +30,14 @@ MonoBehaviour:
   missingArtwork: {fileID: 21300000, guid: c23ada02db666b0408db93b3f641b887, type: 3}
   artworks:
   - id: placeholder_card_forge_soul_shield_squire
-    sprite: {fileID: 21300000, guid: a518a837ff379ea4aa18c1bd4ddb0abd, type: 3}
-    focalPointY: 0.31
+    sprite: {fileID: 21300000, guid: bd4625ccd96b4b54fb4192171803936c, type: 3}
+    focalPointY: 0.5
   - id: placeholder_card_undying_furnace_king
-    sprite: {fileID: 21300000, guid: 14b43ab810b0fd2fa6ad985d473b45dc, type: 3}
-    focalPointY: 0.18
+    sprite: {fileID: 21300000, guid: b5695111347c8e24cabf1f0577de55e1, type: 3}
+    focalPointY: 0.5
   - id: placeholder_card_young_deer_spirit
-    sprite: {fileID: 21300000, guid: 2d1f0e574b5b4882bbfb0231da3db462, type: 3}
-    focalPointY: 0.27
+    sprite: {fileID: 21300000, guid: 5fa1f32a4f7fc7b48ada073457026d42, type: 3}
+    focalPointY: 0.5
   - id: placeholder_card_ten_thousand_hoof_surge
     sprite: {fileID: 21300000, guid: 050bf0f7d6ac4a05a10fc3f352c243f4, type: 3}
     focalPointY: 0.27
@@ -48,8 +48,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 445cc5b4c7764c86be86da345e405d03, type: 3}
     focalPointY: 0.25
   - id: placeholder_card_traveling_physician
-    sprite: {fileID: 21300000, guid: 078cfc8112384ed4ac029ae18f7fef44, type: 3}
-    focalPointY: 0.27
+    sprite: {fileID: 21300000, guid: 14f6097386d31794794476be20050ddb, type: 3}
+    focalPointY: 0.5
   - id: placeholder_card_many_arts_apprentice
     sprite: {fileID: 21300000, guid: b9cd43cae9af4522b6897e6fdb4b03a9, type: 3}
     focalPointY: 0.27
@@ -100,4 +100,190 @@ MonoBehaviour:
     focalPointY: 0.5
   - id: icon_relic_curio_refresh_gear
     sprite: {fileID: 21300000, guid: 6675c1d951ac49449a8de11d015a1279, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_resonance_bell_guard
+    sprite: {fileID: 21300000, guid: 13c26753ab1f4284bb08846854b93e76, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_rootbound_soul_guide
+    sprite: {fileID: 21300000, guid: 747e72fc0ef59ab418ad55058cb5316b, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_ancient_mountain_spirit
+    sprite: {fileID: 21300000, guid: 7248c0927f53b1a47bb2333f42a4ed96, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_glimmer_mage
+    sprite: {fileID: 21300000, guid: ea6d4b23b6ea1934dbf652074d65490d, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_fate_track_recorder
+    sprite: {fileID: 21300000, guid: 785889610e427704caf6addc48bc7445, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_moonwheel_dispatcher
+    sprite: {fileID: 21300000, guid: c87a9d84405bc5447a63aa04da117b7d, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_old_tower_guide
+    sprite: {fileID: 21300000, guid: 5f6e5fa2cec072148afea8dd36e9ab83, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_mirrorsteel_duelist
+    sprite: {fileID: 21300000, guid: 9ab909c7f0e4beb4b9a7ff8c33efe296, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_temporary_ward
+    sprite: {fileID: 21300000, guid: bfd9a43f6853b884098c64b00c26a6f3, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_starlight_rebate
+    sprite: {fileID: 21300000, guid: bd472b96722dbd94baf2cc1b6d49b018, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_legendary_recruitment
+    sprite: {fileID: 21300000, guid: 6bc341a244812e84c9bd19c25e1ee821, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_copper_ring_apprentice
+    sprite: {fileID: 21300000, guid: 52d2a954df4cc784f9968736bf856e54, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_hearth_core_spark
+    sprite: {fileID: 21300000, guid: c51863ae06db1b04fa260b703d5b3b49, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_stardust_attendant
+    sprite: {fileID: 21300000, guid: bbeeb7f3e52be134db6bab3360ef4ae2, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_stargazing_apprentice
+    sprite: {fileID: 21300000, guid: 98e7840e6eadc2848ba0713b801cc1a5, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_wandering_swordsman
+    sprite: {fileID: 21300000, guid: 50e3688f02db0454aae14244f6cc5b28, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_moss_mark_seedling
+    sprite: {fileID: 21300000, guid: fdf2c1d061045d6428c0136b510d0161, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_rending_cub
+    sprite: {fileID: 21300000, guid: 6f8da904c2471e04c80cc890c4c5bc74, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_ember_engraver
+    sprite: {fileID: 21300000, guid: 027b004d5d746bf44a11c5f9ee4e52c5, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_shieldbreaker_blade_blank
+    sprite: {fileID: 21300000, guid: c77143221fc8d4441abacc54b6bbab84, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_shieldwall_furnace_keeper
+    sprite: {fileID: 21300000, guid: 284c4852e60153e439dfac3339848a47, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_moon_phase_scribe
+    sprite: {fileID: 21300000, guid: eba157d929248c84087d8993f669855c, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_rune_ward_reader
+    sprite: {fileID: 21300000, guid: 25c92a5195a213b4b932d74e03a1b8f9, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_star_etched_timekeeper
+    sprite: {fileID: 21300000, guid: 46b3c7ee5eb10054b836628f391d458b, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_black_market_vendor
+    sprite: {fileID: 21300000, guid: 6a4222569ecaf264fb0efdf3bdee522e, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_mercenary_shieldbearer
+    sprite: {fileID: 21300000, guid: ff7aac30dc733c6409b9f0769afa15e2, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_root_devourer
+    sprite: {fileID: 21300000, guid: 65af801cc87af864ba2255eada768680, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_swiftwing_forest_hawk
+    sprite: {fileID: 21300000, guid: 444c1ebb747e80f44964138a6d2909bf, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_two_tailed_fox_spirit
+    sprite: {fileID: 21300000, guid: bf6537b7fd9c0db4d867e32e1add31a7, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_counterflow_smith
+    sprite: {fileID: 21300000, guid: 42ddbacd269cb3a478a9ea1d6f0e7ba5, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_molten_core_standard
+    sprite: {fileID: 21300000, guid: 1c0c94b39af968d47b06fcdfaa10b7ea, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_oathblade_armor
+    sprite: {fileID: 21300000, guid: 4d00edee9d4cb354c8496e40e3f2cbbe, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_echo_starchanter
+    sprite: {fileID: 21300000, guid: 12fd94ee6a2cef244821452a37d75e9f, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_ancient_moss_hatchling
+    sprite: {fileID: 21300000, guid: bcd7a870ddc178f4c94dd54d9e70c03e, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_many_branch_invoker
+    sprite: {fileID: 21300000, guid: 5f4422fa4ff398a4898e9b70781c439e, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_tuskherd_pathrunner
+    sprite: {fileID: 21300000, guid: 0609a89eb8f5039418e02469f80bf5c0, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_cinder_armor_arbiter
+    sprite: {fileID: 21300000, guid: b656813f5491a044d8e805906ed690f5, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_hearth_core_aegis_officer
+    sprite: {fileID: 21300000, guid: faf6e365fa2927c45af0f0081b69bb37, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_ringing_iron_bastion
+    sprite: {fileID: 21300000, guid: ab477577141389d41a4076fcd706b991, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_falling_light_arbiter
+    sprite: {fileID: 21300000, guid: 9f00ef933f9b0d345870882bca5d3d6f, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_star_ring_treasurer
+    sprite: {fileID: 21300000, guid: c2a83402f9c3bcf41afbbaa86e3ac15c, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_stargate_lecturer
+    sprite: {fileID: 21300000, guid: eae5459f07cc14f409ba1900fde5015c, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_formation_breaker_mercenary
+    sprite: {fileID: 21300000, guid: 17356537b65af1b489cdc8d51e32b8c2, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_pack_hunt_inspector
+    sprite: {fileID: 21300000, guid: f13cf1ce78421b746869691c83d82039, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_hundred_song_herd
+    sprite: {fileID: 21300000, guid: 193be5ad104495f4aafb392868f6b8eb, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_mountain_belly_soul_eater
+    sprite: {fileID: 21300000, guid: 45ed3739b1a407b48b283dea8511dc67, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_vinecrown_priest
+    sprite: {fileID: 21300000, guid: 5fa375747ca37714585bb14af9e0b581, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_oathbroken_blade_soul
+    sprite: {fileID: 21300000, guid: d8b883b07b89c3649b060ba9f8191741, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_thousand_ring_tomb_guardian
+    sprite: {fileID: 21300000, guid: 0c36036d342f61d4899d216554fea35e, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_falling_star_prophet
+    sprite: {fileID: 21300000, guid: 1e39ee92c3fbb3e47ba7e8811d7c1104, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_fate_shuffler
+    sprite: {fileID: 21300000, guid: 4e5c9b7724fb61440ad2294f801bbab6, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_royal_bounty_hunter
+    sprite: {fileID: 21300000, guid: bb18722adb4fed147a3345641a161c85, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_card_world_eating_final_bloom
+    sprite: {fileID: 21300000, guid: df3532d2213044d4ab2d0eb32bb4034e, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_delayed_supply
+    sprite: {fileID: 21300000, guid: 743017d194343ed4295f5191a3f5b8e7, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_triple_discovery_reward
+    sprite: {fileID: 21300000, guid: 68268635fe045204095ae00cfe94da40, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_precise_training
+    sprite: {fileID: 21300000, guid: 0dbb507453b6b8541a824d579d6a40bc, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_thickhide_potion
+    sprite: {fileID: 21300000, guid: 90d28f8dd7eb3f842ab392321eaeee60, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_prototype_copy
+    sprite: {fileID: 21300000, guid: 8c2993470e836c248b780f20f547c23a, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_warband_forging
+    sprite: {fileID: 21300000, guid: 1768773e18cef174bb90e542326541d6, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_bloodline_awakening
+    sprite: {fileID: 21300000, guid: 95fef3ab35b2a0e43af24199dc4fa87a, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_army_ascension
+    sprite: {fileID: 21300000, guid: c0492c6962627154790a819b40effe68, type: 3}
+    focalPointY: 0.5
+  - id: placeholder_spell_fate_reforging
+    sprite: {fileID: 21300000, guid: 29873298ddb3d534684c1dc275971b00, type: 3}
     focalPointY: 0.5

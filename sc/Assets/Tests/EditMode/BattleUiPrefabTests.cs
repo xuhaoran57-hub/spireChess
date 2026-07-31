@@ -2,6 +2,7 @@ using System.Linq;
 using NUnit.Framework;
 using SpireChess.Audio;
 using SpireChess.Battle;
+using SpireChess.Editor;
 using SpireChess.UI;
 using SpireChess.UI.Battle;
 using UnityEditor;
@@ -479,9 +480,23 @@ namespace SpireChess.Tests.EditMode
                 .objectReferenceValue as Image;
             Assert.That(artwork, Is.Not.Null);
             Assert.That(artwork.sprite, Is.Not.Null);
+            var promoted =
+                LightStorybookRuntimePromotionBuilder.IsPromoted();
             Assert.That(
                 artwork.sprite.name,
-                Is.EqualTo("card_minion_forge_soul_shield_squire"));
+                Is.EqualTo(
+                    promoted
+                        ? model.ArtworkFallbackId
+                        : "card_minion_forge_soul_shield_squire"));
+            if (promoted)
+            {
+                Assert.That(
+                    AssetDatabase.GetAssetPath(artwork.sprite),
+                    Is.EqualTo(
+                        LightStorybookRuntimePromotionBuilder
+                            .GetRuntimeAssetPath(
+                                model.ArtworkFallbackId)));
+            }
         }
 
         [Test]

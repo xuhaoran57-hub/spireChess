@@ -10,6 +10,9 @@ namespace SpireChess.Tests.EditMode
 {
     public sealed class LightStorybookProductionCatalogTests
     {
+        private static readonly bool RuntimeIsPromoted =
+            LightStorybookRuntimePromotionBuilder.IsPromoted();
+
         private static readonly string[] BatchOneArtIds =
         {
             "placeholder_card_copper_ring_apprentice",
@@ -167,7 +170,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void BatchTwoCatalog_DoesNotModifyBatchOneOrRuntimeCatalog()
+        public void BatchTwoCatalog_DoesNotModifyBatchOne_AndRuntimeMatchesPromotionState()
         {
             var batchOne =
                 AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
@@ -185,10 +188,7 @@ namespace SpireChess.Tests.EditMode
                     batchOne.TryGetArtwork(artId, out _),
                     Is.False,
                     artId);
-                Assert.That(
-                    runtime.TryGetArtwork(artId, out _),
-                    Is.False,
-                    artId);
+                AssertRuntimeMatchesPromotionState(runtime, artId);
             }
         }
 
@@ -236,7 +236,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void BatchThreeCatalog_DoesNotModifyBatchTwoOrRuntimeCatalog()
+        public void BatchThreeCatalog_DoesNotModifyBatchTwo_AndRuntimeMatchesPromotionState()
         {
             var batchTwo =
                 AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
@@ -254,10 +254,7 @@ namespace SpireChess.Tests.EditMode
                     batchTwo.TryGetArtwork(artId, out _),
                     Is.False,
                     artId);
-                Assert.That(
-                    runtime.TryGetArtwork(artId, out _),
-                    Is.False,
-                    artId);
+                AssertRuntimeMatchesPromotionState(runtime, artId);
             }
         }
 
@@ -312,7 +309,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void BatchFourCatalog_DoesNotModifyBatchThreeOrRuntimeCatalog()
+        public void BatchFourCatalog_DoesNotModifyBatchThree_AndRuntimeMatchesPromotionState()
         {
             var batchThree =
                 AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
@@ -330,10 +327,7 @@ namespace SpireChess.Tests.EditMode
                     batchThree.TryGetArtwork(artId, out _),
                     Is.False,
                     artId);
-                Assert.That(
-                    runtime.TryGetArtwork(artId, out _),
-                    Is.False,
-                    artId);
+                AssertRuntimeMatchesPromotionState(runtime, artId);
             }
         }
 
@@ -395,7 +389,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void BatchFiveCatalog_DoesNotModifyBatchFourOrRuntimeCatalog()
+        public void BatchFiveCatalog_DoesNotModifyBatchFour_AndRuntimeMatchesPromotionState()
         {
             var batchFour =
                 AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
@@ -413,10 +407,7 @@ namespace SpireChess.Tests.EditMode
                     batchFour.TryGetArtwork(artId, out _),
                     Is.False,
                     artId);
-                Assert.That(
-                    runtime.TryGetArtwork(artId, out _),
-                    Is.False,
-                    artId);
+                AssertRuntimeMatchesPromotionState(runtime, artId);
             }
         }
 
@@ -485,7 +476,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void BatchSixCatalog_DoesNotModifyBatchFiveOrRuntimeCatalog()
+        public void BatchSixCatalog_DoesNotModifyBatchFive_AndRuntimeMatchesPromotionState()
         {
             var batchFive =
                 AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
@@ -503,10 +494,7 @@ namespace SpireChess.Tests.EditMode
                     batchFive.TryGetArtwork(artId, out _),
                     Is.False,
                     artId);
-                Assert.That(
-                    runtime.TryGetArtwork(artId, out _),
-                    Is.False,
-                    artId);
+                AssertRuntimeMatchesPromotionState(runtime, artId);
             }
         }
 
@@ -581,10 +569,7 @@ namespace SpireChess.Tests.EditMode
                     Is.True,
                     artId);
                 Assert.That(sprite, Is.Not.Null, artId);
-                Assert.That(
-                    runtime.TryGetArtwork(artId, out _),
-                    Is.False,
-                    artId);
+                AssertRuntimeMatchesPromotionState(runtime, artId);
             }
         }
 
@@ -625,6 +610,32 @@ namespace SpireChess.Tests.EditMode
                 .Concat(BatchFiveArtIds)
                 .Concat(BatchSixArtIds)
                 .ToArray();
+        }
+
+        private static void AssertRuntimeMatchesPromotionState(
+            PresentationSpriteCatalog runtime,
+            string artId)
+        {
+            var found = runtime.TryGetArtwork(
+                artId,
+                out var sprite);
+
+            Assert.That(
+                found,
+                Is.EqualTo(RuntimeIsPromoted),
+                artId);
+            if (!RuntimeIsPromoted)
+            {
+                return;
+            }
+
+            Assert.That(sprite, Is.Not.Null, artId);
+            Assert.That(
+                AssetDatabase.GetAssetPath(sprite),
+                Is.EqualTo(
+                    LightStorybookRuntimePromotionBuilder
+                        .GetRuntimeAssetPath(artId)),
+                artId);
         }
     }
 }

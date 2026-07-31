@@ -1,0 +1,422 @@
+{
+  "version": "0.3.3",
+  "status": "PROMOTED",
+  "approvedBy": "项目负责人（Codex 任务内确认）",
+  "approvedAt": "2026-07-31T10:53:54+08:00",
+  "candidateCatalogPath": "Assets/Configs/Presentation/PresentationSpriteCatalog_LightStorybookProductionV033Batch06.asset",
+  "candidateCatalogGuid": "1600000000000000000000000000000a",
+  "runtimeCatalogPath": "Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+  "runtimeCatalogGuid": "75d638606a8084146524a35a317a2cca",
+  "runtimeCatalogEntryCount": 86,
+  "configuredArtworkCount": 83,
+  "productionArtworkCount": 51,
+  "copiedCalibrationArtworkCount": 66,
+  "policy": {
+    "runtimeArtRoot": "Assets/Art/Presentation/Runtime/LightStorybookV033",
+    "standaloneTextureFormat": "DXT1",
+    "maxTextureSize": 1024,
+    "compressionQuality": 50,
+    "mipmaps": false,
+    "readable": false,
+    "calibrationReferences": 0,
+    "runtimeCatalogGuidPreserved": true
+  },
+  "entries": [
+    {
+      "artId": "placeholder_card_ancient_moss_hatchling",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch03/ancient-moss-hatchling-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_ancient_moss_hatchling.png",
+      "sha256": "38cf0fca3401585d3a6c02223941dbcb8a4f25f0405c7e6607aff0e22d75a9d9"
+    },
+    {
+      "artId": "placeholder_card_ancient_mountain_spirit",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/ancient-mountain-spirit-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_ancient_mountain_spirit.png",
+      "sha256": "39608621b5e91e6f10aea8949ccc524dd11d7f1689180d696e8180a9e6cbccc3"
+    },
+    {
+      "artId": "placeholder_card_black_market_vendor",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/black-market-vendor-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_black_market_vendor.png",
+      "sha256": "b413fea4da13d474a4e21312144bf6475d5cf4e498299b514a5cd42d8c622e6e"
+    },
+    {
+      "artId": "placeholder_card_cinder_armor_arbiter",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/cinder-armor-arbiter-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_cinder_armor_arbiter.png",
+      "sha256": "558cf8266e94f572e23485a6bb586b4d4cc9f66f6c2b684b3518ce6e86cb5d6d"
+    },
+    {
+      "artId": "placeholder_card_copper_ring_apprentice",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch01/copper-ring-apprentice-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_copper_ring_apprentice.png",
+      "sha256": "8c39754fca7a78b2b1a9bd292a318ea8809e5bc527817b80132cae93791a6fe6"
+    },
+    {
+      "artId": "placeholder_card_counterflow_smith",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch03/counterflow-smith-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_counterflow_smith.png",
+      "sha256": "6f6fc56fce77336ee42a72c1a1f0511532927cab9d0e7189c1571768f2c21da2"
+    },
+    {
+      "artId": "placeholder_card_echo_starchanter",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch03/echo-starchanter-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_echo_starchanter.png",
+      "sha256": "cd77d14cf0f24a5381109f42bf32c124ccefb7e76a7496e9ced93c3e87d75181"
+    },
+    {
+      "artId": "placeholder_card_ember_engraver",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/ember-engraver-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_ember_engraver.png",
+      "sha256": "9c010ef4485300a32ba4df32b4c11367f049a71a95a34b4f413fcd75a05f6c97"
+    },
+    {
+      "artId": "placeholder_card_falling_light_arbiter",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/falling-light-arbiter-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_falling_light_arbiter.png",
+      "sha256": "66c68a8bf0c706bb6ca4e785a0296dfdfc4a4a9ff4d4b310be52dca46c21001f"
+    },
+    {
+      "artId": "placeholder_card_falling_star_prophet",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch05/falling-star-prophet-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_falling_star_prophet.png",
+      "sha256": "5b68ddf3c42722ba8274d904b733405669c771ae41b47a2a577a1796a77d540d"
+    },
+    {
+      "artId": "placeholder_card_fate_shuffler",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch05/fate-shuffler-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_fate_shuffler.png",
+      "sha256": "859a7602631b0ee204120e48c596ad9c58d30a07d5b7fcc1b84efb5722ed9cbf"
+    },
+    {
+      "artId": "placeholder_card_fate_track_recorder",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/fate-track-recorder-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_fate_track_recorder.png",
+      "sha256": "04f98f3c5123787a2ddf74ca028c726c9f148b2e7b2b000dad7950c9187dbd78"
+    },
+    {
+      "artId": "placeholder_card_forge_soul_shield_squire",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/forge-soul-shield-squire-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_forge_soul_shield_squire.png",
+      "sha256": "6a1651dcf99b2b3dd02da53bf07d3645cce982dccb4d8a297111477f8b7befb1"
+    },
+    {
+      "artId": "placeholder_card_formation_breaker_mercenary",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/formation-breaker-mercenary-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_formation_breaker_mercenary.png",
+      "sha256": "5c9c0dad4ab9c19c263765a8abf7c229c435d4f3b5fd0440d608f5268877d87e"
+    },
+    {
+      "artId": "placeholder_card_glimmer_mage",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/glimmer-mage-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_glimmer_mage.png",
+      "sha256": "a8bd8ab9090ca7ec8cbc3faddc20c207a75c7d880e74e9b1238288fae3278740"
+    },
+    {
+      "artId": "placeholder_card_hearth_core_aegis_officer",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/hearth-core-aegis-officer-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_hearth_core_aegis_officer.png",
+      "sha256": "276a8424ad2a6e4706f88de30f08680e985e0e518e85056ed864e2462865730c"
+    },
+    {
+      "artId": "placeholder_card_hearth_core_spark",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch01/hearth-core-spark-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_hearth_core_spark.png",
+      "sha256": "bff4048dd31c7c4e9d4da82798234c64e198586435f00b7ddb35fd4bd620401e"
+    },
+    {
+      "artId": "placeholder_card_hundred_song_herd",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/hundred-song-herd-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_hundred_song_herd.png",
+      "sha256": "8d6fe3f451d4446744d776a949734509364ffff4601507e565efb82ed1ccbefc"
+    },
+    {
+      "artId": "placeholder_card_many_branch_invoker",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch03/many-branch-invoker-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_many_branch_invoker.png",
+      "sha256": "a6e8c30f41fb858aa7d7897487790e4961c313fb8c4adda8a7b9cbc4244e1c22"
+    },
+    {
+      "artId": "placeholder_card_mercenary_shieldbearer",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/mercenary-shieldbearer-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_mercenary_shieldbearer.png",
+      "sha256": "7361e00b8e70d599beb98f48098d567ca820be93d20f6f6954553c719c4dfc78"
+    },
+    {
+      "artId": "placeholder_card_mirrorsteel_duelist",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/mirrorsteel-duelist-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_mirrorsteel_duelist.png",
+      "sha256": "a1c1c91acdfef44d04a16bed4b73c5762396c908308ba6bb9c1edf5d7f3b2923"
+    },
+    {
+      "artId": "placeholder_card_molten_core_standard",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch03/molten-core-standard-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_molten_core_standard.png",
+      "sha256": "45d80d35b3d0a006b5bc2133638e6387237b3479fa54f80fa70b8ba8d16335e4"
+    },
+    {
+      "artId": "placeholder_card_moon_phase_scribe",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/moon-phase-scribe-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_moon_phase_scribe.png",
+      "sha256": "2da31797ae72587cea554c1b792dff14df70959f4b187c67ddfa97699a268202"
+    },
+    {
+      "artId": "placeholder_card_moonwheel_dispatcher",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/moonwheel-dispatcher-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_moonwheel_dispatcher.png",
+      "sha256": "cf5263a697fdaa2102a6c6d1d1ee1842494140793551d2fa1761fd1b80877826"
+    },
+    {
+      "artId": "placeholder_card_moss_mark_seedling",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch01/moss-mark-seedling-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_moss_mark_seedling.png",
+      "sha256": "dc6b913ba3f1d8cf258540ed12bbbaffbbf1352fce1224abd70c91de6384c929"
+    },
+    {
+      "artId": "placeholder_card_mountain_belly_soul_eater",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/mountain-belly-soul-eater-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_mountain_belly_soul_eater.png",
+      "sha256": "7a8f2a30ba495f503d367f336a9e5f95e80821cef62ad4bde05a636c1446382b"
+    },
+    {
+      "artId": "placeholder_card_oathblade_armor",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch03/oathblade-armor-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_oathblade_armor.png",
+      "sha256": "3b8356c8cbe580a92178292e61de45c0273b3bc7268e388dbaa253add373fd00"
+    },
+    {
+      "artId": "placeholder_card_oathbroken_blade_soul",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch05/oathbroken-blade-soul-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_oathbroken_blade_soul.png",
+      "sha256": "aa32d56abb03ae46c878168128744552abcd7fed49fafdb2f8e04383395283c0"
+    },
+    {
+      "artId": "placeholder_card_old_tower_guide",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/old-tower-guide-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_old_tower_guide.png",
+      "sha256": "d48123b8ac757ec71bc087172d9a60574c1e132fc1a1ab9e4e03c8ab01a06a78"
+    },
+    {
+      "artId": "placeholder_card_pack_hunt_inspector",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/pack-hunt-inspector-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_pack_hunt_inspector.png",
+      "sha256": "7503457ba2229715b1c4eeec9677120af5c761d06273c54f84a0fea573e81f75"
+    },
+    {
+      "artId": "placeholder_card_rending_cub",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch01/rending-cub-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_rending_cub.png",
+      "sha256": "d4c93f6c40bd65b223c04e3273ae822ba2afa9485c8b0987c107d812ab1b1211"
+    },
+    {
+      "artId": "placeholder_card_resonance_bell_guard",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/resonance-bell-guard-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_resonance_bell_guard.png",
+      "sha256": "efd8c4989feef65aaec936bb6758c92654be5f9389b28a216a6c120601f7a01a"
+    },
+    {
+      "artId": "placeholder_card_ringing_iron_bastion",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/ringing-iron-bastion-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_ringing_iron_bastion.png",
+      "sha256": "3c6141797066eb92d3cc21cd550e9a3291a963c2871299c8645a6c68ddffae55"
+    },
+    {
+      "artId": "placeholder_card_root_devourer",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/root-devourer-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_root_devourer.png",
+      "sha256": "bd6c928a48e1de464291a1047e1a35c475a586bf9e84352642cf339112bb7e58"
+    },
+    {
+      "artId": "placeholder_card_rootbound_soul_guide",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/rootbound-soul-guide-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_rootbound_soul_guide.png",
+      "sha256": "2f50c2a83a211be6cd9ed52b66149b3782766bbbb57384e79aff3275870eab94"
+    },
+    {
+      "artId": "placeholder_card_royal_bounty_hunter",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch05/royal-bounty-hunter-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_royal_bounty_hunter.png",
+      "sha256": "628edaa837d42edc5e56840e2c010a6ac4ee7d020f739ba961f408b224d3da56"
+    },
+    {
+      "artId": "placeholder_card_rune_ward_reader",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/rune-ward-reader-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_rune_ward_reader.png",
+      "sha256": "4db00a8ad39617d3f7113caeb04d1ffff37a37bd4334566be36dbf9373c27b12"
+    },
+    {
+      "artId": "placeholder_card_shieldbreaker_blade_blank",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/shieldbreaker-blade-blank-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_shieldbreaker_blade_blank.png",
+      "sha256": "fd2a637c8b283e1f7ce6f716aeceab9861e611ab6796d0ac6f6e7cca0caa17ff"
+    },
+    {
+      "artId": "placeholder_card_shieldwall_furnace_keeper",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/shieldwall-furnace-keeper-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_shieldwall_furnace_keeper.png",
+      "sha256": "d0e768bc540da3010ceacd5b3bc875e7cb7b500127c47844b18e1059e14cd494"
+    },
+    {
+      "artId": "placeholder_card_star_etched_timekeeper",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/star-etched-timekeeper-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_star_etched_timekeeper.png",
+      "sha256": "85cf78937c89dab013d190b6dc96557014dcac5ee0560147ed16480aa082e4ce"
+    },
+    {
+      "artId": "placeholder_card_star_ring_treasurer",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/star-ring-treasurer-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_star_ring_treasurer.png",
+      "sha256": "cca1032da04fb4502c489b3692ebae3c561006b4db3b054162d54994f64f1cbb"
+    },
+    {
+      "artId": "placeholder_card_stardust_attendant",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch01/stardust-attendant-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_stardust_attendant.png",
+      "sha256": "0ab849b3b666759b038d6f53270ea953bfdcb0e0986e7ac8b060bf6eebcdabf8"
+    },
+    {
+      "artId": "placeholder_card_stargate_lecturer",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/stargate-lecturer-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_stargate_lecturer.png",
+      "sha256": "0fbc3fd6d8a4c7e87d187fb9d1e67baecc2fd0e95f9bae54dfe9ea9eac87c9ed"
+    },
+    {
+      "artId": "placeholder_card_stargazing_apprentice",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch01/stargazing-apprentice-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_stargazing_apprentice.png",
+      "sha256": "ad7b091e1348bed318e2e07b64b07c11fa6e031eff252f4906959621bad1a335"
+    },
+    {
+      "artId": "placeholder_card_swiftwing_forest_hawk",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/swiftwing-forest-hawk-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_swiftwing_forest_hawk.png",
+      "sha256": "dca5689b0768ee70476b49bcbd9847344dcabe56a35fed818511627d49c78aec"
+    },
+    {
+      "artId": "placeholder_card_thousand_ring_tomb_guardian",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch05/thousand-ring-tomb-guardian-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_thousand_ring_tomb_guardian.png",
+      "sha256": "d4f8183449b54788ae6145eb7cd3a5440792159d648b6831ab25bb39ca79f76f"
+    },
+    {
+      "artId": "placeholder_card_traveling_physician",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/traveling-physician-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_traveling_physician.png",
+      "sha256": "a426ffb01e19860f66d1080fdb7a4b8593b933d5c99f4ae3967f9cdad1740dca"
+    },
+    {
+      "artId": "placeholder_card_tuskherd_pathrunner",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch03/tuskherd-pathrunner-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_tuskherd_pathrunner.png",
+      "sha256": "b6a9ff49e81cea3846646c5161f3eaac7f652665a38432deafe116a3cfd0cee3"
+    },
+    {
+      "artId": "placeholder_card_two_tailed_fox_spirit",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch02/two-tailed-fox-spirit-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_two_tailed_fox_spirit.png",
+      "sha256": "e5b6ee9eff52bef87d77ada43845ecb74b699e9c1bd402fda69f861858068aff"
+    },
+    {
+      "artId": "placeholder_card_undying_furnace_king",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/undying-furnace-king-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_undying_furnace_king.png",
+      "sha256": "4e2c803e4b0959080a7fbc4b7086e84bdfb27dadb22afe0fd5c6356a692cfa17"
+    },
+    {
+      "artId": "placeholder_card_vinecrown_priest",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch04/vinecrown-priest-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_vinecrown_priest.png",
+      "sha256": "1240c24ad256f7f15a934e87d08e5b03395bc07870f6143fe9acc9b77f665540"
+    },
+    {
+      "artId": "placeholder_card_wandering_swordsman",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch01/wandering-swordsman-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_wandering_swordsman.png",
+      "sha256": "947c4a1e7e88cbdabb04fe39bdcfc9e080a37feb716164a35b58a8d0de012eb7"
+    },
+    {
+      "artId": "placeholder_card_world_eating_final_bloom",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch05/world-eating-final-bloom-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_world_eating_final_bloom.png",
+      "sha256": "51e75969c9dfc54eee3d7b860208cec6e9f286463af39a006fee1115b5dc3b6c"
+    },
+    {
+      "artId": "placeholder_card_young_deer_spirit",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/young-deer-spirit-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_card_young_deer_spirit.png",
+      "sha256": "ebdc8b95458bf2317f0d78eeb2ba74da58471ef5cc148e894c507c3bc2b8e8c2"
+    },
+    {
+      "artId": "placeholder_spell_army_ascension",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/army-ascension-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_army_ascension.png",
+      "sha256": "aff4b04cc298d3127669d5d8f4e6cc9ca0023e0642d5a2a3f6b3621c80cbc744"
+    },
+    {
+      "artId": "placeholder_spell_bloodline_awakening",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/bloodline-awakening-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_bloodline_awakening.png",
+      "sha256": "04ffcebab8e79c376388865539ab0f6ff1df82d72b1819e8834c3fb16580d07a"
+    },
+    {
+      "artId": "placeholder_spell_delayed_supply",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/delayed-supply-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_delayed_supply.png",
+      "sha256": "671f252f610eee7e11653c0387322ccdf0f32eaf69c786956ca21e91f853f690"
+    },
+    {
+      "artId": "placeholder_spell_fate_reforging",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/fate-reforging-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_fate_reforging.png",
+      "sha256": "a4bfa7a52961c017ca6fec06ed8d18adc7f7e51c16caf347c75eadc4d83efbc4"
+    },
+    {
+      "artId": "placeholder_spell_legendary_recruitment",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/legendary-recruitment-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_legendary_recruitment.png",
+      "sha256": "36bb16c7bb7ef842af6fa331caaa47b98ab90f742f147e526ac0fb78433b6091"
+    },
+    {
+      "artId": "placeholder_spell_precise_training",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/precise-training-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_precise_training.png",
+      "sha256": "d43822230525733841c24258cc3356a82681519efdd533a1a4a6ae5510bb2505"
+    },
+    {
+      "artId": "placeholder_spell_prototype_copy",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/prototype-copy-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_prototype_copy.png",
+      "sha256": "4ca13666575326b003d448ad3d06ffbf3a0a12cce7444efb908556466a7f2b76"
+    },
+    {
+      "artId": "placeholder_spell_starlight_rebate",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/starlight-rebate-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_starlight_rebate.png",
+      "sha256": "cade45feec38f25653ff75b08ed7b94830b4943c73f51c5e767bd7830a2c9ac9"
+    },
+    {
+      "artId": "placeholder_spell_temporary_ward",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookFormalCatalogV032/temporary-ward-v0.3.2.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_temporary_ward.png",
+      "sha256": "026dc335a0e7eba16e37fea78a689d04331386dc13ddfb6e7fc376f2e3aaf40c"
+    },
+    {
+      "artId": "placeholder_spell_thickhide_potion",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/thickhide-potion-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_thickhide_potion.png",
+      "sha256": "818b6c2cb1677029357c0689ebb5aa8b9a803d161c8469c4bee3f9629e6cdf7c"
+    },
+    {
+      "artId": "placeholder_spell_triple_discovery_reward",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/triple-discovery-reward-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_triple_discovery_reward.png",
+      "sha256": "d8da03ec46ef780b9c18f6f34a9ae4530500a07b7a56941d8c528ddd817e0367"
+    },
+    {
+      "artId": "placeholder_spell_warband_forging",
+      "sourcePath": "Assets/Art/Presentation/Calibration/LightStorybookProductionV033Batch06/warband-forging-v0.3.3.png",
+      "runtimePath": "Assets/Art/Presentation/Runtime/LightStorybookV033/placeholder_spell_warband_forging.png",
+      "sha256": "3731863ec63294db773434888c8d81d94718b3e639cae2138425e73f39ff62c8"
+    }
+  ]
+}

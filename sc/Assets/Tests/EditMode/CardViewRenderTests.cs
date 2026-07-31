@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using SpireChess.Battle;
 using SpireChess.Config;
+using SpireChess.Editor;
 using SpireChess.UI;
 using SpireChess.UI.Battle;
 using SpireChess.Utils;
@@ -295,12 +296,25 @@ namespace SpireChess.Tests.EditMode
             view.Render(model);
 
             var artworkSprite = ImageAt("ArtworkMask/Artwork").sprite;
+            var promoted =
+                LightStorybookRuntimePromotionBuilder.IsPromoted();
             Assert.That(artworkSprite, Is.Not.Null);
             Assert.That(artworkSprite.name,
-                Is.EqualTo("card_minion_undying_furnace_king"));
+                Is.EqualTo(
+                    promoted
+                        ? model.ArtId
+                        : "card_minion_undying_furnace_king"));
+            if (promoted)
+            {
+                Assert.That(
+                    AssetDatabase.GetAssetPath(artworkSprite),
+                    Is.EqualTo(
+                        LightStorybookRuntimePromotionBuilder
+                            .GetRuntimeAssetPath(model.ArtId)));
+            }
             Assert.That(
                 RectAt("ArtworkMask/Artwork").anchoredPosition.y,
-                Is.EqualTo(-44.8f).Within(0.1f));
+                Is.EqualTo(promoted ? 0f : -44.8f).Within(0.1f));
             Assert.That(ImageAt("NormalFrame").sprite.name,
                 Is.EqualTo("card_frame_storybook_normal_v2"));
             Assert.That(Active("NormalFrame"), Is.True);

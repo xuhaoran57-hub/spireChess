@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using SpireChess.Config;
+using SpireChess.Editor;
 using SpireChess.UI;
 using SpireChess.Utils;
 using UnityEditor;
@@ -234,6 +235,18 @@ namespace SpireChess.Tests.EditMode
             Assert.That(
                 ApprovedArtworks,
                 Has.Length.EqualTo(SampleArtworkCount + 2));
+            var promotedArtIds =
+                new HashSet<string>(StringComparer.Ordinal);
+            if (LightStorybookRuntimePromotionBuilder.IsPromoted())
+            {
+                foreach (var entry in
+                    LightStorybookRuntimePromotionBuilder
+                        .CreatePlan()
+                        .Entries)
+                {
+                    promotedArtIds.Add(entry.ArtId);
+                }
+            }
             foreach (var expected in ApprovedArtworks)
             {
                 // TryGetArtwork is intentionally used here. ResolveArtwork
@@ -244,17 +257,30 @@ namespace SpireChess.Tests.EditMode
                     out var focalPointY);
                 Assert.That(found, Is.True, expected.ArtId);
                 Assert.That(sprite, Is.Not.Null, expected.ArtId);
+                var isRuntimePromotion =
+                    promotedArtIds.Contains(expected.ArtId);
                 Assert.That(
                     sprite.name,
-                    Is.EqualTo(expected.SpriteName),
+                    Is.EqualTo(
+                        isRuntimePromotion
+                            ? expected.ArtId
+                            : expected.SpriteName),
                     expected.ArtId);
                 Assert.That(
                     AssetDatabase.GetAssetPath(sprite),
-                    Is.EqualTo(expected.AssetPath),
+                    Is.EqualTo(
+                        isRuntimePromotion
+                            ? LightStorybookRuntimePromotionBuilder
+                                .GetRuntimeAssetPath(expected.ArtId)
+                            : expected.AssetPath),
                     expected.ArtId);
                 Assert.That(
                     focalPointY,
-                    Is.EqualTo(expected.FocalPointY).Within(0.0001f),
+                    Is.EqualTo(
+                            isRuntimePromotion
+                                ? 0.5f
+                                : expected.FocalPointY)
+                        .Within(0.0001f),
                     expected.ArtId);
             }
         }
