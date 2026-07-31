@@ -575,6 +575,22 @@
   本次仍不提升 Runtime Catalog。
 - [x] 按 v0.3.3 Prompt 与视觉回归基线完成剩余 9 张正式法术资产；量产清单无待
   生成项。任一后续冻结规则变化必须升版为 v0.3.4，不原地修改 v0.3.3。
+- [x] 建立 v0.3.3 Runtime 晋级门禁：机器契约固定 Batch 06 候选身份、51 项
+  源文件与 SHA-256、Unity 批次证据、晋级前 Runtime 隔离、Windows DXT1 /
+  Max 1024 目标策略和负责人批准状态；Unity 菜单与 PowerShell 入口默认阻断
+  `Pending` 批准，不修改 Runtime Catalog。技术设计见
+  `phase-9c-runtime-promotion-technical-design-v0.1.md`。
+- [x] 项目负责人按 `phase-9c-v0.3.3-runtime-promotion-signoff.md` 完成输入权利、
+  AI 披露、51 项视觉复核与 Runtime 晋级确认；2026-07-31 在 Codex 任务中确认
+  签字包，机器契约更新为 `Approved`，RPG-06 关闭。
+- [x] 实现独立 Promotion Builder：门禁通过后动态复制候选中的全部 Calibration
+  美术到正式 Runtime 目录，保留正式 Catalog GUID，应用 Windows DXT1 /
+  Max 1024 / Quality 50 导入策略；支持新建资源及 Catalog 事务回滚、幂等复验、
+  确定性晋级清单和 Unity 菜单/PowerShell 入口。实现阶段未执行晋级，Runtime
+  Catalog 仍保持原状。
+- [ ] 在干净工作树中用 Unity 2022.3.62f3c1 执行 Promotion Builder，提交生成的
+  Runtime 资源与晋级清单；随后完成全量 EditMode/PlayMode、Clean Player、
+  G4 双分辨率视觉和内存/首次 Shop 尖峰证据，才能标记 `Runtime Ready`。
 
 ## 暂缓
 

@@ -1,0 +1,49 @@
+{
+  "version": "0.3.3",
+  "gateVersion": "1",
+  "candidate": {
+    "catalogPath": "Assets/Configs/Presentation/PresentationSpriteCatalog_LightStorybookProductionV033Batch06.asset",
+    "catalogGuid": "1600000000000000000000000000000a",
+    "catalogEntryCount": 86,
+    "configuredArtworkCount": 83,
+    "productionArtworkCount": 51,
+    "productionManifestPath": "ui-concepts/phase-9c/light-storybook-production-v0.1/PRODUCTION-MANIFEST-v0.3.3.json",
+    "releaseManifestPath": "ui-concepts/phase-9c/light-storybook-production-v0.1/unity-batch-release-v0.3.3/release-manifest.json",
+    "captureIndexPath": "ui-concepts/phase-9c/light-storybook-production-v0.1/unity-batch-release-v0.3.3/capture-index.json",
+    "captureIndexSha256": "226cd178b83c90b867f254d0ff0215337f83ce698f1ea94c324e1b37c80f9ddc",
+    "unityVersion": "2022.3.62f3c1",
+    "editModePassed": 373,
+    "playModePassed": 30,
+    "screenshotCount": 42
+  },
+  "runtimeBeforePromotion": {
+    "catalogPath": "Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+    "catalogGuid": "75d638606a8084146524a35a317a2cca",
+    "catalogEntryCount": 24,
+    "productionArtworkCount": 0
+  },
+  "targetPolicy": {
+    "runtimeArtRoot": "Assets/Art/Presentation/Runtime/LightStorybookV033",
+    "standaloneTextureFormat": "DXT1",
+    "maxTextureSize": 1024,
+    "compressionQuality": 50,
+    "mipmaps": false,
+    "readable": false,
+    "preserveRuntimeCatalogGuid": true,
+    "forbidCalibrationReferences": true,
+    "requireCleanBuild": true,
+    "requireFullRegression": true,
+    "requireG4VisualReview": true,
+    "requireMemoryEvidence": true
+  },
+  "approval": {
+    "status": "Approved",
+    "approvedBy": "项目负责人（Codex 任务内确认）",
+    "approvedAt": "2026-07-31T10:53:54+08:00",
+    "accountAgreement": "Personal OpenAI services / Terms of Use",
+    "inputRightsConfirmed": true,
+    "aiDisclosureAccepted": true,
+    "visualReviewAccepted": true,
+    "runtimePromotionAccepted": true
+  }
+}

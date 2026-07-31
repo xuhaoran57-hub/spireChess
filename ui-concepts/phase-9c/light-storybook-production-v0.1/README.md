@@ -279,6 +279,36 @@ Runtime/Formal Catalog 和正式 UI Prefab 的 10 / 10 前后哈希一致。人�
 复核覆盖普通/金色 × Full/Compact、法术、商店与 5v5 战斗立牌，结论为
 `UNITY_BATCH_RELEASE`。本轮不执行 Runtime 提升。
 
+## v0.3.3 Runtime 晋级门禁
+
+仓库根目录的 `phase-9c-v0.3.3-runtime-promotion-contract.json`、
+`phase-9c-v0.3.3-runtime-promotion-signoff.md` 和
+`phase-9c-runtime-promotion-technical-design-v0.1.md` 已建立两段式晋级门禁：
+
+- RPG-01–05 自动验证候选 Catalog、生产源文件、Unity 证据、Runtime 隔离和目标
+  导入策略；
+- RPG-06 要求项目负责人明确确认输入权利、AI 披露、视觉复核与 Runtime 晋级；
+- 项目负责人于 2026-07-31 确认签字包，批准状态更新为 `Approved`；RPG-06
+  已关闭。
+
+负责人签字后运行：
+
+```powershell
+.\tools\run_phase9c_runtime_promotion_gate.ps1
+```
+
+Promotion Builder 已实现，Unity 菜单入口为
+`Spire Chess/Release/Promote Phase 9C v0.3.3 to Runtime`，正式命令行入口为：
+
+```powershell
+.\tools\run_phase9c_runtime_promotion.ps1
+```
+
+Builder 会复制候选的全部 Calibration 引用、应用冻结导入策略、保留正式 Catalog
+GUID，并输出确定性晋级清单；当前实现阶段未执行，Runtime Catalog 仍保持晋级前
+状态。Builder 执行不等同于 `Runtime Ready`，晋级后仍必须复跑全量测试、Clean
+Player、G4 双分辨率视觉和内存/首次 Shop 尖峰证据。
+
 ## v0.2 机制压力测试归档
 
 `mechanic-stress-test-v0.1/` 使用 v0.2 生成九张校准卡。自动画幅与整体亮度检查
