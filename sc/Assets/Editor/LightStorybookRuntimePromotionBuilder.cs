@@ -434,6 +434,13 @@ namespace SpireChess.Editor
             var planById = plan.Entries.ToDictionary(
                 value => value.ArtId,
                 StringComparer.Ordinal);
+            var approvedRefreshArtIds =
+                new HashSet<string>(StringComparer.Ordinal);
+            if (LightStorybookArtRefreshV034Builder.IsPromoted())
+            {
+                approvedRefreshArtIds.UnionWith(
+                    LightStorybookArtRefreshV034Builder.RefreshArtIds());
+            }
             foreach (var candidateEntry in candidateEntries)
             {
                 if (!runtimeById.TryGetValue(
@@ -449,10 +456,15 @@ namespace SpireChess.Editor
                     out var planned)
                         ? planned.RuntimePath
                         : candidateEntry.SourcePath;
+                var expectedFocalPointY =
+                    approvedRefreshArtIds.Contains(
+                        candidateEntry.ArtId)
+                        ? 0.5f
+                        : candidateEntry.FocalPointY;
                 if (runtimeEntry.SourcePath != expectedPath ||
                     Math.Abs(
                         runtimeEntry.FocalPointY -
-                        candidateEntry.FocalPointY) > 0.0001f)
+                        expectedFocalPointY) > 0.0001f)
                 {
                     throw new InvalidOperationException(
                         "Runtime catalog entry drifted: " +

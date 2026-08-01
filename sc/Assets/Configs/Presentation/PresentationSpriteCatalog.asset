@@ -40,40 +40,40 @@ MonoBehaviour:
     focalPointY: 0.5
   - id: placeholder_card_ten_thousand_hoof_surge
     sprite: {fileID: 21300000, guid: 050bf0f7d6ac4a05a10fc3f352c243f4, type: 3}
-    focalPointY: 0.27
+    focalPointY: 0.5
   - id: placeholder_card_astrolabe_calibrator
     sprite: {fileID: 21300000, guid: 14433058cad447eeac1f6e3495056bba, type: 3}
-    focalPointY: 0.27
+    focalPointY: 0.5
   - id: placeholder_card_sky_covenant_bearer
     sprite: {fileID: 21300000, guid: 445cc5b4c7764c86be86da345e405d03, type: 3}
-    focalPointY: 0.25
+    focalPointY: 0.5
   - id: placeholder_card_traveling_physician
     sprite: {fileID: 21300000, guid: 14f6097386d31794794476be20050ddb, type: 3}
     focalPointY: 0.5
   - id: placeholder_card_many_arts_apprentice
     sprite: {fileID: 21300000, guid: b9cd43cae9af4522b6897e6fdb4b03a9, type: 3}
-    focalPointY: 0.27
+    focalPointY: 0.5
   - id: placeholder_card_tempering_mender
     sprite: {fileID: 21300000, guid: 68718a5dc430ca0488d2ac8d546ef074, type: 3}
-    focalPointY: 0.31
+    focalPointY: 0.5
   - id: placeholder_card_cracked_armor_avenger
     sprite: {fileID: 21300000, guid: 1fa97e73403224d44acd6ee534e18663, type: 3}
-    focalPointY: 0.27
+    focalPointY: 0.5
   - id: placeholder_card_rotleaf_heir
     sprite: {fileID: 21300000, guid: 3bd7fa03a5ef35e4d874b66616b73785, type: 3}
-    focalPointY: 0.29
+    focalPointY: 0.5
   - id: placeholder_card_fox_den_matriarch
     sprite: {fileID: 21300000, guid: 838a14903c8e7c04ab87597576da7ae8, type: 3}
     focalPointY: 0.5
   - id: placeholder_card_secret_page_refractor
     sprite: {fileID: 21300000, guid: 85869952f0ebdf643aff589e2a576f85, type: 3}
-    focalPointY: 0.28
+    focalPointY: 0.5
   - id: placeholder_card_star_map_broker
     sprite: {fileID: 21300000, guid: d285ff7a2f2f20a4d82c75e7534072cd, type: 3}
-    focalPointY: 0.3
+    focalPointY: 0.5
   - id: placeholder_token_young_spirit
     sprite: {fileID: 21300000, guid: cb13c5e0516cc6b4fa0ad202ede3ff59, type: 3}
-    focalPointY: 0.31
+    focalPointY: 0.5
   - id: placeholder_token_two_tailed_fox_shadow
     sprite: {fileID: 21300000, guid: a94c860707ffa1d42a57c039ec358fcd, type: 3}
     focalPointY: 0.5
@@ -82,16 +82,16 @@ MonoBehaviour:
     focalPointY: 0.5
   - id: placeholder_spell_minor_tempering
     sprite: {fileID: 21300000, guid: e216b312639b4dc4091e841dbb40b465, type: 3}
-    focalPointY: 0.42
+    focalPointY: 0.5
   - id: placeholder_spell_free_refresh
     sprite: {fileID: 21300000, guid: 11ef1edeab6d09b41adf8708eed94265, type: 3}
-    focalPointY: 0.42
+    focalPointY: 0.5
   - id: placeholder_spell_advanced_discovery
     sprite: {fileID: 21300000, guid: 5c1b8d8124af603439943f0264a60c57, type: 3}
-    focalPointY: 0.38
+    focalPointY: 0.5
   - id: placeholder_spell_prebattle_benediction
     sprite: {fileID: 21300000, guid: c0a551913238ea7469844b082302ad85, type: 3}
-    focalPointY: 0.36
+    focalPointY: 0.5
   - id: icon_relic_crown_echo_bell
     sprite: {fileID: 21300000, guid: fedd2bfeaaf0ea04cb8afb06acc86d92, type: 3}
     focalPointY: 0.5

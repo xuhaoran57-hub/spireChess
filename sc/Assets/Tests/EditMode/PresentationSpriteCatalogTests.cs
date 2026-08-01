@@ -247,6 +247,17 @@ namespace SpireChess.Tests.EditMode
                     promotedArtIds.Add(entry.ArtId);
                 }
             }
+            var refreshedArtIds =
+                new HashSet<string>(StringComparer.Ordinal);
+            if (LightStorybookArtRefreshV034Builder.IsPromoted())
+            {
+                foreach (var artId in
+                    LightStorybookArtRefreshV034Builder
+                        .RefreshArtIds())
+                {
+                    refreshedArtIds.Add(artId);
+                }
+            }
             foreach (var expected in ApprovedArtworks)
             {
                 // TryGetArtwork is intentionally used here. ResolveArtwork
@@ -259,6 +270,8 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(sprite, Is.Not.Null, expected.ArtId);
                 var isRuntimePromotion =
                     promotedArtIds.Contains(expected.ArtId);
+                var isArtRefresh =
+                    refreshedArtIds.Contains(expected.ArtId);
                 Assert.That(
                     sprite.name,
                     Is.EqualTo(
@@ -277,7 +290,7 @@ namespace SpireChess.Tests.EditMode
                 Assert.That(
                     focalPointY,
                     Is.EqualTo(
-                            isRuntimePromotion
+                            isRuntimePromotion || isArtRefresh
                                 ? 0.5f
                                 : expected.FocalPointY)
                         .Within(0.0001f),

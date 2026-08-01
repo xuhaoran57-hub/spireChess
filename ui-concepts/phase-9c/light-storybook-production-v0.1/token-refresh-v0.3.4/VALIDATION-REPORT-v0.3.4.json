@@ -1,9 +1,9 @@
 {
     "version":  "0.3.4",
     "releaseId":  "token-refresh-v0.3.4",
-    "generatedAtUtc":  "2026-07-31T15:19:08.3548519Z",
-    "result":  "PASS_CANDIDATE_RUNTIME_PENDING",
-    "visualApproval":  "pending",
+    "generatedAtUtc":  "2026-08-01T05:29:22.3776576Z",
+    "result":  "PASS_RUNTIME_PROMOTED",
+    "visualApproval":  "approved",
     "checks":  [
                    {
                        "id":  "candidate-identity",
@@ -15,7 +15,7 @@
                                                    "token_swift_young_spirit",
                                                    "token_two_tailed_fox_shadow"
                                                ],
-                                       "runtimePromoted":  0
+                                       "runtimePromoted":  3
                                    }
                    },
                    {
@@ -110,7 +110,7 @@
                                    ]
                    },
                    {
-                       "id":  "runtime-baseline-unchanged",
+                       "id":  "runtime-promotion",
                        "status":  "pass",
                        "details":  {
                                        "catalogPath":  "sc/Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
@@ -118,31 +118,31 @@
                                                       {
                                                           "id":  "token_young_spirit",
                                                           "artId":  "placeholder_token_young_spirit",
-                                                          "runtimeSha256":  "78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218",
-                                                          "expectedOldRuntimeSha256":  "78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218",
+                                                          "runtimeSha256":  "e7eecf493dccc2b86bb798e2a9313dc9a0f375934c64b7c6c53808c1bcdd36c1",
+                                                          "expectedPromotedSha256":  "e7eecf493dccc2b86bb798e2a9313dc9a0f375934c64b7c6c53808c1bcdd36c1",
                                                           "metaGuid":  "cb13c5e0516cc6b4fa0ad202ede3ff59",
                                                           "catalogGuid":  "cb13c5e0516cc6b4fa0ad202ede3ff59",
-                                                          "candidateNotPromoted":  true,
+                                                          "runtimePromoted":  true,
                                                           "passes":  true
                                                       },
                                                       {
                                                           "id":  "token_swift_young_spirit",
                                                           "artId":  "placeholder_token_swift_young_spirit",
-                                                          "runtimeSha256":  "261cd67e14a819b849a7d0fef665ba8c92b29129702b2b6b5c31917dc26ced54",
-                                                          "expectedOldRuntimeSha256":  "261cd67e14a819b849a7d0fef665ba8c92b29129702b2b6b5c31917dc26ced54",
+                                                          "runtimeSha256":  "ea6ff92d95fa0a1ec149594f62fa32387e43ae8f9fd3f813aed93bc772e5563c",
+                                                          "expectedPromotedSha256":  "ea6ff92d95fa0a1ec149594f62fa32387e43ae8f9fd3f813aed93bc772e5563c",
                                                           "metaGuid":  "d189b173395fb3d4db872486c8710606",
                                                           "catalogGuid":  "d189b173395fb3d4db872486c8710606",
-                                                          "candidateNotPromoted":  true,
+                                                          "runtimePromoted":  true,
                                                           "passes":  true
                                                       },
                                                       {
                                                           "id":  "token_two_tailed_fox_shadow",
                                                           "artId":  "placeholder_token_two_tailed_fox_shadow",
-                                                          "runtimeSha256":  "6fa213e471af861a23cbf21c95fe2a566f9b4bebe08f90819a46932974cb1010",
-                                                          "expectedOldRuntimeSha256":  "6fa213e471af861a23cbf21c95fe2a566f9b4bebe08f90819a46932974cb1010",
+                                                          "runtimeSha256":  "9d67ff3fdb159c1560c25003a94baeeb9d99beca4ba10ffe2d62001c38f2406f",
+                                                          "expectedPromotedSha256":  "9d67ff3fdb159c1560c25003a94baeeb9d99beca4ba10ffe2d62001c38f2406f",
                                                           "metaGuid":  "a94c860707ffa1d42a57c039ec358fcd",
                                                           "catalogGuid":  "a94c860707ffa1d42a57c039ec358fcd",
-                                                          "candidateNotPromoted":  true,
+                                                          "runtimePromoted":  true,
                                                           "passes":  true
                                                       }
                                                   ]

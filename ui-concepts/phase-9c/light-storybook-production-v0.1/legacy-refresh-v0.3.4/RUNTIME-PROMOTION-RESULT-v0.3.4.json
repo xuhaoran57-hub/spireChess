@@ -1,0 +1,177 @@
+{
+  "version": "0.3.4",
+  "releaseId": "legacy-card-art-refresh-v0.3.4",
+  "status": "PROMOTED",
+  "promotedAt": "2026-08-01T13:29:54.8598647+08:00",
+  "runtimeCatalogPath": "Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+  "runtimeCatalogGuid": "75d638606a8084146524a35a317a2cca",
+  "runtimeCatalogSha256": "02351e80415b86fc755f32389a4e459db027844cb3e8cd320bb07e21858ee1ea",
+  "configuredArtworkCount": 83,
+  "baselineApprovedArtworkCount": 66,
+  "refreshedArtworkCount": 17,
+  "exactApprovedStyleCoverage": "83/83",
+  "policy": {
+    "standaloneTextureFormat": "DXT1",
+    "maxTextureSize": 1024,
+    "compressionQuality": 50,
+    "mipmaps": false,
+    "readable": false,
+    "focalPointY": 0.5,
+    "runtimeCatalogGuidPreserved": true
+  },
+  "entries": [
+    {
+      "artId": "placeholder_card_astrolabe_calibrator",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/astrolabe-calibrator-v0.3.4.png",
+      "sourceSha256": "c37f8210f0e4877ded5744bd7284510004ef781f70ffc7968f5f0966602fe9ea",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_astrolabe_calibrator.png",
+      "runtimeSha256": "c37f8210f0e4877ded5744bd7284510004ef781f70ffc7968f5f0966602fe9ea",
+      "runtimeGuid": "14433058cad447eeac1f6e3495056bba",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_cracked_armor_avenger",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/cracked-armor-avenger-v0.3.4.png",
+      "sourceSha256": "5471a8cf64cae273199ece6015204ce6a9e907eecb78f600a8dcf758a56f2310",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/ForgeSoul/card_minion_cracked_armor_avenger.png",
+      "runtimeSha256": "5471a8cf64cae273199ece6015204ce6a9e907eecb78f600a8dcf758a56f2310",
+      "runtimeGuid": "1fa97e73403224d44acd6ee534e18663",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_fox_den_matriarch",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/fox-den-matriarch-v0.3.4.png",
+      "sourceSha256": "b78c7fcc8c3771d78512c07086034cc5d63142076e69a52f71c238b8eb354e0f",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/WildSpirit/card_minion_fox_den_matriarch.png",
+      "runtimeSha256": "b78c7fcc8c3771d78512c07086034cc5d63142076e69a52f71c238b8eb354e0f",
+      "runtimeGuid": "838a14903c8e7c04ab87597576da7ae8",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_many_arts_apprentice",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/many-arts-apprentice-v0.3.4.png",
+      "sourceSha256": "f71bd132a411425afed969d3b0b481344982973105124d099457dbf28bcd611e",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Wayfarer/card_minion_many_arts_apprentice.png",
+      "runtimeSha256": "f71bd132a411425afed969d3b0b481344982973105124d099457dbf28bcd611e",
+      "runtimeGuid": "b9cd43cae9af4522b6897e6fdb4b03a9",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_rotleaf_heir",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/rotleaf-heir-v0.3.4.png",
+      "sourceSha256": "f52754155150c706e6075e5f65a09a04a24c6798fa17d3cc709a87eb69344ecb",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/WildSpirit/card_minion_rotleaf_heir.png",
+      "runtimeSha256": "f52754155150c706e6075e5f65a09a04a24c6798fa17d3cc709a87eb69344ecb",
+      "runtimeGuid": "3bd7fa03a5ef35e4d874b66616b73785",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_secret_page_refractor",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/secret-page-refractor-v0.3.4.png",
+      "sourceSha256": "ca19ca4bd2606515d76ce814e1725b524c4a3b0b2f64c798027a73aed4ebbb0b",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_secret_page_refractor.png",
+      "runtimeSha256": "ca19ca4bd2606515d76ce814e1725b524c4a3b0b2f64c798027a73aed4ebbb0b",
+      "runtimeGuid": "85869952f0ebdf643aff589e2a576f85",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_sky_covenant_bearer",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/sky-covenant-bearer-v0.3.4-r2.png",
+      "sourceSha256": "353769a024a21cdcb98984ffa513eb7307c2d18a9acbfecffa4866349b0f7dc3",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_sky_covenant_bearer.png",
+      "runtimeSha256": "353769a024a21cdcb98984ffa513eb7307c2d18a9acbfecffa4866349b0f7dc3",
+      "runtimeGuid": "445cc5b4c7764c86be86da345e405d03",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_star_map_broker",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/star-map-broker-v0.3.4.png",
+      "sourceSha256": "9c30397bf57faa07cb63be5b138381c886346def238522964f963b3891a5af4d",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_star_map_broker.png",
+      "runtimeSha256": "9c30397bf57faa07cb63be5b138381c886346def238522964f963b3891a5af4d",
+      "runtimeGuid": "d285ff7a2f2f20a4d82c75e7534072cd",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_tempering_mender",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/tempering-mender-v0.3.4.png",
+      "sourceSha256": "931f44e5b923aed469871cebf2e37a73a3d74d4fb62757e999b70aaac7f6002b",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/ForgeSoul/card_minion_tempering_mender.png",
+      "runtimeSha256": "931f44e5b923aed469871cebf2e37a73a3d74d4fb62757e999b70aaac7f6002b",
+      "runtimeGuid": "68718a5dc430ca0488d2ac8d546ef074",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_card_ten_thousand_hoof_surge",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/ten-thousand-hoof-surge-v0.3.4.png",
+      "sourceSha256": "b549e6160fd6f55fa33383a0d507b1b42ab24fa984a9154f58da6b1b43c7c865",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/WildSpirit/card_minion_ten_thousand_hoof_surge.png",
+      "runtimeSha256": "b549e6160fd6f55fa33383a0d507b1b42ab24fa984a9154f58da6b1b43c7c865",
+      "runtimeGuid": "050bf0f7d6ac4a05a10fc3f352c243f4",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_spell_advanced_discovery",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/advanced-discovery-v0.3.4.png",
+      "sourceSha256": "88edb3b4adbb832fe2575fb90f398bd51e6a271bf3b4be2724d3da4273b54e2a",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_advanced_discovery.png",
+      "runtimeSha256": "88edb3b4adbb832fe2575fb90f398bd51e6a271bf3b4be2724d3da4273b54e2a",
+      "runtimeGuid": "5c1b8d8124af603439943f0264a60c57",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_spell_free_refresh",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/free-refresh-v0.3.4.png",
+      "sourceSha256": "0eda71fbc1477ed2e58d7e5df27c1087a84c29b814cd4aa2de02a1d5a90f9df6",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_free_refresh.png",
+      "runtimeSha256": "0eda71fbc1477ed2e58d7e5df27c1087a84c29b814cd4aa2de02a1d5a90f9df6",
+      "runtimeGuid": "11ef1edeab6d09b41adf8708eed94265",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_spell_minor_tempering",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/minor-tempering-v0.3.4.png",
+      "sourceSha256": "0e054e2c24209c6cb08234141c2afe6c433149ef1a090fa55d310977f3f9ed27",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_minor_tempering.png",
+      "runtimeSha256": "0e054e2c24209c6cb08234141c2afe6c433149ef1a090fa55d310977f3f9ed27",
+      "runtimeGuid": "e216b312639b4dc4091e841dbb40b465",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_spell_prebattle_benediction",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/prebattle-benediction-v0.3.4.png",
+      "sourceSha256": "552690e5b05a4ee7e0c886a189ac64c6a2f7b9e5b4ed21a476879af9098290dd",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_prebattle_benediction.png",
+      "runtimeSha256": "552690e5b05a4ee7e0c886a189ac64c6a2f7b9e5b4ed21a476879af9098290dd",
+      "runtimeGuid": "c0a551913238ea7469844b082302ad85",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_token_swift_young_spirit",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-swift-young-spirit-v0.3.4.png",
+      "sourceSha256": "ea6ff92d95fa0a1ec149594f62fa32387e43ae8f9fd3f813aed93bc772e5563c",
+      "runtimePath": "Assets/Art/Presentation/Cards/Tokens/card_token_token_swift_young_spirit.png",
+      "runtimeSha256": "ea6ff92d95fa0a1ec149594f62fa32387e43ae8f9fd3f813aed93bc772e5563c",
+      "runtimeGuid": "d189b173395fb3d4db872486c8710606",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_token_two_tailed_fox_shadow",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-two-tailed-fox-shadow-v0.3.4-r3.png",
+      "sourceSha256": "9d67ff3fdb159c1560c25003a94baeeb9d99beca4ba10ffe2d62001c38f2406f",
+      "runtimePath": "Assets/Art/Presentation/Cards/Tokens/card_token_token_two_tailed_fox_shadow.png",
+      "runtimeSha256": "9d67ff3fdb159c1560c25003a94baeeb9d99beca4ba10ffe2d62001c38f2406f",
+      "runtimeGuid": "a94c860707ffa1d42a57c039ec358fcd",
+      "focalPointY": 0.5
+    },
+    {
+      "artId": "placeholder_token_young_spirit",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-young-spirit-v0.3.4.png",
+      "sourceSha256": "e7eecf493dccc2b86bb798e2a9313dc9a0f375934c64b7c6c53808c1bcdd36c1",
+      "runtimePath": "Assets/Art/Presentation/Cards/Tokens/card_token_token_young_spirit.png",
+      "runtimeSha256": "e7eecf493dccc2b86bb798e2a9313dc9a0f375934c64b7c6c53808c1bcdd36c1",
+      "runtimeGuid": "cb13c5e0516cc6b4fa0ad202ede3ff59",
+      "focalPointY": 0.5
+    }
+  ]
+}

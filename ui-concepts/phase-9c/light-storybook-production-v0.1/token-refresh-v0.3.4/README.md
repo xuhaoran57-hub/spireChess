@@ -2,8 +2,8 @@
 
 - 日期：2026-07-31
 - 范围：3 张荒灵 Token 卡图
-- 状态：`CANDIDATE_VISUAL_APPROVAL_PENDING`
-- Runtime：未修改
+- 状态：`PROMOTED`
+- Runtime：3/3 已原位替换
 
 ## 修正内容
 
@@ -15,7 +15,7 @@ v0.3.3 Runtime 晋级时，3 个 Token 的旧图已经正确接入
 基线，版本提升为 `v0.3.4 Token Refresh`，不回写或静默修改已经关闭的
 v0.3.3 生产批次。
 
-## 候选图
+## 已晋级图片
 
 | Token | 规格 | 候选 |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ v0.3.3 生产批次。
 - 完整生成 Prompt 见
   [PROMPTS-v0.3.4.zh-CN.md](PROMPTS-v0.3.4.zh-CN.md)。
 
-## 当前验收
+## 晋级验收
 
 离线门禁检查：
 
@@ -44,7 +44,7 @@ v0.3.3 生产批次。
 - 3/3 画幅为约 5:4；
 - 3/3 满足冻结亮度阈值；
 - 3/3 候选与旧 Runtime 图不同；
-- Runtime PNG、`.meta` GUID 和正式 Catalog 仍为旧基线。
+- Runtime PNG 与候选 SHA-256 一致，`.meta` GUID 和正式 Catalog GUID 保持不变。
 
 人工预审：
 
@@ -65,8 +65,9 @@ v0.3.3 生产批次。
 生成了第三条后腿，合计五条腿，于 2026-07-31 被用户否决。该文件仅保留审计，
 不得晋级。
 
-用户视觉确认仍是 Runtime 晋级前的硬门禁。确认前不覆盖
-`sc/Assets/Art/Presentation/Cards/Tokens/`。
+3 张候选已随 `legacy-card-art-refresh-v0.3.4` 获得视觉确认并于
+2026-08-01 晋级。Runtime 只使用双尾狐影 r3；r1 和 r2 继续作为否决审计，
+不得重新接入。
 
 ## 验证
 
@@ -74,14 +75,14 @@ v0.3.3 生产批次。
 powershell -ExecutionPolicy Bypass -File ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/validate.ps1
 ```
 
-通过结果为 `PASS_CANDIDATE_RUNTIME_PENDING`，报告写入
+通过结果为 `PASS_RUNTIME_PROMOTED`，报告写入
 `VALIDATION-REPORT-v0.3.4.json`。
 
-## 视觉批准后的晋级动作
+## 已完成的晋级动作
 
 1. 保留现有 `.meta` GUID，将 3 张候选覆盖到对应 Runtime PNG。
-2. 将 3 张纹理导入策略统一为 v0.3.3 生产策略：无 mipmap、不可读、
+2. 将 3 张纹理导入策略统一为生产策略：无 mipmap、不可读、
    Default 1024 压缩、Standalone 1024 DXT1。
 3. 保持 3 个 `artId` 和 Catalog GUID 不变。
-4. 运行离线门禁、Unity EditMode / PlayMode 全量测试和卡框裁切截图复核。
-5. 更新 Runtime 晋级清单与 v0.3.4 关闭结论。
+4. 将 3 个横版图片的 Catalog 焦点统一为 0.5。
+5. 纳入全部 83 个配置 ArtId 的批准来源、哈希与导入策略门禁。

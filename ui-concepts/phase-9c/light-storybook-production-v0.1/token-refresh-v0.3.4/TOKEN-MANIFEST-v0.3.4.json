@@ -1,9 +1,15 @@
 {
   "version": "0.3.4",
   "releaseId": "token-refresh-v0.3.4",
-  "status": "CANDIDATE_VISUAL_APPROVAL_PENDING",
+  "status": "PROMOTED",
   "purpose": "Regenerate the three Runtime token illustrations in the frozen light-storybook style.",
-  "runtimePolicy": "Do not replace Runtime files until the three candidates receive explicit visual approval.",
+  "runtimePolicy": "Approved candidates were promoted in place with original ArtIds, Runtime paths and .meta GUIDs preserved; focalPointY is centered at 0.5.",
+  "approval": {
+    "approvedAt": "2026-08-01T10:54:40+08:00",
+    "instruction": "按你的建议进行下一步",
+    "visualReview": true,
+    "runtimePromotion": true
+  },
   "generation": {
     "tool": "Codex built-in ImageGen",
     "mode": "five independent new-image generations; fox r1 and r2 were rejected and regenerated as r3",
@@ -36,7 +42,9 @@
     },
     "runtimeCatalog": {
       "path": "sc/Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
-      "sha256BeforePromotion": "4f319dc36ca77ea2c70c03b54eb52c963f6f10b86b5040c4d10dc90c6aa8d14b"
+      "guid": "75d638606a8084146524a35a317a2cca",
+      "sha256BeforePromotion": "4f319dc36ca77ea2c70c03b54eb52c963f6f10b86b5040c4d10dc90c6aa8d14b",
+      "sha256AfterPromotion": "02351e80415b86fc755f32389a4e459db027844cb3e8cd320bb07e21858ee1ea"
     }
   },
   "counts": {
@@ -44,7 +52,7 @@
     "generationCalls": 5,
     "currentCandidates": 3,
     "rejectedCandidates": 2,
-    "runtimePromoted": 0
+    "runtimePromoted": 3
   },
   "items": [
     {
@@ -61,7 +69,7 @@
       "runtimePath": "sc/Assets/Art/Presentation/Cards/Tokens/card_token_token_young_spirit.png",
       "oldRuntimeSha256": "78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218",
       "runtimeGuid": "cb13c5e0516cc6b4fa0ad202ede3ff59",
-      "focalPointY": 0.31
+      "focalPointY": 0.5
     },
     {
       "id": "token_swift_young_spirit",

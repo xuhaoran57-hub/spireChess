@@ -104,9 +104,10 @@ $checks = @()
 
 $identityPassed = (
     $manifest.version -eq "0.3.4" -and
-    $manifest.status -eq "CANDIDATE_VISUAL_APPROVAL_PENDING" -and
+    $manifest.status -eq "PROMOTED" -and
     $items.Count -eq 3 -and
-    @($items | Where-Object { $_.kind -ne "Token" }).Count -eq 0
+    @($items | Where-Object { $_.kind -ne "Token" }).Count -eq 0 -and
+    $manifest.counts.runtimePromoted -eq 3
 )
 $checks += [ordered]@{
     id = "candidate-identity"
@@ -198,7 +199,7 @@ foreach ($item in $items) {
     $passed = (
         $runtimeExists -and
         $metaExists -and
-        $runtimeHash -eq $item.oldRuntimeSha256 -and
+        $runtimeHash -eq $item.candidateSha256 -and
         $metaGuid -eq $item.runtimeGuid -and
         $catalogGuid -eq $item.runtimeGuid
     )
@@ -207,15 +208,15 @@ foreach ($item in $items) {
         id = $item.id
         artId = $item.artId
         runtimeSha256 = $runtimeHash
-        expectedOldRuntimeSha256 = $item.oldRuntimeSha256
+        expectedPromotedSha256 = $item.candidateSha256
         metaGuid = $metaGuid
         catalogGuid = $catalogGuid
-        candidateNotPromoted = $runtimeHash -ne $item.candidateSha256
+        runtimePromoted = $runtimeHash -eq $item.candidateSha256
         passes = $passed
     }
 }
 $checks += [ordered]@{
-    id = "runtime-baseline-unchanged"
+    id = "runtime-promotion"
     status = $(if ($runtimePassed) { "pass" } else { "fail" })
     details = [ordered]@{
         catalogPath = $manifest.sources.runtimeCatalog.path
@@ -228,8 +229,8 @@ $report = [ordered]@{
     version = "0.3.4"
     releaseId = "token-refresh-v0.3.4"
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
-    result = $(if ($passed) { "PASS_CANDIDATE_RUNTIME_PENDING" } else { "FAIL" })
-    visualApproval = "pending"
+    result = $(if ($passed) { "PASS_RUNTIME_PROMOTED" } else { "FAIL" })
+    visualApproval = "approved"
     checks = $checks
 }
 

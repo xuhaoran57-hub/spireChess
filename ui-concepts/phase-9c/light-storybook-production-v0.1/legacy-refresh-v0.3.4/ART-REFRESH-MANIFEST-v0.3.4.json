@@ -1,0 +1,312 @@
+{
+  "version": "0.3.4",
+  "releaseId": "legacy-card-art-refresh-v0.3.4",
+  "status": "PROMOTED",
+  "purpose": "Replace the 17 configured artworks that still used pre-Light-Storybook card images, then close exact style provenance for all 83 configured card artworks.",
+  "approval": {
+    "approvedBy": "项目负责人（Codex 任务内确认）",
+    "approvedAt": "2026-08-01T10:54:40+08:00",
+    "instruction": "按你的建议进行下一步",
+    "visualReview": true,
+    "runtimePromotion": true
+  },
+  "generation": {
+    "tool": "Codex built-in ImageGen",
+    "mode": "14 independent new-image generations plus one rejected and regenerated Sky Covenant Bearer revision; the three Token candidates inherit their five-call v0.3.4 refresh audit",
+    "imageReferencePolicy": "Only the frozen Style Tile was passed as an image reference. Old Runtime art and prior generated outputs were not passed.",
+    "styleReference": {
+      "role": "style-only",
+      "path": "ui-concepts/phase-9b/style-tiles/style-tile-d-wandering-storybook-v0.1.png",
+      "sha256": "ad56119e54d5649e84bee4c266a9ea628b2e55c8633f4e899035af89014953ed"
+    },
+    "promptArchive": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/PROMPTS-v0.3.4.zh-CN.md",
+    "tokenPromptArchive": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/PROMPTS-v0.3.4.zh-CN.md"
+  },
+  "styleCoverage": {
+    "configuredArtworkCount": 83,
+    "baselineManifest": "ui-concepts/phase-9c/light-storybook-production-v0.1/runtime-promotion-v0.3.3/promotion-manifest.json",
+    "baselineApprovedCount": 66,
+    "refreshApprovedCount": 17,
+    "requireExactUnion": true,
+    "requireRuntimePathAndHash": true,
+    "requireCatalogGuid": true,
+    "requireCenteredFocalPoint": true
+  },
+  "sources": {
+    "minions": {
+      "path": "sc/Assets/Resources/Configs/Json/minions.v0.1.json",
+      "sha256": "4eaa125eb1008422c15ee5437a4dc93ab84bd36adbb9572b9b438a67a5b0fa94"
+    },
+    "spells": {
+      "path": "sc/Assets/Resources/Configs/Json/spells.v0.1.json",
+      "sha256": "015390f60584958e64298f4d715244c30d6eb6c8f9a205a8e862355effbd67f0"
+    },
+    "runtimeCatalog": {
+      "path": "sc/Assets/Configs/Presentation/PresentationSpriteCatalog.asset",
+      "guid": "75d638606a8084146524a35a317a2cca",
+      "sha256BeforePromotion": "4f319dc36ca77ea2c70c03b54eb52c963f6f10b86b5040c4d10dc90c6aa8d14b",
+      "sha256AfterPromotion": "02351e80415b86fc755f32389a4e459db027844cb3e8cd320bb07e21858ee1ea"
+    },
+    "tokenCandidateManifest": {
+      "path": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/TOKEN-MANIFEST-v0.3.4.json",
+      "candidateCount": 3
+    }
+  },
+  "runtimePolicy": {
+    "strategy": "Replace PNG bytes in place while preserving each existing .meta GUID and ArtId; reset focalPointY to 0.5.",
+    "standaloneTextureFormat": "DXT1",
+    "maxTextureSize": 1024,
+    "compressionQuality": 50,
+    "mipmaps": false,
+    "readable": false,
+    "preserveRuntimeCatalogGuid": true
+  },
+  "counts": {
+    "items": 17,
+    "minions": 10,
+    "spells": 4,
+    "tokens": 3,
+    "newGenerationCalls": 15,
+    "newCurrentCandidates": 14,
+    "newRejectedCandidates": 1,
+    "inheritedTokenGenerationCalls": 5,
+    "runtimePromoted": 17
+  },
+  "items": [
+    {
+      "id": "astrolabe_calibrator",
+      "name": "星盘校准师",
+      "kind": "Minion",
+      "race": "Starbound",
+      "artId": "placeholder_card_astrolabe_calibrator",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/astrolabe-calibrator-v0.3.4.png",
+      "candidateSha256": "c37f8210f0e4877ded5744bd7284510004ef781f70ffc7968f5f0966602fe9ea",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_astrolabe_calibrator.png",
+      "oldRuntimeSha256": "05eef768d11f2f509e4d0a48d732ad46ced8dd4939b8f91bc62c8e39899d87e6",
+      "runtimeGuid": "14433058cad447eeac1f6e3495056bba",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "cracked_armor_avenger",
+      "name": "裂甲复仇者",
+      "kind": "Minion",
+      "race": "ForgeSoul",
+      "artId": "placeholder_card_cracked_armor_avenger",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/cracked-armor-avenger-v0.3.4.png",
+      "candidateSha256": "5471a8cf64cae273199ece6015204ce6a9e907eecb78f600a8dcf758a56f2310",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/ForgeSoul/card_minion_cracked_armor_avenger.png",
+      "oldRuntimeSha256": "7908ae6793ed9e34f7bc2045df4a9c40b170dc05e00a79b5a39c037ff733f1af",
+      "runtimeGuid": "1fa97e73403224d44acd6ee534e18663",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "fox_den_matriarch",
+      "name": "狐群巢母",
+      "kind": "Minion",
+      "race": "WildSpirit",
+      "artId": "placeholder_card_fox_den_matriarch",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/fox-den-matriarch-v0.3.4.png",
+      "candidateSha256": "b78c7fcc8c3771d78512c07086034cc5d63142076e69a52f71c238b8eb354e0f",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/WildSpirit/card_minion_fox_den_matriarch.png",
+      "oldRuntimeSha256": "5a203c9b251470b49150f6200c63cc8b9297b561ba35c9275d1cd3f91967816d",
+      "runtimeGuid": "838a14903c8e7c04ab87597576da7ae8",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "many_arts_apprentice",
+      "name": "百技学徒",
+      "kind": "Minion",
+      "race": "Wayfarer",
+      "artId": "placeholder_card_many_arts_apprentice",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/many-arts-apprentice-v0.3.4.png",
+      "candidateSha256": "f71bd132a411425afed969d3b0b481344982973105124d099457dbf28bcd611e",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Wayfarer/card_minion_many_arts_apprentice.png",
+      "oldRuntimeSha256": "aeacbf49f5c25b95512fde0b4693677dd2e26822d09a217df2c09cec6519883e",
+      "runtimeGuid": "b9cd43cae9af4522b6897e6fdb4b03a9",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "rotleaf_heir",
+      "name": "腐叶承嗣",
+      "kind": "Minion",
+      "race": "WildSpirit",
+      "artId": "placeholder_card_rotleaf_heir",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/rotleaf-heir-v0.3.4.png",
+      "candidateSha256": "f52754155150c706e6075e5f65a09a04a24c6798fa17d3cc709a87eb69344ecb",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/WildSpirit/card_minion_rotleaf_heir.png",
+      "oldRuntimeSha256": "fba3a071d839c1e09a7f1619b7687a9e49206c3ba6f20e2a7750f8163aa64403",
+      "runtimeGuid": "3bd7fa03a5ef35e4d874b66616b73785",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "secret_page_refractor",
+      "name": "秘页折光师",
+      "kind": "Minion",
+      "race": "Starbound",
+      "artId": "placeholder_card_secret_page_refractor",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/secret-page-refractor-v0.3.4.png",
+      "candidateSha256": "ca19ca4bd2606515d76ce814e1725b524c4a3b0b2f64c798027a73aed4ebbb0b",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_secret_page_refractor.png",
+      "oldRuntimeSha256": "75eb2709a7900a1f23c8e6fe336593bba92306b64c30a0b6f3b8c3c6e79b5789",
+      "runtimeGuid": "85869952f0ebdf643aff589e2a576f85",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "sky_covenant_bearer",
+      "name": "天穹契约者",
+      "kind": "Minion",
+      "race": "Starbound",
+      "artId": "placeholder_card_sky_covenant_bearer",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/sky-covenant-bearer-v0.3.4-r2.png",
+      "candidateSha256": "353769a024a21cdcb98984ffa513eb7307c2d18a9acbfecffa4866349b0f7dc3",
+      "revision": "r2",
+      "rejectedRevision": {
+        "status": "REJECTED_DURING_REVIEW",
+        "reason": "The first image contained five covenant stations instead of the configured four-refresh threshold."
+      },
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_sky_covenant_bearer.png",
+      "oldRuntimeSha256": "88755c4da82cbdc45ca4b5c4b259a28e892fa7cd022d5443c79dddfd413a502c",
+      "runtimeGuid": "445cc5b4c7764c86be86da345e405d03",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "star_map_broker",
+      "name": "星图掮客",
+      "kind": "Minion",
+      "race": "Starbound",
+      "artId": "placeholder_card_star_map_broker",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/star-map-broker-v0.3.4.png",
+      "candidateSha256": "9c30397bf57faa07cb63be5b138381c886346def238522964f963b3891a5af4d",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/Starbound/card_minion_star_map_broker.png",
+      "oldRuntimeSha256": "f0e395a5483061e99e06dff8fa1d3455b60e6be45c2315cca6f89c22e2ad80f8",
+      "runtimeGuid": "d285ff7a2f2f20a4d82c75e7534072cd",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "tempering_mender",
+      "name": "回火修补匠",
+      "kind": "Minion",
+      "race": "ForgeSoul",
+      "artId": "placeholder_card_tempering_mender",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/tempering-mender-v0.3.4.png",
+      "candidateSha256": "931f44e5b923aed469871cebf2e37a73a3d74d4fb62757e999b70aaac7f6002b",
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/ForgeSoul/card_minion_tempering_mender.png",
+      "oldRuntimeSha256": "0f394d2a8f131b59b40fcc68a5d7a19e6a071758f4a46fe2ccce15d50d9505a4",
+      "runtimeGuid": "68718a5dc430ca0488d2ac8d546ef074",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "ten_thousand_hoof_surge",
+      "name": "万蹄奔潮",
+      "kind": "Minion",
+      "race": "WildSpirit",
+      "artId": "placeholder_card_ten_thousand_hoof_surge",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/ten-thousand-hoof-surge-v0.3.4.png",
+      "candidateSha256": "b549e6160fd6f55fa33383a0d507b1b42ab24fa984a9154f58da6b1b43c7c865",
+      "manualAnatomyReview": {
+        "visibleFrontLegs": 2,
+        "visibleHindLegs": 2,
+        "visibleHooves": 4
+      },
+      "runtimePath": "Assets/Art/Presentation/Cards/Minions/WildSpirit/card_minion_ten_thousand_hoof_surge.png",
+      "oldRuntimeSha256": "32835879a5a470159d25e4240d3e2714defce89bca688e1ffc85e1735e0355ee",
+      "runtimeGuid": "050bf0f7d6ac4a05a10fc3f352c243f4",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "advanced_discovery",
+      "name": "高阶发现",
+      "kind": "Spell",
+      "artId": "placeholder_spell_advanced_discovery",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/advanced-discovery-v0.3.4.png",
+      "candidateSha256": "88edb3b4adbb832fe2575fb90f398bd51e6a271bf3b4be2724d3da4273b54e2a",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_advanced_discovery.png",
+      "oldRuntimeSha256": "7c6e9a7dc7844fe8b8cafc03b00e67a6fbdc0a14c52ea9518debd0f79bbc936b",
+      "runtimeGuid": "5c1b8d8124af603439943f0264a60c57",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "free_refresh",
+      "name": "免费刷新",
+      "kind": "Spell",
+      "artId": "placeholder_spell_free_refresh",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/free-refresh-v0.3.4.png",
+      "candidateSha256": "0eda71fbc1477ed2e58d7e5df27c1087a84c29b814cd4aa2de02a1d5a90f9df6",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_free_refresh.png",
+      "oldRuntimeSha256": "e2e9d614f5fd12c8adb9efdbf35d5a4a9e18eee039e79629c44f7f71813dfe08",
+      "runtimeGuid": "11ef1edeab6d09b41adf8708eed94265",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "minor_tempering",
+      "name": "小型锻体",
+      "kind": "Spell",
+      "artId": "placeholder_spell_minor_tempering",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/minor-tempering-v0.3.4.png",
+      "candidateSha256": "0e054e2c24209c6cb08234141c2afe6c433149ef1a090fa55d310977f3f9ed27",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_minor_tempering.png",
+      "oldRuntimeSha256": "9d56dc56f0b3d07e2d3ad89c46c29b15bc670efb6404e69c754a19c292aec667",
+      "runtimeGuid": "e216b312639b4dc4091e841dbb40b465",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "prebattle_benediction",
+      "name": "战前赐福",
+      "kind": "Spell",
+      "artId": "placeholder_spell_prebattle_benediction",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/masters/prebattle-benediction-v0.3.4.png",
+      "candidateSha256": "552690e5b05a4ee7e0c886a189ac64c6a2f7b9e5b4ed21a476879af9098290dd",
+      "runtimePath": "Assets/Art/Presentation/Cards/Spells/card_spell_prebattle_benediction.png",
+      "oldRuntimeSha256": "2cfda1b7bde54707cd1f0898db7c08b3c688ed59e9495e0017cdc46c1bd26db6",
+      "runtimeGuid": "c0a551913238ea7469844b082302ad85",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "token_young_spirit",
+      "name": "幼灵",
+      "kind": "Token",
+      "race": "WildSpirit",
+      "artId": "placeholder_token_young_spirit",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-young-spirit-v0.3.4.png",
+      "candidateSha256": "e7eecf493dccc2b86bb798e2a9313dc9a0f375934c64b7c6c53808c1bcdd36c1",
+      "runtimePath": "Assets/Art/Presentation/Cards/Tokens/card_token_token_young_spirit.png",
+      "oldRuntimeSha256": "78668c5538a592a17e44888dc76018795da7b6f9ddfd32d468a9711989391218",
+      "runtimeGuid": "cb13c5e0516cc6b4fa0ad202ede3ff59",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "token_swift_young_spirit",
+      "name": "迅捷幼灵",
+      "kind": "Token",
+      "race": "WildSpirit",
+      "artId": "placeholder_token_swift_young_spirit",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-swift-young-spirit-v0.3.4.png",
+      "candidateSha256": "ea6ff92d95fa0a1ec149594f62fa32387e43ae8f9fd3f813aed93bc772e5563c",
+      "runtimePath": "Assets/Art/Presentation/Cards/Tokens/card_token_token_swift_young_spirit.png",
+      "oldRuntimeSha256": "261cd67e14a819b849a7d0fef665ba8c92b29129702b2b6b5c31917dc26ced54",
+      "runtimeGuid": "d189b173395fb3d4db872486c8710606",
+      "focalPointY": 0.5
+    },
+    {
+      "id": "token_two_tailed_fox_shadow",
+      "name": "双尾狐影",
+      "kind": "Token",
+      "race": "WildSpirit",
+      "artId": "placeholder_token_two_tailed_fox_shadow",
+      "candidatePath": "ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/masters/token-two-tailed-fox-shadow-v0.3.4-r3.png",
+      "candidateSha256": "9d67ff3fdb159c1560c25003a94baeeb9d99beca4ba10ffe2d62001c38f2406f",
+      "revision": "r3",
+      "manualAnatomyReview": {
+        "visibleFrontLegs": 2,
+        "visibleHindLegs": 2,
+        "visiblePaws": 4,
+        "tails": 2,
+        "tailRootsAtPelvis": true
+      },
+      "runtimePath": "Assets/Art/Presentation/Cards/Tokens/card_token_token_two_tailed_fox_shadow.png",
+      "oldRuntimeSha256": "6fa213e471af861a23cbf21c95fe2a566f9b4bebe08f90819a46932974cb1010",
+      "runtimeGuid": "a94c860707ffa1d42a57c039ec358fcd",
+      "focalPointY": 0.5
+    }
+  ]
+}

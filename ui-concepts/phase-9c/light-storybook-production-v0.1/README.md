@@ -4,8 +4,8 @@
 
 v0.3 更新：2026-07-29
 
-状态：v0.3.3 规则已冻结；42 张非 Token 随从与 9 张法术已完成 Runtime 晋级。
-3 张既有 G2 Token 不属于该晋级范围，v0.3.4 新风格候选等待视觉批准。
+状态：v0.3.3 规则已冻结；v0.3.4 已补齐 17 张旧风格遗留图。当前 83 个配置
+ArtId 均由批准的新风格路径与 SHA-256 精确覆盖。
 
 ## v0.3.3 冻结包
 
@@ -329,16 +329,30 @@ v0.3.3 的 42 张非 Token 随从与 9 张法术现为 `Runtime Ready`，本晋�
 完整构建身份、哈希、性能数据和范围边界见
 `runtime-promotion-v0.3.3/acceptance-summary.md`。
 
-## v0.3.4 Token Refresh
+## v0.3.4 Legacy Card Art Refresh
 
-幼灵、迅捷幼灵和双尾狐影的旧 G2 图仍在 Runtime；它们的精确 `artId` / GUID
-接线不等于新风格完成。三张图已经以冻结 Style Tile 为唯一图像参考重新生成，
-离线哈希、5:4 画幅和亮度门禁为 3 / 3 通过，当前状态为
-`CANDIDATE_VISUAL_APPROVAL_PENDING`。
+后续排查确认，“83 个配置 ArtId 全部 Exact”只证明 Catalog 接线完整，其中仍有
+10 张随从、4 张法术和 3 张 Token 指向 v0.3.3 冻结风格之前的旧卡图。
 
-候选图、完整 Prompt、来源清单和验证报告见
-`token-refresh-v0.3.4/`。视觉批准前不覆盖 Runtime；获批后保留现有 GUID，
-应用 DXT1 / Max 1024 导入策略并重新执行 Unity 全量与卡框裁切验收。
+17 张遗留图已在 `legacy-refresh-v0.3.4/` 完成视觉复核、来源签名和 Runtime
+原位晋级：
+
+- 14 张随从 / 法术使用冻结 Style Tile 作为唯一图像参考独立生成；
+- 3 张 Token 使用 `token-refresh-v0.3.4/` 的最终候选；
+- 双尾狐影只晋级四腿、四爪、骨盆双尾根的 r3；r1 尾根错误、r2 五腿错误均被
+  否决；
+- PNG 路径、ArtId、图片 `.meta` GUID 和正式 Catalog GUID 保持不变；
+- 17 张横版新图焦点统一为 0.5，纹理统一为 Standalone 1024 DXT1。
+
+新门禁要求 `v0.3.3 已批准 66 + v0.3.4 刷新 17` 与配置中的 83 个 ArtId
+精确相等，并逐项验证批准路径、SHA-256、Catalog 绑定、GUID、焦点和导入策略。
+因此“能 Exact 解析但仍是旧图”不再能通过。
+
+本次关闭验证：Token 离线报告 `PASS_RUNTIME_PROMOTED`；Unity EditMode
+385 / 385、PlayMode 30 / 30；Windows x64 Clean Development Player 构建成功，
+可执行文件 SHA-256 为
+`fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7`；
+1920×1080 Stress Player 冒烟与 3 张实机截图门禁通过。
 
 ## v0.2 机制压力测试归档
 
