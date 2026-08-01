@@ -2,7 +2,7 @@
 
 - 日期：2026-08-01
 - 范围：10 张随从、4 张法术、3 张 Token，共 17 张
-- 状态：`PROMOTED`
+- 状态：`PROMOTED / CLOSED`
 - Runtime：已原位替换
 - 配置卡图新风格精确覆盖：`83/83`
 
@@ -69,10 +69,37 @@ TextureImporter 策略。配置增加、路径漂移、回退到旧图或图片�
 - Token 离线审计：`PASS_RUNTIME_PROMOTED`。
 - Unity EditMode：`385/385`。
 - Unity PlayMode：`30/30`。
-- Windows x64 Clean Development Player：构建成功；可执行文件 SHA-256
+- Runtime 内容基线：`9c7f14ab0f36a05ecc203d2881837bc3c33f68ac`；
+  验收前后工作树均为干净状态。
+- Windows x64 Clean Development Player：Build ID
+  `v034-formal-9c7f14a`，`cleanBuild = true`、`sourceTreeDirty = false`，
+  可执行文件 SHA-256
   `fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7`。
-- 1920×1080 Stress Player：自动退出、核心检查点、截图尺寸、非黑屏和多样性门禁
-  全部通过；实机商店与战斗抽样显示新风格图片。
+- 1920×1080 正式核心流程：`AcceptancePassed`，MainMenu → Run → Shop →
+  Run → Battle → Run → MainMenu → Continue 完整闭环通过，生成 16 张截图。
+- 1920×1200 正式核心流程：`AcceptancePassed`，相同完整闭环通过，生成
+  16 张截图。
+- 运行时全卡画廊：从正式 `PresentationSpriteCatalog.asset` 确定性生成
+  9 页、83 张全卡；83 个配置 ArtId、83 个索引项和 83 个唯一 ArtId 精确一致，
+  9 张页面 PNG 均存在且 SHA-256 与画廊索引一致。
+- 人工逐页复核未发现阻断项：双尾狐影为四腿、四爪、两尾且尾根位于骨盆；
+  万蹄奔潮为四腿；战前赐福为 5 个单位；天穹契约者为 4 枚契约盘；
+  高阶发现为 3 个拱门、3 个角色和 3 个落点。
+
+正式验收报告中的 `provisional = true` 仅对应尚未进入
+`ProductionStrict` 的音频内存与听感结论；它不影响本次卡牌美术与 Runtime
+替换封版，也不据此关闭正式音频或 G4 跨机器门禁。
+
+本地证据由工具生成并按仓库规则不纳入 Git；以下哈希用于复核同一次验收：
+
+| 证据 | SHA-256 |
+| --- | --- |
+| `sc/Builds/G4/v034-formal-9c7f14a/Windows-x64/g4-build-manifest.json` | `732f126b286b1fac6f7d4d1cb0799b4831905c00bf6c25f02a2a57deb53372fb` |
+| `sc/Logs/G4/Acceptance/v034-formal-9c7f14a-core-1920x1080/g4-evidence-manifest.json` | `d8a73cd5ede7deab69c83b471b8ea409ab66b3fe8da7f9873b936609cb009323` |
+| `sc/Logs/G4/Acceptance/v034-formal-9c7f14a-core-1920x1080/performance/g4-performance-v034-formal-9c7f14a-core-1920x1080-1920x1080.json` | `87a3846cee6492bf877257ec115a6c2690711939f949c487503ea3c1caa096b2` |
+| `sc/Logs/G4/Acceptance/v034-formal-9c7f14a-core-1920x1200/g4-evidence-manifest.json` | `27efecf6756718620e61d03012f772b5f5af1e3324cc79248013192fd5237ad4` |
+| `sc/Logs/G4/Acceptance/v034-formal-9c7f14a-core-1920x1200/performance/g4-performance-v034-formal-9c7f14a-core-1920x1200-1920x1200.json` | `29b6553dad9f035686d2ef8ba84a42d7363d7610869214eb80965dfee88c8ea2` |
+| `sc/Logs/Phase9C/ArtRefresh/v0.3.4/runtime-gallery-9c7f14a-formal/gallery/gallery-index.json` | `cc478defbaa2e18a09d6e17f2e4ef5823ca91c6e7804f1423c45c6ca5c891226` |
 
 ## 复现与验证
 
