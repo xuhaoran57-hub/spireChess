@@ -1,0 +1,12 @@
+encounter_id,route_tag,before_score_pct,after_score_pct,before_win_pct,after_win_pct,before_spread_pct,after_spread_pct
+f2_opening_encounter,,100.0,96.5,100.0,94.7,0.0,17.5
+f2_early_spell_encounter,,88.3,47.8,82.7,30.8,37.0,30.5
+f2_normal_encounter,,98.1,66.6,96.3,47.0,9.5,29.5
+f2_mid_mechanic_encounter,,99.5,84.9,99.2,77.8,3.0,31.5
+f2_route_normal_encounter,Adventure,99.1,48.1,98.2,34.3,5.5,32.5
+f2_c4_elite_encounter,Aggressive,84.9,25.2,80.2,14.8,54.0,31.5
+f2_route_safe_encounter,Conservative,99.8,69.9,99.7,52.8,1.0,34.5
+f2_c4_event_ambush_encounter,Event,99.6,67.6,99.2,49.8,2.5,33.0
+f2_c5_break_encounter,,99.8,95.3,99.7,92.2,1.0,22.0
+f2_c5_spell_encounter,,97.8,75.3,96.0,63.5,13.5,24.0
+f2_c6_boss_encounter,,43.3,79.2,33.3,67.7,60.5,30.5

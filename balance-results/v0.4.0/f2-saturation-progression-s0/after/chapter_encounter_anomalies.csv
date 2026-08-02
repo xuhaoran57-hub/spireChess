@@ -1,0 +1,5 @@
+severity,code,scope,floor,development_level,encounter_id,message,evidence,recommendation
+P1,BOSS_CLIFF,Boss,1,C5,f1_c6_boss_encounter,Boss 相对 C5 出现过大的难度悬崖。,计分胜率：Boss 4.3 %，C5 均值 92.3 %,平滑 C5 到 Boss 的数值跃迁，并复核 Boss 机制叠加。
+P1,CHAPTER_REGRESSION,Boss,2,C5,f2_c6_boss_encounter,第 2 章 C6 比第 1 章同阶段更容易。,计分胜率：F1 4.3 %，F2 79.2 %,复核跨章节基础数值倍率与该阶段的机制密度。
+P1,CHAPTER_REGRESSION,Normal,3,C2,f3_early_summon_encounter,第 3 章 C2 比第 2 章同阶段更容易。,计分胜率：F2 57.2 %，F3 79.9 %,复核跨章节基础数值倍率与该阶段的机制密度。
+P2,SATURATED_RESULT,Normal,1,C2,f1_opening_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 100.0 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。

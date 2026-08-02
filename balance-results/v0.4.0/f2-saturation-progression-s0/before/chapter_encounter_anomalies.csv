@@ -1,0 +1,17 @@
+severity,code,scope,floor,development_level,encounter_id,message,evidence,recommendation
+P1,BOSS_CLIFF,Boss,1,C5,f1_c6_boss_encounter,Boss 相对 C5 出现过大的难度悬崖。,计分胜率：Boss 4.3 %，C5 均值 92.3 %,平滑 C5 到 Boss 的数值跃迁，并复核 Boss 机制叠加。
+P1,BUILD_HARD_COUNTER,Normal,2,C2,f2_early_spell_encounter,同档固定构筑之间存在显著胜率断层。,计分胜率跨度 37.0 %；最低 B03_SUMMON，最高 B06_REFRESH,检查站位针对、关键词硬克制和单一机制门槛。
+P1,CHAPTER_REGRESSION,Normal,2,C2,f2_early_spell_encounter,第 2 章 C2 比第 1 章同阶段更容易。,计分胜率：F1 71.4 %，F2 93.2 %,复核跨章节基础数值倍率与该阶段的机制密度。
+P1,BUILD_HARD_COUNTER,Elite,2,C4,f2_c4_elite_encounter,同档固定构筑之间存在显著胜率断层。,计分胜率跨度 54.0 %；最低 B01_SHIELD，最高 B06_REFRESH,检查站位针对、关键词硬克制和单一机制门槛。
+P1,CHAPTER_REGRESSION,Normal,2,C4,f2_mid_mechanic_encounter,第 2 章 C3 比第 1 章同阶段更容易。,计分胜率：F1 85.6 %，F2 99.5 %,复核跨章节基础数值倍率与该阶段的机制密度。
+P1,CHAPTER_REGRESSION,Normal,2,C4,f2_route_normal_encounter,第 2 章 C4 比第 1 章同阶段更容易。,计分胜率：F1 40.9 %，F2 94.6 %,复核跨章节基础数值倍率与该阶段的机制密度。
+P1,BOSS_CLIFF,Boss,2,C5,f2_c6_boss_encounter,Boss 相对 C5 出现过大的难度悬崖。,计分胜率：Boss 43.3 %，C5 均值 98.8 %,平滑 C5 到 Boss 的数值跃迁，并复核 Boss 机制叠加。
+P1,BUILD_HARD_COUNTER,Boss,2,C5,f2_c6_boss_encounter,同档固定构筑之间存在显著胜率断层。,计分胜率跨度 60.5 %；最低 B01_SHIELD，最高 B05_SPELL,检查站位针对、关键词硬克制和单一机制门槛。
+P1,CHAPTER_REGRESSION,Boss,2,C5,f2_c6_boss_encounter,第 2 章 C6 比第 1 章同阶段更容易。,计分胜率：F1 4.3 %，F2 43.3 %,复核跨章节基础数值倍率与该阶段的机制密度。
+P2,SATURATED_RESULT,Normal,1,C2,f1_opening_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 100.0 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。
+P2,SATURATED_RESULT,Normal,2,C2,f2_opening_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 100.0 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。
+P2,SATURATED_RESULT,Event,2,C4,f2_c4_event_ambush_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 99.2 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。
+P2,SATURATED_RESULT,Normal,2,C4,f2_mid_mechanic_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 99.2 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。
+P2,SATURATED_RESULT,Normal,2,C4,f2_route_normal_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 98.2 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。
+P2,SATURATED_RESULT,Normal,2,C4,f2_route_safe_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 99.7 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。
+P2,SATURATED_RESULT,Normal,2,C5,f2_c5_break_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 99.7 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。

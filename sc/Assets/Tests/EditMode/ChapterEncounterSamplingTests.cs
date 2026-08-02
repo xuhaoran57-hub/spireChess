@@ -286,6 +286,61 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void ProgressFixtures_ApplyF2ProgressionAndArchetypeAnchors()
+        {
+            var shield = progressFixtures.CreateFixture(
+                2,
+                2,
+                "B01_SHIELD");
+            Assert.That(shield.Player[0].HasShield, Is.True);
+            Assert.That(shield.Player[1].HasShield, Is.True);
+            Assert.That(shield.Player[0].CurrentHealth, Is.EqualTo(9));
+            Assert.That(shield.Player[1].CurrentHealth, Is.EqualTo(10));
+
+            var summonEarly = progressFixtures.CreateFixture(
+                2,
+                2,
+                "B03_SUMMON");
+            Assert.That(summonEarly.Player[4].HasTaunt, Is.True);
+            Assert.That(summonEarly.Player[4].HasShield, Is.True);
+
+            var deathMid = progressFixtures.CreateFixture(
+                2,
+                4,
+                "B04_DEATH");
+            Assert.That(deathMid.Player[0].HasShield, Is.True);
+
+            var spellMid = progressFixtures.CreateFixture(
+                2,
+                4,
+                "B05_SPELL");
+            Assert.That(spellMid.Player[3].HasCleave, Is.True);
+            Assert.That(spellMid.Player[3].CurrentAttack, Is.EqualTo(13));
+            Assert.That(spellMid.Player[3].CurrentHealth, Is.EqualTo(12));
+
+            var refreshMid = progressFixtures.CreateFixture(
+                2,
+                4,
+                "B06_REFRESH");
+            Assert.That(refreshMid.Player[0].HasShield, Is.True);
+            Assert.That(refreshMid.Player[1].HasShield, Is.True);
+
+            var summonLate = progressFixtures.CreateFixture(
+                2,
+                5,
+                "B03_SUMMON");
+            Assert.That(summonLate.Player[4].HasTaunt, Is.True);
+            Assert.That(summonLate.Player[4].HasShield, Is.False);
+
+            var deathLate = progressFixtures.CreateFixture(
+                2,
+                5,
+                "B04_DEATH");
+            Assert.That(deathLate.Player[0].HasShield, Is.True);
+            Assert.That(deathLate.Player[4].HasShield, Is.True);
+        }
+
+        [Test]
         public void Analyzer_FlagsSafetyHardCountersRouteOrderBossAndLevelInversion()
         {
             var rows = new List<ChapterEncounterAggregate>
