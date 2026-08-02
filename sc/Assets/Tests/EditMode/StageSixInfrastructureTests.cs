@@ -104,7 +104,7 @@ namespace SpireChess.Tests.EditMode
                 "rests.v0.1.json"
             }.Select(file => File.ReadAllText(Path.Combine(configRoot, file))).ToArray());
             Assert.That(configHash, Is.EqualTo(
-                "9732facfe8a656f3c5af647185c12ee95d1c9cca4f3fc166ecbd68df0423b420"));
+                "85b335b8c1beec36019524c3777c1a3dd9ce654bd9e7cbdf49899c4d78260c71"));
             Assert.That(configs.ContentRelease.ContentVersion, Is.EqualTo("5.6.0"));
 
             var serializer = new NewtonsoftJsonSerializer();

@@ -17,9 +17,9 @@
     {
       "buildId": "B01_SHIELD",
       "rosters": [
-        { "checkpointId": "F1_C2", "minionIds": ["forge_soul_shield_squire", "copper_ring_apprentice"] },
-        { "checkpointId": "F1_C4", "minionIds": ["forge_soul_shield_squire", "copper_ring_apprentice", "shieldwall_furnace_keeper", "tempering_mender"] },
-        { "checkpointId": "F1_C5", "minionIds": ["shieldwall_furnace_keeper", "tempering_mender", "molten_core_standard", "resonance_bell_guard", "forge_soul_shield_squire"] },
+        { "checkpointId": "F1_C2", "minionIds": ["forge_soul_shield_squire", "copper_ring_apprentice"], "overlays": [{ "slot": 0, "attack": 1 }, { "slot": 1, "keywords": ["Shield"] }] },
+        { "checkpointId": "F1_C4", "minionIds": ["forge_soul_shield_squire", "copper_ring_apprentice", "shieldwall_furnace_keeper", "tempering_mender"], "overlays": [{ "slot": 0, "attack": 1 }, { "slot": 1, "attack": 1, "keywords": ["Shield"] }, { "slot": 3, "attack": 1, "keywords": ["Shield"] }] },
+        { "checkpointId": "F1_C5", "minionIds": ["shieldwall_furnace_keeper", "tempering_mender", "molten_core_standard", "resonance_bell_guard", "forge_soul_shield_squire"], "overlays": [{ "slot": 1, "attack": 1, "keywords": ["Shield"] }, { "slot": 2, "attack": 1, "keywords": ["Shield"] }] },
         { "checkpointId": "F2_C2", "minionIds": ["molten_core_standard", "resonance_bell_guard", "shieldwall_furnace_keeper", "tempering_mender", "forge_soul_shield_squire"] },
         { "checkpointId": "F2_C4", "minionIds": ["molten_core_standard", "resonance_bell_guard", "hearth_core_aegis_officer", "ringing_iron_bastion", "shieldwall_furnace_keeper"] },
         { "checkpointId": "F2_C5", "minionIds": ["molten_core_standard", "resonance_bell_guard", "hearth_core_aegis_officer", "ringing_iron_bastion", "cinder_armor_arbiter"] },
@@ -31,7 +31,7 @@
     {
       "buildId": "B02_BREAK",
       "rosters": [
-        { "checkpointId": "F1_C2", "minionIds": ["hearth_core_spark", "shieldbreaker_blade_blank"] },
+        { "checkpointId": "F1_C2", "minionIds": ["hearth_core_spark", "shieldbreaker_blade_blank"], "overlays": [{ "slot": 0, "health": 1 }, { "slot": 1, "health": 1 }] },
         { "checkpointId": "F1_C4", "minionIds": ["hearth_core_spark", "shieldbreaker_blade_blank", "ember_engraver", "forge_soul_shield_squire"] },
         { "checkpointId": "F1_C5", "minionIds": ["counterflow_smith", "oathblade_armor", "shieldbreaker_blade_blank", "hearth_core_spark", "ember_engraver"] },
         { "checkpointId": "F2_C2", "minionIds": ["counterflow_smith", "oathblade_armor", "shieldbreaker_blade_blank", "hearth_core_spark", "ember_engraver"] },
@@ -45,9 +45,9 @@
     {
       "buildId": "B03_SUMMON",
       "rosters": [
-        { "checkpointId": "F1_C2", "minionIds": ["young_deer_spirit", "rending_cub"] },
+        { "checkpointId": "F1_C2", "minionIds": ["two_tailed_fox_spirit", "rending_cub"], "overlays": [{ "slot": 0, "attack": 1, "health": 1 }, { "slot": 1, "health": 1 }] },
         { "checkpointId": "F1_C4", "minionIds": ["young_deer_spirit", "rending_cub", "swiftwing_forest_hawk", "two_tailed_fox_spirit"] },
-        { "checkpointId": "F1_C5", "minionIds": ["rending_cub", "swiftwing_forest_hawk", "two_tailed_fox_spirit", "many_branch_invoker", "tuskherd_pathrunner"] },
+        { "checkpointId": "F1_C5", "minionIds": ["two_tailed_fox_spirit", "swiftwing_forest_hawk", "two_tailed_fox_spirit", "many_branch_invoker", "tuskherd_pathrunner"] },
         { "checkpointId": "F2_C2", "minionIds": ["rending_cub", "swiftwing_forest_hawk", "two_tailed_fox_spirit", "many_branch_invoker", "tuskherd_pathrunner"] },
         { "checkpointId": "F2_C4", "minionIds": ["hundred_song_herd", "fox_den_matriarch", "many_branch_invoker", "vinecrown_priest", "tuskherd_pathrunner"] },
         { "checkpointId": "F2_C5", "minionIds": ["hundred_song_herd", "fox_den_matriarch", "many_branch_invoker", "vinecrown_priest", "tuskherd_pathrunner"] },
@@ -59,8 +59,8 @@
     {
       "buildId": "B04_DEATH",
       "rosters": [
-        { "checkpointId": "F1_C2", "minionIds": ["moss_mark_seedling", "root_devourer"] },
-        { "checkpointId": "F1_C4", "minionIds": ["moss_mark_seedling", "root_devourer", "rotleaf_heir", "moss_mark_seedling"] },
+        { "checkpointId": "F1_C2", "minionIds": ["young_deer_spirit", "root_devourer"] },
+        { "checkpointId": "F1_C4", "minionIds": ["young_deer_spirit", "rending_cub", "root_devourer", "moss_mark_seedling"] },
         { "checkpointId": "F1_C5", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "root_devourer", "rotleaf_heir", "moss_mark_seedling"] },
         { "checkpointId": "F2_C2", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "root_devourer", "rotleaf_heir", "moss_mark_seedling"] },
         { "checkpointId": "F2_C4", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "mountain_belly_soul_eater", "rotleaf_heir", "root_devourer"] },
@@ -73,8 +73,8 @@
     {
       "buildId": "B05_SPELL",
       "rosters": [
-        { "checkpointId": "F1_C2", "minionIds": ["glimmer_mage", "rune_ward_reader"] },
-        { "checkpointId": "F1_C4", "minionIds": ["glimmer_mage", "rune_ward_reader", "moon_phase_scribe", "star_etched_timekeeper"] },
+        { "checkpointId": "F1_C2", "minionIds": ["glimmer_mage", "rune_ward_reader"], "overlays": [{ "slot": 0, "health": 1, "keywords": ["Shield"] }, { "slot": 1, "attack": 1 }] },
+        { "checkpointId": "F1_C4", "minionIds": ["glimmer_mage", "rune_ward_reader", "moon_phase_scribe", "star_etched_timekeeper"], "overlays": [{ "slot": 0, "health": 1, "keywords": ["Shield"] }] },
         { "checkpointId": "F1_C5", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "moon_phase_scribe", "glimmer_mage"] },
         { "checkpointId": "F2_C2", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "moon_phase_scribe", "glimmer_mage"] },
         { "checkpointId": "F2_C4", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "falling_light_arbiter", "stargate_lecturer"], "overlays": [{ "slot": 3, "keywords": ["Cleave"] }] },
@@ -87,8 +87,8 @@
     {
       "buildId": "B06_REFRESH",
       "rosters": [
-        { "checkpointId": "F1_C2", "minionIds": ["stardust_attendant", "stargazing_apprentice"] },
-        { "checkpointId": "F1_C4", "minionIds": ["stardust_attendant", "stargazing_apprentice", "astrolabe_calibrator", "star_etched_timekeeper"] },
+        { "checkpointId": "F1_C2", "minionIds": ["stardust_attendant", "astrolabe_calibrator"], "overlays": [{ "slot": 0, "attack": 2, "health": 1 }, { "slot": 1, "attack": 1 }] },
+        { "checkpointId": "F1_C4", "minionIds": ["stardust_attendant", "stargazing_apprentice", "astrolabe_calibrator", "star_etched_timekeeper"], "overlays": [{ "slot": 0, "attack": 1, "health": 1 }, { "slot": 2, "attack": 1 }, { "slot": 3, "attack": 1 }] },
         { "checkpointId": "F1_C5", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "star_etched_timekeeper", "stardust_attendant", "star_map_broker"] },
         { "checkpointId": "F2_C2", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "star_etched_timekeeper", "stardust_attendant", "star_map_broker"] },
         { "checkpointId": "F2_C4", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "moonwheel_dispatcher", "star_ring_treasurer", "star_map_broker"], "overlays": [{ "slot": 0, "keywords": ["Shield"] }] },

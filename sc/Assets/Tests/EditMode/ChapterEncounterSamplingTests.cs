@@ -239,6 +239,53 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void ProgressFixtures_ApplyF1RosterOverlaysAndEarlyArchetypeAnchors()
+        {
+            var shield = progressFixtures.CreateFixture(
+                1,
+                4,
+                "B01_SHIELD");
+
+            Assert.That(shield.Player[0].CurrentAttack, Is.EqualTo(3));
+            Assert.That(shield.Player[1].CurrentAttack, Is.EqualTo(2));
+            Assert.That(shield.Player[1].HasShield, Is.True);
+            Assert.That(shield.Player[3].CurrentAttack, Is.EqualTo(3));
+            Assert.That(shield.Player[3].HasShield, Is.True);
+
+            var summon = progressFixtures.CreateFixture(
+                1,
+                2,
+                "B03_SUMMON");
+            Assert.That(
+                summon.Player[0].Id,
+                Is.EqualTo("two_tailed_fox_spirit"));
+
+            var death = progressFixtures.CreateFixture(
+                1,
+                2,
+                "B04_DEATH");
+            Assert.That(
+                death.Player[0].Id,
+                Is.EqualTo("young_deer_spirit"));
+
+            var spell = progressFixtures.CreateFixture(
+                1,
+                2,
+                "B05_SPELL");
+            Assert.That(spell.Player[0].CurrentHealth, Is.EqualTo(2));
+            Assert.That(spell.Player[0].HasShield, Is.True);
+            Assert.That(spell.Player[1].CurrentAttack, Is.EqualTo(2));
+
+            var refresh = progressFixtures.CreateFixture(
+                1,
+                2,
+                "B06_REFRESH");
+            Assert.That(refresh.Player[0].CurrentAttack, Is.EqualTo(3));
+            Assert.That(refresh.Player[0].CurrentHealth, Is.EqualTo(4));
+            Assert.That(refresh.Player[1].CurrentAttack, Is.EqualTo(3));
+        }
+
+        [Test]
         public void Analyzer_FlagsSafetyHardCountersRouteOrderBossAndLevelInversion()
         {
             var rows = new List<ChapterEncounterAggregate>

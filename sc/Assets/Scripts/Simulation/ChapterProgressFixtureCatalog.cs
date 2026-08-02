@@ -136,16 +136,20 @@ namespace SpireChess.Simulation
                 var flourishAttack = config.Race == "WildSpirit"
                     ? flourishStacks
                     : 0;
+                var temporaryAttack = overlay?.Attack ?? 0;
+                var temporaryHealth = overlay?.Health ?? 0;
                 state.Player[slot] = new BattleMinionRuntime(
                     config,
                     isGolden,
                     initialAttack:
                         (isGolden ? config.GoldenAttack : config.Attack) +
                         permanentAttack +
-                        flourishAttack,
+                        flourishAttack +
+                        temporaryAttack,
                     initialHealth:
                         (isGolden ? config.GoldenHealth : config.Health) +
-                        permanentHealth,
+                        permanentHealth +
+                        temporaryHealth,
                     sourceInstanceId: $"{buildId}_{checkpoint.Id}-S{slot}",
                     permanentAttackBonus: permanentAttack,
                     permanentHealthBonus: permanentHealth,

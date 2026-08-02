@@ -102,7 +102,7 @@ namespace SpireChess.Tests.EditMode
                 "奇遇 · 威胁 ★★★｜第 4 战 · 普通战斗｜狐影繁生队"));
             Assert.That(state.Summary.Text, Does.Contain(
                 "保守 · 威胁 ★★｜第 4 战 · 普通战斗｜盘根守林队"));
-            Assert.That(state.Summary.Text, Does.Contain("敌阵 11/16"));
+            Assert.That(state.Summary.Text, Does.Contain("敌阵 11/12"));
             Assert.That(state.Summary.Text, Does.Contain("失败修正 +1"));
             Assert.That(state.Summary.Text, Does.Contain("奖励：高价值三选一"));
             Assert.That(state.Summary.Text, Does.Contain("奖励：1 次免费刷新"));
