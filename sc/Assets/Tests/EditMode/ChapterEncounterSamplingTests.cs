@@ -219,7 +219,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void ProgressFixtures_ExposeF3DeathAndShieldBreakAnchors()
+        public void ProgressFixtures_ExposeF3ProgressionAnchors()
         {
             foreach (var combatIndex in new[] { 2, 4, 5 })
             {
@@ -233,9 +233,37 @@ namespace SpireChess.Tests.EditMode
 
             var shieldBreak = progressFixtures.CreateFixture(
                 3,
+                2,
+                "B02_BREAK");
+            Assert.That(shieldBreak.Player[0].CurrentHealth, Is.EqualTo(10));
+            Assert.That(shieldBreak.Player[4].CurrentHealth, Is.EqualTo(18));
+
+            var summon = progressFixtures.CreateFixture(
+                3,
+                2,
+                "B03_SUMMON");
+            Assert.That(
+                summon.Player.Where(value => value != null)
+                    .Sum(value => value.CurrentAttack),
+                Is.EqualTo(89));
+            Assert.That(
+                summon.Player.Where(value => value != null)
+                    .Sum(value => value.CurrentHealth),
+                Is.EqualTo(70));
+
+            var spell = progressFixtures.CreateFixture(
+                3,
+                2,
+                "B05_SPELL");
+            Assert.That(spell.Player[3].HasCleave, Is.True);
+            Assert.That(spell.Player[3].CurrentAttack, Is.EqualTo(17));
+            Assert.That(spell.Player[3].CurrentHealth, Is.EqualTo(18));
+
+            var shieldBreakLate = progressFixtures.CreateFixture(
+                3,
                 5,
                 "B02_BREAK");
-            Assert.That(shieldBreak.Player[3].HasShield, Is.True);
+            Assert.That(shieldBreakLate.Player[3].HasShield, Is.True);
         }
 
         [Test]

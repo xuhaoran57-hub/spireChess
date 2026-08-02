@@ -18,7 +18,7 @@ namespace SpireChess.Tests.EditMode
             Assert.That(configs.Identity.RulesVersion, Is.EqualTo("8B.1"));
             Assert.That(
                 configs.Identity.ConfigHash,
-                Is.EqualTo("f79467b282cc5f745fbf9f548375c3173960d4ed7e2b671845c820a681ac3720"));
+                Is.EqualTo("a45ece87784a34f9fff49d28f2655c879217086669a5371d9a28f3f3f08f1b51"));
         }
 
         [Test]

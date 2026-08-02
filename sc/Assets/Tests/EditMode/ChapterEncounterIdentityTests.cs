@@ -158,10 +158,10 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(
                 bosses.Select(value => value.Attack),
-                Is.EqualTo(new[] { 18, 48, 85 }));
+                Is.EqualTo(new[] { 13, 48, 85 }));
             Assert.That(
                 bosses.Select(value => value.Health),
-                Is.EqualTo(new[] { 29, 60, 100 }));
+                Is.EqualTo(new[] { 23, 60, 100 }));
             Assert.That(
                 bosses.Select(value => value.DamageBonus),
                 Is.EqualTo(new[] { 2, 3, 4 }));
@@ -244,7 +244,7 @@ namespace SpireChess.Tests.EditMode
             var errors = string.Join("\n", validation.Errors);
             Assert.That(validation.IsValid, Is.False);
             Assert.That(errors, Does.Contain(
-                "risk text must contain the current formation target '目标 19/29'"));
+                "risk text must contain the current formation target '目标 14/23'"));
             Assert.That(errors, Does.Contain(
                 "risk text must contain the current loss pressure '失败修正 +3'"));
         }
@@ -281,7 +281,7 @@ namespace SpireChess.Tests.EditMode
                             player.SummonAttempts + enemy.SummonAttempts,
                             Is.GreaterThan(0));
                         Assert.That(
-                            player.FlourishGained + enemy.FlourishGained,
+                            player.SummonSuccesses + enemy.SummonSuccesses,
                             Is.GreaterThan(0));
                         break;
                     case 1:

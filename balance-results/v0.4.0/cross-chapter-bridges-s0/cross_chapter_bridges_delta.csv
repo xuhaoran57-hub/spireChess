@@ -1,0 +1,7 @@
+encounter_id,before_score_pct,after_score_pct,before_win_pct,after_win_pct,before_spread_pct,after_spread_pct
+f1_c6_boss_encounter,4.3,87.7,2.5,83.7,24.0,27.5
+f2_c6_boss_encounter,79.2,79.2,67.7,67.7,30.5,30.5
+f3_c6_boss_encounter,23.2,23.2,13.3,13.3,33.5,33.5
+f3_opening_encounter,94.6,98.6,91.2,97.5,26.0,4.5
+f3_early_summon_encounter,91.6,62.8,86.8,46.5,33.5,34.0
+f3_normal_encounter,68.2,65.0,57.0,52.8,28.0,33.5
