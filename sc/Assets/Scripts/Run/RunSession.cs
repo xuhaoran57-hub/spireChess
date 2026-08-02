@@ -20,10 +20,12 @@ namespace SpireChess.Run
         private const int RewardStreamId = 202;
         private const int EventStreamId = 303;
         private const int RelicStreamId = 404;
+        private const int HeroStreamId = 505;
 
         private readonly ConfigService configs;
         private readonly RecordedRandom rewardRandom;
         private readonly RecordedRandom eventRandom;
+        private readonly RecordedRandom heroRandom;
         private readonly IMapProvider mapProvider;
         private readonly CoreActivationEvidence coreEvidence = new CoreActivationEvidence();
         private int attemptSequence;
@@ -35,18 +37,34 @@ namespace SpireChess.Run
         public RunSession(ConfigService configs, Random random)
             : this(
                 configs,
-                (random ?? throw new ArgumentNullException(nameof(random))).Next())
+                (random ?? throw new ArgumentNullException(nameof(random))).Next(),
+                HeroIds.Warrior)
         {
         }
 
         public RunSession(ConfigService configs, int seed)
-            : this(configs, seed, null)
+            : this(configs, seed, HeroIds.Warrior)
+        {
+        }
+
+        public RunSession(ConfigService configs, int seed, string heroId)
+            : this(configs, seed, null, heroId)
         {
         }
 
         public RunSession(ConfigService configs, int seed, IMapProvider mapProvider)
+            : this(configs, seed, mapProvider, HeroIds.Warrior)
+        {
+        }
+
+        public RunSession(
+            ConfigService configs,
+            int seed,
+            IMapProvider mapProvider,
+            string heroId)
         {
             this.configs = configs ?? throw new ArgumentNullException(nameof(configs));
+            HeroCatalog.GetRequired(heroId);
             Shop = new ShopSession(
                 configs.Minions,
                 configs.Spells,
@@ -54,11 +72,12 @@ namespace SpireChess.Run
             Shop.EventRaised += OnShopEvent;
             rewardRandom = new RecordedRandom(SeedDeriver.Combine(seed, RewardStreamId));
             eventRandom = new RecordedRandom(SeedDeriver.Combine(seed, EventStreamId));
+            heroRandom = new RecordedRandom(SeedDeriver.Combine(seed, HeroStreamId));
             this.mapProvider = mapProvider ?? (configs.RunMaps.Count == 0
                 ? null
                 : new FixedMapProvider(configs.RunMaps, configs.MapRuleProfilesById));
             var map = this.mapProvider?.CreateMap(new MapRequest(seed, 1));
-            State = new RunState(seed, map);
+            State = new RunState(seed, map, heroId);
             Relics = new RelicService(
                 configs,
                 State,
@@ -74,6 +93,7 @@ namespace SpireChess.Run
             ShopSession shop,
             RecordedRandom rewardRandom,
             RecordedRandom eventRandom,
+            RecordedRandom heroRandom,
             RecordedRandom relicRandom)
         {
             this.configs = configs ?? throw new ArgumentNullException(nameof(configs));
@@ -84,6 +104,8 @@ namespace SpireChess.Run
                 throw new ArgumentNullException(nameof(rewardRandom));
             this.eventRandom = eventRandom ??
                 throw new ArgumentNullException(nameof(eventRandom));
+            this.heroRandom = heroRandom ??
+                throw new ArgumentNullException(nameof(heroRandom));
             Relics = new RelicService(
                 configs,
                 state,
@@ -101,9 +123,72 @@ namespace SpireChess.Run
         public BattleSimulationResult LastBattleResult { get; private set; }
         public RunTelemetry Telemetry { get; private set; }
         public bool HasStageFourMap => State.CurrentMap != null;
+        public string CurrentShopHeroPassiveMessage
+        {
+            get
+            {
+                var runtime = State.HeroRuntime;
+                if (!Shop.IsShopOpen ||
+                    !string.Equals(State.HeroId, HeroIds.Mage, StringComparison.Ordinal) ||
+                    runtime.LastShopStartTurn != State.ShopTurn)
+                {
+                    return string.Empty;
+                }
+
+                switch (runtime.LastShopStartOutcome)
+                {
+                    case HeroPassiveShopStartOutcome.GrantedTemporarySpell:
+                        var spellName = configs.TryGetSpell(
+                            runtime.LastGrantedSpellId,
+                            out var spell)
+                            ? spell.Name
+                            : runtime.LastGrantedSpellId;
+                        return $"旅途灵感：获得临时法术「{spellName}」，未使用将在本商店结束时消失。";
+                    case HeroPassiveShopStartOutcome.BenchFull:
+                        return "旅途灵感：备战区已满，本商店未获得临时法术。";
+                    case HeroPassiveShopStartOutcome.NoEligibleSpell:
+                        return "旅途灵感：当前没有符合条件的可用法术。";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
+        public string CurrentShopEndHeroPassiveMessage
+        {
+            get
+            {
+                var runtime = State.HeroRuntime;
+                if (Shop.IsShopOpen ||
+                    !string.Equals(State.HeroId, HeroIds.Rogue, StringComparison.Ordinal) ||
+                    runtime.LastShopEndTurn != State.ShopTurn ||
+                    State.CurrentAttempt?.NodeType != RunNodeType.Shop ||
+                    State.CurrentAttempt.NodeResolved != true)
+                {
+                    return string.Empty;
+                }
+
+                switch (runtime.LastShopEndOutcome)
+                {
+                    case HeroPassiveShopEndOutcome.StoleMinion:
+                        var minionName = configs.TryGetMinion(
+                            runtime.LastStolenMinionId,
+                            out var minion)
+                            ? minion.Name
+                            : runtime.LastStolenMinionId;
+                        return $"顺手牵羊：已从商店偷取「{minionName}」，免费加入备战区。";
+                    case HeroPassiveShopEndOutcome.BenchFull:
+                        return "顺手牵羊：备战区已满，本商店未偷取随从。";
+                    case HeroPassiveShopEndOutcome.NoVisibleMinion:
+                        return "顺手牵羊：商店中没有可偷取的随从。";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
         internal RecordedRandom ShopRandom => Shop.RandomStream;
         internal RecordedRandom RewardRandom => rewardRandom;
         internal RecordedRandom EventRandom => eventRandom;
+        internal RecordedRandom HeroRandom => heroRandom;
         internal RecordedRandom RelicRandom => Relics.RandomStream;
         internal int AttemptSequence => attemptSequence;
         internal int RewardSequence => rewardSequence;
@@ -119,6 +204,7 @@ namespace SpireChess.Run
             ShopSession shop,
             RecordedRandom rewardRandom,
             RecordedRandom eventRandom,
+            RecordedRandom heroRandom,
             RecordedRandom relicRandom,
             BattleContext pendingBattle,
             BattleContext lastBattleContext,
@@ -139,6 +225,7 @@ namespace SpireChess.Run
                 shop,
                 rewardRandom,
                 eventRandom,
+                heroRandom,
                 relicRandom)
             {
                 PendingBattle = pendingBattle,
@@ -282,7 +369,12 @@ namespace SpireChess.Run
 
         public RunOperationResult ContinueToNextFloor()
         {
-            if (State.Phase != RunPhase.FloorComplete || State.Floor >= 3 || mapProvider == null)
+            var currentMap = State.CurrentMap;
+            if (State.Phase != RunPhase.FloorComplete ||
+                currentMap == null ||
+                currentMap.IsFinalChapter ||
+                string.IsNullOrWhiteSpace(currentMap.NextMapId) ||
+                mapProvider == null)
             {
                 return RunOperationResult.Fail(RunOperationError.InvalidPhase);
             }
@@ -290,7 +382,7 @@ namespace SpireChess.Run
             MapDefinition nextMap;
             try
             {
-                nextMap = mapProvider.CreateMap(new MapRequest(State.Seed, State.Floor + 1));
+                nextMap = mapProvider.CreateMapById(currentMap.NextMapId);
             }
             catch (InvalidOperationException)
             {
@@ -305,7 +397,7 @@ namespace SpireChess.Run
             State.LastSettlement = null;
             State.LastRewardSummary = string.Empty;
             State.Phase = RunPhase.MapSelection;
-            return RunOperationResult.Succeed($"进入第 {State.Floor} 层");
+            return RunOperationResult.Succeed($"进入{nextMap.DisplayName}");
         }
 
         public RunOperationResult SelectRewardCandidate(
@@ -1271,6 +1363,8 @@ namespace SpireChess.Run
                     grant.ConfigId,
                     grant.ReservedPoolCopies));
             }
+
+            ApplyMageShopStart();
         }
 
         private void ApplyDelayedShopResources()
@@ -1288,6 +1382,153 @@ namespace SpireChess.Run
             resources.Clear();
         }
 
+        private void ApplyMageShopStart()
+        {
+            if (!string.Equals(State.HeroId, HeroIds.Mage, StringComparison.Ordinal) ||
+                !State.HeroRuntime.MarkShopStartProcessed(State.ShopTurn))
+            {
+                return;
+            }
+
+            if (Shop.Collection.EmptyBenchSlotCount() <= 0)
+            {
+                RecordMageShopStart(
+                    HeroPassiveShopStartOutcome.BenchFull);
+                return;
+            }
+
+            var candidates = HeroPassiveRules.GetMageShopStartCandidates(
+                configs.Spells,
+                Shop.TavernTier);
+            if (candidates.Count == 0)
+            {
+                RecordMageShopStart(
+                    HeroPassiveShopStartOutcome.NoEligibleSpell);
+                return;
+            }
+
+            var selected = candidates[heroRandom.Next(candidates.Count)];
+            var card = ShopCardInstance.CreateSpell(
+                $"hero_mage_{State.ShopTurn:D6}",
+                selected,
+                true);
+            if (!Shop.Collection.TryAddToBench(card, out var benchIndex))
+            {
+                throw new InvalidOperationException(
+                    "Mage passive lost its reserved bench capacity.");
+            }
+
+            RecordMageShopStart(
+                HeroPassiveShopStartOutcome.GrantedTemporarySpell,
+                selected.Id,
+                benchIndex);
+        }
+
+        private void RecordMageShopStart(
+            HeroPassiveShopStartOutcome outcome,
+            string spellId = null,
+            int benchIndex = -1)
+        {
+            State.HeroRuntime.RecordShopStartOutcome(
+                State.ShopTurn,
+                outcome,
+                spellId);
+            Telemetry?.Record("HeroPassiveResolved", new
+            {
+                heroId = State.HeroId,
+                passiveId = "journey_inspiration",
+                outcome = outcome.ToString(),
+                spellId = spellId ?? string.Empty,
+                benchIndex,
+                tavernTier = Shop.TavernTier,
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn
+            });
+        }
+
+        private void CompleteHeroShopEnd()
+        {
+            if (string.Equals(State.HeroId, HeroIds.Mage, StringComparison.Ordinal) &&
+                State.ShopTurn >= 1 &&
+                State.HeroRuntime.ProcessedShopStartTurns.Contains(State.ShopTurn))
+            {
+                State.HeroRuntime.MarkShopEndProcessed(State.ShopTurn);
+            }
+        }
+
+        private void ApplyRogueShopEnd()
+        {
+            if (!string.Equals(State.HeroId, HeroIds.Rogue, StringComparison.Ordinal) ||
+                State.ShopTurn < 1 ||
+                State.ShopTurn != Shop.Round ||
+                State.CurrentAttempt?.NodeType != RunNodeType.Shop ||
+                !State.HeroRuntime.MarkShopEndProcessed(State.ShopTurn))
+            {
+                return;
+            }
+
+            if (Shop.Collection.EmptyBenchSlotCount() <= 0)
+            {
+                RecordRogueShopEnd(HeroPassiveShopEndOutcome.BenchFull);
+                return;
+            }
+
+            var candidateIndexes = Enumerable.Range(0, Shop.MinionOffers.Count)
+                .Where(index =>
+                {
+                    var minion = Shop.MinionOffers[index];
+                    return minion != null &&
+                           !minion.IsToken &&
+                           minion.Enabled &&
+                           minion.ImplementationStatus == "Playable";
+                })
+                .ToList();
+            if (candidateIndexes.Count == 0)
+            {
+                RecordRogueShopEnd(HeroPassiveShopEndOutcome.NoVisibleMinion);
+                return;
+            }
+
+            var offerIndex = candidateIndexes[heroRandom.Next(candidateIndexes.Count)];
+            var selected = Shop.MinionOffers[offerIndex];
+            var result = Shop.TakeVisibleMinionOffer(offerIndex);
+            if (!result.Success)
+            {
+                throw new InvalidOperationException(
+                    $"Rogue passive could not take offer {offerIndex}: {result.Error}.");
+            }
+
+            RecordRogueShopEnd(
+                HeroPassiveShopEndOutcome.StoleMinion,
+                selected.Id,
+                offerIndex,
+                result.BenchIndex);
+        }
+
+        private void RecordRogueShopEnd(
+            HeroPassiveShopEndOutcome outcome,
+            string minionId = null,
+            int offerIndex = -1,
+            int benchIndex = -1)
+        {
+            State.HeroRuntime.RecordShopEndOutcome(
+                State.ShopTurn,
+                outcome,
+                minionId);
+            Telemetry?.Record("HeroPassiveResolved", new
+            {
+                heroId = State.HeroId,
+                passiveId = "pickpocket",
+                outcome = outcome.ToString(),
+                minionId = minionId ?? string.Empty,
+                offerIndex,
+                benchIndex,
+                tavernTier = Shop.TavernTier,
+                runTurn = State.ShopTurn,
+                shopTurn = State.ShopTurn
+            });
+        }
+
         private ShopOperationResult EndMapShop()
         {
             if (State.PendingCardRewards.Count > 0 || PendingBattle != null)
@@ -1295,12 +1536,13 @@ namespace SpireChess.Run
                 return ShopOperationResult.Fail(ShopOperationError.InvalidTiming);
             }
 
-            var result = Shop.EndRound();
+            var result = Shop.EndRound(ApplyRogueShopEnd);
             if (!result.Success)
             {
                 return result;
             }
 
+            CompleteHeroShopEnd();
             ResolveCurrentNodeToMap();
             return result;
         }
@@ -1318,6 +1560,7 @@ namespace SpireChess.Run
                 return result;
             }
 
+            CompleteHeroShopEnd();
             var board = Shop.CreateBattleSnapshot();
             Relics.ApplyBattleRules(board);
             FillDefaultEnemy(board.Enemy);
@@ -1337,8 +1580,9 @@ namespace SpireChess.Run
                 return;
             }
 
-            var settlement = BattleSettlementCalculator.Calculate(LastBattleResult, encounter);
-            State.LastSettlement = settlement;
+            var settlement = BattleSettlementCalculator.Calculate(
+                LastBattleResult,
+                encounter);
             attempt.BattleSettled = true;
             if (settlement.PlayerWon)
             {
@@ -1352,9 +1596,18 @@ namespace SpireChess.Run
             }
             if (!attempt.HealthDamageApplied)
             {
-                State.Health = Math.Max(0, State.Health - settlement.Damage);
+                var damage = HeroPassiveRules.ResolveBattleDamage(
+                    State.Health,
+                    State.Armor,
+                    settlement.Damage);
+                State.Armor = damage.RemainingArmor;
+                State.Health = damage.RemainingHealth;
+                settlement = settlement.WithDamageResolution(
+                    damage.ArmorAbsorbed,
+                    damage.HealthDamage);
                 attempt.HealthDamageApplied = true;
             }
+            State.LastSettlement = settlement;
 
             if (State.Health <= 0)
             {
@@ -1372,7 +1625,9 @@ namespace SpireChess.Run
                     attempt.RelicVictoryEffectsApplied = true;
                 }
 
-                if (node.Type == RunNodeType.Boss && State.Floor < 3 && Relics.Enabled &&
+                if (node.Type == RunNodeType.Boss &&
+                    !State.CurrentMap.IsFinalChapter &&
+                    Relics.Enabled &&
                     TryGenerateBossRelic(attempt))
                 {
                     return;
@@ -1385,7 +1640,9 @@ namespace SpireChess.Run
 
                 ResolveNode(node, attempt);
                 State.Phase = node.Type == RunNodeType.Boss
-                    ? (State.Floor >= 3 ? RunPhase.RunWon : RunPhase.FloorComplete)
+                    ? (State.CurrentMap.IsFinalChapter
+                        ? RunPhase.RunWon
+                        : RunPhase.FloorComplete)
                     : RunPhase.BattleResult;
                 if (State.Phase == RunPhase.RunWon)
                 {
@@ -1463,9 +1720,11 @@ namespace SpireChess.Run
 
             if (table.Mode == "ChooseOne")
             {
-                var completionMode = node.Type == RunNodeType.Boss && State.Floor < 3
-                    ? RewardCompletionMode.FloorComplete
-                    : RewardCompletionMode.ReturnToBattleResult;
+                var completionMode = node.Type != RunNodeType.Boss
+                    ? RewardCompletionMode.ReturnToBattleResult
+                    : State.CurrentMap.IsFinalChapter
+                        ? RewardCompletionMode.RunWon
+                        : RewardCompletionMode.FloorComplete;
                 var choice = BuildRewardChoice(table, completionMode);
                 if (choice == null)
                 {
@@ -1712,6 +1971,11 @@ namespace SpireChess.Run
                     break;
                 case RewardCompletionMode.FloorComplete:
                     State.Phase = RunPhase.FloorComplete;
+                    break;
+                case RewardCompletionMode.RunWon:
+                    State.Phase = RunPhase.RunWon;
+                    CompleteRun("Won");
+                    ReleaseOutstandingRewards();
                     break;
                 default:
                     State.Phase = RunPhase.MapSelection;

@@ -133,8 +133,13 @@ namespace SpireChess.Tests
 
             FindButton(initialMenu, "NewGameButton").onClick.Invoke();
             yield return null;
+            Assert.That(initialMenu.HeroSelectionVisible, Is.True);
+            Assert.That(GameApp.Instance.Run, Is.Null);
+            FindButton(initialMenu, "ConfirmHeroButton").onClick.Invoke();
+            yield return null;
             var originalRun = GameApp.Instance.Run;
             Assert.That(originalRun, Is.Not.Null);
+            Assert.That(originalRun.State.HeroId, Is.EqualTo(HeroIds.Warrior));
 
             AssertFormalScene<RunTestController, RunScreenView>(
                 GameSceneNames.Run);

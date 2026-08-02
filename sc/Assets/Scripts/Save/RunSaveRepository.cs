@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -264,13 +265,27 @@ namespace SpireChess.Save
             }
         }
 
-        private static RunSaveSummaryV1 BuildSummary(RunStateSnapshotV1 state)
+        private RunSaveSummaryV1 BuildSummary(RunStateSnapshotV1 state)
         {
+            var mapId = state.MapId ?? string.Empty;
+            var mapName = configs.RunMaps.FirstOrDefault(map =>
+                map != null &&
+                string.Equals(map.Id, mapId, StringComparison.Ordinal))?.DisplayName ??
+                string.Empty;
+            var heroId = state.HeroId ?? string.Empty;
+            var heroName = HeroCatalog.TryGet(heroId, out var hero)
+                ? hero.DisplayName
+                : string.Empty;
             return new RunSaveSummaryV1
             {
+                HeroId = heroId,
+                HeroName = heroName,
+                MapId = mapId,
+                MapName = mapName,
                 Floor = state.Floor,
                 Health = state.Health,
                 MaxHealth = state.MaxHealth,
+                Armor = state.Armor,
                 ShopTurn = state.ShopTurn,
                 Phase = state.Phase
             };

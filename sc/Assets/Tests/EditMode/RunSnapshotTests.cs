@@ -27,7 +27,7 @@ namespace SpireChess.Tests.EditMode
         [Test]
         public void InitialRun_CaptureJsonRestoreCapture_IsEquivalent()
         {
-            var run = new RunSession(configs, 20260721);
+            var run = new RunSession(configs, 20260721, HeroIds.Mage);
             var original = mapper.Capture(run);
             var serializer = new NewtonsoftJsonSerializer();
             var json = serializer.ToJson(original);
@@ -44,6 +44,70 @@ namespace SpireChess.Tests.EditMode
             Assert.That(
                 RunStateFingerprint.Compute(roundTrip),
                 Is.EqualTo(RunStateFingerprint.Compute(original)));
+            Assert.That(restored.State.HeroId, Is.EqualTo(HeroIds.Mage));
+            Assert.That(roundTrip.RandomStreams.Hero, Is.Not.Null);
+        }
+
+        [Test]
+        public void MissingHeroState_IsRejectedByNewRunSchema()
+        {
+            var payload = mapper.Capture(
+                new RunSession(configs, 20260801, HeroIds.Warrior));
+            payload.RunState.HeroId = null;
+            payload.RunState.HeroRuntime = null;
+            payload.RandomStreams.Hero = null;
+
+            var result = validator.ValidateDto(payload);
+
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(
+                result.Errors.Any(value => value.Contains("hero id")),
+                Is.True);
+            Assert.That(
+                result.Errors.Any(value => value.Contains("Hero runtime")),
+                Is.True);
+            Assert.That(
+                result.Errors.Any(value => value.Contains("Hero random")),
+                Is.True);
+        }
+
+        [Test]
+        public void MissingRunStartMarker_IsRejectedByNewRunSchema()
+        {
+            var payload = mapper.Capture(
+                new RunSession(configs, 20260802, HeroIds.Warrior));
+            payload.RunState.HeroRuntime.RunStartApplied = false;
+
+            var result = validator.ValidateDto(payload);
+
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(
+                result.Errors.Any(value =>
+                    value.Contains("Hero runtime trigger markers")),
+                Is.True);
+        }
+
+        [Test]
+        public void InvalidBattleDamageResolution_IsRejected()
+        {
+            var payload = mapper.Capture(
+                new RunSession(configs, 20260803, HeroIds.Warrior));
+            payload.RunState.LastSettlement =
+                new BattleSettlementSnapshotV1
+                {
+                    Damage = 5,
+                    ArmorAbsorbed = 3,
+                    HealthDamage = 1,
+                    OutcomeReason = BattleOutcomeReason.Victory
+                };
+
+            var result = validator.ValidateDto(payload);
+
+            Assert.That(result.IsValid, Is.False);
+            Assert.That(
+                result.Errors.Any(value =>
+                    value.Contains("damage resolution")),
+                Is.True);
         }
 
         [Test]

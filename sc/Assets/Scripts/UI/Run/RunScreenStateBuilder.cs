@@ -63,18 +63,24 @@ namespace SpireChess.UI.Run
                 IsCombat(node.Type) && node.Status == RunNodeStatus.Resolved);
             var shopCount = map?.RuleProfile.ShopCount ?? 0;
             var combatCount = map?.RuleProfile.CombatCount ?? 0;
+            var mapName = string.IsNullOrWhiteSpace(map?.DisplayName)
+                ? $"第 {state.Floor} 章"
+                : map.DisplayName;
+            var hero = HeroCatalog.GetRequired(state.HeroId);
 
             return new RunScreenState
             {
-                Title = $"第 {state.Floor} 层 · 三层远征",
+                Title = $"{mapName} · 第 {state.Floor} 章",
                 ResourceSummary =
-                    $"生命 {state.Health}/{state.MaxHealth}   商店回合 {state.ShopTurn}   " +
+                    $"{hero.DisplayName}·{hero.PassiveName}   " +
+                    $"生命 {state.Health}/{state.MaxHealth}   护甲 {state.Armor}   " +
+                    $"商店回合 {state.ShopTurn}   " +
                     $"战绩 {state.Statistics.BattlesWon}胜/{state.Statistics.BattlesNotWon}未胜",
                 ProgressSummary =
-                    $"本层商店 {completedShops}/{shopCount}   固定战斗 {completedCombats}/{combatCount}   " +
+                    $"本章商店 {completedShops}/{shopCount}   固定战斗 {completedCombats}/{combatCount}   " +
                     $"地图步数 {state.MapStep}",
                 Status = statusMessage ?? string.Empty,
-                RouteHint = "C2/C5 选择遭遇机制 · C4 选择强攻、奇遇或保守路线 · 事件可能触发额外战斗",
+                RouteHint = BuildChapterRouteHint(map),
                 MaximumColumn = map?.Nodes.Count > 0
                     ? map.Nodes.Max(node => node.Column)
                     : 1,
@@ -82,7 +88,7 @@ namespace SpireChess.UI.Run
                 Edges = edges,
                 Relics = BuildRelics(state, configs),
                 Choice = BuildChoice(run, configs),
-                Summary = BuildSummary(state)
+                Summary = BuildSummary(state, nodes)
             };
         }
 
@@ -94,6 +100,13 @@ namespace SpireChess.UI.Run
             var status = state.MapProgress.GetStatus(node.Id);
             var title = ToNodeTypeText(node.Type);
             var subtitle = string.Empty;
+            var routeText = ToRouteTagText(node.RouteTag);
+            var threatLevel = 0;
+            var threatText = string.Empty;
+            var formationText = string.Empty;
+            var mechanicText = string.Empty;
+            var lossPressureText = string.Empty;
+            var rewardText = string.Empty;
             if (node.Type == RunNodeType.Shop)
             {
                 subtitle = "补给与整备";
@@ -103,6 +116,23 @@ namespace SpireChess.UI.Run
             {
                 title = $"第 {node.CombatIndex} 战 · {title}";
                 subtitle = encounter.Name;
+                threatLevel = ChapterThreatRating.Calculate(
+                    state.Floor,
+                    node.CombatIndex,
+                    node.Type,
+                    node.RouteTag,
+                    encounter.DamageBonus);
+                threatText =
+                    $"威胁 {ChapterThreatRating.ToStars(threatLevel)}";
+                routeText = string.IsNullOrWhiteSpace(routeText)
+                    ? threatText
+                    : $"{routeText} · {threatText}";
+                formationText = BuildFormationText(encounter, configs);
+                mechanicText = encounter.Theme ?? string.Empty;
+                lossPressureText = encounter.DamageBonus > 0
+                    ? $"失败修正 +{encounter.DamageBonus}"
+                    : string.Empty;
+                rewardText = encounter.RewardPreviewText ?? string.Empty;
             }
             else
             {
@@ -121,7 +151,13 @@ namespace SpireChess.UI.Run
                 IconId = ToNodeIconId(node.Type),
                 Title = title,
                 Subtitle = subtitle,
-                RouteText = ToRouteTagText(node.RouteTag),
+                RouteText = routeText,
+                ThreatLevel = threatLevel,
+                ThreatText = threatText,
+                FormationText = formationText,
+                MechanicText = mechanicText,
+                LossPressureText = lossPressureText,
+                RewardText = rewardText,
                 Column = node.Column,
                 Row = node.Row,
                 Type = node.Type,
@@ -130,6 +166,46 @@ namespace SpireChess.UI.Run
                 IsInteractable = state.Phase == RunPhase.MapSelection &&
                                  status == RunNodeStatus.Reachable
             };
+        }
+
+        private static string BuildFormationText(
+            EncounterConfig encounter,
+            ConfigService configs)
+        {
+            var attack = 0;
+            var health = 0;
+            foreach (var slot in encounter.EnemySlots ??
+                     new List<EnemySlotConfig>())
+            {
+                if (!configs.TryGetMinion(slot.MinionId, out var minion))
+                {
+                    continue;
+                }
+
+                attack += (slot.Golden
+                    ? minion.GoldenAttack
+                    : minion.Attack) + slot.AttackBonus;
+                health += (slot.Golden
+                    ? minion.GoldenHealth
+                    : minion.Health) + slot.HealthBonus;
+            }
+
+            return $"敌阵 {attack}/{health}";
+        }
+
+        private static string BuildChapterRouteHint(MapDefinition map)
+        {
+            switch (map?.ThemeFaction)
+            {
+                case "WildSpirit":
+                    return "本章：亡语召唤链 · C5 选择迅袭或巢群 · Boss 万籁母巢";
+                case "Starbound":
+                    return "本章：预充护盾与溅射 · C5 选择守势或爆发 · Boss 星轨大司辰";
+                case "ForgeSoul":
+                    return "本章：护盾接力与失盾反击 · C5 选择炉墙或誓刃 · Boss 铸魂不灭王";
+                default:
+                    return "C2/C5 选择遭遇机制 · C4 选择强攻、奇遇或保守路线";
+            }
         }
 
         private static void DerivePresentationStatuses(
@@ -364,7 +440,7 @@ namespace SpireChess.UI.Run
                     pending.HealthCost > 0 ? "以生命换取遗珍" : "选择一件 Boss 遗珍",
                     pending.HealthCost > 0
                         ? $"选择具体遗珍时失去 {pending.HealthCost} 点生命；查看候选不扣血。"
-                        : "冠冕级遗珍会在后续楼层持续改变规则。",
+                        : "冠冕级遗珍会在后续章节持续改变规则。",
                     options);
             }
 
@@ -428,20 +504,23 @@ namespace SpireChess.UI.Run
             return null;
         }
 
-        private static RunSummaryState BuildSummary(RunState state)
+        private static RunSummaryState BuildSummary(
+            RunState state,
+            IReadOnlyList<RunMapNodeState> nodes)
         {
             if (state.Phase == RunPhase.MapSelection)
             {
                 return new RunSummaryState
                 {
-                    Text = "选择高亮节点继续；未选择的互斥路线会在进入后锁定。"
+                    Text = BuildReachableNodeSummary(nodes)
                 };
             }
             if (state.Phase == RunPhase.FloorComplete)
             {
+                var mapName = state.CurrentMap?.DisplayName ?? $"第 {state.Floor} 章";
                 return Summary(
-                    $"第 {state.Floor} 层完成 · Boss 已击败，遗珍已结算",
-                    "进入下一层",
+                    $"{mapName}章节完成 · Boss 已击败，遗珍已结算",
+                    "进入下一章",
                     RunUiActionType.ContinueToNextFloor);
             }
             if (state.Phase == RunPhase.BattleResult)
@@ -471,17 +550,69 @@ namespace SpireChess.UI.Run
             };
         }
 
+        private static string BuildReachableNodeSummary(
+            IReadOnlyList<RunMapNodeState> nodes)
+        {
+            var reachable = (nodes ?? Array.Empty<RunMapNodeState>())
+                .Where(node => node.IsInteractable)
+                .OrderBy(node => node.Row)
+                .ThenBy(node => node.NodeId)
+                .ToList();
+            if (reachable.Count == 0)
+            {
+                return "当前没有可进入节点。";
+            }
+
+            var lines = reachable.Select(node =>
+            {
+                var parts = new List<string>();
+                if (!string.IsNullOrWhiteSpace(node.RouteText))
+                {
+                    parts.Add(node.RouteText);
+                }
+                parts.Add(node.Title);
+                if (!string.IsNullOrWhiteSpace(node.Subtitle))
+                {
+                    parts.Add(node.Subtitle);
+                }
+                if (!string.IsNullOrWhiteSpace(node.FormationText))
+                {
+                    parts.Add(node.FormationText);
+                }
+                if (!string.IsNullOrWhiteSpace(node.MechanicText))
+                {
+                    parts.Add($"机制：{node.MechanicText}");
+                }
+                if (!string.IsNullOrWhiteSpace(node.LossPressureText))
+                {
+                    parts.Add(node.LossPressureText);
+                }
+                if (!string.IsNullOrWhiteSpace(node.RewardText))
+                {
+                    parts.Add($"奖励：{node.RewardText}");
+                }
+                return string.Join("｜", parts);
+            });
+
+            return "可达节点预览（选择后，未选互斥路线将锁定）：\n" +
+                   string.Join("\n", lines);
+        }
+
         private static string BuildResultSummary(RunState state)
         {
+            var hero = HeroCatalog.GetRequired(state.HeroId);
             if (state.Phase == RunPhase.RunWon)
             {
-                return $"三层通关 · {state.Statistics.BattlesWon} 胜 / " +
+                var finalMapName = state.CurrentMap?.DisplayName ?? "最终章节";
+                return $"{hero.DisplayName}旅程完成 · {finalMapName} Boss 已击败 · " +
+                       $"{state.Statistics.BattlesWon} 胜 / " +
                        $"{state.Statistics.BattlesNotWon} 未胜 · 击败 " +
                        $"{state.Statistics.BossesDefeated} Boss · 三连 {state.Statistics.TriplesFormed}";
             }
             if (state.Phase == RunPhase.RunLost)
             {
-                return $"单局失败：止步第 {state.Floor} 层 · " +
+                var mapName = state.CurrentMap?.DisplayName ?? $"第 {state.Floor} 章";
+                return $"{hero.DisplayName}旅程失败：止步{mapName} · " +
                        $"{state.Statistics.BattlesWon} 胜 / {state.Statistics.BattlesNotWon} 未胜";
             }
             if (state.LastSettlement == null)

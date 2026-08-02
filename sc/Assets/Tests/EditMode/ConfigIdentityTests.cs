@@ -14,11 +14,11 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(validation.IsValid, Is.True, string.Join("\n", validation.Errors));
             Assert.That(configs.Identity, Is.Not.Null);
-            Assert.That(configs.Identity.ContentVersion, Is.EqualTo("5.5.0"));
+            Assert.That(configs.Identity.ContentVersion, Is.EqualTo("5.6.0"));
             Assert.That(configs.Identity.RulesVersion, Is.EqualTo("8B.1"));
             Assert.That(
                 configs.Identity.ConfigHash,
-                Is.EqualTo("8a999a25e2987f5139a37d7b36d44b11035fd3daffff06701d11cbda16940085"));
+                Is.EqualTo("9732facfe8a656f3c5af647185c12ee95d1c9cca4f3fc166ecbd68df0423b420"));
         }
 
         [Test]

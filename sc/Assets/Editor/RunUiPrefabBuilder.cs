@@ -178,7 +178,7 @@ namespace SpireChess.Editor
             state.Choice = new RunChoiceOverlayState
             {
                 Title = "选择一件 Boss 遗珍",
-                Description = "冠冕级遗珍会在后续楼层持续改变规则。",
+                Description = "冠冕级遗珍会在后续章节持续改变规则。",
                 Options = new[]
                 {
                     PreviewChoice(
@@ -551,7 +551,7 @@ namespace SpireChess.Editor
                 var topAccent = CreateImage("AccentRule", top, theme.Accent);
                 SetRect(topAccent.rectTransform, 0f, 0f, 1880f, 3f);
                 topAccent.raycastTarget = false;
-                var title = CreateText("Title", top, font, "第 1 层 · 三层远征", 28,
+                var title = CreateText("Title", top, font, "荒野 · 第 1 章", 28,
                     TextAnchor.MiddleLeft);
                 SetRect(title.rectTransform, 18f, 12f, 330f, 68f);
                 title.color = theme.TextPrimary;
@@ -561,11 +561,11 @@ namespace SpireChess.Editor
                 SetRect(resources.rectTransform, 350f, 12f, 650f, 68f);
                 resources.color = theme.TextSecondary;
                 var progress = CreateText("Progress", top, font,
-                    "本层商店 0/6   固定战斗 0/6   地图步数 0", 17,
+                    "本章商店 0/6   固定战斗 0/6   地图步数 0", 17,
                     TextAnchor.MiddleCenter);
                 SetRect(progress.rectTransform, 1000f, 12f, 520f, 68f);
                 progress.color = theme.TextSecondary;
-                var status = CreateText("Status", top, font, "选择可达节点继续三层单局", 16,
+                var status = CreateText("Status", top, font, "选择可达节点继续旅程", 16,
                     TextAnchor.MiddleRight);
                 SetRect(status.rectTransform, 1490f, 12f, 230f, 68f);
                 status.color = theme.Success;
@@ -656,7 +656,7 @@ namespace SpireChess.Editor
                 SetRect(choiceTitle.rectTransform, 36f, 540f, 1428f, 58f);
                 choiceTitle.color = theme.TextPrimary;
                 var choiceDescription = CreateText("Description", dialog, font,
-                    "冠冕级遗珍会在后续楼层持续改变规则。", 18,
+                    "冠冕级遗珍会在后续章节持续改变规则。", 18,
                     TextAnchor.UpperCenter);
                 choiceDescription.horizontalOverflow = HorizontalWrapMode.Wrap;
                 choiceDescription.color = theme.TextSecondary;
@@ -947,7 +947,7 @@ namespace SpireChess.Editor
             var validation = configs.LoadFromResources();
             validation.ThrowIfInvalid();
             var run = new RunSession(configs, 8128);
-            var state = RunScreenStateBuilder.Build(run, configs, "选择可达节点继续三层单局");
+            var state = RunScreenStateBuilder.Build(run, configs, "选择可达节点继续旅程");
             state.Relics = new[]
             {
                 new RunRelicState

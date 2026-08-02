@@ -122,7 +122,10 @@ namespace SpireChess.UI.Shop
                 screenView.Bind(this);
                 RunSystemMenuView.Attach(screenView);
             }
-            SetStatus($"第 {session.Round} 回合商店已开启");
+            var heroPassiveMessage = runSession?.CurrentShopHeroPassiveMessage;
+            SetStatus(string.IsNullOrWhiteSpace(heroPassiveMessage)
+                ? $"第 {session.Round} 回合商店已开启"
+                : heroPassiveMessage);
             RefreshAll();
         }
 
@@ -233,7 +236,15 @@ namespace SpireChess.UI.Shop
             var mapShop = runSession.State.Phase == RunPhase.Shop &&
                           runSession.State.CurrentAttempt?.NodeType == RunNodeType.Shop;
             var result = runSession.EndShopAndPrepareBattle(mapShop ? "RunTest" : "ShopTest");
-            ApplyOperation(result, mapShop ? "商店已结束，返回地图" : "阵容已锁定，进入战斗", true);
+            var heroPassiveMessage = runSession.CurrentShopEndHeroPassiveMessage;
+            ApplyOperation(
+                result,
+                result.Success && !string.IsNullOrWhiteSpace(heroPassiveMessage)
+                    ? heroPassiveMessage
+                    : mapShop
+                        ? "商店已结束，返回地图"
+                        : "阵容已锁定，进入战斗",
+                true);
             if (result.Success && lastPersistenceSucceeded)
             {
                 if (mapShop)

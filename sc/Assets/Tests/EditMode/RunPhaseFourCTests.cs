@@ -17,11 +17,26 @@ namespace SpireChess.Tests
             var provider = new FixedMapProvider(
                 configs.RunMaps,
                 configs.MapRuleProfilesById);
+            var expectedIds = new[]
+            {
+                "map_wilderness",
+                "map_startrail_highlands",
+                "map_soulforge_city"
+            };
+            var expectedNames = new[] { "荒野", "星轨高原", "铸魂熔城" };
+            var expectedFactions = new[] { "WildSpirit", "Starbound", "ForgeSoul" };
 
             for (var floor = 1; floor <= 3; floor++)
             {
                 var map = provider.CreateMap(new MapRequest(1, floor));
-                Assert.That(map.Id, Is.EqualTo($"phase8b_floor{floor}"));
+                Assert.That(map.Id, Is.EqualTo(expectedIds[floor - 1]));
+                Assert.That(map.DisplayName, Is.EqualTo(expectedNames[floor - 1]));
+                Assert.That(map.ThemeFaction, Is.EqualTo(expectedFactions[floor - 1]));
+                Assert.That(
+                    map.NextMapId,
+                    Is.EqualTo(floor < 3 ? expectedIds[floor] : string.Empty));
+                Assert.That(map.IsFinalChapter, Is.EqualTo(floor == 3));
+                Assert.That(provider.CreateMapById(map.Id).Floor, Is.EqualTo(floor));
                 Assert.That(map.Nodes.Count, Is.EqualTo(19));
                 Assert.That(map.StartNodeIds, Is.EqualTo(new[] { $"f{floor}_shop_start" }));
                 Assert.That(map.Nodes.Count(node => node.Type == RunNodeType.Shop), Is.EqualTo(6));
@@ -41,59 +56,59 @@ namespace SpireChess.Tests
         }
 
         [Test]
-        public void ReleasedEncounterCurve_MatchesProvisionalRawStatTargets()
+        public void ReleasedEncounterCurve_MatchesChapterStatTargets()
         {
             var configs = CreateConfigs();
             var expected = new Dictionary<string, int[]>
             {
-                ["f1_opening_encounter"] = new[] { 1, 2 },
+                ["f1_opening_encounter"] = new[] { 1, 1 },
                 ["f1_safe_normal_encounter"] = new[] { 4, 5 },
                 ["f1_event_ambush_encounter"] = new[] { 5, 7 },
                 ["f1_elite_wall_encounter"] = new[] { 4, 7 },
-                ["f1_mid_mechanic_encounter"] = new[] { 5, 9 },
+                ["f1_mid_mechanic_encounter"] = new[] { 6, 10 },
                 ["f1_late_shield_encounter"] = new[] { 8, 12 },
                 ["f1_late_summon_encounter"] = new[] { 7, 11 },
                 ["f1_boss_encounter"] = new[] { 11, 23 },
                 ["f2_opening_encounter"] = new[] { 14, 18 },
-                ["f2_normal_encounter"] = new[] { 18, 22 },
+                ["f2_normal_encounter"] = new[] { 18, 23 },
                 ["f2_event_ambush_encounter"] = new[] { 20, 24 },
                 ["f2_elite_encounter"] = new[] { 20, 26 },
                 ["f2_mid_mechanic_encounter"] = new[] { 23, 27 },
                 ["f2_late_break_encounter"] = new[] { 27, 29 },
                 ["f2_late_spell_encounter"] = new[] { 25, 30 },
                 ["f2_boss_encounter"] = new[] { 36, 40 },
-                ["f3_opening_encounter"] = new[] { 62, 68 },
-                ["f3_normal_encounter"] = new[] { 70, 76 },
+                ["f3_opening_encounter"] = new[] { 56, 65 },
+                ["f3_normal_encounter"] = new[] { 62, 65 },
                 ["f3_event_ambush_encounter"] = new[] { 76, 82 },
                 ["f3_elite_encounter"] = new[] { 76, 82 },
-                ["f3_mid_mechanic_encounter"] = new[] { 80, 86 },
+                ["f3_mid_mechanic_encounter"] = new[] { 68, 83 },
                 ["f3_late_forge_encounter"] = new[] { 90, 94 },
                 ["f3_late_wild_encounter"] = new[] { 90, 94 },
                 ["f3_boss_encounter"] = new[] { 100, 100 },
                 ["f1_early_summon_encounter"] = new[] { 5, 6 },
-                ["f1_route_normal_encounter"] = new[] { 9, 12 },
-                ["f1_route_safe_encounter"] = new[] { 7, 12 },
-                ["f1_c4_elite_encounter"] = new[] { 10, 15 },
-                ["f1_c5_shield_encounter"] = new[] { 12, 16 },
+                ["f1_route_normal_encounter"] = new[] { 9, 14 },
+                ["f1_route_safe_encounter"] = new[] { 7, 13 },
+                ["f1_c4_elite_encounter"] = new[] { 11, 16 },
+                ["f1_c5_shield_encounter"] = new[] { 15, 18 },
                 ["f1_c5_summon_encounter"] = new[] { 11, 16 },
-                ["f1_c6_boss_encounter"] = new[] { 15, 29 },
+                ["f1_c6_boss_encounter"] = new[] { 18, 29 },
                 ["f1_c4_event_ambush_encounter"] = new[] { 9, 13 },
                 ["f2_early_spell_encounter"] = new[] { 19, 23 },
                 ["f2_route_normal_encounter"] = new[] { 28, 32 },
                 ["f2_route_safe_encounter"] = new[] { 25, 29 },
                 ["f2_c4_elite_encounter"] = new[] { 31, 36 },
-                ["f2_c5_break_encounter"] = new[] { 34, 38 },
-                ["f2_c5_spell_encounter"] = new[] { 32, 40 },
-                ["f2_c6_boss_encounter"] = new[] { 44, 50 },
+                ["f2_c5_break_encounter"] = new[] { 30, 42 },
+                ["f2_c5_spell_encounter"] = new[] { 36, 34 },
+                ["f2_c6_boss_encounter"] = new[] { 48, 60 },
                 ["f2_c4_event_ambush_encounter"] = new[] { 28, 33 },
-                ["f3_early_summon_encounter"] = new[] { 72, 80 },
-                ["f3_route_normal_encounter"] = new[] { 90, 98 },
-                ["f3_route_safe_encounter"] = new[] { 86, 94 },
-                ["f3_c4_elite_encounter"] = new[] { 98, 104 },
-                ["f3_c5_forge_encounter"] = new[] { 105, 110 },
-                ["f3_c5_wild_encounter"] = new[] { 105, 110 },
-                ["f3_c6_boss_encounter"] = new[] { 120, 125 },
-                ["f3_c4_event_ambush_encounter"] = new[] { 92, 100 }
+                ["f3_early_summon_encounter"] = new[] { 57, 67 },
+                ["f3_route_normal_encounter"] = new[] { 70, 85 },
+                ["f3_route_safe_encounter"] = new[] { 62, 82 },
+                ["f3_c4_elite_encounter"] = new[] { 82, 94 },
+                ["f3_c5_forge_encounter"] = new[] { 88, 146 },
+                ["f3_c5_wild_encounter"] = new[] { 75, 80 },
+                ["f3_c6_boss_encounter"] = new[] { 85, 100 },
+                ["f3_c4_event_ambush_encounter"] = new[] { 75, 88 }
             };
 
             foreach (var pair in expected)
@@ -145,7 +160,7 @@ namespace SpireChess.Tests
                 run.State.PendingRelicChoice.Candidates[0].CandidateId).Success, Is.True);
             Assert.That(run.ContinueToNextFloor().Success, Is.True);
             Assert.That(run.State.Floor, Is.EqualTo(2));
-            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("phase8b_floor2"));
+            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("map_startrail_highlands"));
             Assert.That(run.State.Health, Is.EqualTo(health));
             Assert.That(run.State.ShopTurn, Is.EqualTo(shopTurn));
             Assert.That(run.State.MapStep, Is.EqualTo(mapStep));

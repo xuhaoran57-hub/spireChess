@@ -40,7 +40,7 @@ namespace SpireChess.UI.Run
 
     public sealed class RunScreenState
     {
-        public string Title { get; set; } = "三层远征";
+        public string Title { get; set; } = "旅团日记";
         public string ResourceSummary { get; set; } = string.Empty;
         public string ProgressSummary { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
@@ -63,6 +63,12 @@ namespace SpireChess.UI.Run
         public string Title { get; set; }
         public string Subtitle { get; set; }
         public string RouteText { get; set; }
+        public int ThreatLevel { get; set; }
+        public string ThreatText { get; set; } = string.Empty;
+        public string FormationText { get; set; } = string.Empty;
+        public string MechanicText { get; set; } = string.Empty;
+        public string LossPressureText { get; set; } = string.Empty;
+        public string RewardText { get; set; } = string.Empty;
         public int Column { get; set; }
         public int Row { get; set; }
         public RunNodeType Type { get; set; }

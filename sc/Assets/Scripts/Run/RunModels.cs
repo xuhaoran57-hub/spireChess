@@ -172,7 +172,8 @@ namespace SpireChess.Run
     {
         ReturnToBattleResult,
         ResolveNodeToMap,
-        FloorComplete
+        FloorComplete,
+        RunWon
     }
 
     public sealed class RewardCandidate
@@ -284,13 +285,46 @@ namespace SpireChess.Run
             int highestEnemyTier,
             int nodeDamageBonus,
             BattleOutcomeReason outcomeReason)
+            : this(
+                playerWon,
+                damage,
+                survivingEnemies,
+                highestEnemyTier,
+                nodeDamageBonus,
+                outcomeReason,
+                0,
+                damage)
         {
+        }
+
+        private BattleSettlementResult(
+            bool playerWon,
+            int damage,
+            int survivingEnemies,
+            int highestEnemyTier,
+            int nodeDamageBonus,
+            BattleOutcomeReason outcomeReason,
+            int armorAbsorbed,
+            int healthDamage)
+        {
+            if (damage < 0 ||
+                armorAbsorbed < 0 ||
+                healthDamage < 0 ||
+                armorAbsorbed + healthDamage != damage)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(damage),
+                    "Battle damage resolution must be non-negative and sum to raw damage.");
+            }
+
             PlayerWon = playerWon;
             Damage = damage;
             SurvivingEnemies = survivingEnemies;
             HighestEnemyTier = highestEnemyTier;
             NodeDamageBonus = nodeDamageBonus;
             OutcomeReason = outcomeReason;
+            ArmorAbsorbed = armorAbsorbed;
+            HealthDamage = healthDamage;
         }
 
         public bool PlayerWon { get; }
@@ -299,6 +333,23 @@ namespace SpireChess.Run
         public int HighestEnemyTier { get; }
         public int NodeDamageBonus { get; }
         public BattleOutcomeReason OutcomeReason { get; }
+        public int ArmorAbsorbed { get; }
+        public int HealthDamage { get; }
+
+        public BattleSettlementResult WithDamageResolution(
+            int armorAbsorbed,
+            int healthDamage)
+        {
+            return new BattleSettlementResult(
+                PlayerWon,
+                Damage,
+                SurvivingEnemies,
+                HighestEnemyTier,
+                NodeDamageBonus,
+                OutcomeReason,
+                armorAbsorbed,
+                healthDamage);
+        }
 
         public string BuildDamageText()
         {
@@ -309,10 +360,13 @@ namespace SpireChess.Run
 
             if (OutcomeReason != BattleOutcomeReason.Victory)
             {
-                return $"平局伤害：{Damage}";
+                return $"平局伤害：{Damage}；护甲吸收 {ArmorAbsorbed}，" +
+                       $"生命损失 {HealthDamage}";
             }
 
-            return $"伤害 {Damage} = 存活 {SurvivingEnemies} + 最高等级 {HighestEnemyTier} + 修正 {NodeDamageBonus}";
+            return $"伤害 {Damage} = 存活 {SurvivingEnemies} + " +
+                   $"最高等级 {HighestEnemyTier} + 修正 {NodeDamageBonus}；" +
+                   $"护甲吸收 {ArmorAbsorbed}，生命损失 {HealthDamage}";
         }
     }
 
@@ -323,22 +377,41 @@ namespace SpireChess.Run
         private readonly List<OwnedRelicState> ownedRelics =
             new List<OwnedRelicState>();
 
-        internal RunState(int seed, MapDefinition map)
+        internal RunState(
+            int seed,
+            MapDefinition map,
+            string heroId,
+            bool applyHeroRunStart = true)
         {
+            if (!HeroIds.IsKnown(heroId))
+            {
+                throw new ArgumentException($"Unknown hero id {heroId}.", nameof(heroId));
+            }
+
             Seed = seed;
+            HeroId = heroId;
             Floor = map?.Floor ?? 1;
             ShopTurn = 0;
             MapStep = 0;
             Health = 20;
             MaxHealth = 20;
+            Armor = applyHeroRunStart
+                ? HeroPassiveRules.GetStartingArmor(heroId)
+                : 0;
             Phase = RunPhase.MapSelection;
             CurrentMap = map;
             MapProgress = map == null ? null : new MapProgressState(map);
             DelayedShopResources = new DelayedShopResources();
+            HeroRuntime = new HeroRuntimeState();
+            if (applyHeroRunStart)
+            {
+                HeroRuntime.MarkRunStartApplied();
+            }
             Statistics = new RunStatistics();
         }
 
         public int Seed { get; }
+        public string HeroId { get; }
         public int Floor { get; internal set; }
         public int ShopTurn { get; internal set; }
         public int RunTurn
@@ -349,6 +422,7 @@ namespace SpireChess.Run
         public int MapStep { get; internal set; }
         public int Health { get; internal set; }
         public int MaxHealth { get; internal set; }
+        public int Armor { get; internal set; }
         public RunPhase Phase { get; internal set; }
         public MapDefinition CurrentMap { get; internal set; }
         public MapProgressState MapProgress { get; internal set; }
@@ -357,6 +431,7 @@ namespace SpireChess.Run
         public BattleSettlementResult LastSettlement { get; internal set; }
         public string LastRewardSummary { get; internal set; }
         public DelayedShopResources DelayedShopResources { get; }
+        public HeroRuntimeState HeroRuntime { get; }
         public IReadOnlyList<PendingCardReward> PendingCardRewards => pendingCardRewards;
         public PendingRewardChoice PendingRewardChoice { get; internal set; }
         public PendingRelicChoice PendingRelicChoice { get; internal set; }
@@ -411,6 +486,135 @@ namespace SpireChess.Run
             pendingCardRewards.AddRange(rewards ?? Array.Empty<PendingCardReward>());
             ownedRelics.Clear();
             ownedRelics.AddRange(relics ?? Array.Empty<OwnedRelicState>());
+        }
+    }
+
+    public sealed class HeroRuntimeState
+    {
+        private readonly HashSet<int> processedShopStartTurns =
+            new HashSet<int>();
+        private readonly HashSet<int> processedShopEndTurns =
+            new HashSet<int>();
+
+        public IReadOnlyCollection<int> ProcessedShopStartTurns =>
+            processedShopStartTurns;
+        public IReadOnlyCollection<int> ProcessedShopEndTurns =>
+            processedShopEndTurns;
+        public bool RunStartApplied { get; private set; }
+        public int LastShopStartTurn { get; private set; }
+        public HeroPassiveShopStartOutcome LastShopStartOutcome { get; private set; }
+        public string LastGrantedSpellId { get; private set; } = string.Empty;
+        public int LastShopEndTurn { get; private set; }
+        public HeroPassiveShopEndOutcome LastShopEndOutcome { get; private set; }
+        public string LastStolenMinionId { get; private set; } = string.Empty;
+
+        internal bool MarkRunStartApplied()
+        {
+            if (RunStartApplied)
+            {
+                return false;
+            }
+
+            RunStartApplied = true;
+            return true;
+        }
+
+        internal bool MarkShopStartProcessed(int shopTurn)
+        {
+            return processedShopStartTurns.Add(shopTurn);
+        }
+
+        internal bool MarkShopEndProcessed(int shopTurn)
+        {
+            return processedShopEndTurns.Add(shopTurn);
+        }
+
+        internal void RecordShopStartOutcome(
+            int shopTurn,
+            HeroPassiveShopStartOutcome outcome,
+            string grantedSpellId = null)
+        {
+            if (shopTurn < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(shopTurn));
+            }
+
+            if (!Enum.IsDefined(typeof(HeroPassiveShopStartOutcome), outcome) ||
+                outcome == HeroPassiveShopStartOutcome.None)
+            {
+                throw new ArgumentOutOfRangeException(nameof(outcome));
+            }
+
+            if (outcome == HeroPassiveShopStartOutcome.GrantedTemporarySpell &&
+                string.IsNullOrWhiteSpace(grantedSpellId))
+            {
+                throw new ArgumentException(
+                    "A granted Mage spell id is required.",
+                    nameof(grantedSpellId));
+            }
+
+            LastShopStartTurn = shopTurn;
+            LastShopStartOutcome = outcome;
+            LastGrantedSpellId =
+                outcome == HeroPassiveShopStartOutcome.GrantedTemporarySpell
+                    ? grantedSpellId ?? string.Empty
+                    : string.Empty;
+        }
+
+        internal void RecordShopEndOutcome(
+            int shopTurn,
+            HeroPassiveShopEndOutcome outcome,
+            string stolenMinionId = null)
+        {
+            if (shopTurn < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(shopTurn));
+            }
+
+            if (!Enum.IsDefined(typeof(HeroPassiveShopEndOutcome), outcome) ||
+                outcome == HeroPassiveShopEndOutcome.None)
+            {
+                throw new ArgumentOutOfRangeException(nameof(outcome));
+            }
+
+            if (outcome == HeroPassiveShopEndOutcome.StoleMinion &&
+                string.IsNullOrWhiteSpace(stolenMinionId))
+            {
+                throw new ArgumentException(
+                    "A stolen Rogue minion id is required.",
+                    nameof(stolenMinionId));
+            }
+
+            LastShopEndTurn = shopTurn;
+            LastShopEndOutcome = outcome;
+            LastStolenMinionId =
+                outcome == HeroPassiveShopEndOutcome.StoleMinion
+                    ? stolenMinionId
+                    : string.Empty;
+        }
+
+        internal void Restore(
+            bool runStartApplied,
+            IEnumerable<int> shopStartTurns,
+            IEnumerable<int> shopEndTurns,
+            int lastShopStartTurn,
+            HeroPassiveShopStartOutcome lastShopStartOutcome,
+            string lastGrantedSpellId,
+            int lastShopEndTurn,
+            HeroPassiveShopEndOutcome lastShopEndOutcome,
+            string lastStolenMinionId)
+        {
+            RunStartApplied = runStartApplied;
+            processedShopStartTurns.Clear();
+            processedShopStartTurns.UnionWith(shopStartTurns ?? Array.Empty<int>());
+            processedShopEndTurns.Clear();
+            processedShopEndTurns.UnionWith(shopEndTurns ?? Array.Empty<int>());
+            LastShopStartTurn = lastShopStartTurn;
+            LastShopStartOutcome = lastShopStartOutcome;
+            LastGrantedSpellId = lastGrantedSpellId ?? string.Empty;
+            LastShopEndTurn = lastShopEndTurn;
+            LastShopEndOutcome = lastShopEndOutcome;
+            LastStolenMinionId = lastStolenMinionId ?? string.Empty;
         }
     }
 

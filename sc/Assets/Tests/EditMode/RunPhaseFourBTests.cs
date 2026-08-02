@@ -37,13 +37,26 @@ namespace SpireChess.Tests
             ResolveBattle(lossRun, new BattleSimulationResult(
                 finalState, BattleSide.Enemy, BattleOutcomeReason.Victory,
                 new List<string>(), new List<BattleStep>()));
-            Assert.That(lossRun.State.Health, Is.EqualTo(17), "1 survivor + tier 1 + elite bonus 1");
+            Assert.That(lossRun.State.Health, Is.EqualTo(20));
+            Assert.That(
+                lossRun.State.Armor,
+                Is.EqualTo(7),
+                "1 survivor + tier 1 + elite bonus 1");
+            Assert.That(
+                lossRun.State.LastSettlement.ArmorAbsorbed,
+                Is.EqualTo(3));
+            Assert.That(lossRun.State.LastSettlement.HealthDamage, Is.Zero);
 
             var drawRun = ReachElite(42);
             ResolveBattle(drawRun, new BattleSimulationResult(
                 new BattleBoardState(), null, BattleOutcomeReason.RoundLimit,
                 new List<string>(), new List<BattleStep>()));
-            Assert.That(drawRun.State.Health, Is.EqualTo(19));
+            Assert.That(drawRun.State.Health, Is.EqualTo(20));
+            Assert.That(drawRun.State.Armor, Is.EqualTo(9));
+            Assert.That(
+                drawRun.State.LastSettlement.ArmorAbsorbed,
+                Is.EqualTo(1));
+            Assert.That(drawRun.State.LastSettlement.HealthDamage, Is.Zero);
         }
 
         [Test]
@@ -122,8 +135,10 @@ namespace SpireChess.Tests
         {
             var run = FindEvent("blood_contract");
             var health = run.State.Health;
+            var armor = run.State.Armor;
             Assert.That(run.SelectEventOption("blood_contract", "accept").Success, Is.True);
             Assert.That(run.State.Health, Is.EqualTo(health - 3));
+            Assert.That(run.State.Armor, Is.EqualTo(armor));
             Assert.That(run.State.DelayedShopResources.GoldBonus, Is.EqualTo(4));
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.MapSelection));
 
@@ -232,11 +247,13 @@ namespace SpireChess.Tests
         public void RestRejectsWastedHeal_ButMaxHealthOptionAlwaysBenefits()
         {
             var run = ReachRest(71);
+            var armor = run.State.Armor;
             Assert.That(run.SelectRestOption("heal_6").Error, Is.EqualTo(RunOperationError.NoBenefit));
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.RestChoice));
             Assert.That(run.SelectRestOption("max_health_2_heal_2").Success, Is.True);
             Assert.That(run.State.MaxHealth, Is.EqualTo(22));
             Assert.That(run.State.Health, Is.EqualTo(22));
+            Assert.That(run.State.Armor, Is.EqualTo(armor));
         }
 
         [Test]

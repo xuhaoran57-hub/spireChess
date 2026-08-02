@@ -1208,7 +1208,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u7B2C 1 \u5C42 \xB7 \u4E09\u5C42\u8FDC\u5F81"
+  m_Text: "\u8352\u91CE \xB7 \u7B2C 1 \u7AE0"
 --- !u!1 &2729317943025049271
 GameObject:
   m_ObjectHideFlags: 0
@@ -2133,7 +2133,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u51A0\u5195\u7EA7\u9057\u73CD\u4F1A\u5728\u540E\u7EED\u697C\u5C42\u6301\u7EED\u6539\u53D8\u89C4\u5219\u3002"
+  m_Text: "\u51A0\u5195\u7EA7\u9057\u73CD\u4F1A\u5728\u540E\u7EED\u7AE0\u8282\u6301\u7EED\u6539\u53D8\u89C4\u5219\u3002"
 --- !u!1 &5066563218674076210
 GameObject:
   m_ObjectHideFlags: 0
@@ -2699,7 +2699,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u672C\u5C42\u5546\u5E97 0/6   \u56FA\u5B9A\u6218\u6597 0/6   \u5730\u56FE\u6B65\u6570
+  m_Text: "\u672C\u7AE0\u5546\u5E97 0/6   \u56FA\u5B9A\u6218\u6597 0/6   \u5730\u56FE\u6B65\u6570
     0"
 --- !u!1 &6803271486059044685
 GameObject:
@@ -3802,4 +3802,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u9009\u62E9\u53EF\u8FBE\u8282\u70B9\u7EE7\u7EED\u4E09\u5C42\u5355\u5C40"
+  m_Text: "\u9009\u62E9\u53EF\u8FBE\u8282\u70B9\u7EE7\u7EED\u65C5\u7A0B"

@@ -1,0 +1,102 @@
+{
+  "fixtureVersion": "0.4.0",
+  "sourceFixtureVersion": "0.3.0",
+  "shopsPerFloor": 6,
+  "checkpoints": [
+    { "id": "F1_C2", "floor": 1, "combatIndex": 2, "runTurn": 2, "activeSlots": 2, "maxTavernTier": 2, "growthScale": 0.0, "highGrowthBlend": 0.0 },
+    { "id": "F1_C4", "floor": 1, "combatIndex": 4, "runTurn": 4, "activeSlots": 4, "maxTavernTier": 2, "growthScale": 0.1, "highGrowthBlend": 0.0 },
+    { "id": "F1_C5", "floor": 1, "combatIndex": 5, "runTurn": 5, "activeSlots": 5, "maxTavernTier": 3, "growthScale": 0.2, "highGrowthBlend": 0.0 },
+    { "id": "F2_C2", "floor": 2, "combatIndex": 2, "runTurn": 8, "activeSlots": 5, "maxTavernTier": 3, "growthScale": 0.35, "highGrowthBlend": 0.0 },
+    { "id": "F2_C4", "floor": 2, "combatIndex": 4, "runTurn": 10, "activeSlots": 5, "maxTavernTier": 4, "growthScale": 0.55, "highGrowthBlend": 0.0 },
+    { "id": "F2_C5", "floor": 2, "combatIndex": 5, "runTurn": 11, "activeSlots": 5, "maxTavernTier": 4, "growthScale": 0.75, "highGrowthBlend": 0.0 },
+    { "id": "F3_C2", "floor": 3, "combatIndex": 2, "runTurn": 14, "activeSlots": 5, "maxTavernTier": 5, "growthScale": 1.0, "highGrowthBlend": 0.0 },
+    { "id": "F3_C4", "floor": 3, "combatIndex": 4, "runTurn": 16, "activeSlots": 5, "maxTavernTier": 5, "growthScale": 1.0, "highGrowthBlend": 0.25 },
+    { "id": "F3_C5", "floor": 3, "combatIndex": 5, "runTurn": 17, "activeSlots": 5, "maxTavernTier": 5, "growthScale": 1.0, "highGrowthBlend": 0.5 }
+  ],
+  "builds": [
+    {
+      "buildId": "B01_SHIELD",
+      "rosters": [
+        { "checkpointId": "F1_C2", "minionIds": ["forge_soul_shield_squire", "copper_ring_apprentice"] },
+        { "checkpointId": "F1_C4", "minionIds": ["forge_soul_shield_squire", "copper_ring_apprentice", "shieldwall_furnace_keeper", "tempering_mender"] },
+        { "checkpointId": "F1_C5", "minionIds": ["shieldwall_furnace_keeper", "tempering_mender", "molten_core_standard", "resonance_bell_guard", "forge_soul_shield_squire"] },
+        { "checkpointId": "F2_C2", "minionIds": ["molten_core_standard", "resonance_bell_guard", "shieldwall_furnace_keeper", "tempering_mender", "forge_soul_shield_squire"] },
+        { "checkpointId": "F2_C4", "minionIds": ["molten_core_standard", "resonance_bell_guard", "hearth_core_aegis_officer", "ringing_iron_bastion", "shieldwall_furnace_keeper"] },
+        { "checkpointId": "F2_C5", "minionIds": ["molten_core_standard", "resonance_bell_guard", "hearth_core_aegis_officer", "ringing_iron_bastion", "cinder_armor_arbiter"] },
+        { "checkpointId": "F3_C2", "minionIds": ["molten_core_standard", "resonance_bell_guard", "hearth_core_aegis_officer", "thousand_ring_tomb_guardian", "undying_furnace_king"] },
+        { "checkpointId": "F3_C4", "minionIds": ["molten_core_standard", "resonance_bell_guard", "hearth_core_aegis_officer", "thousand_ring_tomb_guardian", "undying_furnace_king"], "goldenSlots": [0] },
+        { "checkpointId": "F3_C5", "minionIds": ["molten_core_standard", "resonance_bell_guard", "hearth_core_aegis_officer", "thousand_ring_tomb_guardian", "undying_furnace_king"], "goldenSlots": [0, 1] }
+      ]
+    },
+    {
+      "buildId": "B02_BREAK",
+      "rosters": [
+        { "checkpointId": "F1_C2", "minionIds": ["hearth_core_spark", "shieldbreaker_blade_blank"] },
+        { "checkpointId": "F1_C4", "minionIds": ["hearth_core_spark", "shieldbreaker_blade_blank", "ember_engraver", "forge_soul_shield_squire"] },
+        { "checkpointId": "F1_C5", "minionIds": ["counterflow_smith", "oathblade_armor", "shieldbreaker_blade_blank", "hearth_core_spark", "ember_engraver"] },
+        { "checkpointId": "F2_C2", "minionIds": ["counterflow_smith", "oathblade_armor", "shieldbreaker_blade_blank", "hearth_core_spark", "ember_engraver"] },
+        { "checkpointId": "F2_C4", "minionIds": ["cinder_armor_arbiter", "cracked_armor_avenger", "counterflow_smith", "oathblade_armor", "shieldbreaker_blade_blank"] },
+        { "checkpointId": "F2_C5", "minionIds": ["cinder_armor_arbiter", "cracked_armor_avenger", "counterflow_smith", "oathblade_armor", "shieldbreaker_blade_blank"] },
+        { "checkpointId": "F3_C2", "minionIds": ["oathbroken_blade_soul", "molten_core_standard", "undying_furnace_king", "counterflow_smith", "cinder_armor_arbiter"] },
+        { "checkpointId": "F3_C4", "minionIds": ["oathbroken_blade_soul", "molten_core_standard", "undying_furnace_king", "counterflow_smith", "cinder_armor_arbiter"], "goldenSlots": [0] },
+        { "checkpointId": "F3_C5", "minionIds": ["oathbroken_blade_soul", "molten_core_standard", "undying_furnace_king", "counterflow_smith", "cinder_armor_arbiter"], "goldenSlots": [0, 1], "overlays": [{ "slot": 3, "keywords": ["Shield"] }] }
+      ]
+    },
+    {
+      "buildId": "B03_SUMMON",
+      "rosters": [
+        { "checkpointId": "F1_C2", "minionIds": ["young_deer_spirit", "rending_cub"] },
+        { "checkpointId": "F1_C4", "minionIds": ["young_deer_spirit", "rending_cub", "swiftwing_forest_hawk", "two_tailed_fox_spirit"] },
+        { "checkpointId": "F1_C5", "minionIds": ["rending_cub", "swiftwing_forest_hawk", "two_tailed_fox_spirit", "many_branch_invoker", "tuskherd_pathrunner"] },
+        { "checkpointId": "F2_C2", "minionIds": ["rending_cub", "swiftwing_forest_hawk", "two_tailed_fox_spirit", "many_branch_invoker", "tuskherd_pathrunner"] },
+        { "checkpointId": "F2_C4", "minionIds": ["hundred_song_herd", "fox_den_matriarch", "many_branch_invoker", "vinecrown_priest", "tuskherd_pathrunner"] },
+        { "checkpointId": "F2_C5", "minionIds": ["hundred_song_herd", "fox_den_matriarch", "many_branch_invoker", "vinecrown_priest", "tuskherd_pathrunner"] },
+        { "checkpointId": "F3_C2", "minionIds": ["hundred_song_herd", "fox_den_matriarch", "many_branch_invoker", "vinecrown_priest", "ten_thousand_hoof_surge"] },
+        { "checkpointId": "F3_C4", "minionIds": ["hundred_song_herd", "fox_den_matriarch", "many_branch_invoker", "vinecrown_priest", "ten_thousand_hoof_surge"], "goldenSlots": [0] },
+        { "checkpointId": "F3_C5", "minionIds": ["hundred_song_herd", "fox_den_matriarch", "many_branch_invoker", "vinecrown_priest", "ten_thousand_hoof_surge"], "goldenSlots": [0, 1] }
+      ]
+    },
+    {
+      "buildId": "B04_DEATH",
+      "rosters": [
+        { "checkpointId": "F1_C2", "minionIds": ["moss_mark_seedling", "root_devourer"] },
+        { "checkpointId": "F1_C4", "minionIds": ["moss_mark_seedling", "root_devourer", "rotleaf_heir", "moss_mark_seedling"] },
+        { "checkpointId": "F1_C5", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "root_devourer", "rotleaf_heir", "moss_mark_seedling"] },
+        { "checkpointId": "F2_C2", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "root_devourer", "rotleaf_heir", "moss_mark_seedling"] },
+        { "checkpointId": "F2_C4", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "mountain_belly_soul_eater", "rotleaf_heir", "root_devourer"] },
+        { "checkpointId": "F2_C5", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "mountain_belly_soul_eater", "rotleaf_heir", "root_devourer"] },
+        { "checkpointId": "F3_C2", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "mountain_belly_soul_eater", "ancient_mountain_spirit", "world_eating_final_bloom"], "overlays": [{ "slot": 0, "keywords": ["Taunt"] }, { "slot": 4, "keywords": ["Shield"] }] },
+        { "checkpointId": "F3_C4", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "mountain_belly_soul_eater", "ancient_mountain_spirit", "world_eating_final_bloom"], "goldenSlots": [0], "overlays": [{ "slot": 0, "keywords": ["Taunt"] }, { "slot": 4, "keywords": ["Shield"] }] },
+        { "checkpointId": "F3_C5", "minionIds": ["rootbound_soul_guide", "ancient_moss_hatchling", "mountain_belly_soul_eater", "ancient_mountain_spirit", "world_eating_final_bloom"], "goldenSlots": [0, 1], "overlays": [{ "slot": 0, "keywords": ["Taunt"] }, { "slot": 4, "keywords": ["Shield"] }] }
+      ]
+    },
+    {
+      "buildId": "B05_SPELL",
+      "rosters": [
+        { "checkpointId": "F1_C2", "minionIds": ["glimmer_mage", "rune_ward_reader"] },
+        { "checkpointId": "F1_C4", "minionIds": ["glimmer_mage", "rune_ward_reader", "moon_phase_scribe", "star_etched_timekeeper"] },
+        { "checkpointId": "F1_C5", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "moon_phase_scribe", "glimmer_mage"] },
+        { "checkpointId": "F2_C2", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "moon_phase_scribe", "glimmer_mage"] },
+        { "checkpointId": "F2_C4", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "falling_light_arbiter", "stargate_lecturer"], "overlays": [{ "slot": 3, "keywords": ["Cleave"] }] },
+        { "checkpointId": "F2_C5", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "falling_light_arbiter", "stargate_lecturer"], "overlays": [{ "slot": 3, "keywords": ["Cleave"] }] },
+        { "checkpointId": "F3_C2", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "falling_light_arbiter", "falling_star_prophet"], "overlays": [{ "slot": 3, "keywords": ["Cleave"] }] },
+        { "checkpointId": "F3_C4", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "falling_light_arbiter", "falling_star_prophet"], "goldenSlots": [0], "overlays": [{ "slot": 3, "keywords": ["Cleave"] }] },
+        { "checkpointId": "F3_C5", "minionIds": ["secret_page_refractor", "rune_ward_reader", "echo_starchanter", "falling_light_arbiter", "falling_star_prophet"], "goldenSlots": [0, 1], "overlays": [{ "slot": 3, "keywords": ["Cleave", "Shield"] }] }
+      ]
+    },
+    {
+      "buildId": "B06_REFRESH",
+      "rosters": [
+        { "checkpointId": "F1_C2", "minionIds": ["stardust_attendant", "stargazing_apprentice"] },
+        { "checkpointId": "F1_C4", "minionIds": ["stardust_attendant", "stargazing_apprentice", "astrolabe_calibrator", "star_etched_timekeeper"] },
+        { "checkpointId": "F1_C5", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "star_etched_timekeeper", "stardust_attendant", "star_map_broker"] },
+        { "checkpointId": "F2_C2", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "star_etched_timekeeper", "stardust_attendant", "star_map_broker"] },
+        { "checkpointId": "F2_C4", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "moonwheel_dispatcher", "star_ring_treasurer", "star_map_broker"], "overlays": [{ "slot": 0, "keywords": ["Shield"] }] },
+        { "checkpointId": "F2_C5", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "moonwheel_dispatcher", "star_ring_treasurer", "star_map_broker"], "overlays": [{ "slot": 0, "keywords": ["Shield"] }] },
+        { "checkpointId": "F3_C2", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "moonwheel_dispatcher", "star_ring_treasurer", "sky_covenant_bearer"], "overlays": [{ "slot": 0, "keywords": ["Shield"] }] },
+        { "checkpointId": "F3_C4", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "moonwheel_dispatcher", "star_ring_treasurer", "sky_covenant_bearer"], "goldenSlots": [0], "overlays": [{ "slot": 0, "keywords": ["Shield"] }] },
+        { "checkpointId": "F3_C5", "minionIds": ["astrolabe_calibrator", "fate_track_recorder", "moonwheel_dispatcher", "star_ring_treasurer", "sky_covenant_bearer"], "goldenSlots": [0, 1], "overlays": [{ "slot": 0, "keywords": ["Shield"] }, { "slot": 1, "keywords": ["Shield"] }] }
+      ]
+    }
+  ]
+}

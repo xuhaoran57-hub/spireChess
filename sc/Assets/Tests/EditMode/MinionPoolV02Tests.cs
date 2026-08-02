@@ -132,16 +132,16 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void EncountersAndRewards_ReferenceV02Content()
+        public void EncountersAndRewards_ReferenceExpandedChapterContent()
         {
             var encounterIds = configs.Encounters
                 .SelectMany(value => value.EnemySlots)
                 .Select(value => value.MinionId)
                 .ToList();
-            Assert.That(encounterIds, Does.Contain("counterflow_smith"));
-            Assert.That(encounterIds, Does.Contain("cinder_armor_arbiter"));
             Assert.That(encounterIds, Does.Contain("fox_den_matriarch"));
-            Assert.That(encounterIds, Does.Contain("pack_hunt_inspector"));
+            Assert.That(encounterIds, Does.Contain("falling_light_arbiter"));
+            Assert.That(encounterIds, Does.Contain("cinder_armor_arbiter"));
+            Assert.That(encounterIds, Does.Contain("undying_furnace_king"));
 
             var rewardCardIds = configs.RewardTables
                 .SelectMany(value => value.Entries)

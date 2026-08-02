@@ -84,13 +84,21 @@ namespace SpireChess.Run
 
         public MapDefinition(
             string id,
+            string displayName,
+            string themeFaction,
             int floor,
+            string nextMapId,
+            bool isFinalChapter,
             MapRuleProfile ruleProfile,
             IEnumerable<MapNodeDefinition> nodes,
             IEnumerable<string> startNodeIds)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
+            DisplayName = displayName ?? throw new ArgumentNullException(nameof(displayName));
+            ThemeFaction = themeFaction ?? throw new ArgumentNullException(nameof(themeFaction));
             Floor = floor;
+            NextMapId = nextMapId ?? string.Empty;
+            IsFinalChapter = isFinalChapter;
             RuleProfile = ruleProfile ?? throw new ArgumentNullException(nameof(ruleProfile));
             Nodes = new List<MapNodeDefinition>(nodes ?? throw new ArgumentNullException(nameof(nodes)))
                 .AsReadOnly();
@@ -102,7 +110,11 @@ namespace SpireChess.Run
         }
 
         public string Id { get; }
+        public string DisplayName { get; }
+        public string ThemeFaction { get; }
         public int Floor { get; }
+        public string NextMapId { get; }
+        public bool IsFinalChapter { get; }
         public MapRuleProfile RuleProfile { get; }
         public IReadOnlyList<MapNodeDefinition> Nodes { get; }
         public IReadOnlyList<string> StartNodeIds { get; }
@@ -116,6 +128,7 @@ namespace SpireChess.Run
     public interface IMapProvider
     {
         MapDefinition CreateMap(MapRequest request);
+        MapDefinition CreateMapById(string mapId);
     }
 
     public sealed class FixedMapProvider : IMapProvider
@@ -145,6 +158,28 @@ namespace SpireChess.Run
                 throw new InvalidOperationException($"Missing fixed map for floor {request.Floor}.");
             }
 
+            return CreateDefinition(config);
+        }
+
+        public MapDefinition CreateMapById(string mapId)
+        {
+            if (string.IsNullOrWhiteSpace(mapId))
+            {
+                throw new ArgumentException("Map id is required.", nameof(mapId));
+            }
+
+            var config = configs.FirstOrDefault(map =>
+                map != null && string.Equals(map.Id, mapId, StringComparison.Ordinal));
+            if (config == null)
+            {
+                throw new InvalidOperationException($"Missing fixed map {mapId}.");
+            }
+
+            return CreateDefinition(config);
+        }
+
+        private MapDefinition CreateDefinition(RunMapConfig config)
+        {
             if (!ruleProfiles.TryGetValue(config.RuleProfileId ?? string.Empty, out var ruleConfig))
             {
                 throw new InvalidOperationException(
@@ -172,7 +207,11 @@ namespace SpireChess.Run
 
             var definition = new MapDefinition(
                 config.Id,
+                config.DisplayName,
+                config.ThemeFaction,
                 config.Floor,
+                config.NextMapId,
+                config.IsFinalChapter,
                 new MapRuleProfile(ruleConfig),
                 nodes,
                 config.StartNodeIds);
@@ -199,6 +238,25 @@ namespace SpireChess.Run
             {
                 result.AddError($"Map {map.Id} has no nodes.");
                 return result;
+            }
+
+            if (string.IsNullOrWhiteSpace(map.DisplayName))
+            {
+                result.AddError($"Map {map.Id} has no display name.");
+            }
+
+            if (string.IsNullOrWhiteSpace(map.ThemeFaction))
+            {
+                result.AddError($"Map {map.Id} has no theme faction.");
+            }
+
+            if (map.IsFinalChapter && !string.IsNullOrWhiteSpace(map.NextMapId))
+            {
+                result.AddError($"Final map {map.Id} cannot reference next map {map.NextMapId}.");
+            }
+            else if (!map.IsFinalChapter && string.IsNullOrWhiteSpace(map.NextMapId))
+            {
+                result.AddError($"Non-final map {map.Id} must reference a next map.");
             }
 
             foreach (var duplicate in map.Nodes

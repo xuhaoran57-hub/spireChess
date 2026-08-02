@@ -10,7 +10,7 @@ namespace SpireChess.Save
     public sealed class RunSaveDocumentV1
     {
         public const string FormatId = "spire-chess-run";
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 2;
 
         public string Format { get; set; } = FormatId;
         public int SchemaVersion { get; set; } = CurrentSchemaVersion;
@@ -29,9 +29,14 @@ namespace SpireChess.Save
 
     public sealed class RunSaveSummaryV1
     {
+        public string HeroId { get; set; }
+        public string HeroName { get; set; }
+        public string MapId { get; set; }
+        public string MapName { get; set; }
         public int Floor { get; set; }
         public int Health { get; set; }
         public int MaxHealth { get; set; }
+        public int Armor { get; set; }
         public int ShopTurn { get; set; }
         public RunPhase Phase { get; set; }
     }
@@ -53,11 +58,14 @@ namespace SpireChess.Save
     public sealed class RunStateSnapshotV1
     {
         public int Seed { get; set; }
+        public string HeroId { get; set; }
         public int Floor { get; set; }
         public int ShopTurn { get; set; }
         public int MapStep { get; set; }
         public int Health { get; set; }
         public int MaxHealth { get; set; }
+        public int Armor { get; set; }
+        public HeroRuntimeSnapshotV1 HeroRuntime { get; set; }
         public RunPhase Phase { get; set; }
         public string MapId { get; set; }
         public Dictionary<string, RunNodeStatus> NodeStatuses { get; set; } =
@@ -77,6 +85,21 @@ namespace SpireChess.Save
         public List<OwnedRelicSnapshotV1> OwnedRelics { get; set; } =
             new List<OwnedRelicSnapshotV1>();
         public RunStatisticsSnapshotV1 Statistics { get; set; }
+    }
+
+    public sealed class HeroRuntimeSnapshotV1
+    {
+        public bool RunStartApplied { get; set; }
+        public List<int> ProcessedShopStartTurns { get; set; } =
+            new List<int>();
+        public List<int> ProcessedShopEndTurns { get; set; } =
+            new List<int>();
+        public int LastShopStartTurn { get; set; }
+        public HeroPassiveShopStartOutcome LastShopStartOutcome { get; set; }
+        public string LastGrantedSpellId { get; set; }
+        public int LastShopEndTurn { get; set; }
+        public HeroPassiveShopEndOutcome LastShopEndOutcome { get; set; }
+        public string LastStolenMinionId { get; set; }
     }
 
     public sealed class NodeAttemptSnapshotV1
@@ -108,6 +131,8 @@ namespace SpireChess.Save
         public int HighestEnemyTier { get; set; }
         public int NodeDamageBonus { get; set; }
         public BattleOutcomeReason OutcomeReason { get; set; }
+        public int ArmorAbsorbed { get; set; }
+        public int HealthDamage { get; set; }
     }
 
     public sealed class DelayedShopResourcesSnapshotV1
@@ -368,6 +393,7 @@ namespace SpireChess.Save
         public RandomStreamSnapshotV1 Shop { get; set; }
         public RandomStreamSnapshotV1 Reward { get; set; }
         public RandomStreamSnapshotV1 Event { get; set; }
+        public RandomStreamSnapshotV1 Hero { get; set; }
         public RandomStreamSnapshotV1 Relic { get; set; }
     }
 

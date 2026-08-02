@@ -50,8 +50,19 @@ namespace SpireChess.Tests.EditMode
                 .OrderBy(value => value)
                 .ToArray();
 
-            Assert.That(state.Title, Is.EqualTo("第 1 层 · 三层远征"));
+            Assert.That(state.Title, Is.EqualTo("荒野 · 第 1 章"));
             Assert.That(state.Status, Is.EqualTo("等待选择"));
+            Assert.That(state.ResourceSummary, Does.Contain("护甲 10"));
+            Assert.That(state.RouteHint, Does.Contain("亡语召唤链"));
+            Assert.That(state.RouteHint, Does.Contain("万籁母巢"));
+            var opening = state.Nodes.Single(node =>
+                node.NodeId == "f1_opening_normal");
+            Assert.That(opening.ThreatLevel, Is.EqualTo(1));
+            Assert.That(opening.RouteText, Is.EqualTo("威胁 ★"));
+            Assert.That(opening.FormationText, Is.EqualTo("敌阵 1/1"));
+            Assert.That(opening.MechanicText, Is.EqualTo("低面板亡语入门"));
+            Assert.That(opening.LossPressureText, Is.Empty);
+            Assert.That(opening.RewardText, Is.EqualTo("下个商店 +1 金币"));
             Assert.That(state.Nodes, Has.Count.EqualTo(19));
             Assert.That(state.Edges, Has.Count.EqualTo(expectedEdges));
             Assert.That(renderedConnections, Is.EqualTo(expectedConnections));
@@ -62,8 +73,39 @@ namespace SpireChess.Tests.EditMode
             Assert.That(state.Nodes.Count(node => node.IsInteractable), Is.EqualTo(1));
             Assert.That(state.Relics, Is.Empty);
             Assert.That(state.Choice, Is.Null);
-            Assert.That(state.Summary.Text, Does.Contain("高亮节点"));
+            Assert.That(state.Summary.Text, Does.Contain("可达节点预览"));
+            Assert.That(state.Summary.Text, Does.Contain("商店｜补给与整备"));
             Assert.That(state.Summary.IsActionVisible, Is.False);
+        }
+
+        [Test]
+        public void Build_RouteChoiceSummarizesThreatMechanicLossAndReward()
+        {
+            var run = new RunSession(configs, 8107);
+            var statuses = GetMutableMapStatuses(run.State.MapProgress);
+            foreach (var nodeId in statuses.Keys.ToArray())
+            {
+                statuses[nodeId] = RunNodeStatus.Locked;
+            }
+            statuses["f1_elite_wall"] = RunNodeStatus.Reachable;
+            statuses["f1_route_normal"] = RunNodeStatus.Reachable;
+            statuses["f1_route_safe"] = RunNodeStatus.Reachable;
+
+            var state = RunScreenStateBuilder.Build(
+                run,
+                configs,
+                string.Empty);
+
+            Assert.That(state.Summary.Text, Does.Contain(
+                "强攻 · 威胁 ★★★★｜第 4 战 · 精英战斗｜百根围猎队"));
+            Assert.That(state.Summary.Text, Does.Contain(
+                "奇遇 · 威胁 ★★★｜第 4 战 · 普通战斗｜狐影繁生队"));
+            Assert.That(state.Summary.Text, Does.Contain(
+                "保守 · 威胁 ★★｜第 4 战 · 普通战斗｜盘根守林队"));
+            Assert.That(state.Summary.Text, Does.Contain("敌阵 11/16"));
+            Assert.That(state.Summary.Text, Does.Contain("失败修正 +1"));
+            Assert.That(state.Summary.Text, Does.Contain("奖励：高价值三选一"));
+            Assert.That(state.Summary.Text, Does.Contain("奖励：1 次免费刷新"));
         }
 
         [Test]
@@ -76,7 +118,7 @@ namespace SpireChess.Tests.EditMode
 
             var state = RunScreenStateBuilder.Build(run, configs, "商店完成");
 
-            Assert.That(state.ProgressSummary, Does.Contain("本层商店 1/6"));
+            Assert.That(state.ProgressSummary, Does.Contain("本章商店 1/6"));
             Assert.That(state.ProgressSummary, Does.Contain("地图步数 1"));
             Assert.That(state.Nodes.Single(node => node.NodeId == "f1_shop_start").Status,
                 Is.EqualTo(RunNodeStatus.Resolved));
@@ -84,6 +126,9 @@ namespace SpireChess.Tests.EditMode
                 Is.EqualTo(RunNodeStatus.Reachable));
             Assert.That(state.Nodes.Single(node => node.NodeId == "f1_opening_normal")
                 .IsInteractable, Is.True);
+            Assert.That(state.Summary.Text, Does.Contain("敌阵 1/1"));
+            Assert.That(state.Summary.Text, Does.Contain("机制：低面板亡语入门"));
+            Assert.That(state.Summary.Text, Does.Contain("奖励：下个商店 +1 金币"));
         }
 
         [Test]

@@ -104,8 +104,8 @@ namespace SpireChess.Tests.EditMode
                 "rests.v0.1.json"
             }.Select(file => File.ReadAllText(Path.Combine(configRoot, file))).ToArray());
             Assert.That(configHash, Is.EqualTo(
-                "8a999a25e2987f5139a37d7b36d44b11035fd3daffff06701d11cbda16940085"));
-            Assert.That(configs.ContentRelease.ContentVersion, Is.EqualTo("5.5.0"));
+                "9732facfe8a656f3c5af647185c12ee95d1c9cca4f3fc166ecbd68df0423b420"));
+            Assert.That(configs.ContentRelease.ContentVersion, Is.EqualTo("5.6.0"));
 
             var serializer = new NewtonsoftJsonSerializer();
             var document = serializer.FromJson<BalanceFixtureFile>(

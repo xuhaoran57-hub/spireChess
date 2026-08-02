@@ -1,0 +1,12 @@
+scope_order,stage,scope_id,before_player_win_rate,after_player_win_rate,win_rate_delta,before_player_score_rate,after_player_score_rate,score_rate_delta,before_build_score_spread,after_build_score_spread,spread_delta,before_b04_score_rate,after_b04_score_rate,b04_delta,before_b02_score_rate,after_b02_score_rate,b02_delta
+1,C1,f3_opening_encounter,0,0.911667,0.911667,0.005,0.945833,0.940833,0.03,0.26,0.23,0,1,1,0,1,1
+2,C2,f3_early_summon_encounter,0.003333,0.868333,0.865,0.01,0.915833,0.905833,0.06,0.335,0.275,0,0.99,0.99,0,0.975,0.975
+3,C2,f3_normal_encounter,0.001667,0.57,0.568333,0.009167,0.681667,0.6725,0.025,0.28,0.255,0,0.715,0.715,0.01,0.64,0.63
+4,C3,f3_mid_mechanic_encounter,0,0.2,0.2,0.0025,0.318333,0.315833,0.015,0.25,0.235,0,0.37,0.37,0,0.435,0.435
+5,C4-Adventure,f3_route_normal_encounter,0.091667,0.118333,0.026666,0.18,0.23,0.05,0.3,0.28,-0.02,0.05,0.35,0.3,0.35,0.35,0
+6,C4-Conservative,f3_route_safe_encounter,0.201667,0.255,0.053333,0.36,0.414167,0.054167,0.26,0.275,0.015,0.235,0.56,0.325,0.45,0.45,0
+7,C4-Aggressive,f3_c4_elite_encounter,0,0.043333,0.043333,0,0.066667,0.066667,0,0.215,0.215,0,0.02,0.02,0,0.15,0.15
+8,C4-Event,f3_c4_event_ambush_encounter,0,0.075,0.075,0,0.164167,0.164167,0,0.245,0.245,0,0.29,0.29,0,0.27,0.27
+9,C5,f3_c5_forge_encounter,0.03,0.028333,-0.001667,0.14,0.116667,-0.023333,0.32,0.335,0.015,0.235,0.36,0.125,0,0.115,0.115
+10,C5,f3_c5_wild_encounter,0.171667,0.213333,0.041666,0.255833,0.321667,0.065834,0.435,0.255,-0.18,0.015,0.28,0.265,0.065,0.195,0.13
+11,C6-Boss,f3_c6_boss_encounter,0.095,0.133333,0.038333,0.173333,0.231667,0.058334,0.395,0.335,-0.06,0.025,0.285,0.26,0.125,0.215,0.09

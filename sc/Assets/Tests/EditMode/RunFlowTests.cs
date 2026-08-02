@@ -15,7 +15,7 @@ namespace SpireChess.Tests
         {
             var run = CreateRun(11);
 
-            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("phase8b_floor1"));
+            Assert.That(run.State.CurrentMap.Id, Is.EqualTo("map_wilderness"));
             Assert.That(run.State.CurrentMap.Nodes.Count, Is.EqualTo(19));
             Assert.That(run.State.ShopTurn, Is.Zero);
             Assert.That(run.State.MapStep, Is.Zero);
@@ -91,7 +91,13 @@ namespace SpireChess.Tests
 
             Assert.That(run.TryCompleteBattle(result, out _), Is.True);
             var healthAfterFirstSettlement = run.State.Health;
-            Assert.That(healthAfterFirstSettlement, Is.LessThan(20));
+            var armorAfterFirstSettlement = run.State.Armor;
+            Assert.That(run.State.LastSettlement.Damage, Is.GreaterThan(0));
+            Assert.That(
+                (20 - healthAfterFirstSettlement) +
+                (HeroPassiveRules.WarriorStartingArmor -
+                 armorAfterFirstSettlement),
+                Is.EqualTo(run.State.LastSettlement.Damage));
             Assert.That(run.State.CurrentAttempt.NodeResolved, Is.False);
             Assert.That(run.Shop.IsShopOpen, Is.False);
 
@@ -100,6 +106,8 @@ namespace SpireChess.Tests
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.Battle));
             Assert.That(run.State.ShopTurn, Is.EqualTo(shopTurn));
             Assert.That(run.State.MapStep, Is.EqualTo(mapStep));
+            Assert.That(run.State.Health, Is.EqualTo(healthAfterFirstSettlement));
+            Assert.That(run.State.Armor, Is.EqualTo(armorAfterFirstSettlement));
             Assert.That(run.Shop.Gold, Is.Zero);
             Assert.That(run.Shop.IsShopOpen, Is.False);
             Assert.That(run.PendingBattle.BattleSeed, Is.EqualTo(firstSeed));

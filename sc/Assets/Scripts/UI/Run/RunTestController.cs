@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using SpireChess.App;
 using SpireChess.Audio;
 using SpireChess.Run;
@@ -13,6 +14,7 @@ namespace SpireChess.UI.Run
 
         private RunSession run;
         private bool initialized;
+        private string unlockNotificationText = string.Empty;
 
         public bool IsInitialized => initialized;
         public bool IsUsingFormalView => initialized && screenView != null;
@@ -281,9 +283,13 @@ namespace SpireChess.UI.Run
 
             screenView.Bind(this);
             RunSystemMenuView.Attach(screenView);
-            StatusMessage = IsChoicePhase(run.State.Phase)
-                ? "请完成当前节点选择"
-                : "选择可达节点继续三层单局";
+            CaptureUnlockNotification();
+            var heroPassiveMessage = run.CurrentShopEndHeroPassiveMessage;
+            StatusMessage = !string.IsNullOrWhiteSpace(heroPassiveMessage)
+                ? heroPassiveMessage
+                : IsChoicePhase(run.State.Phase)
+                    ? "请完成当前节点选择"
+                    : "选择可达节点继续旅程";
             RefreshAll();
         }
 
@@ -329,10 +335,53 @@ namespace SpireChess.UI.Run
             {
                 return;
             }
-            screenView.Render(RunScreenStateBuilder.Build(
+            var state = RunScreenStateBuilder.Build(
                 run,
                 GameApp.Instance.Configs,
-                StatusMessage));
+                StatusMessage);
+            if (!string.IsNullOrWhiteSpace(unlockNotificationText) &&
+                state.Summary != null)
+            {
+                state.Summary.Text = string.IsNullOrWhiteSpace(state.Summary.Text)
+                    ? unlockNotificationText
+                    : state.Summary.Text + " · " + unlockNotificationText;
+            }
+
+            screenView.Render(state);
+        }
+
+        private void CaptureUnlockNotification()
+        {
+            if (run.State.Phase != RunPhase.FloorComplete &&
+                run.State.Phase != RunPhase.RunWon)
+            {
+                return;
+            }
+
+            var profiles = GameApp.Instance?.Profiles;
+            var notification = profiles?.Progress?.UnreadUnlockNotifications
+                ?.FirstOrDefault(value =>
+                    string.Equals(
+                        value.SourceMapId,
+                        run.State.CurrentMap?.Id,
+                        StringComparison.Ordinal));
+            if (notification == null ||
+                !HeroCatalog.TryGet(notification.HeroId, out var hero))
+            {
+                return;
+            }
+
+            unlockNotificationText = $"新角色已解锁：{hero.DisplayName}";
+            try
+            {
+                profiles.MarkUnlockNotificationRead(notification.Id);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning(
+                    "[Profile] Unlock notification remains unread: " +
+                    exception.Message);
+            }
         }
 
         private static bool IsChoicePhase(RunPhase phase)

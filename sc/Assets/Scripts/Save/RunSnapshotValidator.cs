@@ -83,9 +83,14 @@ namespace SpireChess.Save
                 result.Add("EnteringNode is not a durable phase.");
             }
 
-            if (state.Floor < 1 || state.Floor > 3)
+            if (state.Floor < 1)
             {
                 result.Add($"Invalid floor {state.Floor}.");
+            }
+
+            if (!HeroIds.IsKnown(state.HeroId))
+            {
+                result.Add($"Unknown or missing hero id {state.HeroId}.");
             }
 
             if (state.ShopTurn < 0 || state.MapStep < 0)
@@ -98,17 +103,30 @@ namespace SpireChess.Save
                 result.Add($"Invalid health {state.Health}/{state.MaxHealth}.");
             }
 
+            if (state.Armor < 0)
+            {
+                result.Add($"Invalid armor {state.Armor}.");
+            }
+
+            if (state.HeroRuntime == null ||
+                !state.HeroRuntime.RunStartApplied ||
+                HasInvalidHeroTurns(state.HeroRuntime.ProcessedShopStartTurns) ||
+                HasInvalidHeroTurns(state.HeroRuntime.ProcessedShopEndTurns) ||
+                HasInvalidHeroShopStartOutcome(state) ||
+                HasInvalidHeroShopEndOutcome(state))
+            {
+                result.Add("Hero runtime trigger markers are invalid.");
+            }
+
             if (state.Phase == RunPhase.RunLost && state.Health > 0)
             {
                 result.Add("RunLost requires zero health.");
             }
 
             var mapConfig = configs.RunMaps.FirstOrDefault(value =>
-                value != null && value.Floor == state.Floor);
-            if (mapConfig == null || !string.Equals(
-                    mapConfig.Id,
-                    state.MapId,
-                    StringComparison.Ordinal))
+                value != null &&
+                string.Equals(value.Id, state.MapId, StringComparison.Ordinal));
+            if (mapConfig == null || mapConfig.Floor != state.Floor)
             {
                 result.Add($"Map {state.MapId} does not match floor {state.Floor}.");
             }
@@ -134,6 +152,7 @@ namespace SpireChess.Save
             }
 
             ValidateAttempt(state, result);
+            ValidateSettlement(state.LastSettlement, result);
             ValidatePendingPhase(payload, result);
             ValidateRunReferences(state, result);
             if (state.Statistics == null || state.Statistics.StartedAtUtc == default(DateTime))
@@ -160,6 +179,25 @@ namespace SpireChess.Save
                 !string.Equals(attempt.NodeId, state.CurrentNodeId, StringComparison.Ordinal))
             {
                 result.Add("Current attempt does not match current node.");
+            }
+        }
+
+        private static void ValidateSettlement(
+            BattleSettlementSnapshotV1 settlement,
+            RunSnapshotValidationResult result)
+        {
+            if (settlement == null)
+            {
+                return;
+            }
+
+            if (settlement.Damage < 0 ||
+                settlement.ArmorAbsorbed < 0 ||
+                settlement.HealthDamage < 0 ||
+                settlement.ArmorAbsorbed + settlement.HealthDamage !=
+                settlement.Damage)
+            {
+                result.Add("Battle settlement damage resolution is invalid.");
             }
         }
 
@@ -299,7 +337,85 @@ namespace SpireChess.Save
             ValidateRandom(streams.Shop, "Shop", result);
             ValidateRandom(streams.Reward, "Reward", result);
             ValidateRandom(streams.Event, "Event", result);
+            ValidateRandom(streams.Hero, "Hero", result);
             ValidateRandom(streams.Relic, "Relic", result);
+        }
+
+        private static bool HasInvalidHeroTurns(IReadOnlyList<int> turns)
+        {
+            return turns == null ||
+                   turns.Any(value => value < 1) ||
+                   turns.Distinct().Count() != turns.Count;
+        }
+
+        private bool HasInvalidHeroShopStartOutcome(RunStateSnapshotV1 state)
+        {
+            var runtime = state.HeroRuntime;
+            if (!Enum.IsDefined(
+                    typeof(HeroPassiveShopStartOutcome),
+                    runtime.LastShopStartOutcome))
+            {
+                return true;
+            }
+
+            if (runtime.LastShopStartOutcome == HeroPassiveShopStartOutcome.None)
+            {
+                return runtime.LastShopStartTurn != 0 ||
+                       !string.IsNullOrWhiteSpace(runtime.LastGrantedSpellId);
+            }
+
+            if (state.HeroId != HeroIds.Mage ||
+                runtime.LastShopStartTurn < 1 ||
+                runtime.LastShopStartTurn > state.ShopTurn ||
+                !runtime.ProcessedShopStartTurns.Contains(runtime.LastShopStartTurn))
+            {
+                return true;
+            }
+
+            if (runtime.LastShopStartOutcome !=
+                HeroPassiveShopStartOutcome.GrantedTemporarySpell)
+            {
+                return !string.IsNullOrWhiteSpace(runtime.LastGrantedSpellId);
+            }
+
+            return string.IsNullOrWhiteSpace(runtime.LastGrantedSpellId) ||
+                   !configs.TryGetSpell(runtime.LastGrantedSpellId, out _);
+        }
+
+        private bool HasInvalidHeroShopEndOutcome(RunStateSnapshotV1 state)
+        {
+            var runtime = state.HeroRuntime;
+            if (!Enum.IsDefined(
+                    typeof(HeroPassiveShopEndOutcome),
+                    runtime.LastShopEndOutcome))
+            {
+                return true;
+            }
+
+            if (runtime.LastShopEndOutcome == HeroPassiveShopEndOutcome.None)
+            {
+                return runtime.LastShopEndTurn != 0 ||
+                       !string.IsNullOrWhiteSpace(runtime.LastStolenMinionId);
+            }
+
+            if (state.HeroId != HeroIds.Rogue ||
+                runtime.LastShopEndTurn < 1 ||
+                runtime.LastShopEndTurn > state.ShopTurn ||
+                !runtime.ProcessedShopEndTurns.Contains(runtime.LastShopEndTurn))
+            {
+                return true;
+            }
+
+            if (runtime.LastShopEndOutcome != HeroPassiveShopEndOutcome.StoleMinion)
+            {
+                return !string.IsNullOrWhiteSpace(runtime.LastStolenMinionId);
+            }
+
+            return string.IsNullOrWhiteSpace(runtime.LastStolenMinionId) ||
+                   !configs.TryGetMinion(runtime.LastStolenMinionId, out var minion) ||
+                   minion.IsToken ||
+                   !minion.Enabled ||
+                   minion.ImplementationStatus != "Playable";
         }
 
         private static void ValidateRandom(

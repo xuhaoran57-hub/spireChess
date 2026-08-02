@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using SpireChess.Audio;
 using SpireChess.Save;
 using SpireChess.UI.Common;
@@ -25,16 +27,24 @@ namespace SpireChess.UI.MainMenu
 
         private MainMenuController controller;
         private Action pendingConfirmation;
+        private GameObject heroSelectionPanel;
+        private Button heroConfirmButton;
+        private Button heroCancelButton;
+        private readonly Dictionary<string, HeroCardBinding> heroCards =
+            new Dictionary<string, HeroCardBinding>(StringComparer.Ordinal);
 
         public bool ContinueInteractable => continueButton != null && continueButton.interactable;
         public bool ConfirmationVisible => confirmDialog != null && confirmDialog.activeSelf;
         public bool SettingsVisible =>
             audioSettingsPanel != null && audioSettingsPanel.IsOpen;
         public string StatusText => statusText == null ? string.Empty : statusText.text;
+        public bool HeroSelectionVisible =>
+            heroSelectionPanel != null && heroSelectionPanel.activeSelf;
 
         public void Bind(MainMenuController value)
         {
             controller = value ?? throw new ArgumentNullException(nameof(value));
+            EnsureHeroSelectionPanel();
             newGameButton.onClick.RemoveAllListeners();
             continueButton.onClick.RemoveAllListeners();
             settingsButton.onClick.RemoveAllListeners();
@@ -63,6 +73,14 @@ namespace SpireChess.UI.MainMenu
             cancelButton.onClick.AddListener(HideConfirmation);
             cancelButton.onClick.AddListener(
                 () => PlayUiCue(PresentationAudioCueIds.UiCancel));
+            heroConfirmButton.onClick.RemoveAllListeners();
+            heroCancelButton.onClick.RemoveAllListeners();
+            heroConfirmButton.onClick.AddListener(controller.ConfirmHeroSelection);
+            heroConfirmButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiConfirm));
+            heroCancelButton.onClick.AddListener(controller.CancelHeroSelection);
+            heroCancelButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiCancel));
         }
 
         public void Render(MainMenuScreenState state)
@@ -79,6 +97,17 @@ namespace SpireChess.UI.MainMenu
             statusText.color = state.StatusIsError
                 ? new Color(0.95f, 0.38f, 0.32f)
                 : new Color(0.72f, 0.78f, 0.86f);
+            if (state.HeroSelectionVisible || heroSelectionPanel != null)
+            {
+                EnsureHeroSelectionPanel();
+                RenderHeroSelection(state);
+            }
+        }
+
+        public bool IsHeroInteractable(string heroId)
+        {
+            return heroCards.TryGetValue(heroId ?? string.Empty, out var card) &&
+                   card.Button.interactable;
         }
 
         public void ShowConfirmation(string message, Action onConfirm)
@@ -110,6 +139,273 @@ namespace SpireChess.UI.MainMenu
         private static void PlayUiCue(string cueId)
         {
             AudioService.Instance?.PlayCue(cueId);
+        }
+
+        private void EnsureHeroSelectionPanel()
+        {
+            if (heroSelectionPanel != null)
+            {
+                return;
+            }
+
+            var font = continueSummary?.font ??
+                       Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var overlay = CreatePanel(
+                transform,
+                "HeroSelectionOverlay",
+                new Color(0.03f, 0.04f, 0.04f, 0.90f));
+            Stretch(overlay.rectTransform);
+            overlay.transform.SetAsLastSibling();
+
+            var page = CreatePanel(
+                overlay.transform,
+                "HeroSelectionPage",
+                new Color(0.94f, 0.89f, 0.75f, 0.99f));
+            AddFrame(
+                page,
+                new Color(0.45f, 0.28f, 0.12f, 0.90f),
+                new Vector2(3f, -3f));
+            SetRect(
+                page.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(1540f, 900f),
+                Vector2.zero);
+            var pageLayout = page.gameObject.AddComponent<VerticalLayoutGroup>();
+            pageLayout.padding = new RectOffset(52, 52, 34, 34);
+            pageLayout.spacing = 18f;
+            pageLayout.childAlignment = TextAnchor.MiddleCenter;
+            pageLayout.childControlWidth = true;
+            pageLayout.childControlHeight = true;
+            pageLayout.childForceExpandHeight = false;
+
+            var title = CreateText(
+                page.transform,
+                "Title",
+                "选择旅团角色",
+                42,
+                72f,
+                FontStyle.Bold,
+                font);
+            title.color = new Color(0.20f, 0.13f, 0.08f, 1f);
+            var hint = CreateText(
+                page.transform,
+                "Hint",
+                "确认后才会创建并写入新旅程；当前旅程中不能更换角色。",
+                22,
+                48f,
+                FontStyle.Normal,
+                font);
+            hint.color = new Color(0.34f, 0.25f, 0.16f, 1f);
+
+            var cardsRoot = new GameObject(
+                "HeroCards",
+                typeof(RectTransform),
+                typeof(HorizontalLayoutGroup),
+                typeof(LayoutElement));
+            cardsRoot.transform.SetParent(page.transform, false);
+            var cardsLayout = cardsRoot.GetComponent<HorizontalLayoutGroup>();
+            cardsLayout.spacing = 22f;
+            cardsLayout.childAlignment = TextAnchor.MiddleCenter;
+            cardsLayout.childControlWidth = true;
+            cardsLayout.childControlHeight = true;
+            cardsLayout.childForceExpandWidth = true;
+            cardsLayout.childForceExpandHeight = false;
+            cardsRoot.GetComponent<LayoutElement>().preferredHeight = 560f;
+
+            var actions = new GameObject(
+                "Actions",
+                typeof(RectTransform),
+                typeof(HorizontalLayoutGroup),
+                typeof(LayoutElement));
+            actions.transform.SetParent(page.transform, false);
+            var actionLayout = actions.GetComponent<HorizontalLayoutGroup>();
+            actionLayout.spacing = 28f;
+            actionLayout.childAlignment = TextAnchor.MiddleCenter;
+            actionLayout.childControlWidth = false;
+            actionLayout.childControlHeight = true;
+            actionLayout.childForceExpandWidth = false;
+            actions.GetComponent<LayoutElement>().preferredHeight = 70f;
+
+            heroCancelButton = CreateButton(
+                actions.transform,
+                "CancelHeroButton",
+                "返回目录",
+                font);
+            heroCancelButton.GetComponent<LayoutElement>().preferredWidth = 260f;
+            heroConfirmButton = CreateButton(
+                actions.transform,
+                "ConfirmHeroButton",
+                "确认启程",
+                font,
+                true);
+            heroConfirmButton.GetComponent<LayoutElement>().preferredWidth = 300f;
+
+            heroSelectionPanel = overlay.gameObject;
+            heroSelectionPanel.SetActive(false);
+        }
+
+        private void RenderHeroSelection(MainMenuScreenState state)
+        {
+            var options = state.HeroOptions ??
+                          Array.Empty<HeroSelectionOptionState>();
+            var cardsRoot = heroSelectionPanel.transform.Find(
+                "HeroSelectionPage/HeroCards");
+            foreach (var option in options.Where(value => value != null))
+            {
+                if (!heroCards.TryGetValue(option.HeroId ?? string.Empty, out var card))
+                {
+                    card = CreateHeroCard(cardsRoot, option);
+                    heroCards[option.HeroId] = card;
+                }
+
+                card.Name.text = option.DisplayName ?? string.Empty;
+                card.Portrait.text =
+                    option.IsUnlocked ? "角色肖像" : "锁定剪影";
+                card.Passive.text = option.PassiveName ?? string.Empty;
+                card.Description.text = option.PassiveDescription ?? string.Empty;
+                card.Lock.text = option.IsUnlocked
+                    ? option.IsSelected ? "已选择" : "已解锁 · 点击选择"
+                    : "未解锁 · " + (option.UnlockCondition ?? string.Empty);
+                card.Button.interactable = option.IsUnlocked;
+                card.Background.color = !option.IsUnlocked
+                    ? new Color(0.48f, 0.47f, 0.43f, 0.86f)
+                    : option.IsSelected
+                        ? new Color(0.43f, 0.64f, 0.45f, 0.98f)
+                        : new Color(0.83f, 0.74f, 0.55f, 0.96f);
+            }
+
+            heroConfirmButton.interactable = options.Any(value =>
+                value != null && value.IsUnlocked && value.IsSelected);
+            heroSelectionPanel.SetActive(state.HeroSelectionVisible);
+            if (state.HeroSelectionVisible)
+            {
+                var selected = options.FirstOrDefault(value =>
+                    value != null && value.IsUnlocked && value.IsSelected);
+                if (selected != null &&
+                    heroCards.TryGetValue(selected.HeroId, out var selectedCard))
+                {
+                    selectedCard.Button.Select();
+                }
+            }
+        }
+
+        private HeroCardBinding CreateHeroCard(
+            Transform parent,
+            HeroSelectionOptionState option)
+        {
+            var font = continueSummary?.font ??
+                       Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var gameObject = new GameObject(
+                option.HeroId ?? "Hero",
+                typeof(RectTransform),
+                typeof(Image),
+                typeof(Button),
+                typeof(LayoutElement),
+                typeof(VerticalLayoutGroup));
+            gameObject.transform.SetParent(parent, false);
+            var image = gameObject.GetComponent<Image>();
+            AddFrame(
+                image,
+                new Color(0.36f, 0.22f, 0.11f, 0.82f),
+                new Vector2(2f, -2f));
+            var element = gameObject.GetComponent<LayoutElement>();
+            element.preferredWidth = 440f;
+            element.preferredHeight = 540f;
+            var layout = gameObject.GetComponent<VerticalLayoutGroup>();
+            layout.padding = new RectOffset(28, 28, 26, 26);
+            layout.spacing = 14f;
+            layout.childAlignment = TextAnchor.UpperCenter;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandHeight = false;
+
+            var name = CreateText(
+                gameObject.transform,
+                "Name",
+                option.DisplayName,
+                36,
+                64f,
+                FontStyle.Bold,
+                font);
+            var portrait = CreateText(
+                gameObject.transform,
+                "PortraitPlaceholder",
+                option.IsUnlocked ? "角色肖像" : "锁定剪影",
+                25,
+                140f,
+                FontStyle.Bold,
+                font);
+            var passive = CreateText(
+                gameObject.transform,
+                "Passive",
+                option.PassiveName,
+                26,
+                52f,
+                FontStyle.Bold,
+                font);
+            var description = CreateText(
+                gameObject.transform,
+                "Description",
+                option.PassiveDescription,
+                20,
+                118f,
+                FontStyle.Normal,
+                font);
+            var lockText = CreateText(
+                gameObject.transform,
+                "Lock",
+                string.Empty,
+                19,
+                52f,
+                FontStyle.Bold,
+                font);
+            foreach (var text in new[] { name, portrait, passive, description, lockText })
+            {
+                text.color = new Color(0.20f, 0.13f, 0.08f, 1f);
+            }
+
+            var button = gameObject.GetComponent<Button>();
+            var heroId = option.HeroId;
+            button.onClick.AddListener(() => controller?.SelectHero(heroId));
+            button.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiClick));
+            return new HeroCardBinding(
+                image,
+                button,
+                name,
+                portrait,
+                passive,
+                description,
+                lockText);
+        }
+
+        private sealed class HeroCardBinding
+        {
+            public HeroCardBinding(
+                Image background,
+                Button button,
+                Text name,
+                Text portrait,
+                Text passive,
+                Text description,
+                Text lockText)
+            {
+                Background = background;
+                Button = button;
+                Name = name;
+                Portrait = portrait;
+                Passive = passive;
+                Description = description;
+                Lock = lockText;
+            }
+
+            public Image Background { get; }
+            public Button Button { get; }
+            public Text Name { get; }
+            public Text Portrait { get; }
+            public Text Passive { get; }
+            public Text Description { get; }
+            public Text Lock { get; }
         }
 
         public static MainMenuScreenView CreateRuntime(Font preferredFont = null)
@@ -177,7 +473,7 @@ namespace SpireChess.UI.MainMenu
             var title = CreateText(
                 card.transform,
                 "Title",
-                "尖塔棋局",
+                "旅团日记",
                 58,
                 104f,
                 FontStyle.Bold,
@@ -187,7 +483,7 @@ namespace SpireChess.UI.MainMenu
             var subtitle = CreateText(
                 card.transform,
                 "Subtitle",
-                "正式单局 · 三层远征",
+                "荒野 · 星轨高原 · 铸魂熔城",
                 26,
                 42f,
                 FontStyle.Normal,

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using SpireChess.App;
 using SpireChess.Diagnostics;
 using SpireChess.Run;
@@ -14,9 +15,14 @@ namespace SpireChess.UI.MainMenu
         private RunSaveLoadResult inspection;
         private string statusMessage = string.Empty;
         private bool statusIsError;
+        private bool heroSelectionVisible;
+        private bool creatingRun;
+        private string selectedHeroId = HeroIds.Warrior;
 
         public MainMenuScreenView ScreenView => screenView;
         public RunSaveLoadResult Inspection => inspection;
+        public bool HeroSelectionVisible => heroSelectionVisible;
+        public string SelectedHeroId => selectedHeroId;
 
         private void Start()
         {
@@ -42,16 +48,74 @@ namespace SpireChess.UI.MainMenu
 
         public void NewGame()
         {
+            if (heroSelectionVisible || creatingRun)
+            {
+                return;
+            }
+
             RefreshInspection();
             if (inspection.Status != RunSaveLoadStatus.Missing)
             {
                 screenView.ShowConfirmation(
                     "已有单局存档。开始新游戏会替换当前进度，是否继续？",
-                    CreateNewRun);
+                    OpenHeroSelection);
                 return;
             }
 
-            CreateNewRun();
+            OpenHeroSelection();
+        }
+
+        public void SelectHero(string heroId)
+        {
+            if (!heroSelectionVisible ||
+                GameApp.Instance?.Profiles?.IsHeroUnlocked(heroId) != true)
+            {
+                return;
+            }
+
+            selectedHeroId = heroId;
+            statusMessage = $"已选择{HeroCatalog.GetRequired(heroId).DisplayName}";
+            statusIsError = false;
+            Refresh();
+        }
+
+        public void ConfirmHeroSelection()
+        {
+            if (!heroSelectionVisible || creatingRun)
+            {
+                return;
+            }
+
+            if (GameApp.Instance?.Profiles?.IsHeroUnlocked(selectedHeroId) != true)
+            {
+                statusMessage = "该角色尚未解锁";
+                statusIsError = true;
+                Refresh();
+                return;
+            }
+
+            creatingRun = true;
+            try
+            {
+                CreateNewRun(selectedHeroId);
+            }
+            finally
+            {
+                creatingRun = false;
+            }
+        }
+
+        public void CancelHeroSelection()
+        {
+            if (!heroSelectionVisible || creatingRun)
+            {
+                return;
+            }
+
+            heroSelectionVisible = false;
+            statusMessage = "已返回目录";
+            statusIsError = false;
+            Refresh();
         }
 
         public void ContinueGame()
@@ -90,7 +154,39 @@ namespace SpireChess.UI.MainMenu
             Application.Quit();
         }
 
-        private void CreateNewRun()
+        private void OpenHeroSelection()
+        {
+            var profiles = GameApp.Instance?.Profiles;
+            if (profiles?.IsReady != true)
+            {
+                statusMessage = "局外档案不可用，暂时无法开始新旅程";
+                statusIsError = true;
+                Refresh();
+                return;
+            }
+
+            var firstUnlocked = HeroCatalog.All.FirstOrDefault(value =>
+                profiles.IsHeroUnlocked(value.Id));
+            if (firstUnlocked == null)
+            {
+                statusMessage = "没有可用角色，无法开始新旅程";
+                statusIsError = true;
+                Refresh();
+                return;
+            }
+
+            if (!profiles.IsHeroUnlocked(selectedHeroId))
+            {
+                selectedHeroId = firstUnlocked.Id;
+            }
+
+            heroSelectionVisible = true;
+            statusMessage = "选择一名已解锁角色并确认启程";
+            statusIsError = false;
+            Refresh();
+        }
+
+        private void CreateNewRun(string heroId)
         {
             var acceptanceSeed = G4RuntimeArguments.IsAcceptanceRequested
                 ? G4RuntimeArguments.ReadInt(
@@ -103,8 +199,8 @@ namespace SpireChess.UI.MainMenu
                     1,
                     int.MaxValue)
                 : (int?)null;
-            GameApp.Instance.StartNewRun(acceptanceSeed);
-            if (GameApp.Instance.Run == null)
+            var created = GameApp.Instance.StartNewRun(heroId, acceptanceSeed);
+            if (!created || GameApp.Instance.Run == null)
             {
                 statusMessage = "无法创建新单局，请检查存储空间后重试";
                 statusIsError = true;
@@ -112,6 +208,7 @@ namespace SpireChess.UI.MainMenu
                 return;
             }
 
+            heroSelectionVisible = false;
             GameApp.Instance.Router.GoToCurrentRunPhase(GameApp.Instance.Run);
         }
 
@@ -120,17 +217,48 @@ namespace SpireChess.UI.MainMenu
             RefreshInspection();
             var summary = inspection.Document?.Summary;
             var canContinue = inspection.CanContinue;
+            var legacyNotice =
+                GameApp.Instance?.Profiles?.Progress
+                    ?.LegacyV033ArchiveNoticePending == true &&
+                (inspection.Status == RunSaveLoadStatus.Missing ||
+                 inspection.Status == RunSaveLoadStatus.IncompatibleContent ||
+                 inspection.Status == RunSaveLoadStatus.UnsupportedSchema);
             screenView.Render(new MainMenuScreenState
             {
                 ContinueEnabled = canContinue,
                 ContinueSummary = BuildSummary(inspection, summary),
                 StatusMessage = string.IsNullOrWhiteSpace(statusMessage)
-                    ? ToPlayerMessage(inspection.Status)
+                    ? legacyNotice
+                        ? "旧旅程已安全归档，v0.4.0 需要开始新旅程"
+                        : ToPlayerMessage(inspection.Status)
                     : statusMessage,
                 StatusIsError = statusIsError ||
-                                (!canContinue && inspection.Status != RunSaveLoadStatus.Missing),
-                SaveStatus = inspection.Status
+                                (!legacyNotice &&
+                                 !canContinue &&
+                                 inspection.Status != RunSaveLoadStatus.Missing),
+                SaveStatus = inspection.Status,
+                HeroSelectionVisible = heroSelectionVisible,
+                SelectedHeroId = selectedHeroId,
+                HeroOptions = BuildHeroOptions()
             });
+        }
+
+        private HeroSelectionOptionState[] BuildHeroOptions()
+        {
+            var profiles = GameApp.Instance?.Profiles;
+            return HeroCatalog.All.Select(hero => new HeroSelectionOptionState
+            {
+                HeroId = hero.Id,
+                DisplayName = hero.DisplayName,
+                PassiveName = hero.PassiveName,
+                PassiveDescription = hero.PassiveDescription,
+                UnlockCondition = hero.UnlockCondition,
+                IsUnlocked = profiles?.IsHeroUnlocked(hero.Id) == true,
+                IsSelected = string.Equals(
+                    hero.Id,
+                    selectedHeroId,
+                    StringComparison.Ordinal)
+            }).ToArray();
         }
 
         private void RefreshInspection()
@@ -150,13 +278,20 @@ namespace SpireChess.UI.MainMenu
                     : "检测到存档，但当前无法继续";
             }
 
-            if (summary.Floor < 1 || summary.Floor > 3 || summary.MaxHealth <= 0 ||
+            if (summary.Floor < 1 || summary.MaxHealth <= 0 ||
                 summary.Health < 0 || summary.Health > summary.MaxHealth)
             {
                 return "已有单局存档";
             }
 
-            return $"第 {summary.Floor} 层 · 生命 {summary.Health}/{summary.MaxHealth} · " +
+            var chapter = string.IsNullOrWhiteSpace(summary.MapName)
+                ? $"第 {summary.Floor} 章"
+                : summary.MapName;
+            var hero = string.IsNullOrWhiteSpace(summary.HeroName)
+                ? string.Empty
+                : summary.HeroName + " · ";
+            return $"{hero}{chapter} · 生命 {summary.Health}/{summary.MaxHealth} · " +
+                   $"护甲 {summary.Armor} · " +
                    $"回合 {summary.ShopTurn} · {ToPhaseLabel(summary.Phase)}";
         }
 
@@ -185,7 +320,7 @@ namespace SpireChess.UI.MainMenu
                 case RunPhase.RestChoice:
                     return "休整选择";
                 case RunPhase.FloorComplete:
-                    return "楼层完成";
+                    return "章节完成";
                 case RunPhase.RunWon:
                     return "单局胜利";
                 case RunPhase.RunLost:
@@ -200,7 +335,7 @@ namespace SpireChess.UI.MainMenu
             switch (status)
             {
                 case RunSaveLoadStatus.Missing:
-                    return "选择新游戏开始三层远征";
+                    return "选择新游戏，开始书写新的旅团日记";
                 case RunSaveLoadStatus.Valid:
                     return "发现可继续的单局";
                 case RunSaveLoadStatus.RecoveredFromBackup:

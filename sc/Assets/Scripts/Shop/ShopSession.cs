@@ -291,6 +291,11 @@ namespace SpireChess.Shop
 
         public ShopOperationResult EndRound()
         {
+            return EndRound(null);
+        }
+
+        internal ShopOperationResult EndRound(Action beforeOfferSettlement)
+        {
             if (!IsShopOpen)
             {
                 return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
@@ -300,6 +305,8 @@ namespace SpireChess.Shop
             {
                 return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
             }
+
+            beforeOfferSettlement?.Invoke();
 
             if (!UpgradedThisRound && TavernTier < ShopEconomyRules.MaximumTavernTier)
             {
@@ -433,6 +440,55 @@ namespace SpireChess.Shop
                 cost,
                 RefreshCount,
                 tavernTier: TavernTier));
+            RaiseTripleEvents(triples);
+            return ShopOperationResult.Succeed(benchIndex);
+        }
+
+        internal ShopOperationResult TakeVisibleMinionOffer(int offerIndex)
+        {
+            if (!IsShopOpen)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.ShopClosed);
+            }
+
+            if (PendingDiscover != null || PendingChoice != null)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.DiscoveryPending);
+            }
+
+            if (offerIndex < 0 || offerIndex >= minionOffers.Count)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidIndex);
+            }
+
+            var config = minionOffers[offerIndex];
+            if (config == null)
+            {
+                return ShopOperationResult.Fail(ShopOperationError.EmptySlot);
+            }
+
+            if (config.IsToken ||
+                !config.Enabled ||
+                config.ImplementationStatus != "Playable")
+            {
+                return ShopOperationResult.Fail(ShopOperationError.InvalidCardType);
+            }
+
+            if (!HasBenchSpace())
+            {
+                return ShopOperationResult.Fail(ShopOperationError.BenchFull);
+            }
+
+            var card = ShopCardInstance.CreateMinion(NextCardInstanceId(), config);
+            ApplyFlourishAttackBonus(card);
+            if (!Collection.TryAddToBench(card, out var benchIndex))
+            {
+                throw new InvalidOperationException(
+                    "A validated stolen minion could not enter the bench.");
+            }
+
+            minionOffers[offerIndex] = null;
+            var triples = ResolveAllTriples();
             RaiseTripleEvents(triples);
             return ShopOperationResult.Succeed(benchIndex);
         }

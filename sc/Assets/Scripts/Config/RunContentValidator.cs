@@ -14,6 +14,10 @@ namespace SpireChess.Config
             new[] { "Normal", "Elite", "Boss" },
             StringComparer.OrdinalIgnoreCase);
 
+        private static readonly HashSet<string> ValidEncounterKeywords = new HashSet<string>(
+            new[] { "Taunt", "Shield", "Cleave" },
+            StringComparer.Ordinal);
+
         private static readonly HashSet<string> ValidRouteTags = new HashSet<string>(
             new[] { "Aggressive", "Adventure", "Conservative" },
             StringComparer.OrdinalIgnoreCase);
@@ -50,6 +54,12 @@ namespace SpireChess.Config
             ValidateUniqueIds(encounters.Select(encounter => encounter?.Id), "encounter", result);
             ValidateUniqueIds(rewardTables.Select(table => table?.Id), "reward table", result);
 
+            var mapsById = maps
+                .Where(value => value != null && !string.IsNullOrWhiteSpace(value.Id))
+                .GroupBy(value => value.Id)
+                .ToDictionary(group => group.Key, group => group.First());
+            ValidateJourney(maps, mapsById, result);
+
             var ruleProfilesById = mapRuleProfiles
                 .Where(value => value != null && !string.IsNullOrWhiteSpace(value.Id))
                 .GroupBy(value => value.Id)
@@ -78,6 +88,7 @@ namespace SpireChess.Config
                     map,
                     ruleProfile,
                     encountersById,
+                    minions,
                     new HashSet<string>(eventPools == null ? Array.Empty<string>() : eventPools.Keys),
                     new HashSet<string>(enhanceNodes == null ? Array.Empty<string>() : enhanceNodes.Keys),
                     new HashSet<string>(restNodes == null ? Array.Empty<string>() : restNodes.Keys),
@@ -103,14 +114,121 @@ namespace SpireChess.Config
                 rewardIds,
                 encountersById,
                 result);
+            ValidateEventEncounterThemes(
+                maps,
+                events,
+                encountersById,
+                minions,
+                result);
 
             return result;
+        }
+
+        private static void ValidateJourney(
+            IReadOnlyList<RunMapConfig> maps,
+            IReadOnlyDictionary<string, RunMapConfig> mapsById,
+            ConfigValidationResult result)
+        {
+            var configured = maps.Where(value => value != null).ToList();
+            foreach (var duplicateFloor in configured
+                         .GroupBy(value => value.Floor)
+                         .Where(group => group.Count() > 1))
+            {
+                result.AddError(
+                    $"Run journey has multiple maps for floor {duplicateFloor.Key}.");
+            }
+
+            foreach (var map in configured)
+            {
+                if (string.IsNullOrWhiteSpace(map.DisplayName))
+                {
+                    result.AddError($"Map {map.Id} has no display name.");
+                }
+
+                if (string.IsNullOrWhiteSpace(map.ThemeFaction))
+                {
+                    result.AddError($"Map {map.Id} has no theme faction.");
+                }
+
+                if (map.IsFinalChapter)
+                {
+                    if (!string.IsNullOrWhiteSpace(map.NextMapId))
+                    {
+                        result.AddError(
+                            $"Final map {map.Id} cannot reference next map {map.NextMapId}.");
+                    }
+                }
+                else if (string.IsNullOrWhiteSpace(map.NextMapId))
+                {
+                    result.AddError($"Non-final map {map.Id} must reference a next map.");
+                }
+                else if (!mapsById.ContainsKey(map.NextMapId))
+                {
+                    result.AddError(
+                        $"Map {map.Id} references missing next map {map.NextMapId}.");
+                }
+            }
+
+            if (configured.Count == 0)
+            {
+                return;
+            }
+
+            var finalCount = configured.Count(value => value.IsFinalChapter);
+            if (finalCount != 1)
+            {
+                result.AddError(
+                    $"Run journey must contain exactly one final map, got {finalCount}.");
+            }
+
+            var starts = configured.Where(value => value.Floor == 1).ToList();
+            if (starts.Count != 1)
+            {
+                result.AddError(
+                    $"Run journey must contain exactly one floor 1 map, got {starts.Count}.");
+                return;
+            }
+
+            var visited = new HashSet<string>(StringComparer.Ordinal);
+            var current = starts[0];
+            while (current != null)
+            {
+                if (!visited.Add(current.Id ?? string.Empty))
+                {
+                    result.AddError($"Run journey contains a map cycle at {current.Id}.");
+                    return;
+                }
+
+                if (current.IsFinalChapter)
+                {
+                    if (visited.Count != configured.Count)
+                    {
+                        result.AddError(
+                            "Run journey progression does not visit every configured map.");
+                    }
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(current.NextMapId) ||
+                    !mapsById.TryGetValue(current.NextMapId, out var next))
+                {
+                    return;
+                }
+
+                if (next.Floor <= current.Floor)
+                {
+                    result.AddError(
+                        $"Map {current.Id} must advance to a later floor, got {next.Id}.");
+                }
+                current = next;
+            }
         }
 
         private static void ValidateMap(
             RunMapConfig map,
             RunMapRuleProfileConfig ruleProfile,
             IReadOnlyDictionary<string, EncounterConfig> encounters,
+            IReadOnlyDictionary<string, MinionConfig> minions,
             ISet<string> eventPoolIds,
             ISet<string> enhanceNodeIds,
             ISet<string> restNodeIds,
@@ -167,6 +285,18 @@ namespace SpireChess.Config
                             result.AddError(
                                 $"Map {map.Id} node {node.Id} uses floor {encounter.Floor} encounter {encounter.Id}.");
                         }
+
+                        ValidateChapterEncounterTheme(
+                            map,
+                            $"node {node.Id}",
+                            encounter,
+                            minions,
+                            result);
+                        ValidateEncounterReadability(
+                            $"Map {map.Id} node {node.Id}",
+                            encounter,
+                            minions,
+                            result);
                     }
 
                     var maximumCombatIndex = ruleProfile?.CombatCount ?? 0;
@@ -344,6 +474,12 @@ namespace SpireChess.Config
                     $"Encounter {encounter.Id} references missing reward table {encounter.RewardTableId}.");
             }
 
+            if (encounter.DamageBonus < 0)
+            {
+                result.AddError(
+                    $"Encounter {encounter.Id} has negative damage bonus {encounter.DamageBonus}.");
+            }
+
             var occupiedSlots = new HashSet<int>();
             foreach (var slot in encounter.EnemySlots ?? new List<EnemySlotConfig>())
             {
@@ -357,6 +493,27 @@ namespace SpireChess.Config
                 {
                     result.AddError(
                         $"Encounter {encounter.Id} references missing minion {slot.MinionId}.");
+                    continue;
+                }
+
+                var attack = (slot.Golden ? minion.GoldenAttack : minion.Attack) +
+                             slot.AttackBonus;
+                var health = (slot.Golden ? minion.GoldenHealth : minion.Health) +
+                             slot.HealthBonus;
+                if (attack <= 0 || health <= 0)
+                {
+                    result.AddError(
+                        $"Encounter {encounter.Id} slot {slot.Slot} has invalid final stats {attack}/{health}.");
+                }
+
+                foreach (var keyword in slot.PermanentKeywords ??
+                         new List<string>())
+                {
+                    if (!ValidEncounterKeywords.Contains(keyword ?? string.Empty))
+                    {
+                        result.AddError(
+                            $"Encounter {encounter.Id} slot {slot.Slot} has invalid permanent keyword {keyword}.");
+                    }
                 }
             }
 
@@ -372,6 +529,161 @@ namespace SpireChess.Config
                 {
                     result.AddError(
                         "The floor-one opening encounter must contain one non-golden tier-one non-token minion.");
+                }
+            }
+        }
+
+        private static void ValidateChapterEncounterTheme(
+            RunMapConfig map,
+            string source,
+            EncounterConfig encounter,
+            IReadOnlyDictionary<string, MinionConfig> minions,
+            ConfigValidationResult result)
+        {
+            if (map == null ||
+                encounter == null ||
+                minions == null ||
+                string.IsNullOrWhiteSpace(map.ThemeFaction))
+            {
+                return;
+            }
+
+            foreach (var slot in encounter.EnemySlots ??
+                     new List<EnemySlotConfig>())
+            {
+                if (!minions.TryGetValue(slot.MinionId ?? string.Empty, out var minion) ||
+                    minion == null)
+                {
+                    continue;
+                }
+
+                if (!string.Equals(
+                        minion.Race,
+                        map.ThemeFaction,
+                        StringComparison.Ordinal))
+                {
+                    result.AddError(
+                        $"Map {map.Id} {source} encounter {encounter.Id} uses " +
+                        $"{minion.Race} minion {minion.Id}; expected chapter faction " +
+                        $"{map.ThemeFaction}.");
+                }
+            }
+        }
+
+        private static void ValidateEncounterReadability(
+            string source,
+            EncounterConfig encounter,
+            IReadOnlyDictionary<string, MinionConfig> minions,
+            ConfigValidationResult result)
+        {
+            if (encounter == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(encounter.Name) ||
+                string.IsNullOrWhiteSpace(encounter.Theme) ||
+                string.IsNullOrWhiteSpace(encounter.RiskText) ||
+                string.IsNullOrWhiteSpace(encounter.RewardPreviewText))
+            {
+                result.AddError(
+                    $"{source} encounter {encounter.Id} has incomplete player-facing readability text.");
+            }
+
+            var attack = 0;
+            var health = 0;
+            var slots = encounter.EnemySlots ?? new List<EnemySlotConfig>();
+            var completeFormation = minions != null && slots.Count > 0;
+            if (slots.Count == 0)
+            {
+                result.AddError(
+                    $"{source} encounter {encounter.Id} has no enemy formation.");
+            }
+            foreach (var slot in slots)
+            {
+                if (minions == null ||
+                    !minions.TryGetValue(slot.MinionId ?? string.Empty, out var minion) ||
+                    minion == null)
+                {
+                    completeFormation = false;
+                    continue;
+                }
+
+                attack += (slot.Golden
+                    ? minion.GoldenAttack
+                    : minion.Attack) + slot.AttackBonus;
+                health += (slot.Golden
+                    ? minion.GoldenHealth
+                    : minion.Health) + slot.HealthBonus;
+            }
+
+            if (completeFormation)
+            {
+                var expectedTarget = $"目标 {attack}/{health}";
+                if (string.IsNullOrWhiteSpace(encounter.RiskText) ||
+                    !encounter.RiskText.Contains(expectedTarget))
+                {
+                    result.AddError(
+                        $"{source} encounter {encounter.Id} risk text must contain " +
+                        $"the current formation target '{expectedTarget}'.");
+                }
+            }
+
+            if (encounter.DamageBonus > 0)
+            {
+                var expectedLoss = $"失败修正 +{encounter.DamageBonus}";
+                if (string.IsNullOrWhiteSpace(encounter.RiskText) ||
+                    !encounter.RiskText.Contains(expectedLoss))
+                {
+                    result.AddError(
+                        $"{source} encounter {encounter.Id} risk text must contain " +
+                        $"the current loss pressure '{expectedLoss}'.");
+                }
+            }
+        }
+
+        private static void ValidateEventEncounterThemes(
+            IReadOnlyList<RunMapConfig> maps,
+            IReadOnlyDictionary<string, EventConfig> events,
+            IReadOnlyDictionary<string, EncounterConfig> encounters,
+            IReadOnlyDictionary<string, MinionConfig> minions,
+            ConfigValidationResult result)
+        {
+            if (events == null || encounters == null)
+            {
+                return;
+            }
+
+            var mapByFloor = (maps ?? Array.Empty<RunMapConfig>())
+                .Where(map => map != null)
+                .GroupBy(map => map.Floor)
+                .ToDictionary(group => group.Key, group => group.First());
+            var visited = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var eventConfig in events.Values.Where(value => value != null))
+            {
+                foreach (var encounterId in (eventConfig.Options ??
+                             new List<EventOptionConfig>())
+                         .Select(option => option?.FollowupEncounterId)
+                         .Where(id => !string.IsNullOrWhiteSpace(id)))
+                {
+                    if (!visited.Add(encounterId) ||
+                        !encounters.TryGetValue(encounterId, out var encounter) ||
+                        !mapByFloor.TryGetValue(encounter.Floor, out var map))
+                    {
+                        continue;
+                    }
+
+                    ValidateChapterEncounterTheme(
+                        map,
+                        $"event follow-up {eventConfig.Id}",
+                        encounter,
+                        minions,
+                        result);
+                    ValidateEncounterReadability(
+                        $"Map {map.Id} event follow-up {eventConfig.Id}",
+                        encounter,
+                        minions,
+                        result);
                 }
             }
         }

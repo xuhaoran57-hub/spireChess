@@ -220,6 +220,14 @@ namespace SpireChess.Diagnostics
             {
                 yield break;
             }
+            if (!ExecuteStep(
+                    "confirm the default unlocked warrior",
+                    () => InvokeNamedButton(
+                        mainMenuController?.ScreenView,
+                        "ConfirmHeroButton")))
+            {
+                yield break;
+            }
 
             yield return WaitForScene<RunTestController>(GameSceneNames.Run);
             if (failed)

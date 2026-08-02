@@ -48,8 +48,20 @@ namespace SpireChess.Config
         [JsonProperty("id")]
         public string Id { get; set; }
 
+        [JsonProperty("displayName")]
+        public string DisplayName { get; set; }
+
+        [JsonProperty("themeFaction")]
+        public string ThemeFaction { get; set; }
+
         [JsonProperty("floor")]
         public int Floor { get; set; }
+
+        [JsonProperty("nextMapId")]
+        public string NextMapId { get; set; }
+
+        [JsonProperty("isFinalChapter")]
+        public bool IsFinalChapter { get; set; }
 
         [JsonProperty("ruleProfileId")]
         public string RuleProfileId { get; set; }

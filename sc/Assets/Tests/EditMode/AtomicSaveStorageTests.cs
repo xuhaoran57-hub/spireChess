@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using NUnit.Framework;
+using SpireChess.App;
 using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.Save;
@@ -39,6 +40,21 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void StableSaveRoot_DoesNotChangeWithLocalizedProductName()
+        {
+            var companyRoot = Path.Combine(root, "DefaultCompany");
+            var oldProductPath = Path.Combine(companyRoot, "sc");
+            var localizedProductPath = Path.Combine(companyRoot, "旅团日记");
+
+            Assert.That(
+                GameApp.ResolveStableSaveRootPath(oldProductPath),
+                Is.EqualTo(Path.GetFullPath(oldProductPath)));
+            Assert.That(
+                GameApp.ResolveStableSaveRootPath(localizedProductPath),
+                Is.EqualTo(Path.GetFullPath(oldProductPath)));
+        }
+
+        [Test]
         public void SaveTwice_CreatesMainAndPreviousRevisionBackup()
         {
             var run = new RunSession(configs, 4201);
@@ -56,6 +72,16 @@ namespace SpireChess.Tests.EditMode
             var loaded = repository.Load();
             Assert.That(loaded.Status, Is.EqualTo(RunSaveLoadStatus.Valid));
             Assert.That(loaded.Document.Revision, Is.EqualTo(2));
+            Assert.That(
+                loaded.Document.SchemaVersion,
+                Is.EqualTo(RunSaveDocumentV1.CurrentSchemaVersion));
+            Assert.That(loaded.Document.Summary.HeroId, Is.EqualTo(HeroIds.Warrior));
+            Assert.That(loaded.Document.Summary.HeroName, Is.EqualTo("战士"));
+            Assert.That(
+                loaded.Document.Summary.Armor,
+                Is.EqualTo(HeroPassiveRules.WarriorStartingArmor));
+            Assert.That(loaded.Document.Summary.MapId, Is.EqualTo("map_wilderness"));
+            Assert.That(loaded.Document.Summary.MapName, Is.EqualTo("荒野"));
             Assert.That(loaded.Session.State.Phase, Is.EqualTo(RunPhase.Shop));
         }
 

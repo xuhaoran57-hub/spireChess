@@ -9,9 +9,11 @@ namespace SpireChess.Save
 {
     public sealed class AtomicFileSaveStorage
     {
-        public const string SlotFileName = "run-slot-0.json";
+        public const string LegacySlotFileName = "run-slot-0.json";
+        public const string SlotFileName = "run-slot-v0.4.0-0.json";
 
         private readonly string rootPath;
+        private readonly string slotFileName;
         private readonly Func<DateTime> utcNow;
 
         public AtomicFileSaveStorage()
@@ -20,18 +22,35 @@ namespace SpireChess.Save
         }
 
         public AtomicFileSaveStorage(string rootPath, Func<DateTime> utcNow = null)
+            : this(rootPath, SlotFileName, utcNow)
+        {
+        }
+
+        public AtomicFileSaveStorage(
+            string rootPath,
+            string slotFileName,
+            Func<DateTime> utcNow = null)
         {
             if (string.IsNullOrWhiteSpace(rootPath))
             {
                 throw new ArgumentException("Save root path is required.", nameof(rootPath));
             }
 
+            if (string.IsNullOrWhiteSpace(slotFileName) ||
+                Path.GetFileName(slotFileName) != slotFileName)
+            {
+                throw new ArgumentException(
+                    "Save slot file name must be a simple file name.",
+                    nameof(slotFileName));
+            }
+
             this.rootPath = Path.GetFullPath(rootPath);
+            this.slotFileName = slotFileName;
             this.utcNow = utcNow ?? (() => DateTime.UtcNow);
             Directory.CreateDirectory(this.rootPath);
         }
 
-        public string MainPath => Path.Combine(rootPath, SlotFileName);
+        public string MainPath => Path.Combine(rootPath, slotFileName);
         public string TemporaryPath => MainPath + ".tmp";
         public string BackupPath => MainPath + ".bak";
 
@@ -122,7 +141,10 @@ namespace SpireChess.Save
                 MainPath + ".repair"
             };
             var corrupt = Directory.Exists(rootPath)
-                ? Directory.GetFiles(rootPath, SlotFileName + ".corrupt-*", SearchOption.TopDirectoryOnly)
+                ? Directory.GetFiles(
+                    rootPath,
+                    slotFileName + ".corrupt-*",
+                    SearchOption.TopDirectoryOnly)
                 : Array.Empty<string>();
             return fixedPaths.Concat(corrupt).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         }

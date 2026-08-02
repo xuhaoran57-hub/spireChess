@@ -16,6 +16,7 @@ namespace SpireChess.App
         }
 
         public bool Enabled { get; }
+        public event Action<RunSession, string> RunSaved;
         public long CurrentRevision { get; private set; }
         public long LastSavedRevision { get; private set; }
         public DateTime? LastSavedAtUtc { get; private set; }
@@ -87,6 +88,16 @@ namespace SpireChess.App
                 Debug.Log(
                     $"[Save] Run saved. reason={reason}, revision={CurrentRevision}, " +
                     $"phase={run.State.Phase}.");
+                try
+                {
+                    RunSaved?.Invoke(run, reason);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError(
+                        "[Save] Post-save observer failed without invalidating " +
+                        "the committed run save: " + exception.Message);
+                }
                 return true;
             }
             catch (Exception exception)

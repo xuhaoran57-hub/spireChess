@@ -97,6 +97,55 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void HeroSelection_ShowsThreeFixedRolesAndLocksUnavailableChoices()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/UI/MainMenu/PF_MainMenuScreen.prefab");
+            var instance = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                var view = instance.GetComponent<MainMenuScreenView>();
+                view.Render(new MainMenuScreenState
+                {
+                    SaveStatus = RunSaveLoadStatus.Missing,
+                    HeroSelectionVisible = true,
+                    SelectedHeroId = HeroIds.Warrior,
+                    HeroOptions = HeroCatalog.All.Select(hero =>
+                        new HeroSelectionOptionState
+                        {
+                            HeroId = hero.Id,
+                            DisplayName = hero.DisplayName,
+                            PassiveName = hero.PassiveName,
+                            PassiveDescription = hero.PassiveDescription,
+                            UnlockCondition = hero.UnlockCondition,
+                            IsUnlocked = hero.Id == HeroIds.Warrior,
+                            IsSelected = hero.Id == HeroIds.Warrior
+                        }).ToArray()
+                });
+
+                Assert.That(view.HeroSelectionVisible, Is.True);
+                Assert.That(view.IsHeroInteractable(HeroIds.Warrior), Is.True);
+                Assert.That(view.IsHeroInteractable(HeroIds.Mage), Is.False);
+                Assert.That(view.IsHeroInteractable(HeroIds.Rogue), Is.False);
+                Assert.That(Find(instance, "ConfirmHeroButton"), Is.Not.Null);
+                Assert.That(
+                    Find(instance, HeroIds.Warrior)
+                        .GetComponentsInChildren<Text>(true)
+                        .Any(text => text.text == "坚甲启程"),
+                    Is.True);
+                Assert.That(
+                    Find(instance, HeroIds.Mage)
+                        .GetComponentsInChildren<Text>(true)
+                        .Any(text => text.text.Contains("击败“荒野”Boss")),
+                    Is.True);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
         public void ContinueSummary_UsesLocalizedLabelsForEveryRunPhase()
         {
             var method = typeof(MainMenuController).GetMethod(
@@ -116,7 +165,7 @@ namespace SpireChess.Tests.EditMode
                 { RunPhase.EventChoice, "事件选择" },
                 { RunPhase.EnhanceChoice, "强化选择" },
                 { RunPhase.RestChoice, "休整选择" },
-                { RunPhase.FloorComplete, "楼层完成" },
+                { RunPhase.FloorComplete, "章节完成" },
                 { RunPhase.RunWon, "单局胜利" },
                 { RunPhase.RunLost, "单局失败" }
             };
@@ -132,6 +181,39 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void ContinueSummary_ShowsHeroChapterHealthAndCurrentArmor()
+        {
+            var method = typeof(MainMenuController).GetMethod(
+                "BuildSummary",
+                BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            var summary = new RunSaveSummaryV1
+            {
+                HeroName = "战士",
+                MapName = "荒野",
+                Floor = 1,
+                Health = 17,
+                MaxHealth = 20,
+                Armor = 4,
+                ShopTurn = 3,
+                Phase = RunPhase.MapSelection
+            };
+
+            var text = (string)method.Invoke(
+                null,
+                new object[]
+                {
+                    new RunSaveLoadResult(RunSaveLoadStatus.Valid),
+                    summary
+                });
+
+            Assert.That(text, Does.Contain("战士"));
+            Assert.That(text, Does.Contain("荒野"));
+            Assert.That(text, Does.Contain("生命 17/20"));
+            Assert.That(text, Does.Contain("护甲 4"));
+        }
+
+        [Test]
         public void MainMenuAndAudioSettings_CopyHasNonCollapsingTextGeometry()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
@@ -140,7 +222,7 @@ namespace SpireChess.Tests.EditMode
             Assert.That(prefab, Is.Not.Null);
             AssertText(
                 prefab.transform.Find("Background/MenuCard/Title"),
-                "尖塔棋局",
+                "旅团日记",
                 104f);
             AssertText(
                 prefab.transform.Find(

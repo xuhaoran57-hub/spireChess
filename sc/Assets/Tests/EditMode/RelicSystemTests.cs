@@ -96,6 +96,7 @@ namespace SpireChess.Tests
 
             run = FindSealedReliquaryRun(configs);
             Assert.That(run.SelectEventOption("sealed_reliquary", "inspect").Success, Is.True);
+            var armor = run.State.Armor;
             SetRunHealth(run, 5);
             var candidateId = run.State.PendingRelicChoice.Candidates[0].CandidateId;
             Assert.That(run.SelectRelicCandidate(candidateId).Error,
@@ -107,6 +108,7 @@ namespace SpireChess.Tests
             SetRunHealth(run, 6);
             Assert.That(run.SelectRelicCandidate(candidateId).Success, Is.True);
             Assert.That(run.State.Health, Is.EqualTo(1));
+            Assert.That(run.State.Armor, Is.EqualTo(armor));
             Assert.That(run.State.OwnedRelics.Count, Is.EqualTo(1));
         }
 

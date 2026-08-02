@@ -52,6 +52,7 @@ namespace SpireChess.Save
                     Shop = CaptureRandom(session.ShopRandom, "Shop"),
                     Reward = CaptureRandom(session.RewardRandom, "Reward"),
                     Event = CaptureRandom(session.EventRandom, "Event"),
+                    Hero = CaptureRandom(session.HeroRandom, "Hero"),
                     Relic = CaptureRandom(session.RelicRandom, "Relic")
                 },
                 PendingBattle = CaptureContext(session.PendingBattle),
@@ -85,19 +86,19 @@ namespace SpireChess.Save
                     configs.RunMaps,
                     configs.MapRuleProfilesById);
                 var stateSnapshot = payload.RunState;
-                var map = mapProvider.CreateMap(new MapRequest(
-                    stateSnapshot.Seed,
-                    stateSnapshot.Floor));
-                if (!string.Equals(map.Id, stateSnapshot.MapId, StringComparison.Ordinal))
+                var map = mapProvider.CreateMapById(stateSnapshot.MapId);
+                if (map.Floor != stateSnapshot.Floor)
                 {
                     throw new RunSnapshotException(
-                        $"Map mismatch: save={stateSnapshot.MapId}, content={map.Id}.");
+                        $"Map floor mismatch: save={stateSnapshot.Floor}, " +
+                        $"content={map.Floor} ({map.Id}).");
                 }
 
                 var randoms = payload.RandomStreams;
                 var shopRandom = RestoreRandom(randoms.Shop, "Shop");
                 var rewardRandom = RestoreRandom(randoms.Reward, "Reward");
                 var eventRandom = RestoreRandom(randoms.Event, "Event");
+                var heroRandom = RestoreRandom(randoms.Hero, "Hero");
                 var relicRandom = RestoreRandom(randoms.Relic, "Relic");
 
                 var state = RestoreRunState(stateSnapshot, map);
@@ -111,6 +112,7 @@ namespace SpireChess.Save
                     shop,
                     rewardRandom,
                     eventRandom,
+                    heroRandom,
                     relicRandom,
                     RestoreContext(payload.PendingBattle),
                     RestoreContext(payload.LastBattleContext),
@@ -143,11 +145,27 @@ namespace SpireChess.Save
             return new RunStateSnapshotV1
             {
                 Seed = state.Seed,
+                HeroId = state.HeroId,
                 Floor = state.Floor,
                 ShopTurn = state.ShopTurn,
                 MapStep = state.MapStep,
                 Health = state.Health,
                 MaxHealth = state.MaxHealth,
+                Armor = state.Armor,
+                HeroRuntime = new HeroRuntimeSnapshotV1
+                {
+                    RunStartApplied = state.HeroRuntime.RunStartApplied,
+                    ProcessedShopStartTurns = state.HeroRuntime
+                        .ProcessedShopStartTurns.OrderBy(value => value).ToList(),
+                    ProcessedShopEndTurns = state.HeroRuntime
+                        .ProcessedShopEndTurns.OrderBy(value => value).ToList(),
+                    LastShopStartTurn = state.HeroRuntime.LastShopStartTurn,
+                    LastShopStartOutcome = state.HeroRuntime.LastShopStartOutcome,
+                    LastGrantedSpellId = state.HeroRuntime.LastGrantedSpellId,
+                    LastShopEndTurn = state.HeroRuntime.LastShopEndTurn,
+                    LastShopEndOutcome = state.HeroRuntime.LastShopEndOutcome,
+                    LastStolenMinionId = state.HeroRuntime.LastStolenMinionId
+                },
                 Phase = state.Phase,
                 MapId = state.CurrentMap?.Id,
                 NodeStatuses = state.MapProgress?.Statuses.ToDictionary(
@@ -209,13 +227,18 @@ namespace SpireChess.Save
                 throw new RunSnapshotException("EnteringNode snapshot is not durable.");
             }
 
-            var state = new RunState(snapshot.Seed, map)
+            var state = new RunState(
+                snapshot.Seed,
+                map,
+                snapshot.HeroId,
+                false)
             {
                 Floor = snapshot.Floor,
                 ShopTurn = snapshot.ShopTurn,
                 MapStep = snapshot.MapStep,
                 Health = snapshot.Health,
                 MaxHealth = snapshot.MaxHealth,
+                Armor = snapshot.Armor,
                 Phase = snapshot.Phase,
                 CurrentNodeId = snapshot.CurrentNodeId,
                 CurrentAttempt = RestoreAttempt(snapshot.CurrentAttempt),
@@ -227,6 +250,18 @@ namespace SpireChess.Save
                 PendingEnhanceChoice = RestoreEnhanceChoice(snapshot.PendingEnhanceChoice),
                 PendingRestChoice = RestoreRestChoice(snapshot.PendingRestChoice)
             };
+            state.HeroRuntime.Restore(
+                snapshot.HeroRuntime?.RunStartApplied == true,
+                snapshot.HeroRuntime?.ProcessedShopStartTurns,
+                snapshot.HeroRuntime?.ProcessedShopEndTurns,
+                snapshot.HeroRuntime?.LastShopStartTurn ?? 0,
+                snapshot.HeroRuntime?.LastShopStartOutcome ??
+                    HeroPassiveShopStartOutcome.None,
+                snapshot.HeroRuntime?.LastGrantedSpellId,
+                snapshot.HeroRuntime?.LastShopEndTurn ?? 0,
+                snapshot.HeroRuntime?.LastShopEndOutcome ??
+                    HeroPassiveShopEndOutcome.None,
+                snapshot.HeroRuntime?.LastStolenMinionId);
             state.MapProgress.RestoreStatuses(snapshot.NodeStatuses);
             var delayed = snapshot.DelayedShopResources ??
                           new DelayedShopResourcesSnapshotV1();
@@ -849,7 +884,9 @@ namespace SpireChess.Save
                     SurvivingEnemies = settlement.SurvivingEnemies,
                     HighestEnemyTier = settlement.HighestEnemyTier,
                     NodeDamageBonus = settlement.NodeDamageBonus,
-                    OutcomeReason = settlement.OutcomeReason
+                    OutcomeReason = settlement.OutcomeReason,
+                    ArmorAbsorbed = settlement.ArmorAbsorbed,
+                    HealthDamage = settlement.HealthDamage
                 };
         }
 
@@ -864,7 +901,10 @@ namespace SpireChess.Save
                     snapshot.SurvivingEnemies,
                     snapshot.HighestEnemyTier,
                     snapshot.NodeDamageBonus,
-                    snapshot.OutcomeReason);
+                    snapshot.OutcomeReason)
+                    .WithDamageResolution(
+                        snapshot.ArmorAbsorbed,
+                        snapshot.HealthDamage);
         }
 
         private static PendingRewardChoiceSnapshotV1 CaptureRewardChoice(

@@ -1,5 +1,5 @@
 {
-  "version": "0.3",
+  "version": "0.4.0",
   "ruleProfiles": [
     {
       "id": "full_map_6x6_v1",
@@ -14,7 +14,9 @@
   ],
   "maps": [
     {
-      "id": "phase8b_floor1", "floor": 1, "ruleProfileId": "full_map_6x6_v1", "startNodeIds": ["f1_shop_start"],
+      "id": "map_wilderness", "displayName": "荒野", "themeFaction": "WildSpirit",
+      "floor": 1, "nextMapId": "map_startrail_highlands", "isFinalChapter": false,
+      "ruleProfileId": "full_map_6x6_v1", "startNodeIds": ["f1_shop_start"],
       "nodes": [
         { "id": "f1_shop_start", "type": "Shop", "column": 0, "row": 0, "payloadId": "", "nextNodeIds": ["f1_opening_normal"] },
         { "id": "f1_opening_normal", "type": "Normal", "combatIndex": 1, "column": 1, "row": 0, "payloadId": "f1_opening_encounter", "nextNodeIds": ["f1_shop_2"] },
@@ -38,7 +40,9 @@
       ]
     },
     {
-      "id": "phase8b_floor2", "floor": 2, "ruleProfileId": "full_map_6x6_v1", "startNodeIds": ["f2_shop_start"],
+      "id": "map_startrail_highlands", "displayName": "星轨高原", "themeFaction": "Starbound",
+      "floor": 2, "nextMapId": "map_soulforge_city", "isFinalChapter": false,
+      "ruleProfileId": "full_map_6x6_v1", "startNodeIds": ["f2_shop_start"],
       "nodes": [
         { "id": "f2_shop_start", "type": "Shop", "column": 0, "row": 0, "payloadId": "", "nextNodeIds": ["f2_opening_normal"] },
         { "id": "f2_opening_normal", "type": "Normal", "combatIndex": 1, "column": 1, "row": 0, "payloadId": "f2_opening_encounter", "nextNodeIds": ["f2_shop_2"] },
@@ -62,7 +66,9 @@
       ]
     },
     {
-      "id": "phase8b_floor3", "floor": 3, "ruleProfileId": "full_map_6x6_v1", "startNodeIds": ["f3_shop_start"],
+      "id": "map_soulforge_city", "displayName": "铸魂熔城", "themeFaction": "ForgeSoul",
+      "floor": 3, "nextMapId": "", "isFinalChapter": true,
+      "ruleProfileId": "full_map_6x6_v1", "startNodeIds": ["f3_shop_start"],
       "nodes": [
         { "id": "f3_shop_start", "type": "Shop", "column": 0, "row": 0, "payloadId": "", "nextNodeIds": ["f3_opening_normal"] },
         { "id": "f3_opening_normal", "type": "Normal", "combatIndex": 1, "column": 1, "row": 0, "payloadId": "f3_opening_encounter", "nextNodeIds": ["f3_shop_2"] },
