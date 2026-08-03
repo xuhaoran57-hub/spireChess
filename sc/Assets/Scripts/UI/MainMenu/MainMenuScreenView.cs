@@ -28,17 +28,19 @@ namespace SpireChess.UI.MainMenu
         [SerializeField] private Button cancelButton;
         [SerializeField] private AudioSettingsPanelView audioSettingsPanel;
 
+        [Header("Journal pages")]
+        [SerializeField] private GameObject coverPage;
+        [SerializeField] private GameObject contentsPage;
+        [SerializeField] private GameObject mapTransitionPage;
+        [SerializeField] private Button coverOpenButton;
+        [SerializeField] private Button coverSkipButton;
+        [SerializeField] private Button pageTurnSkipButton;
+        [SerializeField] private GameObject heroSelectionPanel;
+        [SerializeField] private Button heroConfirmButton;
+        [SerializeField] private Button heroCancelButton;
+
         private MainMenuController controller;
         private Action pendingConfirmation;
-        private GameObject coverPage;
-        private GameObject contentsPage;
-        private GameObject mapTransitionPage;
-        private Button coverOpenButton;
-        private Button coverSkipButton;
-        private Button pageTurnSkipButton;
-        private GameObject heroSelectionPanel;
-        private Button heroConfirmButton;
-        private Button heroCancelButton;
         private Coroutine pageTurnRoutine;
         private Action pageTurnCompleted;
         private JournalMenuPage pageTurnDestination;
@@ -54,6 +56,19 @@ namespace SpireChess.UI.MainMenu
         public bool HeroSelectionVisible =>
             heroSelectionPanel != null && heroSelectionPanel.activeSelf;
         public bool IsPageTurnRunning => isPageTurnRunning;
+        public bool HasCompleteJournalBindings =>
+            HasPageTransitionBinding(coverPage) &&
+            HasPageTransitionBinding(contentsPage) &&
+            HasPageTransitionBinding(mapTransitionPage) &&
+            HasPageTransitionBinding(heroSelectionPanel) &&
+            coverOpenButton != null &&
+            coverSkipButton != null && pageTurnSkipButton != null &&
+            heroConfirmButton != null && heroCancelButton != null;
+
+        private static bool HasPageTransitionBinding(GameObject page)
+        {
+            return page != null && page.GetComponent<CanvasGroup>() != null;
+        }
 
         public void Bind(MainMenuController value)
         {
@@ -654,7 +669,12 @@ namespace SpireChess.UI.MainMenu
         private static CanvasGroup EnsureCanvasGroup(GameObject page)
         {
             var group = page.GetComponent<CanvasGroup>();
-            return group ?? page.AddComponent<CanvasGroup>();
+            if (group != null)
+            {
+                return group;
+            }
+
+            return page.AddComponent<CanvasGroup>();
         }
 
         private static Button FindButton(GameObject root, string name)

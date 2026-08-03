@@ -380,7 +380,7 @@ namespace SpireChess.Battle
                         side,
                         "OnShieldLost",
                         pair.Key,
-                        ReferenceEquals(pair.Key, target) ? attacker : target);
+                        ReferenceEquals(pair.Key, attacker) ? target : attacker);
                 }
             }
 

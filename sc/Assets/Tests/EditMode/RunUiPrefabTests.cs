@@ -42,7 +42,13 @@ namespace SpireChess.Tests.EditMode
             "SafeArea/SummaryPanel/ActionButton",
             "SafeArea/ChoiceOverlay/Dialog/Title",
             "SafeArea/ChoiceOverlay/Dialog/Description",
-            "SafeArea/ChoiceOverlay/Dialog/OptionsScroll/Viewport/Content"
+            "SafeArea/ChoiceOverlay/Dialog/OptionsScroll/Viewport/Content",
+            "SafeArea/JournalPageOverlay/JournalPage/NeutralJournalArtwork",
+            "SafeArea/JournalPageOverlay/JournalPage/Title",
+            "SafeArea/JournalPageOverlay/JournalPage/Body",
+            "SafeArea/JournalPageOverlay/JournalPage/UnlockNotice",
+            "SafeArea/JournalPageOverlay/JournalPage/JournalActionButton",
+            "SafeArea/JournalPageOverlay/JournalPage/JournalActionButton/Label"
         };
 
         private GameObject screen;

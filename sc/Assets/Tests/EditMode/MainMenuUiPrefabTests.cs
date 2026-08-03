@@ -28,7 +28,20 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(prefab, Is.Not.Null);
             Assert.That(prefab.GetComponent<Canvas>(), Is.Not.Null);
-            Assert.That(prefab.GetComponent<MainMenuScreenView>(), Is.Not.Null);
+            var view = prefab.GetComponent<MainMenuScreenView>();
+            Assert.That(view, Is.Not.Null);
+            Assert.That(
+                view.HasCompleteJournalBindings,
+                Is.True,
+                "PF_MainMenuScreen must serialize the formal journal hierarchy.");
+            Assert.That(Find(prefab, "CoverPage"), Is.Not.Null);
+            Assert.That(Find(prefab, "MapTransitionPage"), Is.Not.Null);
+            Assert.That(Find(prefab, "OpenJournalButton"), Is.Not.Null);
+            Assert.That(Find(prefab, "CoverSkipButton"), Is.Not.Null);
+            Assert.That(Find(prefab, "SkipPageTurnButton"), Is.Not.Null);
+            Assert.That(
+                Find(prefab, "HeroSelectionOverlay").GetComponent<CanvasGroup>(),
+                Is.Not.Null);
             Assert.That(Find(prefab, "NewGameButton"), Is.Not.Null);
             Assert.That(Find(prefab, "ContinueButton"), Is.Not.Null);
             Assert.That(Find(prefab, "SettingsButton"), Is.Not.Null);
@@ -160,7 +173,7 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
-        public void JournalPages_RuntimeFallbackCreatesCoverAndLocksContentsInputs()
+        public void JournalPages_FormalPrefabRendersAndLocksContentsInputs()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/Prefabs/UI/MainMenu/PF_MainMenuScreen.prefab");
@@ -208,7 +221,9 @@ namespace SpireChess.Tests.EditMode
                     Page = JournalMenuPage.Map,
                     SaveStatus = RunSaveLoadStatus.Missing
                 });
-                Assert.That(Find(instance, "MapTransitionPage").activeSelf, Is.True);
+                Assert.That(
+                    Find(instance, "MapTransitionPage").gameObject.activeSelf,
+                    Is.True);
                 Assert.That(
                     Find(instance, "NewGameButton").GetComponent<Button>()
                         .interactable,

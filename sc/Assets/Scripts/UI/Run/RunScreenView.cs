@@ -86,13 +86,15 @@ namespace SpireChess.UI.Run
         [SerializeField] private RectTransform choiceContent;
         [SerializeField] private GameObject choiceOptionPrefab;
 
-        private GameObject journalPageOverlay;
-        private Text journalPageTitleText;
-        private Text journalPageBodyText;
-        private Text journalPageUnlockText;
-        private Image journalPageArtwork;
-        private Button journalPageActionButton;
-        private Text journalPageActionText;
+        [Header("Journal page")]
+        [SerializeField] private GameObject journalPageOverlay;
+        [SerializeField] private Text journalPageTitleText;
+        [SerializeField] private Text journalPageBodyText;
+        [SerializeField] private Text journalPageUnlockText;
+        [SerializeField] private Image journalPageArtwork;
+        [SerializeField] private Button journalPageActionButton;
+        [SerializeField] private Text journalPageActionText;
+
         private readonly Dictionary<string, RunMapNodeView> nodeViews =
             new Dictionary<string, RunMapNodeView>(StringComparer.Ordinal);
         private RunTestController controller;
@@ -113,6 +115,11 @@ namespace SpireChess.UI.Run
             mapScrollRect == null
                 ? 0f
                 : mapScrollRect.horizontalNormalizedPosition;
+        public bool HasCompleteJournalBindings =>
+            journalPageOverlay != null && journalPageTitleText != null &&
+            journalPageBodyText != null && journalPageUnlockText != null &&
+            journalPageArtwork != null && journalPageActionButton != null &&
+            journalPageActionText != null;
         public bool HasCompleteBindings =>
             theme != null && rootCanvas != null && safeArea != null &&
             titleText != null && resourceText != null && progressText != null &&
@@ -126,7 +133,8 @@ namespace SpireChess.UI.Run
             summaryText != null && summaryActionButton != null && summaryActionText != null &&
             choiceOverlay != null && choiceTitleText != null &&
             choiceDescriptionText != null && choiceScrollRect != null &&
-            choiceContent != null && choiceOptionPrefab != null;
+            choiceContent != null && choiceOptionPrefab != null &&
+            HasCompleteJournalBindings;
 
         public void Bind(RunTestController value)
         {

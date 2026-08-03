@@ -638,10 +638,10 @@
       "iconId": "icon_forge_soul",
       "audioId": "",
       "effects": [
-        { "id": "oathblade_armor_lost", "trigger": "OnShieldLost", "action": "DealDamage", "condition": { "type": "AttackerExists" }, "target": { "side": "Enemy", "scope": "Attacker", "includeSelf": false }, "value": { "amount": 2, "duration": "Combat" } }
+        { "id": "oathblade_armor_lost", "trigger": "OnShieldLost", "action": "DealDamage", "condition": { "type": "SubjectIsSelf" }, "target": { "side": "Enemy", "scope": "Attacker", "includeSelf": false }, "value": { "amount": 2, "duration": "Combat" } }
       ],
       "goldenEffects": [
-        { "id": "golden_oathblade_armor_lost", "trigger": "OnShieldLost", "action": "DealDamage", "condition": { "type": "AttackerExists" }, "target": { "side": "Enemy", "scope": "Attacker", "includeSelf": false }, "value": { "amount": 4, "duration": "Combat" } }
+        { "id": "golden_oathblade_armor_lost", "trigger": "OnShieldLost", "action": "DealDamage", "condition": { "type": "SubjectIsSelf" }, "target": { "side": "Enemy", "scope": "Attacker", "includeSelf": false }, "value": { "amount": 4, "duration": "Combat" } }
       ],
       "tags": ["shield_break", "damage"],
       "enabled": true,

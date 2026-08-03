@@ -191,6 +191,16 @@ namespace SpireChess.Tests.EditMode
         [Test]
         public void BreakAndDeathFinishers_HaveCurrentTriggerAndGrowthRules()
         {
+            var oathblade = configs.MinionsById["oathblade_armor"];
+            Assert.That(oathblade.Effects.Where(effect =>
+                    effect.Trigger == "OnShieldLost"),
+                Has.All.Matches<EffectConfig>(effect =>
+                    effect.Condition?.Type == "SubjectIsSelf"));
+            Assert.That(oathblade.GoldenEffects.Where(effect =>
+                    effect.Trigger == "OnShieldLost"),
+                Has.All.Matches<EffectConfig>(effect =>
+                    effect.Condition?.Type == "SubjectIsSelf"));
+
             var oathbroken = configs.MinionsById["oathbroken_blade_soul"];
             Assert.That(oathbroken.Effects.Where(effect =>
                     effect.Trigger == "OnShieldLost"),
@@ -446,6 +456,81 @@ namespace SpireChess.Tests.EditMode
             }
         }
 
+        [TestCase(false, 2)]
+        [TestCase(true, 4)]
+        public void OathbladeArmor_OwnShieldLossDamagesAttacker(
+            bool golden,
+            int expectedDamage)
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = CreateBattleTestMinion("attacker", 1, 100);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["oathblade_armor"],
+                golden,
+                initialAttack: 0,
+                initialHealth: 100,
+                permanentKeywords: new[] { "Taunt" });
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var firstAttack = result.Steps.First(step => step.HasAttack);
+
+            Assert.That(firstAttack.BoardState.Enemy[0].HasShield, Is.False);
+            Assert.That(
+                firstAttack.BoardState.Player[0].CurrentHealth,
+                Is.EqualTo(100 - expectedDamage));
+        }
+
+        [Test]
+        public void OathbladeArmor_AllyShieldLossDoesNotTriggerRetaliation()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = CreateBattleTestMinion("attacker", 1, 100);
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["oathblade_armor"],
+                initialAttack: 0,
+                initialHealth: 100);
+            state.Enemy[1] = CreateBattleTestMinion(
+                "shielded_ally",
+                0,
+                100,
+                "Shield",
+                "Taunt");
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var firstAttack = result.Steps.First(step => step.HasAttack);
+
+            Assert.That(firstAttack.BoardState.Enemy[0].HasShield, Is.True);
+            Assert.That(firstAttack.BoardState.Enemy[1].HasShield, Is.False);
+            Assert.That(firstAttack.BoardState.Player[0].CurrentHealth, Is.EqualTo(100));
+        }
+
+        [Test]
+        public void OathbladeArmor_CleaveShieldLossDamagesActualAttacker()
+        {
+            var state = new BattleBoardState();
+            state.Player[0] = CreateBattleTestMinion(
+                "cleave_attacker",
+                4,
+                100,
+                "Cleave");
+            state.Enemy[0] = new BattleMinionRuntime(
+                configs.MinionsById["oathblade_armor"],
+                initialAttack: 0,
+                initialHealth: 100);
+            state.Enemy[1] = CreateBattleTestMinion(
+                "primary_target",
+                0,
+                100,
+                "Taunt");
+
+            var result = CreateSimulator().SimulatePlayback(state);
+            var firstAttack = result.Steps.First(step => step.HasAttack);
+
+            Assert.That(firstAttack.BoardState.Enemy[0].HasShield, Is.False);
+            Assert.That(firstAttack.BoardState.Enemy[1].CurrentHealth, Is.EqualTo(96));
+            Assert.That(firstAttack.BoardState.Player[0].CurrentHealth, Is.EqualTo(98));
+        }
+
         [Test]
         public void SameSummonEvent_DeduplicatesImmediateAttackAcrossMultipleSources()
         {
@@ -611,6 +696,26 @@ namespace SpireChess.Tests.EditMode
             return new BattleSimulator(
                 new Random(7),
                 id => configs.MinionsById.TryGetValue(id, out var value) ? value : null);
+        }
+
+        private static BattleMinionRuntime CreateBattleTestMinion(
+            string id,
+            int attack,
+            int health,
+            params string[] keywords)
+        {
+            return new BattleMinionRuntime(new MinionConfig
+            {
+                Id = id,
+                Name = id,
+                Race = "Wayfarer",
+                Attack = attack,
+                Health = health,
+                GoldenAttack = attack,
+                GoldenHealth = health,
+                Keywords = keywords.ToList(),
+                Enabled = true
+            });
         }
 
         private static int FindBench(ShopSession shop, string configId)
