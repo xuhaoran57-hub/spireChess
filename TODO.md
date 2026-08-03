@@ -1,7 +1,23 @@
 # 项目待办
 
+> **v0.4.0 当前权威入口（2026-08-03）**：
+> [v0.4.0-authoritative-backlog-and-acceptance-matrix.md](v0.4.0-authoritative-backlog-and-acceptance-matrix.md)。
+> 下文是历史实施记录；当前优先级和验收状态只以该矩阵为准。
+
+## v0.4.0 当前工作板
+
+- [ ] P0（实现待复验）：封面→目录→角色选择→地图、章节完成页、结局页与一次性解锁提示已接入 UI；十张 v0.4 日记正式候选资产（含锁定角色状态）已接入并通过离线哈希/导入合同核验，详见 [资产包](ui-concepts/phase-9c/light-storybook-production-v0.1/journal-ui-v0.4.0/README.md)；Prefab 重建、Unity 测试、双分辨率 Player 证据及视觉签字仍待完成，见 [v0.4.0 日记 UI 证据目录](ui-concepts/unity-validation/v0.4.0-journal-ui/README.md)。
+- [ ] P0：在干净当前候选上重新完成 EditMode、PlayMode、Clean Player、双分辨率和
+  重复输入/Exactly-once 门禁。
+- [ ] P0：重新生成可追溯的 v0.4.0 章节进度 S0 平衡证据，固定提交、配置哈希和
+  fixture 身份。
+- [ ] P1：建立并验证三角色真实单局的平衡候选，再决定正式 S1/S2 规模和人工批次。
+- [ ] P2：完成正式音频、背景生产签字、第二机性能、截图签字和外部试玩门禁。
+
+## 历史实施记录（非当前排期）
+
 版本：0.1
-当前目标：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；v0.3.3 的 42 张非 Token 随从与 9 张法术 Runtime 晋级已关闭；3 张旧 G2 Token 尚未使用冻结的新美术风格，v0.3.4 Token Refresh 候选已生成并等待视觉批准；G3 屏幕、地图、VFX 与音频工程已完成，67 个本地程序合成占位 Clip 已接入用于联调；G4-E 已依据提交 `f377497` 关闭，G4-V 技术复验已在晋级提交 `8fc61a5` 上通过，仍需 Token Refresh 视觉批准/晋级、五张背景的负责人生产许可/视觉签字、第二机/两机门槛、五人试玩与正式音频门禁。
+当前目标（历史快照）：R17 Phase 6B 的旧 S1/S2 继续暂缓；阶段 9A 已完成并建立候选；阶段 9B G0、G1、G2 已通过并关闭；v0.3.3 的 42 张非 Token 随从与 9 张法术 Runtime 晋级已关闭。其余状态以 v0.4.0 权威矩阵为准。
 
 ## 已完成：阶段 0 项目准备
 
@@ -611,10 +627,10 @@
   的 `v0.3.4 Token Refresh` 候选；3 / 3 哈希、约 5:4 画幅、亮度和旧 Runtime
   隔离门禁通过，Prompt、来源与报告见
   `ui-concepts/phase-9c/light-storybook-production-v0.1/token-refresh-v0.3.4/`。
-- [ ] 项目负责人完成 3 张 v0.3.4 Token 候选的视觉、输入权利与生产使用确认。
-- [ ] 获批后保留现有 `.meta` GUID 覆盖 3 张 Runtime Token，统一 DXT1 / Max
-  1024 / Mipmap 与 Read/Write 关闭策略，并复跑全量 EditMode/PlayMode、卡框
-  裁切截图与 Runtime 证据；完成前不得标记新风格 Token 为 `Runtime Ready`。
+- [x] v0.3.4 Token 候选已完成视觉、输入权利与生产使用确认，并随
+  `legacy-card-art-refresh-v0.3.4` 于 2026-08-01 晋级；3 张 Runtime Token 保留
+  `.meta` GUID，导入策略、全量测试、卡框裁切与 Runtime 证据均已复验。关闭证据见
+  `ui-concepts/phase-9c/light-storybook-production-v0.1/legacy-refresh-v0.3.4/README.md`。
 
 ## 暂缓
 

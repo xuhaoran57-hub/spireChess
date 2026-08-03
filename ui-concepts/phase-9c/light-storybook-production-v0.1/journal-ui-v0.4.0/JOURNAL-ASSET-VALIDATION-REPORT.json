@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "spire-chess-journal-art-v0.4.0-v1",
+  "status": "PASS_OFFLINE_UNITY_PENDING",
+  "assetCount": 10,
+  "assets": [
+    {
+      "id": "journal-cover",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_cover_v0_4_0.png",
+      "width": 1086,
+      "height": 1448,
+      "sha256": "10f42d65319e95e01bdc0f199d13aedbb4c781d534bc0e9b0e57828dfc2b09eb"
+    },
+    {
+      "id": "journal-contents",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_contents_v0_4_0.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "3ebd4d7a02427a5eefe4c86b4382e0403dac4d5d1b36e69b889c5306f5cd9c22"
+    },
+    {
+      "id": "journal-hero-warrior",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_hero_warrior_v0_4_0.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "e8b4d27981ff5486818152d3e256fed35559a0fcfb1a45c412717cca15482c7e"
+    },
+    {
+      "id": "journal-hero-mage",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_hero_mage_v0_4_0.png",
+      "width": 1024,
+      "height": 1535,
+      "sha256": "37194f7cd1298b34aa8dba768807e74fc358225c0353cad83afd0a97688495c1"
+    },
+    {
+      "id": "journal-hero-rogue",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_hero_rogue_v0_4_0.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "9e791f626ef977db71df9b43f0f464dd1ef2cc0e3a912fa5454c3a5022e97fb8"
+    },
+    {
+      "id": "journal-hero-locked",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_hero_locked_v0_4_0.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "1000186bf812065f7868af8bb0a7cc77a58edafdf40f0b6899c0b383772c90b5"
+    },
+    {
+      "id": "journal-chapter-wilderness",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_chapter_wilderness_v0_4_0.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "9b6a75c6e8f47adc6d653e45bd38b3728c8778e1c46f2cd81c00e1c19ffb6e86"
+    },
+    {
+      "id": "journal-chapter-startrail-highlands",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_chapter_startrail_highlands_v0_4_0.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "818c4f11a455f3ec555245fb4899e8717638ac63bd63478f4ce0ae26fa9c7466"
+    },
+    {
+      "id": "journal-chapter-soulforge-city",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_chapter_soulforge_city_v0_4_0.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "a9871d4bba72f40a37b597c9bf3ef82b46586ee77de5d428147b70574e9b9278"
+    },
+    {
+      "id": "journal-ending",
+      "path": "sc/Assets/Resources/Presentation/Journal/journal_ending_v0_4_0.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "51d45b6aa41ff836a525deb54a3eac8f641abb1bf380c731e661c23ffeef14af"
+    }
+  ],
+  "errors": [],
+  "note": "Offline consistency only. Unity import, EditMode/PlayMode, Player screenshots, and human visual approval are still required."
+}

@@ -168,13 +168,50 @@ namespace SpireChess.Editor
                 "ui-concepts",
                 "unity-validation",
                 "g3-run-screen-v0.1");
+            var journalOutputDirectory = Path.Combine(
+                repositoryRoot,
+                "ui-concepts",
+                "unity-validation",
+                "v0.4.0-journal-ui",
+                "editor-preview");
             Directory.CreateDirectory(outputDirectory);
+            Directory.CreateDirectory(journalOutputDirectory);
             Capture(camera, canvasRect, 1920, 1080,
                 Path.Combine(outputDirectory, "run-screen-1920x1080.png"));
             view.Render(state);
             Capture(camera, canvasRect, 1920, 1200,
                 Path.Combine(outputDirectory, "run-screen-1920x1200.png"));
 
+            state.Choice = null;
+            state.JournalPage = new RunJournalPageState
+            {
+                Kind = RunJournalPageKind.ChapterComplete,
+                Title = "荒野 · 章节完成",
+                Body = "Boss 已击败，遗珍已结算。",
+                UnlockNotification = "新角色已解锁：法师",
+                ActionLabel = "进入下一章",
+                Action = RunUiActionType.ContinueToNextFloor
+            };
+            view.Render(state);
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(journalOutputDirectory, "journal-chapter-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(journalOutputDirectory, "journal-chapter-1920x1200.png"));
+            state.JournalPage = new RunJournalPageState
+            {
+                Kind = RunJournalPageKind.Ending,
+                Title = "旅团日记 · 完结",
+                Body = "三章旅程完成。",
+                ActionLabel = "返回目录",
+                Action = RunUiActionType.ReturnToMainMenu
+            };
+            view.Render(state);
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(journalOutputDirectory, "journal-ending-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(journalOutputDirectory, "journal-ending-1920x1200.png"));
+
+            state.JournalPage = null;
             state.Choice = new RunChoiceOverlayState
             {
                 Title = "选择一件 Boss 遗珍",
@@ -697,6 +734,7 @@ namespace SpireChess.Editor
                 SetReference(serialized, "choiceContent", choiceContent);
                 SetReference(serialized, "choiceOptionPrefab", choicePrefab);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
+                view.EnsureJournalPageOverlay();
                 PrefabUtility.SaveAsPrefabAsset(root, ScreenPrefabPath);
             }
             finally

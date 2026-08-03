@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SpireChess.Audio;
@@ -12,6 +13,8 @@ namespace SpireChess.UI.MainMenu
 {
     public sealed class MainMenuScreenView : MonoBehaviour
     {
+        private const float PageTurnDuration = 0.24f;
+
         [SerializeField] private Text continueSummary;
         [SerializeField] private Text statusText;
         [SerializeField] private Button newGameButton;
@@ -27,9 +30,19 @@ namespace SpireChess.UI.MainMenu
 
         private MainMenuController controller;
         private Action pendingConfirmation;
+        private GameObject coverPage;
+        private GameObject contentsPage;
+        private GameObject mapTransitionPage;
+        private Button coverOpenButton;
+        private Button coverSkipButton;
+        private Button pageTurnSkipButton;
         private GameObject heroSelectionPanel;
         private Button heroConfirmButton;
         private Button heroCancelButton;
+        private Coroutine pageTurnRoutine;
+        private Action pageTurnCompleted;
+        private JournalMenuPage pageTurnDestination;
+        private bool isPageTurnRunning;
         private readonly Dictionary<string, HeroCardBinding> heroCards =
             new Dictionary<string, HeroCardBinding>(StringComparer.Ordinal);
 
@@ -40,10 +53,12 @@ namespace SpireChess.UI.MainMenu
         public string StatusText => statusText == null ? string.Empty : statusText.text;
         public bool HeroSelectionVisible =>
             heroSelectionPanel != null && heroSelectionPanel.activeSelf;
+        public bool IsPageTurnRunning => isPageTurnRunning;
 
         public void Bind(MainMenuController value)
         {
             controller = value ?? throw new ArgumentNullException(nameof(value));
+            EnsureJournalPages();
             EnsureHeroSelectionPanel();
             newGameButton.onClick.RemoveAllListeners();
             continueButton.onClick.RemoveAllListeners();
@@ -52,6 +67,9 @@ namespace SpireChess.UI.MainMenu
             quitButton.onClick.RemoveAllListeners();
             confirmButton.onClick.RemoveAllListeners();
             cancelButton.onClick.RemoveAllListeners();
+            coverOpenButton.onClick.RemoveAllListeners();
+            coverSkipButton.onClick.RemoveAllListeners();
+            pageTurnSkipButton.onClick.RemoveAllListeners();
             newGameButton.onClick.AddListener(controller.NewGame);
             newGameButton.onClick.AddListener(
                 () => PlayUiCue(PresentationAudioCueIds.UiConfirm));
@@ -73,6 +91,15 @@ namespace SpireChess.UI.MainMenu
             cancelButton.onClick.AddListener(HideConfirmation);
             cancelButton.onClick.AddListener(
                 () => PlayUiCue(PresentationAudioCueIds.UiCancel));
+            coverOpenButton.onClick.AddListener(controller.OpenContentsFromCover);
+            coverOpenButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiConfirm));
+            coverSkipButton.onClick.AddListener(controller.OpenContentsFromCover);
+            coverSkipButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiClick));
+            pageTurnSkipButton.onClick.AddListener(controller.SkipPageTurn);
+            pageTurnSkipButton.onClick.AddListener(
+                () => PlayUiCue(PresentationAudioCueIds.UiClick));
             heroConfirmButton.onClick.RemoveAllListeners();
             heroCancelButton.onClick.RemoveAllListeners();
             heroConfirmButton.onClick.AddListener(controller.ConfirmHeroSelection);
@@ -90,18 +117,30 @@ namespace SpireChess.UI.MainMenu
                 return;
             }
 
-            continueButton.interactable = state.ContinueEnabled;
-            deleteButton.interactable = state.SaveStatus != RunSaveLoadStatus.Missing;
+            EnsureJournalPages();
+            var contentsInteractable =
+                state.Page == JournalMenuPage.Contents && !state.IsInputLocked;
+            newGameButton.interactable = contentsInteractable;
+            continueButton.interactable =
+                contentsInteractable && state.ContinueEnabled;
+            settingsButton.interactable = contentsInteractable;
+            deleteButton.interactable = contentsInteractable &&
+                state.SaveStatus != RunSaveLoadStatus.Missing;
+            quitButton.interactable = !state.IsInputLocked;
             continueSummary.text = state.ContinueSummary ?? string.Empty;
             statusText.text = state.StatusMessage ?? string.Empty;
             statusText.color = state.StatusIsError
                 ? new Color(0.95f, 0.38f, 0.32f)
                 : new Color(0.72f, 0.78f, 0.86f);
-            if (state.HeroSelectionVisible || heroSelectionPanel != null)
+            var heroVisible = state.Page == JournalMenuPage.HeroSelection ||
+                              state.HeroSelectionVisible;
+            if (heroVisible || heroSelectionPanel != null)
             {
                 EnsureHeroSelectionPanel();
-                RenderHeroSelection(state);
+                RenderHeroSelection(state, heroVisible);
             }
+
+            RenderJournalPage(state.Page, state.IsInputLocked, heroVisible);
         }
 
         public bool IsHeroInteractable(string heroId)
@@ -141,10 +180,507 @@ namespace SpireChess.UI.MainMenu
             AudioService.Instance?.PlayCue(cueId);
         }
 
+        public void PlayPageTurn(
+            JournalMenuPage source,
+            JournalMenuPage destination,
+            Action onCompleted)
+        {
+            EnsureJournalPages();
+            if (isPageTurnRunning)
+            {
+                return;
+            }
+
+            var sourcePage = GetPageObject(source);
+            var destinationPage = GetPageObject(destination);
+            if (sourcePage == null || destinationPage == null)
+            {
+                onCompleted?.Invoke();
+                return;
+            }
+
+            isPageTurnRunning = true;
+            pageTurnDestination = destination;
+            pageTurnCompleted = onCompleted;
+            sourcePage.SetActive(true);
+            destinationPage.SetActive(true);
+            ConfigurePageForTransition(sourcePage, 1f, true);
+            ConfigurePageForTransition(destinationPage, 0f, false);
+            pageTurnSkipButton.gameObject.SetActive(true);
+            pageTurnSkipButton.transform.SetAsLastSibling();
+            pageTurnRoutine = StartCoroutine(
+                AnimatePageTurn(sourcePage, destinationPage));
+        }
+
+        public void SkipPageTurn()
+        {
+            if (!isPageTurnRunning)
+            {
+                return;
+            }
+
+            if (pageTurnRoutine != null)
+            {
+                StopCoroutine(pageTurnRoutine);
+                pageTurnRoutine = null;
+            }
+
+            FinishPageTurn();
+        }
+
+        private IEnumerator AnimatePageTurn(
+            GameObject sourcePage,
+            GameObject destinationPage)
+        {
+            var sourceRect = sourcePage.GetComponent<RectTransform>();
+            var destinationRect = destinationPage.GetComponent<RectTransform>();
+            var sourceStart = sourceRect.anchoredPosition;
+            var destinationStart = destinationRect.anchoredPosition;
+            var distance = Mathf.Max(120f, sourceRect.rect.width * 0.12f);
+            var elapsed = 0f;
+            while (elapsed < PageTurnDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                var progress = Mathf.Clamp01(elapsed / PageTurnDuration);
+                var eased = progress * progress * (3f - 2f * progress);
+                ConfigurePageForTransition(sourcePage, 1f - eased, false);
+                ConfigurePageForTransition(destinationPage, eased, false);
+                sourceRect.anchoredPosition = sourceStart +
+                    new Vector2(-distance * eased, 0f);
+                destinationRect.anchoredPosition = destinationStart +
+                    new Vector2(distance * (1f - eased), 0f);
+                yield return null;
+            }
+
+            sourceRect.anchoredPosition = sourceStart;
+            destinationRect.anchoredPosition = destinationStart;
+            pageTurnRoutine = null;
+            FinishPageTurn();
+        }
+
+        private void FinishPageTurn()
+        {
+            if (!isPageTurnRunning)
+            {
+                return;
+            }
+
+            isPageTurnRunning = false;
+            SetVisiblePage(pageTurnDestination);
+            var completed = pageTurnCompleted;
+            pageTurnCompleted = null;
+            completed?.Invoke();
+        }
+
+        private void EnsureJournalPages()
+        {
+            if (contentsPage == null)
+            {
+                var existing = transform.Find("Background/ContentsPage");
+                if (existing != null)
+                {
+                    contentsPage = existing.gameObject;
+                }
+                else
+                {
+                    var background = transform.Find("Background");
+                    var parent = background == null ? transform : background;
+                    var contents = new GameObject(
+                        "ContentsPage",
+                        typeof(RectTransform),
+                        typeof(CanvasGroup));
+                    contents.transform.SetParent(parent, false);
+                    Stretch(contents.GetComponent<RectTransform>());
+                    var menuCard = parent.Find("MenuCard");
+                    if (menuCard != null)
+                    {
+                        menuCard.SetParent(contents.transform, false);
+                    }
+
+                    contentsPage = contents;
+                }
+            }
+
+            EnsureCanvasGroup(contentsPage);
+            if (coverPage == null)
+            {
+                var existing = transform.Find("CoverPage");
+                coverPage = existing == null
+                    ? CreateCoverPage()
+                    : existing.gameObject;
+            }
+
+            EnsureCanvasGroup(coverPage);
+            if (mapTransitionPage == null)
+            {
+                var existing = transform.Find("MapTransitionPage");
+                mapTransitionPage = existing == null
+                    ? CreateMapTransitionPage()
+                    : existing.gameObject;
+            }
+
+            EnsureCanvasGroup(mapTransitionPage);
+            ApplyContentsArtwork();
+            ApplyCoverArtwork();
+            ApplyMapTransitionArtwork();
+            if (coverOpenButton == null)
+            {
+                coverOpenButton = FindButton(coverPage, "OpenJournalButton");
+            }
+            if (coverSkipButton == null)
+            {
+                coverSkipButton = FindButton(coverPage, "CoverSkipButton");
+            }
+            if (pageTurnSkipButton == null)
+            {
+                var existing = transform.Find("SkipPageTurnButton");
+                if (existing != null)
+                {
+                    pageTurnSkipButton = existing.GetComponent<Button>();
+                }
+                else
+                {
+                    var font = continueSummary?.font ??
+                               Resources.GetBuiltinResource<Font>(
+                                   "LegacyRuntime.ttf");
+                    pageTurnSkipButton = CreateButton(
+                        transform,
+                        "SkipPageTurnButton",
+                        "跳过翻页",
+                        font);
+                    SetRect(
+                        pageTurnSkipButton.GetComponent<RectTransform>(),
+                        new Vector2(1f, 1f),
+                        new Vector2(180f, 54f),
+                        new Vector2(-118f, -54f));
+                    pageTurnSkipButton.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        private void ApplyContentsArtwork()
+        {
+            if (contentsPage == null)
+            {
+                return;
+            }
+
+            PresentationArtworkResources.EnsureImage(
+                contentsPage.transform,
+                "JournalContentsArtwork",
+                PresentationArtworkResources.LoadJournalContents(),
+                Color.white,
+                true);
+        }
+
+        private void ApplyCoverArtwork()
+        {
+            var artwork = coverPage == null
+                ? null
+                : coverPage.transform.Find("NeutralCoverArtwork")
+                    ?.GetComponent<Image>();
+            var label = coverPage == null
+                ? null
+                : coverPage.transform.Find("NeutralCoverArtwork/Label");
+            ApplyArtwork(
+                artwork,
+                PresentationArtworkResources.LoadJournalCover(),
+                new Color(0.31f, 0.33f, 0.31f, 1f),
+                label,
+                true);
+        }
+
+        private void ApplyMapTransitionArtwork()
+        {
+            var artwork = mapTransitionPage == null
+                ? null
+                : mapTransitionPage.transform.Find("NeutralMapArtwork")
+                    ?.GetComponent<Image>();
+            var label = mapTransitionPage == null
+                ? null
+                : mapTransitionPage.transform.Find("NeutralMapArtwork/Label");
+            ApplyArtwork(
+                artwork,
+                PresentationArtworkResources.LoadJournalChapter(
+                    "map_wilderness"),
+                new Color(0.18f, 0.28f, 0.28f, 0.92f),
+                label,
+                false);
+        }
+
+        private static void ApplyArtwork(
+            Image artwork,
+            Sprite sprite,
+            Color fallbackColor,
+            Transform fallbackLabel,
+            bool preserveAspect)
+        {
+            if (artwork == null)
+            {
+                return;
+            }
+
+            artwork.sprite = sprite;
+            artwork.type = Image.Type.Simple;
+            artwork.preserveAspect = preserveAspect;
+            artwork.color = sprite == null ? fallbackColor : Color.white;
+            if (fallbackLabel != null)
+            {
+                fallbackLabel.gameObject.SetActive(sprite == null);
+            }
+        }
+
+        private GameObject CreateCoverPage()
+        {
+            var font = continueSummary?.font ??
+                       Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var cover = CreatePanel(
+                transform,
+                "CoverPage",
+                new Color(0.95f, 0.91f, 0.80f, 1f));
+            Stretch(cover.rectTransform);
+            cover.gameObject.AddComponent<CanvasGroup>();
+
+            var artwork = CreatePanel(
+                cover.transform,
+                "NeutralCoverArtwork",
+                new Color(0.31f, 0.33f, 0.31f, 1f));
+            SetRect(
+                artwork.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(645f, 860f),
+                new Vector2(-300f, 0f));
+            AddFrame(
+                artwork,
+                new Color(0.78f, 0.66f, 0.40f, 0.72f),
+                new Vector2(4f, -4f));
+            var artworkLabel = CreateText(
+                artwork.transform,
+                "Label",
+                "中性封面占位图",
+                24,
+                64f,
+                FontStyle.Bold,
+                font);
+            Stretch(artworkLabel.rectTransform);
+            artworkLabel.color = new Color(0.88f, 0.86f, 0.78f, 0.82f);
+
+            var title = CreateText(
+                cover.transform,
+                "CoverTitle",
+                "旅团日记",
+                72,
+                112f,
+                FontStyle.Bold,
+                font);
+            SetRect(
+                title.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(760f, 112f),
+                new Vector2(450f, 210f));
+            title.color = new Color(0.20f, 0.13f, 0.08f, 1f);
+            var description = CreateText(
+                cover.transform,
+                "CoverDescription",
+                "沿着纸页与星盘，写下新的旅程。",
+                26,
+                72f,
+                FontStyle.Normal,
+                font);
+            SetRect(
+                description.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(720f, 72f),
+                new Vector2(450f, 95f));
+            description.color = new Color(0.34f, 0.25f, 0.16f, 1f);
+            var open = CreateButton(
+                cover.transform,
+                "OpenJournalButton",
+                "翻开日记",
+                font,
+                true);
+            SetRect(
+                open.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(340f, 76f),
+                new Vector2(450f, -58f));
+            var skip = CreateButton(
+                cover.transform,
+                "CoverSkipButton",
+                "跳过封面",
+                font);
+            SetRect(
+                skip.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(280f, 62f),
+                new Vector2(450f, -145f));
+            cover.transform.SetAsLastSibling();
+            return cover.gameObject;
+        }
+
+        private GameObject CreateMapTransitionPage()
+        {
+            var font = continueSummary?.font ??
+                       Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var map = CreatePanel(
+                transform,
+                "MapTransitionPage",
+                new Color(0.95f, 0.91f, 0.80f, 1f));
+            Stretch(map.rectTransform);
+            map.gameObject.AddComponent<CanvasGroup>();
+
+            var artwork = CreatePanel(
+                map.transform,
+                "NeutralMapArtwork",
+                new Color(0.18f, 0.28f, 0.28f, 0.92f));
+            SetRect(
+                artwork.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(1220f, 680f),
+                Vector2.zero);
+            AddFrame(
+                artwork,
+                new Color(0.72f, 0.62f, 0.38f, 0.72f),
+                new Vector2(4f, -4f));
+            var artworkLabel = CreateText(
+                artwork.transform,
+                "Label",
+                "临时中性地图占位图",
+                28,
+                72f,
+                FontStyle.Bold,
+                font);
+            Stretch(artworkLabel.rectTransform);
+            artworkLabel.color = new Color(0.86f, 0.88f, 0.78f, 0.88f);
+
+            var title = CreateText(
+                map.transform,
+                "MapTransitionTitle",
+                "展开旅程地图",
+                52,
+                84f,
+                FontStyle.Bold,
+                font);
+            SetRect(
+                title.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(760f, 84f),
+                new Vector2(0f, 390f));
+            title.color = new Color(0.20f, 0.13f, 0.08f, 1f);
+            map.transform.SetAsLastSibling();
+            return map.gameObject;
+        }
+
+        private void RenderJournalPage(
+            JournalMenuPage page,
+            bool isInputLocked,
+            bool heroVisible)
+        {
+            if (!isPageTurnRunning)
+            {
+                SetVisiblePage(heroVisible
+                    ? JournalMenuPage.HeroSelection
+                    : page);
+            }
+
+            if (coverOpenButton != null)
+            {
+                coverOpenButton.interactable =
+                    page == JournalMenuPage.Cover && !isInputLocked;
+            }
+            if (coverSkipButton != null)
+            {
+                coverSkipButton.interactable =
+                    page == JournalMenuPage.Cover && !isInputLocked;
+            }
+            if (pageTurnSkipButton != null)
+            {
+                pageTurnSkipButton.interactable = isPageTurnRunning;
+            }
+        }
+
+        private void SetVisiblePage(JournalMenuPage page)
+        {
+            SetPageVisible(coverPage, page == JournalMenuPage.Cover);
+            SetPageVisible(contentsPage, page == JournalMenuPage.Contents);
+            SetPageVisible(
+                heroSelectionPanel,
+                page == JournalMenuPage.HeroSelection);
+            SetPageVisible(mapTransitionPage, page == JournalMenuPage.Map);
+            if (pageTurnSkipButton != null)
+            {
+                pageTurnSkipButton.gameObject.SetActive(false);
+            }
+        }
+
+        private GameObject GetPageObject(JournalMenuPage page)
+        {
+            switch (page)
+            {
+                case JournalMenuPage.Cover:
+                    return coverPage;
+                case JournalMenuPage.HeroSelection:
+                    EnsureHeroSelectionPanel();
+                    return heroSelectionPanel;
+                case JournalMenuPage.Map:
+                    return mapTransitionPage;
+                default:
+                    return contentsPage;
+            }
+        }
+
+        private static void SetPageVisible(GameObject page, bool isVisible)
+        {
+            if (page == null)
+            {
+                return;
+            }
+
+            page.SetActive(isVisible);
+            ConfigurePageForTransition(page, isVisible ? 1f : 0f, isVisible);
+        }
+
+        private static void ConfigurePageForTransition(
+            GameObject page,
+            float alpha,
+            bool acceptsInput)
+        {
+            var group = EnsureCanvasGroup(page);
+            group.alpha = alpha;
+            group.interactable = acceptsInput;
+            group.blocksRaycasts = acceptsInput;
+        }
+
+        private static CanvasGroup EnsureCanvasGroup(GameObject page)
+        {
+            var group = page.GetComponent<CanvasGroup>();
+            return group ?? page.AddComponent<CanvasGroup>();
+        }
+
+        private static Button FindButton(GameObject root, string name)
+        {
+            var target = root == null ? null : root.transform.Find(name);
+            return target == null ? null : target.GetComponent<Button>();
+        }
+
         private void EnsureHeroSelectionPanel()
         {
             if (heroSelectionPanel != null)
             {
+                return;
+            }
+
+            var existing = transform.Find("HeroSelectionOverlay");
+            if (existing != null)
+            {
+                heroSelectionPanel = existing.gameObject;
+                heroConfirmButton = FindButton(
+                    heroSelectionPanel,
+                    "HeroSelectionPage/Actions/ConfirmHeroButton");
+                heroCancelButton = FindButton(
+                    heroSelectionPanel,
+                    "HeroSelectionPage/Actions/CancelHeroButton");
+                EnsureCanvasGroup(heroSelectionPanel);
                 return;
             }
 
@@ -153,7 +689,7 @@ namespace SpireChess.UI.MainMenu
             var overlay = CreatePanel(
                 transform,
                 "HeroSelectionOverlay",
-                new Color(0.03f, 0.04f, 0.04f, 0.90f));
+                new Color(0.20f, 0.15f, 0.10f, 0.34f));
             Stretch(overlay.rectTransform);
             overlay.transform.SetAsLastSibling();
 
@@ -241,10 +777,13 @@ namespace SpireChess.UI.MainMenu
             heroConfirmButton.GetComponent<LayoutElement>().preferredWidth = 300f;
 
             heroSelectionPanel = overlay.gameObject;
+            EnsureCanvasGroup(heroSelectionPanel);
             heroSelectionPanel.SetActive(false);
         }
 
-        private void RenderHeroSelection(MainMenuScreenState state)
+        private void RenderHeroSelection(
+            MainMenuScreenState state,
+            bool isVisible)
         {
             var options = state.HeroOptions ??
                           Array.Empty<HeroSelectionOptionState>();
@@ -259,14 +798,26 @@ namespace SpireChess.UI.MainMenu
                 }
 
                 card.Name.text = option.DisplayName ?? string.Empty;
-                card.Portrait.text =
-                    option.IsUnlocked ? "角色肖像" : "锁定剪影";
+                var portraitSprite = option.IsUnlocked
+                    ? PresentationArtworkResources.LoadJournalHero(
+                        option.HeroId)
+                    : PresentationArtworkResources.LoadJournalLockedHero();
+                ApplyArtwork(
+                    card.PortraitArtwork,
+                    portraitSprite,
+                    new Color(0.18f, 0.23f, 0.25f, 0.22f),
+                    null,
+                    true);
+                card.Portrait.text = portraitSprite == null
+                    ? option.IsUnlocked ? "角色肖像" : "锁定剪影"
+                    : string.Empty;
                 card.Passive.text = option.PassiveName ?? string.Empty;
                 card.Description.text = option.PassiveDescription ?? string.Empty;
                 card.Lock.text = option.IsUnlocked
                     ? option.IsSelected ? "已选择" : "已解锁 · 点击选择"
                     : "未解锁 · " + (option.UnlockCondition ?? string.Empty);
-                card.Button.interactable = option.IsUnlocked;
+                card.Button.interactable = option.IsUnlocked &&
+                                           !state.IsInputLocked;
                 card.Background.color = !option.IsUnlocked
                     ? new Color(0.48f, 0.47f, 0.43f, 0.86f)
                     : option.IsSelected
@@ -274,10 +825,12 @@ namespace SpireChess.UI.MainMenu
                         : new Color(0.83f, 0.74f, 0.55f, 0.96f);
             }
 
-            heroConfirmButton.interactable = options.Any(value =>
-                value != null && value.IsUnlocked && value.IsSelected);
-            heroSelectionPanel.SetActive(state.HeroSelectionVisible);
-            if (state.HeroSelectionVisible)
+            heroConfirmButton.interactable = !state.IsInputLocked &&
+                options.Any(value =>
+                    value != null && value.IsUnlocked && value.IsSelected);
+            heroCancelButton.interactable = !state.IsInputLocked;
+            heroSelectionPanel.SetActive(isVisible);
+            if (isVisible)
             {
                 var selected = options.FirstOrDefault(value =>
                     value != null && value.IsUnlocked && value.IsSelected);
@@ -335,6 +888,16 @@ namespace SpireChess.UI.MainMenu
                 140f,
                 FontStyle.Bold,
                 font);
+            var neutralPortraitArtwork = CreatePanel(
+                portrait.transform,
+                "NeutralPortraitArtwork",
+                new Color(0.18f, 0.23f, 0.25f, 0.22f));
+            Stretch(neutralPortraitArtwork.rectTransform);
+            neutralPortraitArtwork.raycastTarget = false;
+            AddFrame(
+                neutralPortraitArtwork,
+                new Color(0.72f, 0.62f, 0.38f, 0.55f),
+                new Vector2(2f, -2f));
             var passive = CreateText(
                 gameObject.transform,
                 "Passive",
@@ -374,6 +937,7 @@ namespace SpireChess.UI.MainMenu
                 button,
                 name,
                 portrait,
+                neutralPortraitArtwork,
                 passive,
                 description,
                 lockText);
@@ -386,6 +950,7 @@ namespace SpireChess.UI.MainMenu
                 Button button,
                 Text name,
                 Text portrait,
+                Image portraitArtwork,
                 Text passive,
                 Text description,
                 Text lockText)
@@ -394,6 +959,7 @@ namespace SpireChess.UI.MainMenu
                 Button = button;
                 Name = name;
                 Portrait = portrait;
+                PortraitArtwork = portraitArtwork;
                 Passive = passive;
                 Description = description;
                 Lock = lockText;
@@ -403,6 +969,7 @@ namespace SpireChess.UI.MainMenu
             public Button Button { get; }
             public Text Name { get; }
             public Text Portrait { get; }
+            public Image PortraitArtwork { get; }
             public Text Passive { get; }
             public Text Description { get; }
             public Text Lock { get; }
@@ -590,6 +1157,8 @@ namespace SpireChess.UI.MainMenu
             view.confirmButton = confirm;
             view.cancelButton = cancel;
             view.audioSettingsPanel = settingsPanel;
+            view.EnsureJournalPages();
+            view.EnsureHeroSelectionPanel();
             return view;
         }
 

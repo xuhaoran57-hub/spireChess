@@ -134,10 +134,101 @@ namespace SpireChess.Tests.EditMode
                         .Any(text => text.text == "坚甲启程"),
                     Is.True);
                 Assert.That(
+                    Find(instance, HeroIds.Warrior)
+                        .Find("PortraitPlaceholder/NeutralPortraitArtwork")
+                        .GetComponent<Image>().sprite,
+                    Is.Not.Null);
+                Assert.That(
+                    Find(instance, HeroIds.Warrior)
+                        .Find("PortraitPlaceholder").GetComponent<Text>().text,
+                    Is.Empty);
+                Assert.That(
+                    Find(instance, HeroIds.Mage)
+                        .Find("PortraitPlaceholder/NeutralPortraitArtwork")
+                        .GetComponent<Image>().sprite,
+                    Is.Not.Null);
+                Assert.That(
                     Find(instance, HeroIds.Mage)
                         .GetComponentsInChildren<Text>(true)
                         .Any(text => text.text.Contains("击败“荒野”Boss")),
                     Is.True);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
+        public void JournalPages_RuntimeFallbackCreatesCoverAndLocksContentsInputs()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/UI/MainMenu/PF_MainMenuScreen.prefab");
+            var instance = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                var view = instance.GetComponent<MainMenuScreenView>();
+                view.Render(new MainMenuScreenState
+                {
+                    Page = JournalMenuPage.Cover,
+                    SaveStatus = RunSaveLoadStatus.Missing
+                });
+
+                Assert.That(Find(instance, "CoverPage"), Is.Not.Null);
+                Assert.That(Find(instance, "NeutralCoverArtwork"), Is.Not.Null);
+                Assert.That(
+                    Find(instance, "NeutralCoverArtwork")
+                        .GetComponent<Image>().sprite,
+                    Is.Not.Null);
+                Assert.That(
+                    Find(instance, "NeutralCoverArtwork")
+                        .Find("Label").gameObject.activeSelf,
+                    Is.False);
+                Assert.That(Find(instance, "MapTransitionPage"), Is.Not.Null);
+                Assert.That(Find(instance, "NeutralMapArtwork"), Is.Not.Null);
+                Assert.That(
+                    Find(instance, "NeutralMapArtwork")
+                        .GetComponent<Image>().sprite,
+                    Is.Not.Null);
+                Assert.That(
+                    Find(instance, "NeutralMapArtwork")
+                        .Find("Label").gameObject.activeSelf,
+                    Is.False);
+                Assert.That(Find(instance, "JournalContentsArtwork"), Is.Not.Null);
+                Assert.That(
+                    Find(instance, "JournalContentsArtwork")
+                        .GetComponent<Image>().sprite,
+                    Is.Not.Null);
+                Assert.That(Find(instance, "OpenJournalButton"), Is.Not.Null);
+                Assert.That(Find(instance, "CoverSkipButton"), Is.Not.Null);
+                Assert.That(Find(instance, "SkipPageTurnButton"), Is.Not.Null);
+
+                view.Render(new MainMenuScreenState
+                {
+                    Page = JournalMenuPage.Map,
+                    SaveStatus = RunSaveLoadStatus.Missing
+                });
+                Assert.That(Find(instance, "MapTransitionPage").activeSelf, Is.True);
+                Assert.That(
+                    Find(instance, "NewGameButton").GetComponent<Button>()
+                        .interactable,
+                    Is.False);
+
+                view.Render(new MainMenuScreenState
+                {
+                    Page = JournalMenuPage.Contents,
+                    IsInputLocked = true,
+                    SaveStatus = RunSaveLoadStatus.Valid,
+                    ContinueEnabled = true
+                });
+                Assert.That(
+                    Find(instance, "NewGameButton").GetComponent<Button>()
+                        .interactable,
+                    Is.False);
+                Assert.That(
+                    Find(instance, "ContinueButton").GetComponent<Button>()
+                        .interactable,
+                    Is.False);
             }
             finally
             {
@@ -221,7 +312,8 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(prefab, Is.Not.Null);
             AssertText(
-                prefab.transform.Find("Background/MenuCard/Title"),
+                prefab.transform.Find("Background/ContentsPage/MenuCard/Title") ??
+                    prefab.transform.Find("Background/MenuCard/Title"),
                 "旅团日记",
                 104f);
             AssertText(

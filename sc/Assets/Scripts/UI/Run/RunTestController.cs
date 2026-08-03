@@ -14,7 +14,9 @@ namespace SpireChess.UI.Run
 
         private RunSession run;
         private bool initialized;
+        private bool returningToMenu;
         private string unlockNotificationText = string.Empty;
+        private string unlockNotificationMapId = string.Empty;
 
         public bool IsInitialized => initialized;
         public bool IsUsingFormalView => initialized && screenView != null;
@@ -27,6 +29,8 @@ namespace SpireChess.UI.Run
         public bool ChoiceOverlayVisible => screenView != null
             ? screenView.IsChoiceVisible
             : run != null && IsChoicePhase(run.State.Phase);
+        public bool JournalPageVisible => screenView != null &&
+                                          screenView.IsJournalPageVisible;
 
         private void Start()
         {
@@ -220,6 +224,21 @@ namespace SpireChess.UI.Run
             }
         }
 
+        public void ReturnToMainMenu()
+        {
+            if (returningToMenu || GameApp.Instance == null)
+            {
+                return;
+            }
+
+            returningToMenu = true;
+            if (!GameApp.Instance.SaveAndReturnToMainMenu())
+            {
+                returningToMenu = false;
+                SetStatus("旅程状态尚未保存，暂时无法返回目录");
+            }
+        }
+
         public void ExecuteUiAction(
             RunUiActionType action,
             string primaryId = null,
@@ -263,6 +282,9 @@ namespace SpireChess.UI.Run
                 case RunUiActionType.StartNewRun:
                     StartNewRun();
                     break;
+                case RunUiActionType.ReturnToMainMenu:
+                    ReturnToMainMenu();
+                    break;
             }
         }
 
@@ -283,7 +305,6 @@ namespace SpireChess.UI.Run
 
             screenView.Bind(this);
             RunSystemMenuView.Attach(screenView);
-            CaptureUnlockNotification();
             var heroPassiveMessage = run.CurrentShopEndHeroPassiveMessage;
             StatusMessage = !string.IsNullOrWhiteSpace(heroPassiveMessage)
                 ? heroPassiveMessage
@@ -298,9 +319,13 @@ namespace SpireChess.UI.Run
             string saveReason)
         {
             SetStatus(result.Success ? result.Message : ToErrorText(result.Error));
-            if (result.Success)
+            if (result.Success && Persist(saveReason))
             {
-                Persist(saveReason);
+                // Persisting a chapter boundary can create an existing
+                // profile unlock notification. Refresh once more after the
+                // save event so the presentation consumes that notification
+                // on the page where the player earned it.
+                RefreshAll();
             }
             return result;
         }
@@ -339,21 +364,69 @@ namespace SpireChess.UI.Run
                 run,
                 GameApp.Instance.Configs,
                 StatusMessage);
-            if (!string.IsNullOrWhiteSpace(unlockNotificationText) &&
-                state.Summary != null)
+            CaptureUnlockNotification();
+            state.JournalPage = BuildJournalPage(state.Summary);
+            screenView.Render(state);
+        }
+
+        private RunJournalPageState BuildJournalPage(RunSummaryState summary)
+        {
+            var mapName = run?.State?.CurrentMap?.DisplayName ?? "当前章节";
+            var mapArtworkId = run?.State?.CurrentMap?.Id ?? string.Empty;
+            if (run?.State?.Phase == RunPhase.FloorComplete)
             {
-                state.Summary.Text = string.IsNullOrWhiteSpace(state.Summary.Text)
-                    ? unlockNotificationText
-                    : state.Summary.Text + " · " + unlockNotificationText;
+                return new RunJournalPageState
+                {
+                    Kind = RunJournalPageKind.ChapterComplete,
+                    Title = mapName + " · 章节完成",
+                    Body = summary?.Text ?? string.Empty,
+                    UnlockNotification = unlockNotificationText,
+                    ArtworkId = mapArtworkId,
+                    ActionLabel = summary?.ActionLabel ?? "进入下一章",
+                    Action = RunUiActionType.ContinueToNextFloor
+                };
             }
 
-            screenView.Render(state);
+            if (run?.State?.Phase == RunPhase.RunWon)
+            {
+                return new RunJournalPageState
+                {
+                    Kind = RunJournalPageKind.Ending,
+                    Title = "旅团日记 · 完结",
+                    Body = summary?.Text ?? string.Empty,
+                    UnlockNotification = unlockNotificationText,
+                    ArtworkId = mapArtworkId,
+                    ActionLabel = "返回目录",
+                    Action = RunUiActionType.ReturnToMainMenu
+                };
+            }
+
+            return null;
         }
 
         private void CaptureUnlockNotification()
         {
-            if (run.State.Phase != RunPhase.FloorComplete &&
-                run.State.Phase != RunPhase.RunWon)
+            var phase = run?.State?.Phase;
+            var mapId = run?.State?.CurrentMap?.Id ?? string.Empty;
+            var canShowOnCurrentPage = phase == RunPhase.FloorComplete ||
+                                       phase == RunPhase.RunWon;
+            if (!canShowOnCurrentPage)
+            {
+                unlockNotificationText = string.Empty;
+                unlockNotificationMapId = string.Empty;
+                return;
+            }
+
+            if (!string.Equals(
+                    unlockNotificationMapId,
+                    mapId,
+                    StringComparison.Ordinal))
+            {
+                unlockNotificationText = string.Empty;
+                unlockNotificationMapId = string.Empty;
+            }
+
+            if (!string.IsNullOrWhiteSpace(unlockNotificationText))
             {
                 return;
             }
@@ -372,6 +445,7 @@ namespace SpireChess.UI.Run
             }
 
             unlockNotificationText = $"新角色已解锁：{hero.DisplayName}";
+            unlockNotificationMapId = mapId;
             try
             {
                 profiles.MarkUnlockNotificationRead(notification.Id);

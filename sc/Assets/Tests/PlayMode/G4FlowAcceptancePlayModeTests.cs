@@ -111,6 +111,15 @@ namespace SpireChess.Tests
             AssertFormalScene<MainMenuController, MainMenuScreenView>(
                 GameSceneNames.MainMenu);
             var initialMenu = Object.FindObjectOfType<MainMenuScreenView>();
+            var initialController = Object.FindObjectOfType<MainMenuController>();
+            if (initialController.CurrentPage == JournalMenuPage.Cover)
+            {
+                FindButton(initialMenu, "CoverSkipButton").onClick.Invoke();
+                CompleteJournalTurn(initialMenu);
+            }
+            Assert.That(
+                initialController.CurrentPage,
+                Is.EqualTo(JournalMenuPage.Contents));
             Assert.That(initialMenu.ContinueInteractable, Is.False);
             var audio = AudioService.Instance;
             SaveAudioSettings(
@@ -132,14 +141,25 @@ namespace SpireChess.Tests
                 ui: 0.29f);
 
             FindButton(initialMenu, "NewGameButton").onClick.Invoke();
+            Assert.That(initialController.IsPageInputLocked, Is.True);
+            FindButton(initialMenu, "NewGameButton").onClick.Invoke();
+            CompleteJournalTurn(initialMenu);
             yield return null;
             Assert.That(initialMenu.HeroSelectionVisible, Is.True);
             Assert.That(GameApp.Instance.Run, Is.Null);
             FindButton(initialMenu, "ConfirmHeroButton").onClick.Invoke();
-            yield return null;
             var originalRun = GameApp.Instance.Run;
             Assert.That(originalRun, Is.Not.Null);
             Assert.That(originalRun.State.HeroId, Is.EqualTo(HeroIds.Warrior));
+            var createdRevision = GameApp.Instance.Persistence.CurrentRevision;
+            FindButton(initialMenu, "ConfirmHeroButton").onClick.Invoke();
+            Assert.That(GameApp.Instance.Run, Is.SameAs(originalRun));
+            Assert.That(
+                GameApp.Instance.Persistence.CurrentRevision,
+                Is.EqualTo(createdRevision),
+                "Repeated confirmation must not create a second run or save.");
+            CompleteJournalTurn(initialMenu);
+            yield return null;
 
             AssertFormalScene<RunTestController, RunScreenView>(
                 GameSceneNames.Run);
@@ -560,6 +580,14 @@ namespace SpireChess.Tests
                 .ToArray();
             Assert.That(matches, Has.Length.EqualTo(1), name);
             return matches[0];
+        }
+
+        private static void CompleteJournalTurn(MainMenuScreenView view)
+        {
+            if (view != null && view.IsPageTurnRunning)
+            {
+                FindButton(view, "SkipPageTurnButton").onClick.Invoke();
+            }
         }
 
         private static void SaveAudioSettings(

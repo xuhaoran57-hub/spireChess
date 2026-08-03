@@ -12,20 +12,38 @@ namespace SpireChess.UI.MainMenu
     {
         [SerializeField] private MainMenuScreenView screenView;
 
+        private static bool coverSeenThisApplication;
         private RunSaveLoadResult inspection;
         private string statusMessage = string.Empty;
         private bool statusIsError;
-        private bool heroSelectionVisible;
         private bool creatingRun;
+        private bool continuingRun;
         private string selectedHeroId = HeroIds.Warrior;
+        private JournalPageFlow journalFlow;
 
         public MainMenuScreenView ScreenView => screenView;
         public RunSaveLoadResult Inspection => inspection;
-        public bool HeroSelectionVisible => heroSelectionVisible;
+        public bool HeroSelectionVisible =>
+            CurrentPage == JournalMenuPage.HeroSelection;
         public string SelectedHeroId => selectedHeroId;
+        public JournalMenuPage CurrentPage => journalFlow == null
+            ? JournalMenuPage.Contents
+            : journalFlow.CurrentPage;
+        public bool IsPageInputLocked => journalFlow != null &&
+                                         journalFlow.IsInputLocked;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetCoverForApplicationLaunch()
+        {
+            coverSeenThisApplication = false;
+        }
 
         private void Start()
         {
+            journalFlow = new JournalPageFlow(
+                coverSeenThisApplication
+                    ? JournalMenuPage.Contents
+                    : JournalMenuPage.Cover);
             if (screenView == null)
             {
                 screenView = FindObjectOfType<MainMenuScreenView>() ??
@@ -48,7 +66,8 @@ namespace SpireChess.UI.MainMenu
 
         public void NewGame()
         {
-            if (heroSelectionVisible || creatingRun)
+            if (CurrentPage != JournalMenuPage.Contents ||
+                IsPageInputLocked || creatingRun || continuingRun)
             {
                 return;
             }
@@ -67,7 +86,8 @@ namespace SpireChess.UI.MainMenu
 
         public void SelectHero(string heroId)
         {
-            if (!heroSelectionVisible ||
+            if (CurrentPage != JournalMenuPage.HeroSelection ||
+                IsPageInputLocked ||
                 GameApp.Instance?.Profiles?.IsHeroUnlocked(heroId) != true)
             {
                 return;
@@ -81,7 +101,8 @@ namespace SpireChess.UI.MainMenu
 
         public void ConfirmHeroSelection()
         {
-            if (!heroSelectionVisible || creatingRun)
+            if (CurrentPage != JournalMenuPage.HeroSelection ||
+                IsPageInputLocked || creatingRun)
             {
                 return;
             }
@@ -101,18 +122,23 @@ namespace SpireChess.UI.MainMenu
             }
             finally
             {
-                creatingRun = false;
+                if (!IsPageInputLocked)
+                {
+                    creatingRun = false;
+                    Refresh();
+                }
             }
         }
 
         public void CancelHeroSelection()
         {
-            if (!heroSelectionVisible || creatingRun)
+            if (CurrentPage != JournalMenuPage.HeroSelection ||
+                IsPageInputLocked || creatingRun)
             {
                 return;
             }
 
-            heroSelectionVisible = false;
+            BeginPageTurn(JournalMenuPage.Contents);
             statusMessage = "已返回目录";
             statusIsError = false;
             Refresh();
@@ -120,6 +146,14 @@ namespace SpireChess.UI.MainMenu
 
         public void ContinueGame()
         {
+            if (CurrentPage != JournalMenuPage.Contents ||
+                IsPageInputLocked || creatingRun || continuingRun)
+            {
+                return;
+            }
+
+            continuingRun = true;
+            Refresh();
             var app = GameApp.Instance;
             var loaded = app?.ContinueRun();
             if (loaded?.CanContinue == true && app.Run != null)
@@ -128,6 +162,7 @@ namespace SpireChess.UI.MainMenu
                 return;
             }
 
+            continuingRun = false;
             statusMessage = ToPlayerMessage(loaded?.Status ?? RunSaveLoadStatus.IoFailure);
             statusIsError = true;
             Refresh();
@@ -135,6 +170,12 @@ namespace SpireChess.UI.MainMenu
 
         public void DeleteSave()
         {
+            if (CurrentPage != JournalMenuPage.Contents ||
+                IsPageInputLocked || creatingRun || continuingRun)
+            {
+                return;
+            }
+
             screenView.ShowConfirmation("确定删除当前单局存档？此操作无法撤销。", () =>
             {
                 GameApp.Instance.AbandonRun();
@@ -146,12 +187,44 @@ namespace SpireChess.UI.MainMenu
 
         public void OpenSettingsPlaceholder()
         {
+            if (CurrentPage != JournalMenuPage.Contents ||
+                IsPageInputLocked)
+            {
+                return;
+            }
+
             screenView?.ShowSettings();
         }
 
         public void QuitGame()
         {
+            if (IsPageInputLocked)
+            {
+                return;
+            }
+
             Application.Quit();
+        }
+
+        public void OpenContentsFromCover()
+        {
+            if (CurrentPage != JournalMenuPage.Cover || IsPageInputLocked)
+            {
+                return;
+            }
+
+            BeginPageTurn(JournalMenuPage.Contents);
+        }
+
+        public void SkipPageTurn()
+        {
+            if (!IsPageInputLocked)
+            {
+                OpenContentsFromCover();
+                return;
+            }
+
+            screenView?.SkipPageTurn();
         }
 
         private void OpenHeroSelection()
@@ -180,7 +253,7 @@ namespace SpireChess.UI.MainMenu
                 selectedHeroId = firstUnlocked.Id;
             }
 
-            heroSelectionVisible = true;
+            BeginPageTurn(JournalMenuPage.HeroSelection);
             statusMessage = "选择一名已解锁角色并确认启程";
             statusIsError = false;
             Refresh();
@@ -208,8 +281,57 @@ namespace SpireChess.UI.MainMenu
                 return;
             }
 
-            heroSelectionVisible = false;
-            GameApp.Instance.Router.GoToCurrentRunPhase(GameApp.Instance.Run);
+            // The run has already been created through the preserved domain
+            // entry point. The presentation-only Map page is the final
+            // journal turn before the existing router shows its real map.
+            BeginPageTurn(JournalMenuPage.Map, () =>
+            {
+                creatingRun = false;
+                GameApp.Instance.Router.GoToCurrentRunPhase(GameApp.Instance.Run);
+            });
+        }
+
+        private void BeginPageTurn(
+            JournalMenuPage destination,
+            Action afterTransition = null)
+        {
+            if (journalFlow == null)
+            {
+                journalFlow = new JournalPageFlow(JournalMenuPage.Contents);
+            }
+
+            var source = journalFlow.CurrentPage;
+            if (!journalFlow.TryBeginTransition(destination))
+            {
+                return;
+            }
+
+            Refresh();
+            var completed = false;
+            Action finish = () =>
+            {
+                if (completed)
+                {
+                    return;
+                }
+
+                completed = true;
+                journalFlow.CompleteTransition();
+                if (source == JournalMenuPage.Cover)
+                {
+                    coverSeenThisApplication = true;
+                }
+
+                Refresh();
+                afterTransition?.Invoke();
+            };
+            if (screenView == null)
+            {
+                finish();
+                return;
+            }
+
+            screenView.PlayPageTurn(source, destination, finish);
         }
 
         private void Refresh()
@@ -237,7 +359,10 @@ namespace SpireChess.UI.MainMenu
                                  !canContinue &&
                                  inspection.Status != RunSaveLoadStatus.Missing),
                 SaveStatus = inspection.Status,
-                HeroSelectionVisible = heroSelectionVisible,
+                Page = CurrentPage,
+                IsInputLocked = IsPageInputLocked || creatingRun || continuingRun,
+                HeroSelectionVisible =
+                    CurrentPage == JournalMenuPage.HeroSelection,
                 SelectedHeroId = selectedHeroId,
                 HeroOptions = BuildHeroOptions()
             });

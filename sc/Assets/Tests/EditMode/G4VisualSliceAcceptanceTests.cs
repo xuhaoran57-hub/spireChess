@@ -20,6 +20,14 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void JournalUiRuntimeFlag_IsStable()
+        {
+            Assert.That(
+                G4RuntimeArguments.JournalUiFlag,
+                Is.EqualTo("-g4JournalUi"));
+        }
+
+        [Test]
         public void SeedTenEventFixture_SelectsTranquilGroveArtwork()
         {
             var configs = new ConfigService(

@@ -21,6 +21,8 @@ param(
 
     [switch]$VisualSlice,
 
+    [switch]$JournalUi,
+
     [switch]$Stress,
 
     [switch]$AllowDirtyProbe,
@@ -44,9 +46,10 @@ $ErrorActionPreference = "Stop"
 $selectedSpecialModes =
     [int]$FrozenVisual.IsPresent +
     [int]$VisualSlice.IsPresent +
+    [int]$JournalUi.IsPresent +
     [int]$Stress.IsPresent
 if ($selectedSpecialModes -gt 1) {
-    throw "-FrozenVisual, -VisualSlice, and -Stress are mutually exclusive."
+    throw "-FrozenVisual, -VisualSlice, -JournalUi, and -Stress are mutually exclusive."
 }
 if ($FrozenVisual -and -not $PSBoundParameters.ContainsKey("Seed")) {
     $Seed = 78
@@ -487,6 +490,9 @@ if ($FrozenVisual) {
 if ($VisualSlice) {
     $arguments += "-g4VisualSlice"
 }
+if ($JournalUi) {
+    $arguments += "-g4JournalUi"
+}
 if ($Stress) {
     $arguments += "-g4Stress"
 }
@@ -497,6 +503,8 @@ $acceptanceMode = if ($Stress) {
     "frozen-visual"
 } elseif ($VisualSlice) {
     "visual-slice"
+} elseif ($JournalUi) {
+    "journal-ui"
 } else {
     "core"
 }
@@ -766,6 +774,19 @@ $requiredCheckpoints = if ($Stress) {
         "sample-catalog-exact",
         "acceptance-complete"
     )
+} elseif ($JournalUi) {
+    @(
+        "journal-cover",
+        "journal-contents",
+        "journal-hero-select",
+        "map-chapter-1",
+        "chapter-complete",
+        "chapter-two-complete",
+        "ending",
+        "continue-restored",
+        "sample-catalog-exact",
+        "acceptance-complete"
+    )
 } else {
     @(
         "main-menu",
@@ -843,6 +864,16 @@ if (-not $NoScreenshots) {
             "03-shop-environment-$Resolution.png",
             "04-battle-background-$Resolution.png",
             "05-event-tranquil-grove-$Resolution.png"
+        )
+    } elseif ($JournalUi) {
+        @(
+            "01-journal-cover-$Resolution.png",
+            "02-journal-contents-$Resolution.png",
+            "03-journal-hero-select-$Resolution.png",
+            "04-map-chapter-1-$Resolution.png",
+            "05-chapter-complete-$Resolution.png",
+            "06-ending-$Resolution.png",
+            "07-continue-restored-$Resolution.png"
         )
     } else {
         @(
@@ -967,6 +998,8 @@ if (-not $NoScreenshots) {
         3
     } elseif ($VisualSlice) {
         5
+    } elseif ($JournalUi) {
+        6
     } else {
         8
     }

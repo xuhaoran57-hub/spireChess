@@ -86,6 +86,13 @@ namespace SpireChess.UI.Run
         [SerializeField] private RectTransform choiceContent;
         [SerializeField] private GameObject choiceOptionPrefab;
 
+        private GameObject journalPageOverlay;
+        private Text journalPageTitleText;
+        private Text journalPageBodyText;
+        private Text journalPageUnlockText;
+        private Image journalPageArtwork;
+        private Button journalPageActionButton;
+        private Text journalPageActionText;
         private readonly Dictionary<string, RunMapNodeView> nodeViews =
             new Dictionary<string, RunMapNodeView>(StringComparer.Ordinal);
         private RunTestController controller;
@@ -96,6 +103,8 @@ namespace SpireChess.UI.Run
         public int RenderedRelicCount { get; private set; }
         public int RenderedChoiceCount { get; private set; }
         public bool IsChoiceVisible => choiceOverlay != null && choiceOverlay.activeSelf;
+        public bool IsJournalPageVisible => journalPageOverlay != null &&
+                                            journalPageOverlay.activeSelf;
         public bool IsChoiceArtworkVisible =>
             choiceArtworkImage != null &&
             choiceArtworkImage.gameObject.activeInHierarchy &&
@@ -148,6 +157,7 @@ namespace SpireChess.UI.Run
             RenderRelics(state.Relics);
             RenderSummary(state.Summary);
             RenderChoice(state.Choice);
+            RenderJournalPage(state.JournalPage);
             Canvas.ForceUpdateCanvases();
         }
 
@@ -360,6 +370,276 @@ namespace SpireChess.UI.Run
             }
             RenderedChoiceCount = choice.Options?.Count ?? 0;
             choiceScrollRect.verticalNormalizedPosition = 1f;
+        }
+
+        public void EnsureJournalPageOverlay()
+        {
+            if (journalPageOverlay != null)
+            {
+                return;
+            }
+
+            var journalParent = safeArea == null
+                ? transform
+                : (Transform)safeArea;
+            var existing = journalParent.Find("JournalPageOverlay");
+            if (existing != null)
+            {
+                journalPageOverlay = existing.gameObject;
+                journalPageTitleText = FindJournalText(existing, "JournalPage/Title");
+                journalPageBodyText = FindJournalText(existing, "JournalPage/Body");
+                journalPageUnlockText = FindJournalText(existing, "JournalPage/UnlockNotice");
+                var artwork = existing.Find("JournalPage/NeutralJournalArtwork");
+                journalPageArtwork = artwork == null
+                    ? null
+                    : artwork.GetComponent<Image>();
+                var action = existing.Find("JournalPage/JournalActionButton") ??
+                             existing.Find("JournalPage/ActionButton");
+                journalPageActionButton = action == null
+                    ? null
+                    : action.GetComponent<Button>();
+                journalPageActionText = action == null
+                    ? null
+                    : action.Find("Label")?.GetComponent<Text>();
+                return;
+            }
+
+            var font = titleText == null
+                ? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
+                : titleText.font;
+            var overlay = CreateJournalImage(
+                journalParent,
+                "JournalPageOverlay",
+                theme.ModalScrim);
+            StretchJournal(overlay.rectTransform);
+            var page = CreateJournalImage(
+                overlay.transform,
+                "JournalPage",
+                theme.PanelBackground);
+            SetJournalRect(
+                page.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(1180f, 740f),
+                Vector2.zero);
+            AddJournalOutline(
+                page,
+                new Color(0.74f, 0.61f, 0.32f, 0.88f));
+
+            journalPageArtwork = CreateJournalImage(
+                page.transform,
+                "NeutralJournalArtwork",
+                new Color(0.30f, 0.34f, 0.34f, 1f));
+            SetJournalRect(
+                journalPageArtwork.rectTransform,
+                new Vector2(0.5f, 1f),
+                new Vector2(500f, 180f),
+                new Vector2(0f, -124f));
+            AddJournalOutline(
+                journalPageArtwork,
+                new Color(0.82f, 0.71f, 0.44f, 0.66f));
+            var artworkText = CreateJournalText(
+                journalPageArtwork.transform,
+                "Label",
+                "中性章节插图占位",
+                font,
+                22,
+                FontStyle.Bold);
+            StretchJournal(artworkText.rectTransform);
+
+            journalPageTitleText = CreateJournalText(
+                page.transform,
+                "Title",
+                string.Empty,
+                font,
+                36,
+                FontStyle.Bold);
+            SetJournalRect(
+                journalPageTitleText.rectTransform,
+                new Vector2(0.5f, 1f),
+                new Vector2(1000f, 62f),
+                new Vector2(0f, -252f));
+            journalPageTitleText.color = theme.TextPrimary;
+
+            journalPageBodyText = CreateJournalText(
+                page.transform,
+                "Body",
+                string.Empty,
+                font,
+                22,
+                FontStyle.Normal);
+            SetJournalRect(
+                journalPageBodyText.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(960f, 156f),
+                new Vector2(0f, 24f));
+            journalPageBodyText.alignment = TextAnchor.MiddleCenter;
+            journalPageBodyText.color = theme.TextSecondary;
+
+            journalPageUnlockText = CreateJournalText(
+                page.transform,
+                "UnlockNotice",
+                string.Empty,
+                font,
+                24,
+                FontStyle.Bold);
+            SetJournalRect(
+                journalPageUnlockText.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(900f, 60f),
+                new Vector2(0f, -116f));
+            journalPageUnlockText.color = theme.Success;
+
+            var actionImage = CreateJournalImage(
+                page.transform,
+                "JournalActionButton",
+                theme.ButtonNormal);
+            SetJournalRect(
+                actionImage.rectTransform,
+                new Vector2(0.5f, 0f),
+                new Vector2(350f, 74f),
+                new Vector2(0f, 72f));
+            AddJournalOutline(
+                actionImage,
+                new Color(0.74f, 0.61f, 0.32f, 0.82f));
+            journalPageActionButton = actionImage.gameObject.AddComponent<Button>();
+            journalPageActionButton.targetGraphic = actionImage;
+            journalPageActionText = CreateJournalText(
+                actionImage.transform,
+                "Label",
+                string.Empty,
+                font,
+                24,
+                FontStyle.Bold);
+            StretchJournal(journalPageActionText.rectTransform);
+            journalPageActionText.color = theme.TextPrimary;
+            journalPageOverlay = overlay.gameObject;
+            journalPageOverlay.SetActive(false);
+        }
+
+        private void RenderJournalPage(RunJournalPageState page)
+        {
+            EnsureJournalPageOverlay();
+            var isVisible = page != null &&
+                            page.Kind != RunJournalPageKind.None;
+            journalPageOverlay.SetActive(isVisible);
+            if (!isVisible)
+            {
+                // Remove the old action before hiding the overlay. This makes
+                // programmatic/queued duplicate clicks harmless as well as
+                // preventing a stale page action from being retained between
+                // chapter and map renders.
+                journalPageActionButton.onClick.RemoveAllListeners();
+                journalPageActionButton.interactable = false;
+                return;
+            }
+
+            journalPageOverlay.transform.SetAsLastSibling();
+            journalPageTitleText.text = page.Title ?? string.Empty;
+            journalPageBodyText.text = page.Body ?? string.Empty;
+            journalPageUnlockText.text = page.UnlockNotification ?? string.Empty;
+            journalPageUnlockText.gameObject.SetActive(
+                !string.IsNullOrWhiteSpace(page.UnlockNotification));
+            var artworkSprite = page.Kind == RunJournalPageKind.Ending
+                ? PresentationArtworkResources.LoadJournalEnding()
+                : PresentationArtworkResources.LoadJournalChapter(
+                    page.ArtworkId);
+            journalPageArtwork.sprite = artworkSprite;
+            journalPageArtwork.type = Image.Type.Simple;
+            journalPageArtwork.preserveAspect = false;
+            journalPageArtwork.color = artworkSprite == null
+                ? page.Kind == RunJournalPageKind.Ending
+                    ? new Color(0.38f, 0.31f, 0.24f, 1f)
+                    : new Color(0.30f, 0.34f, 0.34f, 1f)
+                : Color.white;
+            var artworkLabel = journalPageArtwork.transform.Find("Label");
+            if (artworkLabel != null)
+            {
+                artworkLabel.gameObject.SetActive(artworkSprite == null);
+            }
+            journalPageActionText.text = page.ActionLabel ?? string.Empty;
+            journalPageActionButton.onClick.RemoveAllListeners();
+            journalPageActionButton.interactable =
+                !page.IsInputLocked && page.Action != RunUiActionType.None;
+            if (journalPageActionButton.interactable)
+            {
+                var action = page.Action;
+                journalPageActionButton.onClick.AddListener(() =>
+                    controller?.ExecuteUiAction(action));
+            }
+        }
+
+        private static Image CreateJournalImage(
+            Transform parent,
+            string name,
+            Color color)
+        {
+            var gameObject = new GameObject(
+                name,
+                typeof(RectTransform),
+                typeof(Image));
+            gameObject.transform.SetParent(parent, false);
+            var image = gameObject.GetComponent<Image>();
+            image.color = color;
+            return image;
+        }
+
+        private static Text CreateJournalText(
+            Transform parent,
+            string name,
+            string value,
+            Font font,
+            int fontSize,
+            FontStyle style)
+        {
+            var gameObject = new GameObject(
+                name,
+                typeof(RectTransform),
+                typeof(Text));
+            gameObject.transform.SetParent(parent, false);
+            var text = gameObject.GetComponent<Text>();
+            text.font = font ?? Resources.GetBuiltinResource<Font>(
+                "LegacyRuntime.ttf");
+            text.fontSize = fontSize;
+            text.fontStyle = style;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            text.text = value;
+            return text;
+        }
+
+        private static Text FindJournalText(Transform root, string path)
+        {
+            var target = root.Find(path);
+            return target == null ? null : target.GetComponent<Text>();
+        }
+
+        private static void StretchJournal(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
+        private static void SetJournalRect(
+            RectTransform rect,
+            Vector2 anchor,
+            Vector2 size,
+            Vector2 position)
+        {
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = size;
+            rect.anchoredPosition = position;
+        }
+
+        private static void AddJournalOutline(Image image, Color color)
+        {
+            var outline = image.gameObject.AddComponent<Outline>();
+            outline.effectColor = color;
+            outline.effectDistance = new Vector2(2f, -2f);
         }
 
         private void SetChoiceArtwork(string artworkId)

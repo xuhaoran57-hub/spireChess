@@ -1,5 +1,10 @@
 # 单机自走棋爬塔游戏开发执行计划
 
+> 状态说明（2026-08-03）：本文是 v0.1 阶段路线图与历史实施背景。v0.4.0 的当前
+> 工作优先级、完成状态和验收标准以
+> [v0.4.0-authoritative-backlog-and-acceptance-matrix.md](v0.4.0-authoritative-backlog-and-acceptance-matrix.md)
+> 与 `game-design-freeze-v0.4.0.md` 为准。
+
 版本：0.1
 关联文档：`game-design.md`
 目标：把当前玩法设计拆成可执行的开发阶段，明确每个阶段要做什么、产出什么、需要确认什么，以及如何判断可以进入下一阶段。

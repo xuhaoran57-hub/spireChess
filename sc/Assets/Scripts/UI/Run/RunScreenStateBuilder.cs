@@ -541,8 +541,12 @@ namespace SpireChess.UI.Run
             {
                 return Summary(
                     BuildResultSummary(state),
-                    "重新开始",
-                    RunUiActionType.StartNewRun);
+                    state.Phase == RunPhase.RunWon
+                        ? "返回目录"
+                        : "重新开始",
+                    state.Phase == RunPhase.RunWon
+                        ? RunUiActionType.ReturnToMainMenu
+                        : RunUiActionType.StartNewRun);
             }
             return new RunSummaryState
             {

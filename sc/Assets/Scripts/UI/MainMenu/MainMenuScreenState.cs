@@ -21,6 +21,8 @@ namespace SpireChess.UI.MainMenu
         public string StatusMessage { get; set; }
         public bool StatusIsError { get; set; }
         public RunSaveLoadStatus SaveStatus { get; set; }
+        public JournalMenuPage Page { get; set; } = JournalMenuPage.Contents;
+        public bool IsInputLocked { get; set; }
         public bool HeroSelectionVisible { get; set; }
         public string SelectedHeroId { get; set; }
         public IReadOnlyList<HeroSelectionOptionState> HeroOptions { get; set; } =

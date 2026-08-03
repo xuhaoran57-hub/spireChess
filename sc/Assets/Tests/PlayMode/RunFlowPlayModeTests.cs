@@ -204,12 +204,50 @@ namespace SpireChess.Tests
                 Is.EqualTo(run.State.PendingRelicChoice.Candidates.Count));
             choiceContent.GetChild(0).GetComponent<Button>().onClick.Invoke();
             Assert.That(run.State.Phase, Is.EqualTo(RunPhase.FloorComplete));
+            Assert.That(
+                GameApp.Instance.Profiles.RecordChapterBossVictory(
+                    run.State.CurrentMap.Id),
+                Is.True,
+                "The isolated Player-profile fixture creates the chapter unlock that a committed save records in production.");
+
+            // PlayMode runs deliberately disable run-file persistence. Reloading
+            // the real Run scene after seeding the profile notification verifies
+            // that the UI consumes it exactly once without changing run rules.
+            SceneManager.LoadScene("RunTest");
+            yield return null;
+            map = Object.FindObjectOfType<RunTestController>();
             var continueButton = map.FormalScreenView.transform.Find(
-                    "SafeArea/SummaryPanel/ActionButton")
+                    "SafeArea/JournalPageOverlay/JournalPage/JournalActionButton")
+                .GetComponent<Button>();
+            Assert.That(map.JournalPageVisible, Is.True);
+            Assert.That(
+                map.FormalScreenView.transform.Find(
+                    "SafeArea/JournalPageOverlay/JournalPage/UnlockNotice")
+                    .GetComponent<Text>().text,
+                Does.Contain("法师"));
+            Assert.That(
+                GameApp.Instance.Profiles.Progress.UnreadUnlockNotifications,
+                Is.Empty,
+                "Showing the chapter page marks its unlock notification as read.");
+
+            SceneManager.LoadScene("RunTest");
+            yield return null;
+            map = Object.FindObjectOfType<RunTestController>();
+            Assert.That(map.FormalScreenView.transform.Find(
+                    "SafeArea/JournalPageOverlay/JournalPage/UnlockNotice")
+                .gameObject.activeSelf, Is.False,
+                "Reloading the same chapter page does not repeat the unlock notice.");
+            continueButton = map.FormalScreenView.transform.Find(
+                    "SafeArea/JournalPageOverlay/JournalPage/JournalActionButton")
                 .GetComponent<Button>();
             Assert.That(continueButton.gameObject.activeSelf, Is.True);
             continueButton.onClick.Invoke();
             Assert.That(run.State.Floor, Is.EqualTo(2));
+            continueButton.onClick.Invoke();
+            Assert.That(
+                run.State.Floor,
+                Is.EqualTo(2),
+                "The completed chapter action is unbound after its first click.");
             Assert.That(map.NodeButtonCount, Is.EqualTo(19));
             Assert.That(map.FormalScreenView.RenderedEdgeCount,
                 Is.EqualTo(run.State.CurrentMap.Nodes.Sum(node => node.NextNodeIds.Count)));
@@ -242,6 +280,12 @@ namespace SpireChess.Tests
             SceneManager.LoadScene("RunTest");
             yield return null;
             var map = Object.FindObjectOfType<RunTestController>();
+            Assert.That(map.JournalPageVisible, Is.True);
+            Assert.That(
+                map.FormalScreenView.transform.Find(
+                    "SafeArea/JournalPageOverlay/JournalPage/Title")
+                    .GetComponent<Text>().text,
+                Does.Contain("完结"));
             Assert.That(map.NodeButtonCount, Is.EqualTo(19));
             Assert.That(run.State.Statistics.BossesDefeated, Is.EqualTo(3));
             Assert.That(run.State.Statistics.CompletedAtUtc, Is.Not.Null);

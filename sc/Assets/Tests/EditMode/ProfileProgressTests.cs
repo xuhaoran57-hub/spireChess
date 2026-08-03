@@ -93,6 +93,28 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void UnlockNotification_IsRemovedAfterFirstReadAndIsNotRecreated()
+        {
+            var repository = new ProfileProgressRepository(root, () => now);
+            var service = new ProfileProgressService(repository, () => now);
+            Assert.That(service.Initialize().IsUsable, Is.True);
+            Assert.That(service.RecordChapterBossVictory("map_wilderness"), Is.True);
+            var notification = service.Progress.UnreadUnlockNotifications.Single();
+
+            Assert.That(service.MarkUnlockNotificationRead(notification.Id), Is.True);
+            Assert.That(service.Progress.UnreadUnlockNotifications, Is.Empty);
+            Assert.That(service.MarkUnlockNotificationRead(notification.Id), Is.False);
+            Assert.That(service.RecordChapterBossVictory("map_wilderness"), Is.False);
+            Assert.That(service.Progress.UnreadUnlockNotifications, Is.Empty);
+
+            var reloaded = new ProfileProgressService(
+                new ProfileProgressRepository(root, () => now),
+                () => now);
+            Assert.That(reloaded.Initialize().IsUsable, Is.True);
+            Assert.That(reloaded.Progress.UnreadUnlockNotifications, Is.Empty);
+        }
+
+        [Test]
         public void CorruptMain_RecoversProfileFromValidatedBackup()
         {
             var repository = new ProfileProgressRepository(root, () => now);

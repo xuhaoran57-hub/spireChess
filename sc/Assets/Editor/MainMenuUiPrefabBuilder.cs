@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using SpireChess.UI.MainMenu;
 using SpireChess.Save;
+using SpireChess.Run;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -144,11 +145,78 @@ namespace SpireChess.Editor
                 "ui-concepts",
                 "unity-validation",
                 "g3-main-menu-v0.1");
+            var journalOutputDirectory = Path.Combine(
+                repositoryRoot,
+                "ui-concepts",
+                "unity-validation",
+                "v0.4.0-journal-ui",
+                "editor-preview");
             Directory.CreateDirectory(outputDirectory);
+            Directory.CreateDirectory(journalOutputDirectory);
+            view.Render(new MainMenuScreenState
+            {
+                Page = JournalMenuPage.Cover,
+                SaveStatus = RunSaveLoadStatus.Missing
+            });
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(journalOutputDirectory, "journal-cover-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(journalOutputDirectory, "journal-cover-1920x1200.png"));
+            view.Render(new MainMenuScreenState
+            {
+                Page = JournalMenuPage.Contents,
+                ContinueEnabled = true,
+                ContinueSummary = "第 2 层 · 生命 13/20 · 回合 8 · RelicChoice",
+                StatusMessage = "发现可继续的单局",
+                SaveStatus = RunSaveLoadStatus.Valid
+            });
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(journalOutputDirectory, "journal-contents-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(journalOutputDirectory, "journal-contents-1920x1200.png"));
             Capture(camera, canvasRect, 1920, 1080,
                 Path.Combine(outputDirectory, "main-menu-1920x1080.png"));
             Capture(camera, canvasRect, 1920, 1200,
                 Path.Combine(outputDirectory, "main-menu-1920x1200.png"));
+            view.Render(new MainMenuScreenState
+            {
+                Page = JournalMenuPage.HeroSelection,
+                HeroSelectionVisible = true,
+                SelectedHeroId = HeroIds.Warrior,
+                SaveStatus = RunSaveLoadStatus.Missing,
+                HeroOptions = HeroCatalog.All.Select(hero =>
+                    new HeroSelectionOptionState
+                    {
+                        HeroId = hero.Id,
+                        DisplayName = hero.DisplayName,
+                        PassiveName = hero.PassiveName,
+                        PassiveDescription = hero.PassiveDescription,
+                        UnlockCondition = hero.UnlockCondition,
+                        IsUnlocked = hero.Id == HeroIds.Warrior,
+                        IsSelected = hero.Id == HeroIds.Warrior
+                    }).ToArray()
+            });
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(journalOutputDirectory, "journal-hero-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(journalOutputDirectory, "journal-hero-1920x1200.png"));
+            view.Render(new MainMenuScreenState
+            {
+                Page = JournalMenuPage.Map,
+                SaveStatus = RunSaveLoadStatus.Missing
+            });
+            Capture(camera, canvasRect, 1920, 1080,
+                Path.Combine(journalOutputDirectory, "journal-map-turn-1920x1080.png"));
+            Capture(camera, canvasRect, 1920, 1200,
+                Path.Combine(journalOutputDirectory, "journal-map-turn-1920x1200.png"));
+            view.Render(new MainMenuScreenState
+            {
+                Page = JournalMenuPage.Contents,
+                ContinueEnabled = true,
+                ContinueSummary = "第 2 层 · 生命 13/20 · 回合 8 · RelicChoice",
+                StatusMessage = "发现可继续的单局",
+                SaveStatus = RunSaveLoadStatus.Valid
+            });
             view.ShowConfirmation(
                 "已有单局存档。开始新游戏会替换当前进度，是否继续？",
                 () => { });

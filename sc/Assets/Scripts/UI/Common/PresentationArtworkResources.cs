@@ -14,6 +14,13 @@ namespace SpireChess.UI
         public const string BattleBackdropPath =
             "Presentation/Backdrops/backdrop_battle";
         public const string EventArtworkRoot = "Presentation/Events/";
+        public const string JournalArtworkRoot = "Presentation/Journal/";
+        public const string JournalCoverPath =
+            JournalArtworkRoot + "journal_cover_v0_4_0";
+        public const string JournalContentsPath =
+            JournalArtworkRoot + "journal_contents_v0_4_0";
+        public const string JournalEndingPath =
+            JournalArtworkRoot + "journal_ending_v0_4_0";
 
         public static string GetBackdropPath(
             PresentationBackdropVariant variant)
@@ -48,6 +55,63 @@ namespace SpireChess.UI
                 ? null
                 : Resources.Load<Sprite>(
                     EventArtworkRoot + artworkId.Trim());
+        }
+
+        public static Sprite LoadJournalCover()
+        {
+            return Resources.Load<Sprite>(JournalCoverPath);
+        }
+
+        public static Sprite LoadJournalContents()
+        {
+            return Resources.Load<Sprite>(JournalContentsPath);
+        }
+
+        public static Sprite LoadJournalHero(string heroId)
+        {
+            switch ((heroId ?? string.Empty).Trim())
+            {
+                case "warrior":
+                    return LoadJournal("journal_hero_warrior_v0_4_0");
+                case "mage":
+                    return LoadJournal("journal_hero_mage_v0_4_0");
+                case "rogue":
+                    return LoadJournal("journal_hero_rogue_v0_4_0");
+                default:
+                    return null;
+            }
+        }
+
+        public static Sprite LoadJournalLockedHero()
+        {
+            return LoadJournal("journal_hero_locked_v0_4_0");
+        }
+
+        public static Sprite LoadJournalChapter(string mapId)
+        {
+            switch ((mapId ?? string.Empty).Trim())
+            {
+                case "map_wilderness":
+                    return LoadJournal("journal_chapter_wilderness_v0_4_0");
+                case "map_startrail_highlands":
+                    return LoadJournal(
+                        "journal_chapter_startrail_highlands_v0_4_0");
+                case "map_soulforge_city":
+                    return LoadJournal(
+                        "journal_chapter_soulforge_city_v0_4_0");
+                default:
+                    return null;
+            }
+        }
+
+        public static Sprite LoadJournalEnding()
+        {
+            return Resources.Load<Sprite>(JournalEndingPath);
+        }
+
+        private static Sprite LoadJournal(string artworkId)
+        {
+            return Resources.Load<Sprite>(JournalArtworkRoot + artworkId);
         }
 
         public static Image EnsureImage(

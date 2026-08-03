@@ -80,12 +80,14 @@ namespace SpireChess.Diagnostics
             var selectedSpecialModes =
                 (G4RuntimeArguments.IsFrozenVisualRequested ? 1 : 0) +
                 (G4RuntimeArguments.IsVisualSliceRequested ? 1 : 0) +
+                (G4RuntimeArguments.IsJournalUiRequested ? 1 : 0) +
                 (G4RuntimeArguments.IsStressRequested ? 1 : 0);
             if (selectedSpecialModes > 1)
             {
                 Fail(
                     $"{G4RuntimeArguments.FrozenVisualFlag}, " +
-                    $"{G4RuntimeArguments.VisualSliceFlag}, and " +
+                    $"{G4RuntimeArguments.VisualSliceFlag}, " +
+                    $"{G4RuntimeArguments.JournalUiFlag}, and " +
                     $"{G4RuntimeArguments.StressFlag} are mutually exclusive.");
                 yield break;
             }
@@ -186,19 +188,72 @@ namespace SpireChess.Diagnostics
                     "artwork resource. " + artworkDetails);
                 yield break;
             }
-            yield return CaptureCheckpoint(
-                G4RuntimeArguments.IsFrozenVisualRequested
-                    ? "main-menu-new-run"
-                    : "main-menu",
-                "Fresh isolated save root; no continue slot.",
-                fileOrdinal: G4RuntimeArguments.IsFrozenVisualRequested
-                    ? 1
-                    : G4RuntimeArguments.IsVisualSliceRequested
+            var mainMenuController =
+                Object.FindObjectOfType<MainMenuController>();
+            if (G4RuntimeArguments.IsJournalUiRequested)
+            {
+                yield return CaptureCheckpoint(
+                    "journal-cover",
+                    "Fresh isolated save root; cover waits for the first turn.",
+                    fileOrdinal: 1);
+                if (failed)
+                {
+                    yield break;
+                }
+            }
+
+            if (mainMenuController?.CurrentPage == JournalMenuPage.Cover)
+            {
+                if (!ExecuteStep(
+                        "open the journal cover through CoverSkipButton",
+                        () => InvokeNamedButton(
+                            mainMenuController.ScreenView,
+                            "CoverSkipButton")))
+                {
+                    yield break;
+                }
+
+                yield return WaitForCondition(
+                    () => mainMenuController != null &&
+                          mainMenuController.CurrentPage ==
+                          JournalMenuPage.Contents &&
+                          !mainMenuController.IsPageInputLocked,
+                    "journal contents after cover turn");
+                if (failed)
+                {
+                    yield break;
+                }
+            }
+
+            if (G4RuntimeArguments.IsJournalUiRequested)
+            {
+                yield return CaptureCheckpoint(
+                    "journal-contents",
+                    "Cover turn completed; the real contents page accepts input.",
+                    fileOrdinal: 2);
+                if (failed)
+                {
+                    yield break;
+                }
+            }
+            else
+            {
+                // Keep the established G4 modes focused on their historical
+                // menu contents checkpoint; only the dedicated journal chain
+                // uses the cover as evidence.
+                yield return CaptureCheckpoint(
+                    G4RuntimeArguments.IsFrozenVisualRequested
+                        ? "main-menu-new-run"
+                        : "main-menu",
+                    "Fresh isolated save root; no continue slot.",
+                    fileOrdinal: G4RuntimeArguments.IsFrozenVisualRequested ||
+                                 G4RuntimeArguments.IsVisualSliceRequested
                         ? 1
                         : 0);
-            if (failed)
-            {
-                yield break;
+                if (failed)
+                {
+                    yield break;
+                }
             }
 
             var seed = G4RuntimeArguments.ReadInt(
@@ -210,8 +265,6 @@ namespace SpireChess.Diagnostics
                         : 940101,
                 1,
                 int.MaxValue);
-            var mainMenuController =
-                Object.FindObjectOfType<MainMenuController>();
             if (!ExecuteStep(
                     "start deterministic run through NewGameButton",
                     () => InvokeNamedButton(
@@ -219,6 +272,29 @@ namespace SpireChess.Diagnostics
                         "NewGameButton")))
             {
                 yield break;
+            }
+            yield return WaitForCondition(
+                () => mainMenuController != null &&
+                      mainMenuController.CurrentPage ==
+                      JournalMenuPage.HeroSelection &&
+                      !mainMenuController.IsPageInputLocked &&
+                      mainMenuController.ScreenView != null &&
+                      mainMenuController.ScreenView.HeroSelectionVisible,
+                "hero selection after contents turn");
+            if (failed)
+            {
+                yield break;
+            }
+            if (G4RuntimeArguments.IsJournalUiRequested)
+            {
+                yield return CaptureCheckpoint(
+                    "journal-hero-select",
+                    "The real role-selection page is visible before a run exists.",
+                    fileOrdinal: 3);
+                if (failed)
+                {
+                    yield break;
+                }
             }
             if (!ExecuteStep(
                     "confirm the default unlocked warrior",
@@ -232,6 +308,11 @@ namespace SpireChess.Diagnostics
             yield return WaitForScene<RunTestController>(GameSceneNames.Run);
             if (failed)
             {
+                yield break;
+            }
+            if (G4RuntimeArguments.IsJournalUiRequested)
+            {
+                yield return RunJournalUiAcceptanceFlow(seed);
                 yield break;
             }
             if (G4RuntimeArguments.IsFrozenVisualRequested)
@@ -660,6 +741,569 @@ namespace SpireChess.Diagnostics
                 "Formal MainMenu -> Run -> Shop -> Run -> Battle -> Run -> " +
                 "MainMenu -> Continue chain completed with isolated " +
                 "persistence.");
+        }
+
+        private IEnumerator RunJournalUiAcceptanceFlow(int seed)
+        {
+            var run = GameApp.Instance?.Run;
+            var runController = Object.FindObjectOfType<RunTestController>();
+            if (run == null || runController?.FormalScreenView == null ||
+                run.State.Phase != RunPhase.MapSelection ||
+                run.State.Floor != 1)
+            {
+                Fail(
+                    "Journal UI acceptance did not enter the first real map " +
+                    "through the MainMenu page flow.");
+                yield break;
+            }
+
+            yield return CaptureCheckpoint(
+                "map-chapter-1",
+                $"Seed {seed}; role confirmation completed its Map page turn " +
+                "and the existing router opened the first map.",
+                fileOrdinal: 4);
+            if (failed)
+            {
+                yield break;
+            }
+
+            // This diagnostic fixture uses only existing RunSession operations
+            // to reach chapter boundaries quickly. It does not alter the
+            // domain model; relic selection and journal actions below remain
+            // real Player UI clicks against the formal Run screen.
+            if (!TryPrepareFirstJournalBoundary(run, out var firstFailure))
+            {
+                Fail("Journal UI first-chapter fixture failed: " + firstFailure);
+                yield break;
+            }
+
+            yield return ReloadJournalRunScene();
+            if (failed)
+            {
+                yield break;
+            }
+            runController = Object.FindObjectOfType<RunTestController>();
+            yield return WaitForCondition(
+                () => runController?.FormalScreenView != null &&
+                      runController.ChoiceOverlayVisible &&
+                      run.State.Phase == RunPhase.RelicChoice,
+                "first chapter relic choice on the formal Run screen");
+            if (failed)
+            {
+                yield break;
+            }
+            if (!ExecuteStep(
+                    "select first chapter relic through the real choice button",
+                    () => InvokeFirstChoiceAction(
+                        runController,
+                        RunUiActionType.SelectRelic)))
+            {
+                yield break;
+            }
+            yield return WaitForCondition(
+                () => runController?.JournalPageVisible == true &&
+                      run.State.Phase == RunPhase.FloorComplete &&
+                      GameApp.Instance?.Profiles?.IsHeroUnlocked(HeroIds.Mage) == true &&
+                      HasJournalText(
+                          runController.FormalScreenView,
+                          "UnlockNotice",
+                          "法师") &&
+                      IsJournalActionReady(runController),
+                "first chapter complete page and mage unlock notification");
+            if (failed)
+            {
+                yield break;
+            }
+            yield return CaptureCheckpoint(
+                "chapter-complete",
+                "Boss completion used a real relic choice and now shows the " +
+                "formal chapter page with its one-time mage notification.",
+                fileOrdinal: 5);
+            if (failed)
+            {
+                yield break;
+            }
+            if (!ExecuteStep(
+                    "advance to chapter two through JournalActionButton",
+                    () => InvokeNamedButton(
+                        runController.FormalScreenView,
+                        "JournalActionButton")))
+            {
+                yield break;
+            }
+            yield return WaitForCondition(
+                () => run.State.Phase == RunPhase.MapSelection &&
+                      run.State.Floor == 2 &&
+                      !runController.JournalPageVisible,
+                "chapter two map after the journal action");
+            if (failed)
+            {
+                yield break;
+            }
+
+            if (!TryPrepareCompleteJournalFloor(
+                    run,
+                    2,
+                    "f2_normal",
+                    "f2_route_safe",
+                    "f2_rest",
+                    "f2_late_break",
+                    out var secondFailure))
+            {
+                Fail("Journal UI second-chapter fixture failed: " + secondFailure);
+                yield break;
+            }
+            yield return ReloadJournalRunScene();
+            if (failed)
+            {
+                yield break;
+            }
+            runController = Object.FindObjectOfType<RunTestController>();
+            yield return WaitForCondition(
+                () => runController?.FormalScreenView != null &&
+                      runController.ChoiceOverlayVisible &&
+                      run.State.Phase == RunPhase.RelicChoice,
+                "second chapter relic choice on the formal Run screen");
+            if (failed)
+            {
+                yield break;
+            }
+            if (!ExecuteStep(
+                    "select second chapter relic through the real choice button",
+                    () => InvokeFirstChoiceAction(
+                        runController,
+                        RunUiActionType.SelectRelic)))
+            {
+                yield break;
+            }
+            yield return WaitForCondition(
+                () => runController?.JournalPageVisible == true &&
+                      run.State.Phase == RunPhase.FloorComplete &&
+                      GameApp.Instance?.Profiles?.IsHeroUnlocked(HeroIds.Rogue) == true &&
+                      HasJournalText(
+                          runController.FormalScreenView,
+                          "UnlockNotice",
+                          "盗贼") &&
+                      IsJournalActionReady(runController),
+                "second chapter complete page and rogue unlock notification");
+            if (failed)
+            {
+                yield break;
+            }
+            G4PerformanceCollector.RecordCheckpoint(
+                "chapter-two-complete",
+                true,
+                "Second chapter page rendered through the formal UI with its " +
+                "one-time rogue notification.",
+                string.Empty);
+            if (!ExecuteStep(
+                    "advance to final chapter through JournalActionButton",
+                    () => InvokeNamedButton(
+                        runController.FormalScreenView,
+                        "JournalActionButton")))
+            {
+                yield break;
+            }
+            yield return WaitForCondition(
+                () => run.State.Phase == RunPhase.MapSelection &&
+                      run.State.Floor == 3 &&
+                      !runController.JournalPageVisible,
+                "final chapter map after the journal action");
+            if (failed)
+            {
+                yield break;
+            }
+
+            if (!TryPrepareCompleteJournalFloor(
+                    run,
+                    3,
+                    "f3_normal",
+                    "f3_route_safe",
+                    "f3_rest",
+                    "f3_late_wild",
+                    out var finalFailure))
+            {
+                Fail("Journal UI final-chapter fixture failed: " + finalFailure);
+                yield break;
+            }
+            yield return ReloadJournalRunScene();
+            if (failed)
+            {
+                yield break;
+            }
+            runController = Object.FindObjectOfType<RunTestController>();
+            yield return WaitForCondition(
+                () => runController?.JournalPageVisible == true &&
+                      run.State.Phase == RunPhase.RunWon &&
+                      HasJournalText(
+                          runController.FormalScreenView,
+                          "Title",
+                          "完结") &&
+                      IsJournalActionReady(runController),
+                "formal ending page after the final boss");
+            if (failed)
+            {
+                yield break;
+            }
+            yield return CaptureCheckpoint(
+                "ending",
+                "The final configured chapter resolves to the formal ending " +
+                "page and exposes only the existing return-to-menu action.",
+                fileOrdinal: 6);
+            if (failed)
+            {
+                yield break;
+            }
+            if (!ExecuteStep(
+                    "return from ending through JournalActionButton",
+                    () => InvokeNamedButton(
+                        runController.FormalScreenView,
+                        "JournalActionButton")))
+            {
+                yield break;
+            }
+            yield return WaitForScene<MainMenuController>(GameSceneNames.MainMenu);
+            if (failed)
+            {
+                yield break;
+            }
+            var mainMenuController = Object.FindObjectOfType<MainMenuController>();
+            if (mainMenuController?.ScreenView == null ||
+                !mainMenuController.ScreenView.ContinueInteractable)
+            {
+                Fail("Ending return did not preserve a Continue-compatible run save.");
+                yield break;
+            }
+            if (!ExecuteStep(
+                    "continue the saved ending through ContinueButton",
+                    () => InvokeNamedButton(
+                        mainMenuController.ScreenView,
+                        "ContinueButton")))
+            {
+                yield break;
+            }
+            yield return WaitForScene<RunTestController>(GameSceneNames.Run);
+            if (failed)
+            {
+                yield break;
+            }
+            runController = Object.FindObjectOfType<RunTestController>();
+            yield return WaitForCondition(
+                () => GameApp.Instance?.Run?.State?.Phase == RunPhase.RunWon &&
+                      runController?.JournalPageVisible == true &&
+                      HasJournalText(
+                          runController.FormalScreenView,
+                          "Title",
+                          "完结"),
+                "saved ending restored through the real Continue button");
+            if (failed)
+            {
+                yield break;
+            }
+            yield return CaptureCheckpoint(
+                "continue-restored",
+                "The completed run was saved, returned to contents, and " +
+                "restored through the existing Continue flow.",
+                fileOrdinal: 7);
+            if (failed)
+            {
+                yield break;
+            }
+
+            yield return CompleteAcceptance(
+                "Journal UI Player chain completed: Cover -> Contents -> " +
+                "HeroSelection -> Map -> ChapterComplete -> Ending -> Continue.");
+        }
+
+        private IEnumerator ReloadJournalRunScene()
+        {
+            G4SceneLoadDiagnostics.NotifySceneLoadRequested(GameSceneNames.Run);
+            SceneManager.LoadScene(GameSceneNames.Run);
+            yield return WaitForScene<RunTestController>(GameSceneNames.Run);
+        }
+
+        private static bool TryPrepareFirstJournalBoundary(
+            RunSession run,
+            out string failure)
+        {
+            if (run == null || run.State.Floor != 1 ||
+                run.State.Phase != RunPhase.MapSelection)
+            {
+                failure = "Expected the first map after its opening encounter.";
+                return false;
+            }
+
+            return TryPrepareCompleteJournalFloor(
+                run,
+                1,
+                "f1_safe_normal",
+                "f1_route_safe",
+                "f1_rest",
+                "f1_late_shield",
+                out failure);
+        }
+
+        private static bool TryPrepareCompleteJournalFloor(
+            RunSession run,
+            int floor,
+            string earlyCombat,
+            string routeCombat,
+            string restNode,
+            string lateCombat,
+            out string failure)
+        {
+            if (run == null || run.State.Floor != floor ||
+                run.State.Phase != RunPhase.MapSelection)
+            {
+                failure = "Expected a selectable map for floor " + floor + ".";
+                return false;
+            }
+
+            return TryCompleteFixtureShop(
+                       run,
+                       $"f{floor}_shop_start",
+                       out failure) &&
+                   TryCompleteFixtureCombatAndContinue(
+                       run,
+                       $"f{floor}_opening_normal",
+                       out failure) &&
+                   TryCompleteFixtureShop(
+                       run,
+                       $"f{floor}_shop_2",
+                       out failure) &&
+                   TryCompleteFixtureCombatAndContinue(
+                       run,
+                       earlyCombat,
+                       out failure) &&
+                   TryCompleteFixtureShop(
+                       run,
+                       $"f{floor}_shop_3",
+                       out failure) &&
+                   TryCompleteFixtureCombatAndContinue(
+                       run,
+                       $"f{floor}_mid_mechanic",
+                       out failure) &&
+                   TryCompleteFixtureShop(
+                       run,
+                       $"f{floor}_shop_4",
+                       out failure) &&
+                   TryCompleteFixtureCombatAndContinue(
+                       run,
+                       routeCombat,
+                       out failure) &&
+                   TryCompleteFixtureRest(run, restNode, out failure) &&
+                   TryCompleteFixtureShop(
+                       run,
+                       $"f{floor}_shop_5",
+                       out failure) &&
+                   TryCompleteFixtureCombatAndContinue(
+                       run,
+                       lateCombat,
+                       out failure) &&
+                   TryCompleteFixtureShop(
+                       run,
+                       $"f{floor}_shop_boss",
+                       out failure) &&
+                   TryCompleteFixtureBoss(
+                       run,
+                       $"f{floor}_boss",
+                       out failure);
+        }
+
+        private static bool TryCompleteFixtureShop(
+            RunSession run,
+            string nodeId,
+            out string failure)
+        {
+            var enter = run.EnterNode(nodeId);
+            if (!enter.Success)
+            {
+                failure = nodeId + " could not be entered: " + enter.Error + ".";
+                return false;
+            }
+
+            if (!TryClearFixtureCardRewards(run, out failure))
+            {
+                return false;
+            }
+
+            var end = run.EndShopAndPrepareBattle(GameSceneNames.Run);
+            if (!end.Success)
+            {
+                failure = nodeId + " could not end its shop: " + end.Error + ".";
+                return false;
+            }
+
+            failure = string.Empty;
+            return true;
+        }
+
+        private static bool TryCompleteFixtureCombatAndContinue(
+            RunSession run,
+            string nodeId,
+            out string failure)
+        {
+            var enter = run.EnterNode(nodeId);
+            if (!enter.Success)
+            {
+                failure = nodeId + " could not be entered: " + enter.Error + ".";
+                return false;
+            }
+
+            if (!TryCompleteFixtureBattleAsWin(run, out failure))
+            {
+                return false;
+            }
+
+            var continueResult = run.ContinueAfterBattle();
+            if (!continueResult.Success)
+            {
+                failure = nodeId + " could not acknowledge battle: " +
+                          continueResult.Error + ".";
+                return false;
+            }
+
+            failure = string.Empty;
+            return true;
+        }
+
+        private static bool TryCompleteFixtureRest(
+            RunSession run,
+            string nodeId,
+            out string failure)
+        {
+            var enter = run.EnterNode(nodeId);
+            if (!enter.Success)
+            {
+                failure = nodeId + " could not be entered: " + enter.Error + ".";
+                return false;
+            }
+
+            var leave = run.SelectRestOption("leave");
+            if (!leave.Success)
+            {
+                failure = nodeId + " could not select leave: " + leave.Error + ".";
+                return false;
+            }
+
+            failure = string.Empty;
+            return true;
+        }
+
+        private static bool TryCompleteFixtureBoss(
+            RunSession run,
+            string nodeId,
+            out string failure)
+        {
+            var enter = run.EnterNode(nodeId);
+            if (!enter.Success)
+            {
+                failure = nodeId + " could not be entered: " + enter.Error + ".";
+                return false;
+            }
+
+            return TryCompleteFixtureBattleAsWin(run, out failure);
+        }
+
+        private static bool TryClearFixtureCardRewards(
+            RunSession run,
+            out string failure)
+        {
+            while (run.State.PendingCardRewards.Count > 0)
+            {
+                var claim = run.ClaimNextCardReward();
+                if (claim.Success)
+                {
+                    continue;
+                }
+
+                if (claim.Error != RunOperationError.BenchFull)
+                {
+                    failure = "Fixture reward claim failed: " + claim.Error + ".";
+                    return false;
+                }
+
+                var skip = run.SkipNextCardReward();
+                if (!skip.Success)
+                {
+                    failure = "Fixture reward skip failed: " + skip.Error + ".";
+                    return false;
+                }
+            }
+
+            failure = string.Empty;
+            return true;
+        }
+
+        private static bool TryCompleteFixtureBattleAsWin(
+            RunSession run,
+            out string failure)
+        {
+            if (run.PendingBattle == null)
+            {
+                failure = "Fixture expected a pending battle.";
+                return false;
+            }
+
+            var result = new BattleSimulationResult(
+                new BattleBoardState(),
+                BattleSide.Player,
+                BattleOutcomeReason.Victory,
+                new List<string>(),
+                new List<BattleStep>());
+            if (!run.TryCompleteBattle(result, out var returnScene))
+            {
+                failure = "Fixture battle could not be completed.";
+                return false;
+            }
+
+            if (!string.Equals(
+                    returnScene,
+                    GameSceneNames.Run,
+                    StringComparison.Ordinal))
+            {
+                failure = "Fixture battle returned an unexpected scene: " +
+                          (returnScene ?? "<null>") + ".";
+                return false;
+            }
+
+            failure = string.Empty;
+            return true;
+        }
+
+        private static bool InvokeFirstChoiceAction(
+            RunTestController controller,
+            RunUiActionType action)
+        {
+            var option = controller?.FormalScreenView
+                ?.GetComponentsInChildren<RunChoiceOptionView>(true)
+                .FirstOrDefault(value => value != null &&
+                                         value.Action == action &&
+                                         value.IsInteractable);
+            var button = option == null ? null : option.GetComponent<Button>();
+            return button != null && button.IsInteractable() && InvokeButton(button);
+        }
+
+        private static bool IsJournalActionReady(RunTestController controller)
+        {
+            var target = controller?.FormalScreenView?.transform.Find(
+                "SafeArea/JournalPageOverlay/JournalPage/JournalActionButton");
+            var button = target == null ? null : target.GetComponent<Button>();
+            return button != null && button.IsInteractable();
+        }
+
+        private static bool HasJournalText(
+            RunScreenView view,
+            string name,
+            string expectedText)
+        {
+            var target = view?.transform.Find(
+                "SafeArea/JournalPageOverlay/JournalPage/" + name);
+            var text = target == null ? null : target.GetComponent<Text>();
+            return text != null && text.gameObject.activeInHierarchy &&
+                   text.text.IndexOf(
+                       expectedText ?? string.Empty,
+                       StringComparison.Ordinal) >= 0;
         }
 
         private IEnumerator RunVisualSliceAcceptanceFlow(int seed)

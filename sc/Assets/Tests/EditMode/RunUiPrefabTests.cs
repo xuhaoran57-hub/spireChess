@@ -93,6 +93,68 @@ namespace SpireChess.Tests.EditMode
         }
 
         [Test]
+        public void JournalPage_RuntimeFallbackShowsChapterAndOneTimeUnlockNotice()
+        {
+            var state = CreateState();
+            state.Choice = null;
+            state.JournalPage = new RunJournalPageState
+            {
+                Kind = RunJournalPageKind.ChapterComplete,
+                Title = "荒野 · 章节完成",
+                Body = "Boss 已击败，遗珍已结算。",
+                UnlockNotification = "新角色已解锁：法师",
+                ArtworkId = "map_wilderness",
+                ActionLabel = "进入下一章",
+                Action = RunUiActionType.ContinueToNextFloor
+            };
+
+            view.Render(state);
+
+            Assert.That(view.IsJournalPageVisible, Is.True);
+            Assert.That(
+                root.Find("SafeArea/JournalPageOverlay/JournalPage/NeutralJournalArtwork"),
+                Is.Not.Null);
+            Assert.That(
+                root.Find("SafeArea/JournalPageOverlay/JournalPage/NeutralJournalArtwork")
+                    .GetComponent<Image>().sprite,
+                Is.Not.Null);
+            Assert.That(
+                root.Find("SafeArea/JournalPageOverlay/JournalPage/NeutralJournalArtwork")
+                    .Find("Label").gameObject.activeSelf,
+                Is.False);
+            Assert.That(
+                root.Find("SafeArea/JournalPageOverlay/JournalPage/UnlockNotice")
+                    .GetComponent<Text>().text,
+                Is.EqualTo("新角色已解锁：法师"));
+
+            state.JournalPage.UnlockNotification = string.Empty;
+            view.Render(state);
+            Assert.That(
+                root.Find("SafeArea/JournalPageOverlay/JournalPage/UnlockNotice")
+                    .gameObject.activeSelf,
+                Is.False,
+                "A read unlock notification must not render a second time.");
+
+            state.JournalPage = new RunJournalPageState
+            {
+                Kind = RunJournalPageKind.Ending,
+                Title = "旅团日记 · 完结",
+                Body = "三章旅程完成。",
+                ActionLabel = "返回目录",
+                Action = RunUiActionType.ReturnToMainMenu
+            };
+            view.Render(state);
+            Assert.That(
+                root.Find("SafeArea/JournalPageOverlay/JournalPage/Title")
+                    .GetComponent<Text>().text,
+                Does.Contain("完结"));
+            Assert.That(
+                root.Find("SafeArea/JournalPageOverlay/JournalPage/NeutralJournalArtwork")
+                    .GetComponent<Image>().sprite,
+                Is.Not.Null);
+        }
+
+        [Test]
         public void Theme_DefinesCrossScreenSevenTypeFiveStateAndFourEdgeContracts()
         {
             var theme = AssetDatabase.LoadAssetAtPath<PresentationTheme>(ThemePath);

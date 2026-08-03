@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "spire-chess-v0.4.0-journal-evidence-v1",
+  "candidateCommit": "<required-clean-commit>",
+  "sourceTreeDirty": false,
+  "unityVersion": "<from-sc/ProjectSettings/ProjectVersion.txt>",
+  "configHash": "<required>",
+  "generatedAtUtc": "<ISO-8601>",
+  "commands": {
+    "tests": "tools/run_unity_tests.ps1 -Platform All ...",
+    "player": "tools/run_g4_acceptance.ps1 -JournalUi ..."
+  },
+  "playerFixture": {
+    "id": "journal-fixture-v1",
+    "scope": "RunSession prepares chapter boundaries; visible selection, page actions, return and continue use formal Player UI."
+  },
+  "testResults": {
+    "editModeXml": "tests/EditMode-results.xml",
+    "playModeXml": "tests/PlayMode-results.xml",
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "playerRuns": [
+    {
+      "resolution": "1920x1080",
+      "evidencePath": "player-1920x1080",
+      "screenshots": []
+    },
+    {
+      "resolution": "1920x1200",
+      "evidencePath": "player-1920x1200",
+      "screenshots": []
+    }
+  ],
+  "review": {
+    "engineering": "pending",
+    "visual": "pending",
+    "playerFlow": "pending"
+  }
+}

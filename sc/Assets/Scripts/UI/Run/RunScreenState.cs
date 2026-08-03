@@ -35,7 +35,8 @@ namespace SpireChess.UI.Run
         ContinueAfterBattle,
         RetryBoss,
         ContinueToNextFloor,
-        StartNewRun
+        StartNewRun,
+        ReturnToMainMenu
     }
 
     public sealed class RunScreenState
@@ -54,6 +55,7 @@ namespace SpireChess.UI.Run
             Array.Empty<RunRelicState>();
         public RunChoiceOverlayState Choice { get; set; }
         public RunSummaryState Summary { get; set; } = new RunSummaryState();
+        public RunJournalPageState JournalPage { get; set; }
     }
 
     public sealed class RunMapNodeState
@@ -124,5 +126,28 @@ namespace SpireChess.UI.Run
         public bool IsActionVisible { get; set; }
         public string ActionLabel { get; set; } = string.Empty;
         public RunUiActionType Action { get; set; }
+    }
+
+    public enum RunJournalPageKind
+    {
+        None,
+        ChapterComplete,
+        Ending
+    }
+
+    /// <summary>
+    /// A full-page journal presentation layered over the map. It is a UI view
+    /// model only; its action delegates to the pre-existing run operations.
+    /// </summary>
+    public sealed class RunJournalPageState
+    {
+        public RunJournalPageKind Kind { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+        public string UnlockNotification { get; set; } = string.Empty;
+        public string ArtworkId { get; set; } = string.Empty;
+        public string ActionLabel { get; set; } = string.Empty;
+        public RunUiActionType Action { get; set; }
+        public bool IsInputLocked { get; set; }
     }
 }
