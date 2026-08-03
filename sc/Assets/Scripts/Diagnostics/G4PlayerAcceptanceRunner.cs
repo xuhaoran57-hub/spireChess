@@ -976,6 +976,12 @@ namespace SpireChess.Diagnostics
             {
                 yield break;
             }
+            yield return WaitForMainMenuPresentationReady(
+                "ending return");
+            if (failed)
+            {
+                yield break;
+            }
             var mainMenuController = Object.FindObjectOfType<MainMenuController>();
             if (mainMenuController?.ScreenView == null ||
                 !mainMenuController.ScreenView.ContinueInteractable)
