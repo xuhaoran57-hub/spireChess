@@ -6,9 +6,10 @@
 
 ## v0.4.0 当前工作板
 
-- [ ] P0（实现待复验）：封面→目录→角色选择→地图、章节完成页、结局页与一次性解锁提示已接入 UI；十张 v0.4 日记正式候选资产（含锁定角色状态）已接入并通过离线哈希/导入合同核验，详见 [资产包](ui-concepts/phase-9c/light-storybook-production-v0.1/journal-ui-v0.4.0/README.md)；Prefab 重建、Unity 测试、双分辨率 Player 证据及视觉签字仍待完成，见 [v0.4.0 日记 UI 证据目录](ui-concepts/unity-validation/v0.4.0-journal-ui/README.md)。
-- [ ] P0：在干净当前候选上重新完成 EditMode、PlayMode、Clean Player、双分辨率和
-  重复输入/Exactly-once 门禁。
+- [ ] P0（Clean Player 已关闭，外部签字待完成）：封面→目录→角色选择→地图、章节完成页、结局页与一次性解锁提示已接入 UI；十张 v0.4 日记正式候选资产（含锁定角色状态）已接入并通过离线哈希/导入合同核验，详见 [资产包](ui-concepts/phase-9c/light-storybook-production-v0.1/journal-ui-v0.4.0/README.md)；候选 `d12e2ef` 的 Prefab/Unity、Clean Player、双分辨率与工程审图证据已归档，资产来源/许可和外部视觉签字仍待完成，见 [验收摘要](ui-concepts/unity-validation/v0.4.0-journal-ui/d12e2ef/acceptance-summary.md)。
+- [x] P0：候选 `d12e2ef` 已在干净工作树上完成 EditMode、PlayMode、Clean Player、
+  双分辨率和重复输入/Exactly-once 门禁；见
+  [不可变证据包](ui-concepts/unity-validation/v0.4.0-journal-ui/d12e2ef/manifest.json)。
 - [ ] P0：重新生成可追溯的 v0.4.0 章节进度 S0 平衡证据，固定提交、配置哈希和
   fixture 身份。
 - [ ] P1：建立并验证三角色真实单局的平衡候选，再决定正式 S1/S2 规模和人工批次。

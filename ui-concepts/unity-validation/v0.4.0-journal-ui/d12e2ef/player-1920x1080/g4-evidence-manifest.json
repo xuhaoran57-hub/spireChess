@@ -1,0 +1,132 @@
+﻿{
+    "schemaVersion":  "spire-chess-g4-evidence-v2",
+    "generatedAtUtc":  "2026-08-03T14:10:12.2483291Z",
+    "runId":  "player-1920x1080",
+    "machineName":  "DESKTOP-453378L",
+    "resolution":  "1920x1080",
+    "quality":  "High",
+    "seed":  940101,
+    "acceptanceMode":  "journal-ui",
+    "playerPath":  "D:\\code\\spireChess\\spireChess\\sc\\Builds\\G4\\d12e2ef-clean-player\\Windows-x64\\SpireChess.exe",
+    "playerSha256":  "fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7",
+    "playerLog":  "player.log",
+    "playerLogSha256":  "a15fc9ccdc31030559ee72427cdf3e19864e4e3e037c84838cd21f93b7246078",
+    "playerLogBytes":  69270,
+    "buildId":  "d12e2ef-clean-player",
+    "gitCommit":  "d12e2ef0c528a697a4b57fa73f101dfe3059c6c5",
+    "sourceTreeDirty":  false,
+    "evidenceClassification":  "FormalCandidate",
+    "buildManifestSha256":  "224fbeb7cba021e4c8e4edb00b9307bcbdadc07e2b8731b14c87bee5e273e9fd",
+    "performanceReport":  "g4-performance-player-1920x1080-1920x1080.json",
+    "performanceReportSha256":  "fc8f8823b79af9e72426f435f569423801060c13cd22655c450625e8cb1e7ce7",
+    "samplesCsv":  "g4-performance-player-1920x1080-1920x1080.csv",
+    "samplesCsvSha256":  "675dd0bd8b5a373392220e0c74f9c1ded0e9b197adf5df57ff893eaf6852fc5d",
+    "samplesCsvBytes":  31113,
+    "samplesCsvLineCount":  368,
+    "samplesCsvSampleCount":  367,
+    "provisionalAudio":  true,
+    "sampleCatalogExact":  true,
+    "cleanupPassed":  true,
+    "runtimeLogGatePassed":  true,
+    "runtimeFailureLogCount":  0,
+    "runtimeFailureMarkerPresent":  false,
+    "checkpoints":  [
+                        "journal-cover",
+                        "journal-contents",
+                        "journal-hero-select",
+                        "map-chapter-1",
+                        "chapter-complete",
+                        "chapter-two-complete",
+                        "ending",
+                        "continue-restored",
+                        "sample-catalog-exact",
+                        "acceptance-complete"
+                    ],
+    "screenshots":  [
+                        {
+                            "file":  "01-journal-cover-1920x1080.png",
+                            "bytes":  1171842,
+                            "width":  1920,
+                            "height":  1080,
+                            "sha256":  "ac05cab4bc2ffb35ba258b0d19e9aa1644aa0b1e1da3c90bf8c5a15f6c6ce70c",
+                            "brightSampleRatio":  1,
+                            "luminanceRange":  229.43719999999996
+                        },
+                        {
+                            "file":  "02-journal-contents-1920x1080.png",
+                            "bytes":  2166947,
+                            "width":  1920,
+                            "height":  1080,
+                            "sha256":  "499aed409fa687bfda6ad42b219a6a3a0a399fb424557457158b077ed38f628c",
+                            "brightSampleRatio":  0.96527777777777779,
+                            "luminanceRange":  253.14959999999996
+                        },
+                        {
+                            "file":  "03-journal-hero-select-1920x1080.png",
+                            "bytes":  1247615,
+                            "width":  1920,
+                            "height":  1080,
+                            "sha256":  "736aebde5cb508ed0d5019c265f0073a1e056d69b8a067e826ed82c3b31b9e9e",
+                            "brightSampleRatio":  1,
+                            "luminanceRange":  218.46479999999997
+                        },
+                        {
+                            "file":  "04-map-chapter-1-1920x1080.png",
+                            "bytes":  1289024,
+                            "width":  1920,
+                            "height":  1080,
+                            "sha256":  "98eeb30d2877e04c763a47163819347188c16069ca6d3ddfba7406fed6c67851",
+                            "brightSampleRatio":  0.86197916666666663,
+                            "luminanceRange":  247.12599999999998
+                        },
+                        {
+                            "file":  "05-chapter-complete-1920x1080.png",
+                            "bytes":  577400,
+                            "width":  1920,
+                            "height":  1080,
+                            "sha256":  "2c7ce9af6f5a6c0bba1b1b92c81506da39d2ba805e6d8f15b1cf061963e410b2",
+                            "brightSampleRatio":  0.54904513888888884,
+                            "luminanceRange":  254.99999999999997
+                        },
+                        {
+                            "file":  "06-ending-1920x1080.png",
+                            "bytes":  626435,
+                            "width":  1920,
+                            "height":  1080,
+                            "sha256":  "c158418669ed31c904986bb5c0de416280a6c87b96c19883446e9e9ce904821f",
+                            "brightSampleRatio":  0.56076388888888884,
+                            "luminanceRange":  254.99999999999997
+                        },
+                        {
+                            "file":  "07-continue-restored-1920x1080.png",
+                            "bytes":  626435,
+                            "width":  1920,
+                            "height":  1080,
+                            "sha256":  "c158418669ed31c904986bb5c0de416280a6c87b96c19883446e9e9ce904821f",
+                            "brightSampleRatio":  0.56076388888888884,
+                            "luminanceRange":  254.99999999999997
+                        }
+                    ],
+    "isolatedSaveFiles":  [
+                              {
+                                  "file":  "profile-progress-v1.json",
+                                  "bytes":  682,
+                                  "sha256":  "401d7a37a94b3b16673228487b000c5901dadbff6b10fecd4518c3bd272f8c55"
+                              },
+                              {
+                                  "file":  "profile-progress-v1.json.bak",
+                                  "bytes":  653,
+                                  "sha256":  "17a9c59191eeffda93416c8dace5734581caa97fadaa63dec7162ed9efebf39f"
+                              },
+                              {
+                                  "file":  "run-slot-v0.4.0-0.json",
+                                  "bytes":  36602,
+                                  "sha256":  "dbc348aa69d7c62b7f44ca70fd222c514665cf0fc9fa98d420b0f73a2c8896cb"
+                              },
+                              {
+                                  "file":  "run-slot-v0.4.0-0.json.bak",
+                                  "bytes":  29359,
+                                  "sha256":  "22fa82b92bffff8212000f616f04906fccb7736aab1350ff15ec824dd0ea0ac7"
+                              }
+                          ]
+}

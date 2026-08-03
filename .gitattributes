@@ -1,0 +1,2 @@
+# Preserve archived Player evidence byte-for-byte so recorded SHA-256 values remain reproducible.
+ui-concepts/unity-validation/v0.4.0-journal-ui/*/** -text

@@ -1,0 +1,25 @@
+{
+  "format": "travel-journal-profile",
+  "schemaVersion": 1,
+  "savedAtUtc": "2026-08-03T14:10:33.4162966Z",
+  "revision": 6,
+  "progress": {
+    "schemaVersion": 1,
+    "lastWrittenVersion": "0.4.0",
+    "unlockedHeroIds": [
+      "warrior",
+      "mage",
+      "rogue"
+    ],
+    "defeatedChapterBossIds": [
+      "map_wilderness",
+      "map_startrail_highlands",
+      "map_soulforge_city"
+    ],
+    "unreadUnlockNotifications": [],
+    "legacyV033ArchiveCompleted": false,
+    "legacyV033ArchiveRelativePath": "",
+    "legacyV033ArchiveNoticePending": false
+  },
+  "progressSha256": "ae7ae8f7b8cab907c7f809fce0d6c3176d106461e38614ca7d5236aa22b00e56"
+}

@@ -1,7 +1,10 @@
 # v0.4.0 日记式 UI 证据目录
 
-状态：`待生成`。本目录只接收 v0.4.0 的新证据，绝不覆盖
-`g3-*`、`g4-formal-chain-v0.1` 或 v0.3.3/v0.3.4 的冻结结果。
+状态：`Clean Player 已关闭`。正式候选 `d12e2ef` 已完成全量 Unity、Clean
+Windows x64、核心链与 Journal UI 双分辨率验收；证据见
+[d12e2ef/acceptance-summary.md](d12e2ef/acceptance-summary.md)。本目录只接收
+v0.4.0 的新证据，绝不覆盖 `g3-*`、`g4-formal-chain-v0.1` 或
+v0.3.3/v0.3.4 的冻结结果。
 
 ## 目录合同
 
@@ -14,12 +17,20 @@ v0.4.0-journal-ui/
    ├─ acceptance-summary.md
    ├─ manifest.json
    ├─ tests/
+   ├─ build/
+   ├─ core-matrix/
    ├─ player-1920x1080/
    └─ player-1920x1200/
 ```
 
 `<candidate-id>` 使用已提交的短 SHA；诊断性脏工作树只能放在
 `editor-preview/` 或临时目录，不能伪装为正式 Player 证据。
+
+## 已冻结候选
+
+| 候选 | 状态 | 范围 |
+| --- | --- | --- |
+| [`d12e2ef`](d12e2ef/acceptance-summary.md) | Clean Player 已关闭 | EditMode 458/458、PlayMode 30/30、Clean Build、核心链 2/2、Journal 链 2/2；S0 与外部签字不在本结论内。 |
 
 ## 最低截图集合
 

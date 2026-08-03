@@ -1,0 +1,132 @@
+﻿{
+    "schemaVersion":  "spire-chess-g4-evidence-v2",
+    "generatedAtUtc":  "2026-08-03T14:10:35.5187486Z",
+    "runId":  "player-1920x1200",
+    "machineName":  "DESKTOP-453378L",
+    "resolution":  "1920x1200",
+    "quality":  "High",
+    "seed":  940101,
+    "acceptanceMode":  "journal-ui",
+    "playerPath":  "D:\\code\\spireChess\\spireChess\\sc\\Builds\\G4\\d12e2ef-clean-player\\Windows-x64\\SpireChess.exe",
+    "playerSha256":  "fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7",
+    "playerLog":  "player.log",
+    "playerLogSha256":  "f4570bf6b92584c83bc0f17790bdb99fc7714e84a4dd9e76bca409b2a50085eb",
+    "playerLogBytes":  69264,
+    "buildId":  "d12e2ef-clean-player",
+    "gitCommit":  "d12e2ef0c528a697a4b57fa73f101dfe3059c6c5",
+    "sourceTreeDirty":  false,
+    "evidenceClassification":  "FormalCandidate",
+    "buildManifestSha256":  "224fbeb7cba021e4c8e4edb00b9307bcbdadc07e2b8731b14c87bee5e273e9fd",
+    "performanceReport":  "g4-performance-player-1920x1200-1920x1200.json",
+    "performanceReportSha256":  "38d412713abe1d86efc3aee13c8f4e2aaafc4127bf9a43059d31deafa76f16e3",
+    "samplesCsv":  "g4-performance-player-1920x1200-1920x1200.csv",
+    "samplesCsvSha256":  "81d559d5daf5f76e6e54f00bf4f573f0738fa9b15fe377d82b0c6184ebdcdc9c",
+    "samplesCsvBytes":  30946,
+    "samplesCsvLineCount":  366,
+    "samplesCsvSampleCount":  365,
+    "provisionalAudio":  true,
+    "sampleCatalogExact":  true,
+    "cleanupPassed":  true,
+    "runtimeLogGatePassed":  true,
+    "runtimeFailureLogCount":  0,
+    "runtimeFailureMarkerPresent":  false,
+    "checkpoints":  [
+                        "journal-cover",
+                        "journal-contents",
+                        "journal-hero-select",
+                        "map-chapter-1",
+                        "chapter-complete",
+                        "chapter-two-complete",
+                        "ending",
+                        "continue-restored",
+                        "sample-catalog-exact",
+                        "acceptance-complete"
+                    ],
+    "screenshots":  [
+                        {
+                            "file":  "01-journal-cover-1920x1200.png",
+                            "bytes":  1292005,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "3800d0a3b089751d8edb754b3eed71de4379eb077415093c4c445121b4011495",
+                            "brightSampleRatio":  1,
+                            "luminanceRange":  227.84639999999996
+                        },
+                        {
+                            "file":  "02-journal-contents-1920x1200.png",
+                            "bytes":  2375119,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "a7dc38209eec5a16d8310c942d2531a2bff5b0fa860fa544b797a022c82dd87f",
+                            "brightSampleRatio":  0.96484375,
+                            "luminanceRange":  253.14959999999996
+                        },
+                        {
+                            "file":  "03-journal-hero-select-1920x1200.png",
+                            "bytes":  1415633,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "de17591f17ba3770f7984b087c877c4adf29b97c50a80a3404431e9490d32274",
+                            "brightSampleRatio":  1,
+                            "luminanceRange":  230.99999999999997
+                        },
+                        {
+                            "file":  "04-map-chapter-1-1920x1200.png",
+                            "bytes":  1376030,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "42d6bae07cbb40e676cfdf8155a0f6da4d6fda5ab359fbf12639f5252a85a7bc",
+                            "brightSampleRatio":  0.88064236111111116,
+                            "luminanceRange":  247.12599999999998
+                        },
+                        {
+                            "file":  "05-chapter-complete-1920x1200.png",
+                            "bytes":  600949,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "9d187081476044dbd7f314f294de61966487a45ed689d9a06a5d2a91be60c3d1",
+                            "brightSampleRatio":  0.58680555555555558,
+                            "luminanceRange":  254.21259999999998
+                        },
+                        {
+                            "file":  "06-ending-1920x1200.png",
+                            "bytes":  649538,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "cf90e553e75960b9f6fe080721d8562c73e3d4f811788e0925a64afc9b93f502",
+                            "brightSampleRatio":  0.60243055555555558,
+                            "luminanceRange":  254.21259999999998
+                        },
+                        {
+                            "file":  "07-continue-restored-1920x1200.png",
+                            "bytes":  649538,
+                            "width":  1920,
+                            "height":  1200,
+                            "sha256":  "cf90e553e75960b9f6fe080721d8562c73e3d4f811788e0925a64afc9b93f502",
+                            "brightSampleRatio":  0.60243055555555558,
+                            "luminanceRange":  254.21259999999998
+                        }
+                    ],
+    "isolatedSaveFiles":  [
+                              {
+                                  "file":  "profile-progress-v1.json",
+                                  "bytes":  682,
+                                  "sha256":  "4360e2ac3d69d48fcecf13c0cb01ab6267ad51bc9bfba8edfc269e98732f5a1a"
+                              },
+                              {
+                                  "file":  "profile-progress-v1.json.bak",
+                                  "bytes":  653,
+                                  "sha256":  "7a822bab449aa2f047830937dc1cd7b38956fceecba769da30882ebec3a40982"
+                              },
+                              {
+                                  "file":  "run-slot-v0.4.0-0.json",
+                                  "bytes":  36602,
+                                  "sha256":  "d836fb1825989347a57c8f39b19a94acb3558de9792c42f2b144a73c1439a41a"
+                              },
+                              {
+                                  "file":  "run-slot-v0.4.0-0.json.bak",
+                                  "bytes":  29359,
+                                  "sha256":  "5c377e6293ee7fd8385e7e3c70bf987538682bd3743fde178cfbc0c3c1311b1d"
+                              }
+                          ]
+}

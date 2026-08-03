@@ -1,0 +1,1031 @@
+{
+  "format": "spire-chess-run",
+  "schemaVersion": 2,
+  "contentVersion": "5.6.0",
+  "rulesVersion": "8B.1",
+  "configHash": "9ed1dbb542cffb31dab62aa339767bc4497ec7c858028cf36e3802c283646c7f",
+  "appVersion": "1.0",
+  "gitCommit": "",
+  "unityVersion": "2022.3.62f3c1",
+  "savedAtUtc": "2026-08-03T14:10:32.6265061Z",
+  "revision": 5,
+  "summary": {
+    "heroId": "warrior",
+    "heroName": "战士",
+    "mapId": "map_soulforge_city",
+    "mapName": "铸魂熔城",
+    "floor": 3,
+    "health": 20,
+    "maxHealth": 20,
+    "armor": 10,
+    "shopTurn": 12,
+    "phase": "MapSelection"
+  },
+  "payload": {
+    "runState": {
+      "seed": 940101,
+      "heroId": "warrior",
+      "floor": 3,
+      "shopTurn": 12,
+      "mapStep": 26,
+      "health": 20,
+      "maxHealth": 20,
+      "armor": 10,
+      "heroRuntime": {
+        "runStartApplied": true,
+        "processedShopStartTurns": [],
+        "processedShopEndTurns": [],
+        "lastShopStartTurn": 0,
+        "lastShopStartOutcome": "None",
+        "lastGrantedSpellId": "",
+        "lastShopEndTurn": 0,
+        "lastShopEndOutcome": "None",
+        "lastStolenMinionId": ""
+      },
+      "phase": "MapSelection",
+      "mapId": "map_soulforge_city",
+      "nodeStatuses": {
+        "f3_shop_start": "Reachable",
+        "f3_opening_normal": "Locked",
+        "f3_shop_2": "Locked",
+        "f3_normal": "Locked",
+        "f3_early_summon": "Locked",
+        "f3_shop_3": "Locked",
+        "f3_mid_mechanic": "Locked",
+        "f3_shop_4": "Locked",
+        "f3_elite": "Locked",
+        "f3_route_normal": "Locked",
+        "f3_route_safe": "Locked",
+        "f3_enhance": "Locked",
+        "f3_event": "Locked",
+        "f3_rest": "Locked",
+        "f3_shop_5": "Locked",
+        "f3_late_forge": "Locked",
+        "f3_late_wild": "Locked",
+        "f3_shop_boss": "Locked",
+        "f3_boss": "Locked"
+      },
+      "currentNodeId": null,
+      "currentAttempt": null,
+      "lastSettlement": null,
+      "lastRewardSummary": "",
+      "delayedShopResources": {
+        "goldBonus": 0,
+        "freeRefreshes": 0,
+        "upgradeDiscount": 0,
+        "lastAppliedRunTurn": 12
+      },
+      "pendingCardRewards": [],
+      "pendingRewardChoice": null,
+      "pendingRelicChoice": null,
+      "pendingEventChoice": null,
+      "pendingEnhanceChoice": null,
+      "pendingRestChoice": null,
+      "ownedRelics": [
+        {
+          "relicId": "crown_star_satchel",
+          "sourceType": "Boss",
+          "sourceId": "f1_c6_boss_encounter",
+          "acquiredFloor": 1,
+          "acquiredShopTurn": 6,
+          "shopProgress": 0,
+          "lastResolvedShopTurn": 12,
+          "activationCount": 6
+        },
+        {
+          "relicId": "crown_thousand_shields",
+          "sourceType": "Boss",
+          "sourceId": "f2_c6_boss_encounter",
+          "acquiredFloor": 2,
+          "acquiredShopTurn": 12,
+          "shopProgress": 0,
+          "lastResolvedShopTurn": 12,
+          "activationCount": 0
+        }
+      ],
+      "statistics": {
+        "startedAtUtc": "2026-08-03T14:10:30.5591597Z",
+        "completedAtUtc": null,
+        "battlesWon": 12,
+        "battlesNotWon": 0,
+        "elitesAttempted": 0,
+        "elitesDefeated": 0,
+        "bossAttempts": 2,
+        "bossesDefeated": 2,
+        "triplesFormed": 0,
+        "refreshesPaid": 0,
+        "refreshesFree": 0,
+        "minionsBought": 0,
+        "minionsSold": 0,
+        "spellsUsed": 0,
+        "tavernUpgrades": 0,
+        "goldWasted": 93,
+        "targetedDiscoversUsed": 0,
+        "firstCoreTurn": null,
+        "secondCoreTurn": null
+      }
+    },
+    "shopSession": {
+      "round": 12,
+      "gold": 0,
+      "tavernTier": 1,
+      "refreshCount": 0,
+      "freeRefreshes": 0,
+      "isShopOpen": false,
+      "isFrozen": false,
+      "upgradedThisRound": false,
+      "minionOfferIds": [
+        null,
+        null
+      ],
+      "spellOfferId": null,
+      "minionPoolRemainingCopies": {
+        "forge_soul_shield_squire": 8,
+        "hearth_core_spark": 8,
+        "copper_ring_apprentice": 8,
+        "young_deer_spirit": 8,
+        "rending_cub": 8,
+        "moss_mark_seedling": 8,
+        "stargazing_apprentice": 8,
+        "glimmer_mage": 8,
+        "stardust_attendant": 8,
+        "wandering_swordsman": 8,
+        "shieldwall_furnace_keeper": 7,
+        "shieldbreaker_blade_blank": 7,
+        "tempering_mender": 7,
+        "two_tailed_fox_spirit": 7,
+        "swiftwing_forest_hawk": 7,
+        "root_devourer": 7,
+        "moon_phase_scribe": 7,
+        "astrolabe_calibrator": 7,
+        "rune_ward_reader": 7,
+        "black_market_vendor": 7,
+        "oathblade_armor": 6,
+        "resonance_bell_guard": 6,
+        "molten_core_standard": 6,
+        "many_branch_invoker": 6,
+        "tuskherd_pathrunner": 6,
+        "ancient_moss_hatchling": 6,
+        "echo_starchanter": 6,
+        "star_map_broker": 6,
+        "fate_track_recorder": 6,
+        "old_tower_guide": 6,
+        "hearth_core_aegis_officer": 5,
+        "cracked_armor_avenger": 5,
+        "ringing_iron_bastion": 5,
+        "vinecrown_priest": 5,
+        "hundred_song_herd": 5,
+        "mountain_belly_soul_eater": 5,
+        "stargate_lecturer": 5,
+        "moonwheel_dispatcher": 5,
+        "falling_light_arbiter": 5,
+        "formation_breaker_mercenary": 5,
+        "undying_furnace_king": 4,
+        "oathbroken_blade_soul": 4,
+        "thousand_ring_tomb_guardian": 4,
+        "ancient_mountain_spirit": 4,
+        "ten_thousand_hoof_surge": 4,
+        "world_eating_final_bloom": 4,
+        "falling_star_prophet": 4,
+        "fate_shuffler": 4,
+        "sky_covenant_bearer": 4,
+        "royal_bounty_hunter": 4,
+        "ember_engraver": 7,
+        "counterflow_smith": 6,
+        "cinder_armor_arbiter": 5,
+        "rotleaf_heir": 7,
+        "rootbound_soul_guide": 6,
+        "fox_den_matriarch": 5,
+        "star_etched_timekeeper": 7,
+        "secret_page_refractor": 6,
+        "star_ring_treasurer": 5,
+        "traveling_physician": 8,
+        "mercenary_shieldbearer": 7,
+        "many_arts_apprentice": 6,
+        "pack_hunt_inspector": 5,
+        "mirrorsteel_duelist": 4
+      },
+      "bench": [
+        {
+          "instanceId": "shop_card_000001",
+          "cardType": "Spell",
+          "configId": "minor_tempering",
+          "isGolden": false,
+          "permanentAttackBonus": 0,
+          "permanentHealthBonus": 0,
+          "flourishAttackBonus": 0,
+          "permanentKeywords": [],
+          "tripleDiscoveryPending": false,
+          "expiresAtShopEnd": false,
+          "pendingCombatModifiers": []
+        },
+        {
+          "instanceId": "shop_card_000002",
+          "cardType": "Spell",
+          "configId": "minor_tempering",
+          "isGolden": false,
+          "permanentAttackBonus": 0,
+          "permanentHealthBonus": 0,
+          "flourishAttackBonus": 0,
+          "permanentKeywords": [],
+          "tripleDiscoveryPending": false,
+          "expiresAtShopEnd": false,
+          "pendingCombatModifiers": []
+        },
+        {
+          "instanceId": "shop_card_000003",
+          "cardType": "Spell",
+          "configId": "minor_tempering",
+          "isGolden": false,
+          "permanentAttackBonus": 0,
+          "permanentHealthBonus": 0,
+          "flourishAttackBonus": 0,
+          "permanentKeywords": [],
+          "tripleDiscoveryPending": false,
+          "expiresAtShopEnd": false,
+          "pendingCombatModifiers": []
+        },
+        {
+          "instanceId": "shop_card_000004",
+          "cardType": "Spell",
+          "configId": "minor_tempering",
+          "isGolden": false,
+          "permanentAttackBonus": 0,
+          "permanentHealthBonus": 0,
+          "flourishAttackBonus": 0,
+          "permanentKeywords": [],
+          "tripleDiscoveryPending": false,
+          "expiresAtShopEnd": false,
+          "pendingCombatModifiers": []
+        },
+        {
+          "instanceId": "shop_card_000005",
+          "cardType": "Spell",
+          "configId": "precise_training",
+          "isGolden": false,
+          "permanentAttackBonus": 0,
+          "permanentHealthBonus": 0,
+          "flourishAttackBonus": 0,
+          "permanentKeywords": [],
+          "tripleDiscoveryPending": false,
+          "expiresAtShopEnd": false,
+          "pendingCombatModifiers": []
+        }
+      ],
+      "battle": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "pendingDiscover": null,
+      "pendingChoice": null,
+      "activeShopEffects": [],
+      "perShopEffectUsage": {},
+      "pendingPostCombatBuffs": {},
+      "pendingBattleStartEffects": [],
+      "phaseStats": {
+        "refreshCount": 0,
+        "spellUsedCount": 0,
+        "spellBoughtCount": 0,
+        "minionBoughtCount": 0
+      },
+      "flourishStacks": 0,
+      "cardInstanceSequence": 5,
+      "roundsWithoutUpgradeAtCurrentTier": 12,
+      "pendingUpgradeDiscount": 0,
+      "scheduledGold": 0,
+      "ruleModifiers": {
+        "firstPurchaseFree": false,
+        "firstPaidRefreshFree": false,
+        "firstMinionSaleBonusGold": 0,
+        "extraBattlecryTriggers": 0
+      },
+      "firstPurchaseFreeAvailable": false,
+      "firstPaidRefreshFreeAvailable": false,
+      "firstMinionSaleBonusAvailable": false
+    },
+    "randomStreams": {
+      "shop": {
+        "seed": 1035634526,
+        "entries": [
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 31,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 66,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 2,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 70,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 26,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 1,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 47,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 13,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 1,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 43,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 33,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 2,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 10,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 56,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 1,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 38,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 19,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 36,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 14,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 2,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 28,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 68,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 28,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 60,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 2,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 29,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 63,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 57,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 71,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 2,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 24,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 82,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          }
+        ]
+      },
+      "reward": {
+        "seed": 633981418,
+        "entries": [
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 1,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          }
+        ]
+      },
+      "event": {
+        "seed": 525085728,
+        "entries": []
+      },
+      "hero": {
+        "seed": 757848880,
+        "entries": []
+      },
+      "relic": {
+        "seed": 1393769012,
+        "entries": [
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1562123916,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1198787321,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1408380267,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 82939946,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1398038794,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 360404044,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1339708453,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1909838786,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 1,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 2,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 0,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1500123263,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1354342376,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1590589989,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1083211622,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 669360686,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1511068165,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "Next",
+            "minimum": 0,
+            "maximum": 0,
+            "intResult": 1285486238,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          }
+        ]
+      }
+    },
+    "pendingBattle": null,
+    "lastBattleContext": {
+      "board": {
+        "player": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "enemy": [
+          {
+            "configId": "falling_light_arbiter",
+            "sourceInstanceId": null,
+            "runtimeInstanceId": null,
+            "isGolden": true,
+            "currentAttack": 11,
+            "currentHealth": 9,
+            "combatMaxHealth": 9,
+            "permanentAttackBonus": 1,
+            "permanentHealthBonus": 1,
+            "hasShield": false,
+            "keywords": [
+              "Cleave"
+            ],
+            "summonEffectMultiplier": 1
+          },
+          {
+            "configId": "secret_page_refractor",
+            "sourceInstanceId": null,
+            "runtimeInstanceId": null,
+            "isGolden": true,
+            "currentAttack": 7,
+            "currentHealth": 9,
+            "combatMaxHealth": 9,
+            "permanentAttackBonus": 1,
+            "permanentHealthBonus": 1,
+            "hasShield": true,
+            "keywords": [
+              "Shield"
+            ],
+            "summonEffectMultiplier": 1
+          },
+          {
+            "configId": "star_ring_treasurer",
+            "sourceInstanceId": null,
+            "runtimeInstanceId": null,
+            "isGolden": true,
+            "currentAttack": 8,
+            "currentHealth": 12,
+            "combatMaxHealth": 12,
+            "permanentAttackBonus": 0,
+            "permanentHealthBonus": 0,
+            "hasShield": true,
+            "keywords": [
+              "Shield"
+            ],
+            "summonEffectMultiplier": 1
+          },
+          {
+            "configId": "falling_star_prophet",
+            "sourceInstanceId": null,
+            "runtimeInstanceId": null,
+            "isGolden": true,
+            "currentAttack": 13,
+            "currentHealth": 13,
+            "combatMaxHealth": 13,
+            "permanentAttackBonus": 1,
+            "permanentHealthBonus": 1,
+            "hasShield": true,
+            "keywords": [
+              "Shield"
+            ],
+            "summonEffectMultiplier": 1
+          },
+          {
+            "configId": "sky_covenant_bearer",
+            "sourceInstanceId": null,
+            "runtimeInstanceId": null,
+            "isGolden": true,
+            "currentAttack": 9,
+            "currentHealth": 17,
+            "combatMaxHealth": 17,
+            "permanentAttackBonus": 1,
+            "permanentHealthBonus": 1,
+            "hasShield": false,
+            "keywords": [],
+            "summonEffectMultiplier": 1
+          }
+        ],
+        "battleStartEffects": [],
+        "ruleModifiers": {
+          "playerExtraDeathrattleTriggers": 0,
+          "playerFirstNonTokenDeathSummonCount": 0,
+          "playerFirstNonTokenDeathTokenId": null,
+          "playerFirstNonTokenDeathTokenAttack": 0,
+          "playerFirstNonTokenDeathTokenHealth": 0,
+          "playerBattleStartShieldTargets": 0,
+          "playerDistinctRaceStatBonus": 0
+        },
+        "playerFlourishStacks": 0,
+        "enemyFlourishStacks": 0
+      },
+      "encounterName": "星轨大司辰",
+      "returnScene": "Run",
+      "nodeAttemptId": "attempt_000026",
+      "encounterId": "f2_c6_boss_encounter",
+      "battleSeed": 364307512
+    },
+    "lastBattleResult": {
+      "finalBoard": {
+        "player": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "enemy": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "battleStartEffects": [],
+        "ruleModifiers": {
+          "playerExtraDeathrattleTriggers": 0,
+          "playerFirstNonTokenDeathSummonCount": 0,
+          "playerFirstNonTokenDeathTokenId": null,
+          "playerFirstNonTokenDeathTokenAttack": 0,
+          "playerFirstNonTokenDeathTokenHealth": 0,
+          "playerBattleStartShieldTargets": 0,
+          "playerDistinctRaceStatBonus": 0
+        },
+        "playerFlourishStacks": 0,
+        "enemyFlourishStacks": 0
+      },
+      "winner": "Player",
+      "outcomeReason": "Victory",
+      "log": []
+    },
+    "sequences": {
+      "attemptSequence": 26,
+      "rewardSequence": 13,
+      "choiceSequence": 0,
+      "relicChoiceSequence": 2,
+      "relicCandidateSequence": 6
+    },
+    "coreEvidence": {
+      "shieldEvents": 0,
+      "shieldBenefitEvents": 0,
+      "summonSuccesses": 0,
+      "nonTokenDeathBenefitEvents": 0,
+      "spellsUsed": 0,
+      "refreshes": 0
+    },
+    "turnTenSnapshotRecorded": true,
+    "runEndedRecorded": false
+  },
+  "payloadSha256": "e10d1205a92ab49a5dcc712ea554935a38782c420f7742a72b8f54cb0aea4308"
+}

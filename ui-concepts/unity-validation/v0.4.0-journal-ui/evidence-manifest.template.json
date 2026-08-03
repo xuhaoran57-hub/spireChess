@@ -7,7 +7,10 @@
   "generatedAtUtc": "<ISO-8601>",
   "commands": {
     "tests": "tools/run_unity_tests.ps1 -Platform All ...",
-    "player": "tools/run_g4_acceptance.ps1 -JournalUi ..."
+    "build": "tools/build_g4_windows.ps1 -CleanBuild ...",
+    "corePlayer": "tools/run_g4_acceptance_matrix.ps1 ...",
+    "journalPlayer1080": "tools/run_g4_acceptance.ps1 -JournalUi -Resolution 1920x1080 ...",
+    "journalPlayer1200": "tools/run_g4_acceptance.ps1 -JournalUi -Resolution 1920x1200 ..."
   },
   "playerFixture": {
     "id": "journal-fixture-v1",
@@ -19,6 +22,20 @@
     "failed": 0,
     "skipped": 0,
     "inconclusive": 0
+  },
+  "build": {
+    "buildId": "<required>",
+    "manifest": "build/g4-build-manifest.json",
+    "manifestSha256": "<required>",
+    "playerSha256": "<required>",
+    "cleanBuild": true,
+    "result": "Succeeded"
+  },
+  "coreMatrix": {
+    "summary": "core-matrix/g4-matrix-summary.json",
+    "summarySha256": "<required>",
+    "runCount": 2,
+    "runtimeFailureLogCount": 0
   },
   "playerRuns": [
     {
@@ -36,5 +53,10 @@
     "engineering": "pending",
     "visual": "pending",
     "playerFlow": "pending"
+  },
+  "scopeBoundary": {
+    "cleanPlayerChain": "pending",
+    "v40Qa04BalanceS0": "open",
+    "ac12": "open"
   }
 }

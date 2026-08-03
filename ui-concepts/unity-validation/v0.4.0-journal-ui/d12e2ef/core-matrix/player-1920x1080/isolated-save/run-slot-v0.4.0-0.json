@@ -1,0 +1,452 @@
+{
+  "format": "spire-chess-run",
+  "schemaVersion": 2,
+  "contentVersion": "5.6.0",
+  "rulesVersion": "8B.1",
+  "configHash": "9ed1dbb542cffb31dab62aa339767bc4497ec7c858028cf36e3802c283646c7f",
+  "appVersion": "1.0",
+  "gitCommit": "",
+  "unityVersion": "2022.3.62f3c1",
+  "savedAtUtc": "2026-08-03T14:09:22.2598917Z",
+  "revision": 10,
+  "summary": {
+    "heroId": "warrior",
+    "heroName": "战士",
+    "mapId": "map_wilderness",
+    "mapName": "荒野",
+    "floor": 1,
+    "health": 20,
+    "maxHealth": 20,
+    "armor": 9,
+    "shopTurn": 1,
+    "phase": "MapSelection"
+  },
+  "payload": {
+    "runState": {
+      "seed": 940101,
+      "heroId": "warrior",
+      "floor": 1,
+      "shopTurn": 1,
+      "mapStep": 2,
+      "health": 20,
+      "maxHealth": 20,
+      "armor": 9,
+      "heroRuntime": {
+        "runStartApplied": true,
+        "processedShopStartTurns": [],
+        "processedShopEndTurns": [],
+        "lastShopStartTurn": 0,
+        "lastShopStartOutcome": "None",
+        "lastGrantedSpellId": "",
+        "lastShopEndTurn": 0,
+        "lastShopEndOutcome": "None",
+        "lastStolenMinionId": ""
+      },
+      "phase": "MapSelection",
+      "mapId": "map_wilderness",
+      "nodeStatuses": {
+        "f1_shop_start": "Resolved",
+        "f1_opening_normal": "Resolved",
+        "f1_shop_2": "Reachable",
+        "f1_safe_normal": "Locked",
+        "f1_early_summon": "Locked",
+        "f1_shop_3": "Locked",
+        "f1_mid_mechanic": "Locked",
+        "f1_shop_4": "Locked",
+        "f1_elite_wall": "Locked",
+        "f1_route_normal": "Locked",
+        "f1_route_safe": "Locked",
+        "f1_enhance": "Locked",
+        "f1_event": "Locked",
+        "f1_rest": "Locked",
+        "f1_shop_5": "Locked",
+        "f1_late_shield": "Locked",
+        "f1_late_summon": "Locked",
+        "f1_shop_boss": "Locked",
+        "f1_boss": "Locked"
+      },
+      "currentNodeId": "f1_opening_normal",
+      "currentAttempt": {
+        "nodeAttemptId": "attempt_000002",
+        "nodeId": "f1_opening_normal",
+        "nodeType": "Normal",
+        "contentId": "f1_opening_encounter",
+        "encounterId": "f1_opening_encounter",
+        "runTurn": 1,
+        "runTurnCommitted": true,
+        "economyTurnCommitted": false,
+        "contentGenerated": true,
+        "choiceCommitted": false,
+        "effectApplied": false,
+        "battleSettled": true,
+        "healthDamageApplied": true,
+        "rewardGenerated": true,
+        "relicGenerated": false,
+        "relicVictoryEffectsApplied": false,
+        "nodeResolved": true
+      },
+      "lastSettlement": {
+        "playerWon": false,
+        "damage": 1,
+        "survivingEnemies": 0,
+        "highestEnemyTier": 0,
+        "nodeDamageBonus": 0,
+        "outcomeReason": "MutualElimination",
+        "armorAbsorbed": 1,
+        "healthDamage": 0
+      },
+      "lastRewardSummary": "",
+      "delayedShopResources": {
+        "goldBonus": 0,
+        "freeRefreshes": 0,
+        "upgradeDiscount": 0,
+        "lastAppliedRunTurn": 1
+      },
+      "pendingCardRewards": [],
+      "pendingRewardChoice": null,
+      "pendingRelicChoice": null,
+      "pendingEventChoice": null,
+      "pendingEnhanceChoice": null,
+      "pendingRestChoice": null,
+      "ownedRelics": [],
+      "statistics": {
+        "startedAtUtc": "2026-08-03T14:09:11.8277864Z",
+        "completedAtUtc": null,
+        "battlesWon": 0,
+        "battlesNotWon": 1,
+        "elitesAttempted": 0,
+        "elitesDefeated": 0,
+        "bossAttempts": 0,
+        "bossesDefeated": 0,
+        "triplesFormed": 0,
+        "refreshesPaid": 0,
+        "refreshesFree": 0,
+        "minionsBought": 1,
+        "minionsSold": 0,
+        "spellsUsed": 0,
+        "tavernUpgrades": 0,
+        "goldWasted": 0,
+        "targetedDiscoversUsed": 0,
+        "firstCoreTurn": 1,
+        "secondCoreTurn": null
+      }
+    },
+    "shopSession": {
+      "round": 1,
+      "gold": 0,
+      "tavernTier": 1,
+      "refreshCount": 0,
+      "freeRefreshes": 0,
+      "isShopOpen": false,
+      "isFrozen": false,
+      "upgradedThisRound": false,
+      "minionOfferIds": [
+        null,
+        null
+      ],
+      "spellOfferId": null,
+      "minionPoolRemainingCopies": {
+        "forge_soul_shield_squire": 8,
+        "hearth_core_spark": 8,
+        "copper_ring_apprentice": 8,
+        "young_deer_spirit": 7,
+        "rending_cub": 8,
+        "moss_mark_seedling": 8,
+        "stargazing_apprentice": 8,
+        "glimmer_mage": 8,
+        "stardust_attendant": 8,
+        "wandering_swordsman": 8,
+        "shieldwall_furnace_keeper": 7,
+        "shieldbreaker_blade_blank": 7,
+        "tempering_mender": 7,
+        "two_tailed_fox_spirit": 7,
+        "swiftwing_forest_hawk": 7,
+        "root_devourer": 7,
+        "moon_phase_scribe": 7,
+        "astrolabe_calibrator": 7,
+        "rune_ward_reader": 7,
+        "black_market_vendor": 7,
+        "oathblade_armor": 6,
+        "resonance_bell_guard": 6,
+        "molten_core_standard": 6,
+        "many_branch_invoker": 6,
+        "tuskherd_pathrunner": 6,
+        "ancient_moss_hatchling": 6,
+        "echo_starchanter": 6,
+        "star_map_broker": 6,
+        "fate_track_recorder": 6,
+        "old_tower_guide": 6,
+        "hearth_core_aegis_officer": 5,
+        "cracked_armor_avenger": 5,
+        "ringing_iron_bastion": 5,
+        "vinecrown_priest": 5,
+        "hundred_song_herd": 5,
+        "mountain_belly_soul_eater": 5,
+        "stargate_lecturer": 5,
+        "moonwheel_dispatcher": 5,
+        "falling_light_arbiter": 5,
+        "formation_breaker_mercenary": 5,
+        "undying_furnace_king": 4,
+        "oathbroken_blade_soul": 4,
+        "thousand_ring_tomb_guardian": 4,
+        "ancient_mountain_spirit": 4,
+        "ten_thousand_hoof_surge": 4,
+        "world_eating_final_bloom": 4,
+        "falling_star_prophet": 4,
+        "fate_shuffler": 4,
+        "sky_covenant_bearer": 4,
+        "royal_bounty_hunter": 4,
+        "ember_engraver": 7,
+        "counterflow_smith": 6,
+        "cinder_armor_arbiter": 5,
+        "rotleaf_heir": 7,
+        "rootbound_soul_guide": 6,
+        "fox_den_matriarch": 5,
+        "star_etched_timekeeper": 7,
+        "secret_page_refractor": 6,
+        "star_ring_treasurer": 5,
+        "traveling_physician": 8,
+        "mercenary_shieldbearer": 7,
+        "many_arts_apprentice": 6,
+        "pack_hunt_inspector": 5,
+        "mirrorsteel_duelist": 4
+      },
+      "bench": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "battle": [
+        {
+          "instanceId": "shop_card_000001",
+          "cardType": "Minion",
+          "configId": "young_deer_spirit",
+          "isGolden": false,
+          "permanentAttackBonus": 0,
+          "permanentHealthBonus": 0,
+          "flourishAttackBonus": 0,
+          "permanentKeywords": [],
+          "tripleDiscoveryPending": false,
+          "expiresAtShopEnd": false,
+          "pendingCombatModifiers": []
+        },
+        null,
+        null,
+        null,
+        null
+      ],
+      "pendingDiscover": null,
+      "pendingChoice": null,
+      "activeShopEffects": [],
+      "perShopEffectUsage": {},
+      "pendingPostCombatBuffs": {},
+      "pendingBattleStartEffects": [],
+      "phaseStats": {
+        "refreshCount": 0,
+        "spellUsedCount": 0,
+        "spellBoughtCount": 0,
+        "minionBoughtCount": 1
+      },
+      "flourishStacks": 0,
+      "cardInstanceSequence": 1,
+      "roundsWithoutUpgradeAtCurrentTier": 1,
+      "pendingUpgradeDiscount": 0,
+      "scheduledGold": 0,
+      "ruleModifiers": {
+        "firstPurchaseFree": false,
+        "firstPaidRefreshFree": false,
+        "firstMinionSaleBonusGold": 0,
+        "extraBattlecryTriggers": 0
+      },
+      "firstPurchaseFreeAvailable": false,
+      "firstPaidRefreshFreeAvailable": false,
+      "firstMinionSaleBonusAvailable": false
+    },
+    "randomStreams": {
+      "shop": {
+        "seed": 1035634526,
+        "entries": [
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 88,
+            "intResult": 31,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 87,
+            "intResult": 66,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          },
+          {
+            "operation": "NextMax",
+            "minimum": 0,
+            "maximum": 3,
+            "intResult": 2,
+            "doubleResult": 0.0,
+            "bytesResult": null
+          }
+        ]
+      },
+      "reward": {
+        "seed": 633981418,
+        "entries": []
+      },
+      "event": {
+        "seed": 525085728,
+        "entries": []
+      },
+      "hero": {
+        "seed": 757848880,
+        "entries": []
+      },
+      "relic": {
+        "seed": 1393769012,
+        "entries": []
+      }
+    },
+    "pendingBattle": null,
+    "lastBattleContext": {
+      "board": {
+        "player": [
+          {
+            "configId": "young_deer_spirit",
+            "sourceInstanceId": "shop_card_000001",
+            "runtimeInstanceId": "shop_card_000001",
+            "isGolden": false,
+            "currentAttack": 1,
+            "currentHealth": 1,
+            "combatMaxHealth": 1,
+            "permanentAttackBonus": 0,
+            "permanentHealthBonus": 0,
+            "hasShield": false,
+            "keywords": [
+              "Deathrattle"
+            ],
+            "summonEffectMultiplier": 1
+          },
+          null,
+          null,
+          null,
+          null
+        ],
+        "enemy": [
+          {
+            "configId": "young_deer_spirit",
+            "sourceInstanceId": null,
+            "runtimeInstanceId": null,
+            "isGolden": false,
+            "currentAttack": 1,
+            "currentHealth": 1,
+            "combatMaxHealth": 1,
+            "permanentAttackBonus": 0,
+            "permanentHealthBonus": 0,
+            "hasShield": false,
+            "keywords": [
+              "Deathrattle"
+            ],
+            "summonEffectMultiplier": 1
+          },
+          null,
+          null,
+          null,
+          null
+        ],
+        "battleStartEffects": [],
+        "ruleModifiers": {
+          "playerExtraDeathrattleTriggers": 0,
+          "playerFirstNonTokenDeathSummonCount": 0,
+          "playerFirstNonTokenDeathTokenId": null,
+          "playerFirstNonTokenDeathTokenAttack": 0,
+          "playerFirstNonTokenDeathTokenHealth": 0,
+          "playerBattleStartShieldTargets": 0,
+          "playerDistinctRaceStatBonus": 0
+        },
+        "playerFlourishStacks": 0,
+        "enemyFlourishStacks": 0
+      },
+      "encounterName": "幼灵初啼",
+      "returnScene": "Run",
+      "nodeAttemptId": "attempt_000002",
+      "encounterId": "f1_opening_encounter",
+      "battleSeed": 1638225429
+    },
+    "lastBattleResult": {
+      "finalBoard": {
+        "player": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "enemy": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "battleStartEffects": [],
+        "ruleModifiers": {
+          "playerExtraDeathrattleTriggers": 0,
+          "playerFirstNonTokenDeathSummonCount": 0,
+          "playerFirstNonTokenDeathTokenId": null,
+          "playerFirstNonTokenDeathTokenAttack": 0,
+          "playerFirstNonTokenDeathTokenHealth": 0,
+          "playerBattleStartShieldTargets": 0,
+          "playerDistinctRaceStatBonus": 0
+        },
+        "playerFlourishStacks": 0,
+        "enemyFlourishStacks": 0
+      },
+      "winner": null,
+      "outcomeReason": "MutualElimination",
+      "log": [
+        "战斗开始。",
+        "第 1 轮。",
+        "玩家 幼鹿灵 攻击 幼鹿灵。",
+        "幼鹿灵 受到 1 点伤害，剩余生命 0。",
+        "幼鹿灵 死亡。",
+        "幼鹿灵 受到 1 点伤害，剩余生命 0。",
+        "幼鹿灵 死亡。",
+        "幼鹿灵 从 1 号位移除。",
+        "幼鹿灵 从 1 号位移除。",
+        "幼鹿灵 在 1 号位召唤了 幼灵。",
+        "幼鹿灵 在 1 号位召唤了 幼灵。",
+        "敌方 幼灵 攻击 幼灵。",
+        "幼灵 受到 1 点伤害，剩余生命 0。",
+        "幼灵 死亡。",
+        "幼灵 受到 1 点伤害，剩余生命 0。",
+        "幼灵 死亡。",
+        "幼灵 从 1 号位移除。",
+        "幼灵 从 1 号位移除。",
+        "双方同时倒下，战斗平局。"
+      ]
+    },
+    "sequences": {
+      "attemptSequence": 2,
+      "rewardSequence": 0,
+      "choiceSequence": 0,
+      "relicChoiceSequence": 0,
+      "relicCandidateSequence": 0
+    },
+    "coreEvidence": {
+      "shieldEvents": 0,
+      "shieldBenefitEvents": 0,
+      "summonSuccesses": 1,
+      "nonTokenDeathBenefitEvents": 0,
+      "spellsUsed": 0,
+      "refreshes": 0
+    },
+    "turnTenSnapshotRecorded": false,
+    "runEndedRecorded": false
+  },
+  "payloadSha256": "dbf9a1b17e4845295a0cfdcfd9b1b6b9505f28a0c234c3b07a56d044ce0bb8f5"
+}

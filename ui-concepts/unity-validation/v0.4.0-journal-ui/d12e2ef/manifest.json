@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "spire-chess-v0.4.0-journal-evidence-v1",
+  "candidateCommit": "d12e2ef0c528a697a4b57fa73f101dfe3059c6c5",
+  "candidateBranch": "codex/v040-clean-player",
+  "sourceTreeDirty": false,
+  "unityVersion": "2022.3.62f3c1",
+  "configHash": "9ed1dbb542cffb31dab62aa339767bc4497ec7c858028cf36e3802c283646c7f",
+  "generatedAtUtc": "2026-08-03T14:15:25.7526281Z",
+  "commands": {
+    "tests": "tools/run_unity_tests.ps1 -Platform All -UnityPath \"C:\\Program Files\\Unity\\Hub\\Editor\\2022.3.62f3c1\\Editor\\Unity.exe\" -ResultsDirectory \".\\sc\\Logs\\TestResults\\d12e2ef-clean-player\" -TimeoutSeconds 1800 -StartupTimeoutSeconds 120 -NoProgressTimeoutSeconds 300",
+    "build": "tools/build_g4_windows.ps1 -BuildId d12e2ef-clean-player -CleanBuild -UnityPath \"C:\\Program Files\\Unity\\Hub\\Editor\\2022.3.62f3c1\\Editor\\Unity.exe\" -TimeoutSeconds 3600 -StartupTimeoutSeconds 120 -NoProgressTimeoutSeconds 300",
+    "corePlayer": "tools/run_g4_acceptance_matrix.ps1 -PlayerPath \".\\sc\\Builds\\G4\\d12e2ef-clean-player\\Windows-x64\\SpireChess.exe\" -OutputDirectory \".\\sc\\Logs\\G4\\Acceptance\\d12e2ef-core\" -TimeoutSeconds 300",
+    "journalPlayer1080": "tools/run_g4_acceptance.ps1 -JournalUi -PlayerPath \".\\sc\\Builds\\G4\\d12e2ef-clean-player\\Windows-x64\\SpireChess.exe\" -OutputDirectory \".\\ui-concepts\\unity-validation\\v0.4.0-journal-ui\\d12e2ef\" -RunId player-1920x1080 -Resolution 1920x1080 -TimeoutSeconds 300 -StartupTimeoutSeconds 60 -NoProgressTimeoutSeconds 120",
+    "journalPlayer1200": "tools/run_g4_acceptance.ps1 -JournalUi -PlayerPath \".\\sc\\Builds\\G4\\d12e2ef-clean-player\\Windows-x64\\SpireChess.exe\" -OutputDirectory \".\\ui-concepts\\unity-validation\\v0.4.0-journal-ui\\d12e2ef\" -RunId player-1920x1200 -Resolution 1920x1200 -TimeoutSeconds 300 -StartupTimeoutSeconds 60 -NoProgressTimeoutSeconds 120"
+  },
+  "playerFixture": {
+    "id": "journal-fixture-v1",
+    "scope": "RunSession prepares chapter boundaries; visible selection, page actions, relic selection, return and continue use formal Player UI.",
+    "manualFullRun": false
+  },
+  "testResults": {
+    "editModeXml": "tests/EditMode-results.xml",
+    "editModeXmlSha256": "fce651ba5ec39689443dfa40b8adb8775ca47221b43466f39f1bd7a58dc776b9",
+    "editModeLog": "tests/EditMode.log",
+    "editModeLogSha256": "ae7062efaae2e4aa717db7b490f646f90cecc8417822c52ddceaef7cad072654",
+    "editModeTotal": 458,
+    "editModePassed": 458,
+    "editModeDurationSeconds": 70.8214922,
+    "playModeXml": "tests/PlayMode-results.xml",
+    "playModeXmlSha256": "190f7f1df464c013e97662d7ad3c687cafe3404dc4aa60b9dcc8d2cb66293057",
+    "playModeLog": "tests/PlayMode.log",
+    "playModeLogSha256": "bc1e7ffdcec202e0762fc9116ed2f6b742fcd6a52a6993a6d45c15374a61fb45",
+    "playModeTotal": 30,
+    "playModePassed": 30,
+    "playModeDurationSeconds": 34.9109922,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0,
+    "forcedShutdown": false
+  },
+  "build": {
+    "buildId": "d12e2ef-clean-player",
+    "manifest": "build/g4-build-manifest.json",
+    "manifestSha256": "224fbeb7cba021e4c8e4edb00b9307bcbdadc07e2b8731b14c87bee5e273e9fd",
+    "log": "build/G4-Windows-Build-d12e2ef-clean-player.log",
+    "logSha256": "9b1386e9c73e748d8b1826d9411cdba63b98f0c3a1a4a30e148b7dc444113539",
+    "playerSha256": "fa01ccdbaa5f74c777609235b99ba8988285b2bf0754445e85bba268b2e61eb7",
+    "cleanBuild": true,
+    "result": "Succeeded"
+  },
+  "coreMatrix": {
+    "summary": "core-matrix/g4-matrix-summary.json",
+    "summarySha256": "de5810322b5ccb66958810b9cd49a20e41c9296c1c38dcb7b6340f33cfe29fd5",
+    "runsCsv": "core-matrix/g4-matrix-runs.csv",
+    "runsCsvSha256": "cd90ae6e821179839f3e390d619b84b5c39e886d73324ced868e08796390c04c",
+    "runCount": 2,
+    "screenshotsPerRun": 16,
+    "runtimeFailureLogCount": 0,
+    "runs": [
+      {
+        "resolution": "1920x1080",
+        "evidencePath": "core-matrix/player-1920x1080",
+        "manifestSha256": "91da73db387e1849f3ce154818c9c70af045619b657c31c3c7766a5e50b6ec1b",
+        "playerLogSha256": "2a8336094a66e796a04f971224ccee1bd9a223c28dd891b5edf9410de48647a8",
+        "completionStatus": "AcceptancePassed"
+      },
+      {
+        "resolution": "1920x1200",
+        "evidencePath": "core-matrix/player-1920x1200",
+        "manifestSha256": "55eaa6b33ac308a96658e4c9154380b080771a20b046b8f2c7453fcce664ad61",
+        "playerLogSha256": "e5c9879b447bd3b9043cf7cbffc35d7ca4848ed6c1f0c4920513779e3dddd52b",
+        "completionStatus": "AcceptancePassed"
+      }
+    ]
+  },
+  "playerRuns": [
+    {
+      "resolution": "1920x1080",
+      "evidencePath": "player-1920x1080",
+      "manifest": "player-1920x1080/g4-evidence-manifest.json",
+      "manifestSha256": "9ada5c77e94755d0393653c367afbd2d5dd39793a109c2e43b1addfd0ccd3443",
+      "playerLogSha256": "a15fc9ccdc31030559ee72427cdf3e19864e4e3e037c84838cd21f93b7246078",
+      "completionStatus": "AcceptancePassed",
+      "runtimeFailureLogCount": 0,
+      "screenshots": [
+        {
+          "file": "screenshots/01-journal-cover-1920x1080.png",
+          "sha256": "ac05cab4bc2ffb35ba258b0d19e9aa1644aa0b1e1da3c90bf8c5a15f6c6ce70c"
+        },
+        {
+          "file": "screenshots/02-journal-contents-1920x1080.png",
+          "sha256": "499aed409fa687bfda6ad42b219a6a3a0a399fb424557457158b077ed38f628c"
+        },
+        {
+          "file": "screenshots/03-journal-hero-select-1920x1080.png",
+          "sha256": "736aebde5cb508ed0d5019c265f0073a1e056d69b8a067e826ed82c3b31b9e9e"
+        },
+        {
+          "file": "screenshots/04-map-chapter-1-1920x1080.png",
+          "sha256": "98eeb30d2877e04c763a47163819347188c16069ca6d3ddfba7406fed6c67851"
+        },
+        {
+          "file": "screenshots/05-chapter-complete-1920x1080.png",
+          "sha256": "2c7ce9af6f5a6c0bba1b1b92c81506da39d2ba805e6d8f15b1cf061963e410b2"
+        },
+        {
+          "file": "screenshots/06-ending-1920x1080.png",
+          "sha256": "c158418669ed31c904986bb5c0de416280a6c87b96c19883446e9e9ce904821f"
+        },
+        {
+          "file": "screenshots/07-continue-restored-1920x1080.png",
+          "sha256": "c158418669ed31c904986bb5c0de416280a6c87b96c19883446e9e9ce904821f"
+        }
+      ]
+    },
+    {
+      "resolution": "1920x1200",
+      "evidencePath": "player-1920x1200",
+      "manifest": "player-1920x1200/g4-evidence-manifest.json",
+      "manifestSha256": "4218a0a1919f1db9e6eebf1e9f19fded8cb7537d1869740d4af0cb24d20980e1",
+      "playerLogSha256": "f4570bf6b92584c83bc0f17790bdb99fc7714e84a4dd9e76bca409b2a50085eb",
+      "completionStatus": "AcceptancePassed",
+      "runtimeFailureLogCount": 0,
+      "screenshots": [
+        {
+          "file": "screenshots/01-journal-cover-1920x1200.png",
+          "sha256": "3800d0a3b089751d8edb754b3eed71de4379eb077415093c4c445121b4011495"
+        },
+        {
+          "file": "screenshots/02-journal-contents-1920x1200.png",
+          "sha256": "a7dc38209eec5a16d8310c942d2531a2bff5b0fa860fa544b797a022c82dd87f"
+        },
+        {
+          "file": "screenshots/03-journal-hero-select-1920x1200.png",
+          "sha256": "de17591f17ba3770f7984b087c877c4adf29b97c50a80a3404431e9490d32274"
+        },
+        {
+          "file": "screenshots/04-map-chapter-1-1920x1200.png",
+          "sha256": "42d6bae07cbb40e676cfdf8155a0f6da4d6fda5ab359fbf12639f5252a85a7bc"
+        },
+        {
+          "file": "screenshots/05-chapter-complete-1920x1200.png",
+          "sha256": "9d187081476044dbd7f314f294de61966487a45ed689d9a06a5d2a91be60c3d1"
+        },
+        {
+          "file": "screenshots/06-ending-1920x1200.png",
+          "sha256": "cf90e553e75960b9f6fe080721d8562c73e3d4f811788e0925a64afc9b93f502"
+        },
+        {
+          "file": "screenshots/07-continue-restored-1920x1200.png",
+          "sha256": "cf90e553e75960b9f6fe080721d8562c73e3d4f811788e0925a64afc9b93f502"
+        }
+      ]
+    }
+  ],
+  "review": {
+    "engineering": "passed",
+    "visual": "passed-by-codex-screen-review",
+    "playerFlow": "passed",
+    "reviewedAtUtc": "2026-08-03T14:15:25.7526281Z",
+    "notes": "Reviewed all 32 core and 14 journal source screenshots at both resolutions. No clipping, occlusion, missing artwork, unreadable primary text, or inconsistent restored state was found."
+  },
+  "scopeBoundary": {
+    "cleanPlayerChain": "closed",
+    "v40Qa04BalanceS0": "open",
+    "ac12": "open",
+    "externalAssetLicenseSignoff": "open",
+    "secondMachinePerformanceAndExternalPlaytest": "open"
+  }
+}

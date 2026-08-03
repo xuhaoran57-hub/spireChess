@@ -1,0 +1,19 @@
+{
+  "format": "travel-journal-profile",
+  "schemaVersion": 1,
+  "savedAtUtc": "2026-08-03T14:09:09.9237476Z",
+  "revision": 1,
+  "progress": {
+    "schemaVersion": 1,
+    "lastWrittenVersion": "0.4.0",
+    "unlockedHeroIds": [
+      "warrior"
+    ],
+    "defeatedChapterBossIds": [],
+    "unreadUnlockNotifications": [],
+    "legacyV033ArchiveCompleted": false,
+    "legacyV033ArchiveRelativePath": "",
+    "legacyV033ArchiveNoticePending": false
+  },
+  "progressSha256": "93609be5adeb7689eb0cb9964966c985fee817bb5b23be78dc4d11a40a52f8fb"
+}

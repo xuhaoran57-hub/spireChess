@@ -1,0 +1,24 @@
+{
+  "format": "travel-journal-profile",
+  "schemaVersion": 1,
+  "savedAtUtc": "2026-08-03T14:10:09.3101006Z",
+  "revision": 5,
+  "progress": {
+    "schemaVersion": 1,
+    "lastWrittenVersion": "0.4.0",
+    "unlockedHeroIds": [
+      "warrior",
+      "mage",
+      "rogue"
+    ],
+    "defeatedChapterBossIds": [
+      "map_wilderness",
+      "map_startrail_highlands"
+    ],
+    "unreadUnlockNotifications": [],
+    "legacyV033ArchiveCompleted": false,
+    "legacyV033ArchiveRelativePath": "",
+    "legacyV033ArchiveNoticePending": false
+  },
+  "progressSha256": "bf03f8c14cd4a076e14f4e1740b820fc0d57e90b778648f0ba2ef76c1ca959c8"
+}

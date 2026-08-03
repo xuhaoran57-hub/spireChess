@@ -1,0 +1,774 @@
+Mono path[0] = 'D:/code/spireChess/spireChess/sc/Builds/G4/d12e2ef-clean-player/Windows-x64/SpireChess_Data/Managed'
+Mono config path = 'D:/code/spireChess/spireChess/sc/Builds/G4/d12e2ef-clean-player/Windows-x64/MonoBleedingEdge/etc'
+Found 2 interfaces on host : 0) 192.168.1.3 1) 198.18.0.1
+Player connection [10348]  Target information:
+
+Player connection [10348]  * "[IP] 192.168.1.3 [Port] 55000 [Flags] 2 [Guid] 2425571162 [EditorId] 1617642123 [Version] 1048832 [Id] WindowsPlayer(2,DESKTOP-453378L) [Debug] 0 [PackageName] WindowsPlayer [ProjectName] SpireChess G4 Acceptance" 
+
+Player connection [10348]  * "[IP] 198.18.0.1 [Port] 55000 [Flags] 2 [Guid] 2425571162 [EditorId] 1617642123 [Version] 1048832 [Id] WindowsPlayer(2,DESKTOP-453378L) [Debug] 0 [PackageName] WindowsPlayer [ProjectName] SpireChess G4 Acceptance" 
+
+Player connection [10348] Started UDP target info broadcast (1) on [225.0.0.222:54997].
+
+Input System module state changed to: Initialized.
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+Initialize engine version: 2022.3.62f3c1 (1623fc0bbb97)
+[Subsystems] Discovering subsystems at path D:/code/spireChess/spireChess/sc/Builds/G4/d12e2ef-clean-player/Windows-x64/SpireChess_Data/UnitySubsystems
+GfxDevice: creating device client; threaded=1; jobified=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 5070 (ID=0x2f04)
+    Vendor:   NVIDIA
+    VRAM:     11944 MB
+    Driver:   32.0.15.9186
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.099 seconds
+- Finished resetting the current domain, in  0.001 seconds
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 2.741300 ms
+[G4] Performance collection started. runId=20260803-140906-DESKTOP-453378L-1920x1080-r01, output=D:\code\spireChess\spireChess\sc\Logs\G4\Acceptance\d12e2ef-core\20260803-140906-DESKTOP-453378L-1920x1080-r01\performance, saveRoot=D:\code\spireChess\spireChess\sc\Logs\G4\Acceptance\d12e2ef-core\20260803-140906-DESKTOP-453378L-1920x1080-r01\isolated-save.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Diagnostics.G4PerformanceCollector:ConfigureRun () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PerformanceCollector.cs:504)
+SpireChess.Diagnostics.G4PerformanceCollector:Awake () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PerformanceCollector.cs:220)
+UnityEngine.GameObject:AddComponent (System.Type) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:240)
+UnityEngine.GameObject:AddComponent<SpireChess.Diagnostics.G4PerformanceCollector> () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:245)
+SpireChess.Diagnostics.G4PerformanceCollector:Bootstrap () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PerformanceCollector.cs:207)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PerformanceCollector.cs Line: 504)
+
+[Config] Validation passed.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.GameApp:LogValidation (SpireChess.Config.ConfigValidationResult) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:406)
+SpireChess.App.GameApp:Initialize () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:90)
+SpireChess.App.GameApp:Awake () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:61)
+UnityEngine.GameObject:AddComponent (System.Type) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:240)
+UnityEngine.GameObject:AddComponent<SpireChess.App.GameApp> () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:245)
+SpireChess.App.GameApp:Bootstrap () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:45)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs Line: 406)
+
+[G4] Isolated run-save root: D:\code\spireChess\spireChess\sc\Logs\G4\Acceptance\d12e2ef-core\20260803-140906-DESKTOP-453378L-1920x1080-r01\isolated-save
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.GameApp:ResolveSaveRootPath () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:181)
+SpireChess.App.GameApp:Initialize () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:92)
+SpireChess.App.GameApp:Awake () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:61)
+UnityEngine.GameObject:AddComponent (System.Type) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:240)
+UnityEngine.GameObject:AddComponent<SpireChess.App.GameApp> () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:245)
+SpireChess.App.GameApp:Bootstrap () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:45)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs Line: 181)
+
+[GameApp] Ready. Loaded 67 minions (3 tokens) and 16 spells. config=9ed1dbb542cffb31dab62aa339767bc4497ec7c858028cf36e3802c283646c7f.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.GameApp:Initialize () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:151)
+SpireChess.App.GameApp:Awake () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:61)
+UnityEngine.GameObject:AddComponent (System.Type) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:240)
+UnityEngine.GameObject:AddComponent<SpireChess.App.GameApp> () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/GameObject.bindings.cs:245)
+SpireChess.App.GameApp:Bootstrap () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:45)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs Line: 151)
+
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 0.253200 ms
+Unloading 13 unused Assets / (Unknown). Loaded Objects now: 2061.
+Memory consumption went from 67.2 MB to 67.3 MB.
+Total: 1.359400 ms (FindLiveObjects: 0.098400 ms CreateObjectMapping: 0.029800 ms MarkObjects: 1.210000 ms  DeleteObjects: 0.020900 ms)
+
+[Save] Run saved. reason=NewRun, revision=1, phase=MapSelection.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:BeginNewRun (SpireChess.Run.RunSession) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:32)
+SpireChess.App.GameApp:StartNewRun (string,System.Nullable`1<int>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:217)
+SpireChess.UI.MainMenu.MainMenuController:CreateNewRun (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/MainMenu/MainMenuController.cs:275)
+SpireChess.UI.MainMenu.MainMenuController:ConfirmHeroSelection () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/MainMenu/MainMenuController.cs:121)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeNamedButton (UnityEngine.Component,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4519)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__7 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:310)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:308)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 2.760900 ms
+Unloading 9 unused Assets / (Unknown). Loaded Objects now: 2141.
+Memory consumption went from 68.3 MB to 68.3 MB.
+Total: 1.086400 ms (FindLiveObjects: 0.072500 ms CreateObjectMapping: 0.025800 ms MarkObjects: 0.959800 ms  DeleteObjects: 0.028100 ms)
+
+[Save] Run saved. reason=EnterNode, revision=2, phase=Shop.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Run.RunTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:341)
+SpireChess.UI.Run.RunTestController:EnterNode (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:85)
+SpireChess.UI.Run.RunMapNodeView:HandleClick () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunMapNodeView.cs:107)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeMapNode (SpireChess.UI.Run.RunTestController,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4497)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__8 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:348)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:346)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 2.787600 ms
+Unloading 1 unused Assets / (7.0 KB). Loaded Objects now: 2775.
+Memory consumption went from 69.0 MB to 69.0 MB.
+Total: 1.153200 ms (FindLiveObjects: 0.079000 ms CreateObjectMapping: 0.033000 ms MarkObjects: 1.032400 ms  DeleteObjects: 0.008600 ms)
+
+[Save] Run saved. reason=已购买随从, revision=3, phase=Shop.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Shop.ShopTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:505)
+SpireChess.UI.Shop.ShopTestController:ApplyOperation (SpireChess.Shop.ShopOperationResult,string,bool) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:485)
+SpireChess.UI.Shop.ShopTestController:BuyMinionAt (int) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:134)
+SpireChess.UI.Shop.ShopTestController:HandleCardClick (SpireChess.UI.Shop.ShopCardZone,int) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:327)
+SpireChess.UI.Shop.ShopCardView:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopCardView.cs:51)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+UnityEngine.EventSystems.ExecuteEvents:ExecuteHierarchy<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:298)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokePointerClick (UnityEngine.Component) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4652)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__9 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:383)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:371)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+[Save] Run saved. reason=随从已上场, revision=4, phase=Shop.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Shop.ShopTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:505)
+SpireChess.UI.Shop.ShopTestController:ApplyOperation (SpireChess.Shop.ShopOperationResult,string,bool) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:485)
+SpireChess.UI.Shop.ShopTestController:PlayBenchMinion (int,int,int) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:181)
+SpireChess.UI.Shop.ShopTestController:HandleBattleSlotSelection (int) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:443)
+SpireChess.UI.Shop.ShopTestController:HandleSlotClick (SpireChess.UI.Shop.ShopCardZone,int) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:345)
+SpireChess.UI.Shop.ShopSlotView:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopSlotView.cs:101)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+UnityEngine.EventSystems.ExecuteEvents:ExecuteHierarchy<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:298)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokePointerClick (UnityEngine.Component) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4652)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__10 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:408)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:393)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+[Save] Run saved. reason=商店已冻结, revision=5, phase=Shop.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Shop.ShopTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:505)
+SpireChess.UI.Shop.ShopTestController:ApplyOperation (SpireChess.Shop.ShopOperationResult,string,bool) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:485)
+SpireChess.UI.Shop.ShopTestController:ToggleFreeze () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:154)
+SpireChess.UI.Shop.ShopScreenView:<Bind>b__78_1 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopScreenView.cs:156)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeNamedButton (UnityEngine.Component,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4519)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__11 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:427)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+[Save] Run saved. reason=商店已解冻, revision=6, phase=Shop.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Shop.ShopTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:505)
+SpireChess.UI.Shop.ShopTestController:ApplyOperation (SpireChess.Shop.ShopOperationResult,string,bool) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:485)
+SpireChess.UI.Shop.ShopTestController:ToggleFreeze () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:154)
+SpireChess.UI.Shop.ShopScreenView:<Bind>b__78_1 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopScreenView.cs:156)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeNamedButton (UnityEngine.Component,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4519)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__12 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:446)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:444)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+[Save] Run saved. reason=商店已结束，返回地图, revision=7, phase=MapSelection.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Shop.ShopTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:505)
+SpireChess.UI.Shop.ShopTestController:ApplyOperation (SpireChess.Shop.ShopOperationResult,string,bool) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:485)
+SpireChess.UI.Shop.ShopTestController:EndShopAndEnterBattle () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopTestController.cs:240)
+SpireChess.UI.Shop.ShopScreenView:<Bind>b__78_4 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Shop/ShopScreenView.cs:161)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeNamedButton (UnityEngine.Component,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4519)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__13 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:463)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:461)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 2.061800 ms
+Unloading 3 unused Assets / (0.6 MB). Loaded Objects now: 2308.
+Memory consumption went from 69.5 MB to 68.8 MB.
+Total: 1.123600 ms (FindLiveObjects: 0.065900 ms CreateObjectMapping: 0.026800 ms MarkObjects: 0.994800 ms  DeleteObjects: 0.035800 ms)
+
+[Save] Run saved. reason=EnterNode, revision=8, phase=Battle.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Run.RunTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:341)
+SpireChess.UI.Run.RunTestController:EnterNode (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:85)
+SpireChess.UI.Run.RunMapNodeView:HandleClick () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunMapNodeView.cs:107)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeMapNode (SpireChess.UI.Run.RunTestController,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4497)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__14 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:486)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:484)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 1.791100 ms
+Unloading 1 unused Assets / (Unknown). Loaded Objects now: 2604.
+Memory consumption went from 69.2 MB to 69.3 MB.
+Total: 1.243400 ms (FindLiveObjects: 0.072000 ms CreateObjectMapping: 0.025400 ms MarkObjects: 1.139400 ms  DeleteObjects: 0.006400 ms)
+
+[Save] Run saved. reason=BattleCompleted, revision=9, phase=BattleResult.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Battle.BattleTestController:FinalizeBattle (SpireChess.Battle.BattleSimulationResult) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Battle/BattleTestController.cs:667)
+SpireChess.UI.Battle.BattleTestController/<PlayBattle>d__55:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Battle/BattleTestController.cs:422)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 1.379100 ms
+Unloading 1 unused Assets / (Unknown). Loaded Objects now: 2368.
+Memory consumption went from 69.2 MB to 69.4 MB.
+Total: 1.242100 ms (FindLiveObjects: 0.073900 ms CreateObjectMapping: 0.023100 ms MarkObjects: 1.137200 ms  DeleteObjects: 0.007700 ms)
+
+[Save] Run saved. reason=ContinueAfterBattle, revision=10, phase=MapSelection.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:CommitSuccessful (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:52)
+SpireChess.UI.Run.RunTestController:Persist (string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:341)
+SpireChess.UI.Run.RunTestController:CompleteChoice (SpireChess.Run.RunOperationResult,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:322)
+SpireChess.UI.Run.RunTestController:ContinueAfterBattle () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:188)
+SpireChess.UI.Run.RunTestController:ExecuteUiAction (SpireChess.UI.Run.RunUiActionType,string,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunTestController.cs:274)
+SpireChess.UI.Run.RunScreenView/<>c__DisplayClass80_0:<RenderSummary>b__0 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Run/RunScreenView.cs:353)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeNamedButton (UnityEngine.Component,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4519)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__19 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:622)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:620)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+[Save] Run saved. reason=ReturnToMainMenu, revision=10, phase=MapSelection.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.RunPersistenceCoordinator:Save (SpireChess.Run.RunSession,bool,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:88)
+SpireChess.App.RunPersistenceCoordinator:RetrySave (SpireChess.Run.RunSession,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs:57)
+SpireChess.App.GameApp:SaveAndReturnToMainMenu () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:279)
+SpireChess.UI.Common.RunSystemMenuView:SaveAndReturn () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/Common/RunSystemMenuView.cs:189)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeNamedButton (UnityEngine.Component,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4519)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__23 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:686)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:684)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/RunPersistenceCoordinator.cs Line: 88)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 1.992900 ms
+Unloading 1 unused Assets / (Unknown). Loaded Objects now: 2606.
+Memory consumption went from 69.3 MB to 69.5 MB.
+Total: 1.306100 ms (FindLiveObjects: 0.077400 ms CreateObjectMapping: 0.029600 ms MarkObjects: 1.192600 ms  DeleteObjects: 0.006300 ms)
+
+[Save] Run resumed. revision=10, phase=MapSelection.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.App.GameApp:ContinueRun () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs:271)
+SpireChess.UI.MainMenu.MainMenuController:ContinueGame () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/UI/MainMenu/MainMenuController.cs:158)
+UnityEngine.Events.InvokableCall:Invoke () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/UnityEvent/UnityEvent.cs:178)
+UnityEngine.Events.UnityEvent:Invoke () (at C:/b/o/ra-engineer/unity-resell/artifacts/generated/UnityEvent/UnityEvent_0.cs:57)
+UnityEngine.UI.Button:Press () (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
+UnityEngine.UI.Button:OnPointerClick (UnityEngine.EventSystems.PointerEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
+UnityEngine.EventSystems.ExecuteEvents:Execute (UnityEngine.EventSystems.IPointerClickHandler,UnityEngine.EventSystems.BaseEventData) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
+UnityEngine.EventSystems.ExecuteEvents:Execute<UnityEngine.EventSystems.IPointerClickHandler> (UnityEngine.GameObject,UnityEngine.EventSystems.BaseEventData,UnityEngine.EventSystems.ExecuteEvents/EventFunction`1<UnityEngine.EventSystems.IPointerClickHandler>) (at ./Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeButton (UnityEngine.UI.Button) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4549)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:InvokeNamedButton (UnityEngine.Component,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4519)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<>c__DisplayClass16_0:<RunAcceptanceFlow>b__24 () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:716)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner:ExecuteStep (string,System.Func`1<bool>) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4429)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<RunAcceptanceFlow>d__16:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:714)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/App/GameApp.cs Line: 271)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+UnloadTime: 0.732300 ms
+Unloading 9 unused Assets / (Unknown). Loaded Objects now: 2365.
+Memory consumption went from 69.1 MB to 69.3 MB.
+Total: 1.283300 ms (FindLiveObjects: 0.079900 ms CreateObjectMapping: 0.028900 ms MarkObjects: 1.146900 ms  DeleteObjects: 0.027300 ms)
+
+[G4] Performance report written: D:\code\spireChess\spireChess\sc\Logs\G4\Acceptance\d12e2ef-core\20260803-140906-DESKTOP-453378L-1920x1080-r01\performance\g4-performance-20260803-140906-DESKTOP-453378L-1920x1080-r01-1920x1080.json. status=AcceptancePassed, provisional=True.
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/StackTrace.cs:37)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Diagnostics.G4PerformanceCollector:CompleteSession (string,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PerformanceCollector.cs:740)
+SpireChess.Diagnostics.G4PerformanceCollector:Complete (string,string) (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PerformanceCollector.cs:443)
+SpireChess.Diagnostics.G4PlayerAcceptanceRunner/<CompleteAcceptance>d__64:MoveNext () (at D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PlayerAcceptanceRunner.cs:4209)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/b/o/ra-engineer/unity-resell/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: D:/code/spireChess/spireChess/sc/Assets/Scripts/Diagnostics/G4PerformanceCollector.cs Line: 740)
+
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.
+PlayerConnection::CleanupMemory Statistics:
+[ALLOC_TEMP_TLS] TLS Allocator
+  StackAllocators : 
+    [ALLOC_TEMP_MAIN]
+      Peak usage frame count: [4.0 KB-8.0 KB]: 713 frames, [8.0 KB-16.0 KB]: 8 frames, [16.0 KB-32.0 KB]: 1 frames, [64.0 KB-128.0 KB]: 5 frames, [128.0 KB-256.0 KB]: 5 frames, [256.0 KB-0.5 MB]: 8 frames, [0.5 MB-1.0 MB]: 1 frames, [1.0 MB-2.0 MB]: 10 frames, [2.0 MB-4.0 MB]: 6 frames
+      Initial Block Size 4.0 MB
+      Current Block Size 4.0 MB
+      Peak Allocated Bytes 3.4 MB
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 8]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 4]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 45.7 KB
+      Overflow Count 0
+    [ALLOC_TEMP_AUDIO_FMOD mixer thread]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 11]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 3]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_BatchDeleteObjects]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 13]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 2]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 10]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 12]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Loading.PreloadManager]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 163.1 KB
+      Overflow Count 36
+    [ALLOC_TEMP_Profiler.Dispatcher]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 456 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 14]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 3]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 45.7 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 5]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 13]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 2]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 45.7 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 11]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 0]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 0 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 6]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 0 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 5]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 0 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 9]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_AUDIO_FMOD file thread]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 111 B
+      Overflow Count 0
+    [ALLOC_TEMP_EnlightenWorker] x 8
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 9]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 0 B
+      Overflow Count 0
+    [ALLOC_TEMP_Loading.AsyncRead]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 452 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 10]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 6]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_AUDIO_FMOD (WASAPI) feeder thread]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 168 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 1]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_AUDIO_FMOD stream thread]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 15]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 7]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 8]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 0 B
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 1]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 89.4 KB
+      Overflow Count 0
+    [ALLOC_TEMP_AUDIO_FMOD nonblocking thread (0)]
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 444 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 12]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_AssetGarbageCollectorHelper] x 15
+      Initial Block Size 64.0 KB
+      Current Block Size 64.0 KB
+      Peak Allocated Bytes 138 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 0]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 4]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_Background Job.Worker 14]
+      Initial Block Size 32.0 KB
+      Current Block Size 32.0 KB
+      Peak Allocated Bytes 54 B
+      Overflow Count 0
+    [ALLOC_TEMP_UnityGfxDeviceWorker]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 3.2 KB
+      Overflow Count 0
+    [ALLOC_TEMP_Job.Worker 7]
+      Initial Block Size 256.0 KB
+      Current Block Size 256.0 KB
+      Peak Allocated Bytes 0 B
+      Overflow Count 0
+[ALLOC_MEMORYPROFILER]
+  Peak usage frame count: [64.0 KB-128.0 KB]: 79 frames, [128.0 KB-256.0 KB]: 678 frames
+  Requested Block Size 1.0 MB
+  Peak Block count 1
+  Peak Allocated memory 251.6 KB
+  Peak Large allocation bytes 0 B
+[ALLOC_DEFAULT] Dual Thread Allocator
+  Peak main deferred allocation count 1696
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 1.1 MB
+    [ALLOC_DEFAULT_MAIN]
+      Peak usage frame count: [16.0 MB-32.0 MB]: 740 frames, [32.0 MB-64.0 MB]: 17 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 3
+      Peak Allocated memory 42.6 MB
+      Peak Large allocation bytes 8.0 MB
+    [ALLOC_DEFAULT_THREAD]
+      Peak usage frame count: [16.0 MB-32.0 MB]: 757 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 1
+      Peak Allocated memory 22.6 MB
+      Peak Large allocation bytes 16.0 MB
+[ALLOC_TEMP_JOB_1_FRAME]
+  Initial Block Size 2.0 MB
+  Used Block Count 0
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_TEMP_JOB_2_FRAMES]
+  Initial Block Size 2.0 MB
+  Used Block Count 0
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_TEMP_JOB_4_FRAMES (JobTemp)]
+  Initial Block Size 2.0 MB
+  Used Block Count 1
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_TEMP_JOB_ASYNC (Background)]
+  Initial Block Size 1.0 MB
+  Used Block Count 1
+  Overflow Count (too large) 0
+  Overflow Count (full) 0
+[ALLOC_GFX] Dual Thread Allocator
+  Peak main deferred allocation count 1
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 1.1 MB
+    [ALLOC_GFX_MAIN]
+      Peak usage frame count: [64.0 KB-128.0 KB]: 93 frames, [128.0 KB-256.0 KB]: 155 frames, [256.0 KB-0.5 MB]: 336 frames, [0.5 MB-1.0 MB]: 170 frames, [1.0 MB-2.0 MB]: 1 frames, [8.0 MB-16.0 MB]: 1 frames, [16.0 MB-32.0 MB]: 1 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 2
+      Peak Allocated memory 16.2 MB
+      Peak Large allocation bytes 0 B
+    [ALLOC_GFX_THREAD]
+      Peak usage frame count: [1.0 KB-2.0 KB]: 79 frames, [32.0 KB-64.0 KB]: 678 frames
+      Requested Block Size 16.0 MB
+      Peak Block count 1
+      Peak Allocated memory 33.8 KB
+      Peak Large allocation bytes 0 B
+[ALLOC_CACHEOBJECTS] Dual Thread Allocator
+  Peak main deferred allocation count 33
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 1.1 MB
+    [ALLOC_CACHEOBJECTS_MAIN]
+      Peak usage frame count: [1.0 MB-2.0 MB]: 757 frames
+      Requested Block Size 4.0 MB
+      Peak Block count 1
+      Peak Allocated memory 1.3 MB
+      Peak Large allocation bytes 0 B
+    [ALLOC_CACHEOBJECTS_THREAD]
+      Peak usage frame count: [8.0 MB-16.0 MB]: 120 frames, [16.0 MB-32.0 MB]: 637 frames
+      Requested Block Size 4.0 MB
+      Peak Block count 1
+      Peak Allocated memory 16.8 MB
+      Peak Large allocation bytes 15.7 MB
+[ALLOC_TYPETREE] Dual Thread Allocator
+  Peak main deferred allocation count 0
+    [ALLOC_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 1.1 MB
+    [ALLOC_TYPETREE_MAIN]
+      Peak usage frame count: [4.0 KB-8.0 KB]: 757 frames
+      Requested Block Size 2.0 MB
+      Peak Block count 1
+      Peak Allocated memory 7.2 KB
+      Peak Large allocation bytes 0 B
+    [ALLOC_TYPETREE_THREAD]
+      Peak usage frame count: [1.0 KB-2.0 KB]: 78 frames, [2.0 KB-4.0 KB]: 679 frames
+      Requested Block Size 2.0 MB
+      Peak Block count 1
+      Peak Allocated memory 2.8 KB
+      Peak Large allocation bytes 0 B
+[ALLOC_PROFILER]
+  Peak usage frame count: [256.0 KB-0.5 MB]: 756 frames, [32.0 MB-64.0 MB]: 1 frames
+  Requested Block Size 16.0 MB
+  Peak Block count 3
+  Peak Allocated memory 33.3 MB
+  Peak Large allocation bytes 0 B
+    [ALLOC_PROFILER_BUCKET]
+      Large Block size 4.0 MB
+      Used Block count 1
+      Peak Allocated bytes 66.0 KB
+##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1785766164649,"processId":14308,"allocatedMemory":580096,"memoryLabels":[{"Default":-128},{"NewDelete":80},{"Manager":540279},{"GfxDevice":72},{"Serialization":508},{"JobScheduler":33024},{"String":245},{"HashMap":3840},{"PoolAlloc":168},{"VR":1784},{"Subsystems":96},{"CoreBusinessMetrics":128}]}
