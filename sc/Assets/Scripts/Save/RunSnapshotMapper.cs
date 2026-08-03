@@ -657,12 +657,15 @@ namespace SpireChess.Save
             {
                 Player = board.Player.Select(CaptureBattleMinion).ToList(),
                 Enemy = board.Enemy.Select(CaptureBattleMinion).ToList(),
-                BattleStartEffects = board.BattleStartEffects.Select(value =>
-                    new BattleStartEffectSnapshotV1
-                    {
-                        Side = value.Side,
-                        Effect = CaptureEffect(value.Effect, null)
-                    }).ToList(),
+                BattleStartEffects = board.BattleStartEffects
+                    .Where(value =>
+                        !RelicService.IsDerivedBattleStartEffect(value?.Effect))
+                    .Select(value =>
+                        new BattleStartEffectSnapshotV1
+                        {
+                            Side = value.Side,
+                            Effect = CaptureEffect(value.Effect, null)
+                        }).ToList(),
                 RuleModifiers = CaptureBattleRules(board.RuleModifiers),
                 PlayerFlourishStacks = board.PlayerFlourishStacks,
                 EnemyFlourishStacks = board.EnemyFlourishStacks
@@ -698,6 +701,7 @@ namespace SpireChess.Save
             }
 
             RestoreBattleRules(board.RuleModifiers, snapshot.RuleModifiers);
+            RelicService.MaterializeDerivedBattleStartEffects(board);
             return board;
         }
 

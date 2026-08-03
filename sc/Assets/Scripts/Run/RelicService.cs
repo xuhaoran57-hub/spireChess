@@ -9,6 +9,11 @@ namespace SpireChess.Run
 {
     public sealed class RelicService
     {
+        internal const string BattleStartShieldEffectId =
+            "relic_battle_start_shield";
+        internal const string ManyfoldBannerEffectId =
+            "relic_manyfold_banner";
+
         private static readonly HashSet<string> FormalRaces = new HashSet<string>(
             new[] { "ForgeSoul", "WildSpirit", "Starbound", "Wayfarer" },
             StringComparer.Ordinal);
@@ -275,7 +280,6 @@ namespace SpireChess.Run
             }
 
             var shieldTargets = 0;
-            var relicStartEffectCount = 0;
             foreach (var pair in GetOwnedConfigs())
             {
                 var config = pair.config;
@@ -300,73 +304,112 @@ namespace SpireChess.Run
                 }
             }
 
-            if (shieldTargets > 0)
-            {
-                board.RuleModifiers.PlayerBattleStartShieldTargets = shieldTargets;
-                board.BattleStartEffects.Insert(
-                    relicStartEffectCount++,
-                    new BattleStartEffectState(
-                    BattleSide.Player,
-                    new EffectConfig
-                    {
-                        Id = "relic_battle_start_shield",
-                        Trigger = "OnBattleStart",
-                        Action = "AddShield",
-                        Target = new TargetConfig
-                        {
-                            Side = "Ally",
-                            Scope = "Single",
-                            IncludeSelf = true,
-                            IncludeToken = true,
-                            MaxTargets = shieldTargets,
-                            Selector = "NoShieldLowestHealth"
-                        },
-                        Value = new ValueConfig { Duration = "Combat" }
-                    }));
-            }
+            board.RuleModifiers.PlayerBattleStartShieldTargets = shieldTargets;
 
+            var distinctRaceStatBonus = 0;
             var banner = GetOwnedConfigs().FirstOrDefault(value =>
                 value.config.EffectType == "GrantCombatStatsPerDistinctRace");
-            if (banner.config == null)
+            if (banner.config != null)
             {
-                return;
-            }
-
-            var distinctRaces = board.Player.Where(value => value != null &&
-                    value.IsAlive && !value.Config.IsToken && FormalRaces.Contains(value.Config.Race))
-                .Select(value => value.Config.Race)
-                .Distinct()
-                .Count();
-            var amount = Math.Min(Math.Max(0, banner.config.Threshold), distinctRaces);
-            if (amount <= 0)
-            {
-                return;
-            }
-
-            board.RuleModifiers.PlayerDistinctRaceStatBonus = amount;
-            board.BattleStartEffects.Insert(
-                relicStartEffectCount,
-                new BattleStartEffectState(
-                BattleSide.Player,
-                new EffectConfig
+                var distinctRaces = board.Player.Where(value => value != null &&
+                        value.IsAlive && !value.Config.IsToken &&
+                        FormalRaces.Contains(value.Config.Race))
+                    .Select(value => value.Config.Race)
+                    .Distinct()
+                    .Count();
+                var amount = Math.Min(
+                    Math.Max(0, banner.config.Threshold),
+                    distinctRaces);
+                if (amount > 0)
                 {
-                    Id = "relic_manyfold_banner",
-                    Trigger = "OnBattleStart",
-                    Action = "ModifyStats",
-                    Target = new TargetConfig
-                    {
-                        Side = "Ally",
-                        Scope = "All",
-                        IncludeSelf = true,
-                        IncludeToken = true
-                    },
-                    Value = new ValueConfig
-                    {
-                        Attack = amount,
-                        Health = amount,
-                        Duration = "Combat"
-                    }
-                }));
+                    distinctRaceStatBonus = amount;
+                }
+            }
+            board.RuleModifiers.PlayerDistinctRaceStatBonus =
+                distinctRaceStatBonus;
+
+            MaterializeDerivedBattleStartEffects(board);
+        }
+
+        internal static bool IsDerivedBattleStartEffect(EffectConfig effect)
+        {
+            return effect != null &&
+                   (string.Equals(
+                        effect.Id,
+                        BattleStartShieldEffectId,
+                        StringComparison.Ordinal) ||
+                    string.Equals(
+                        effect.Id,
+                        ManyfoldBannerEffectId,
+                        StringComparison.Ordinal));
+        }
+
+        internal static void MaterializeDerivedBattleStartEffects(
+            BattleBoardState board)
+        {
+            if (board == null)
+            {
+                throw new ArgumentNullException(nameof(board));
+            }
+
+            board.BattleStartEffects.RemoveAll(value =>
+                IsDerivedBattleStartEffect(value?.Effect));
+
+            var insertionIndex = 0;
+            var shieldTargets =
+                board.RuleModifiers.PlayerBattleStartShieldTargets;
+            if (shieldTargets > 0)
+            {
+                board.BattleStartEffects.Insert(
+                    insertionIndex++,
+                    new BattleStartEffectState(
+                        BattleSide.Player,
+                        new EffectConfig
+                        {
+                            Id = BattleStartShieldEffectId,
+                            Trigger = "OnBattleStart",
+                            Action = "AddShield",
+                            Target = new TargetConfig
+                            {
+                                Side = "Ally",
+                                Scope = "Single",
+                                IncludeSelf = true,
+                                IncludeToken = true,
+                                MaxTargets = shieldTargets,
+                                Selector = "NoShieldLowestHealth"
+                            },
+                            Value = new ValueConfig { Duration = "Combat" }
+                        }));
+            }
+
+            var statBonus =
+                board.RuleModifiers.PlayerDistinctRaceStatBonus;
+            if (statBonus > 0)
+            {
+                board.BattleStartEffects.Insert(
+                    insertionIndex,
+                    new BattleStartEffectState(
+                        BattleSide.Player,
+                        new EffectConfig
+                        {
+                            Id = ManyfoldBannerEffectId,
+                            Trigger = "OnBattleStart",
+                            Action = "ModifyStats",
+                            Target = new TargetConfig
+                            {
+                                Side = "Ally",
+                                Scope = "All",
+                                IncludeSelf = true,
+                                IncludeToken = true
+                            },
+                            Value = new ValueConfig
+                            {
+                                Attack = statBonus,
+                                Health = statBonus,
+                                Duration = "Combat"
+                            }
+                        }));
+            }
         }
 
         private RelicCardGrant DrawSpellGrant(RelicConfig relic)

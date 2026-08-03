@@ -296,6 +296,15 @@ namespace SpireChess.Diagnostics
                     yield break;
                 }
             }
+            yield return WaitForCondition(
+                () => IsNamedButtonReady(
+                    mainMenuController?.ScreenView,
+                    "ConfirmHeroButton"),
+                "default unlocked warrior confirmation button");
+            if (failed)
+            {
+                yield break;
+            }
             if (!ExecuteStep(
                     "confirm the default unlocked warrior",
                     () => InvokeNamedButton(

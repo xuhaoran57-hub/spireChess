@@ -6,6 +6,7 @@ using NUnit.Framework;
 using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Run;
+using SpireChess.Save;
 using SpireChess.Shop;
 using SpireChess.Simulation;
 using SpireChess.Utils;
@@ -276,6 +277,70 @@ namespace SpireChess.Tests
                     "relic_manyfold_banner",
                     "existing_spell_effect"
                 }));
+        }
+
+        [Test]
+        public void BattleSnapshotRelics_RoundTripPendingAndCommittedContexts()
+        {
+            var configs = CreateConfigs();
+            var run = new RunSession(configs, 1010);
+            AddOwnedRelic(run, configs.RelicsById["crown_thousand_shields"]);
+            AddOwnedRelic(run, configs.RelicsById["crown_manyfold_banner"]);
+
+            Assert.That(run.EnterNode("f1_shop_start").Success, Is.True);
+            var grant = run.Shop.ClaimRewardMinion(
+                configs.Minions.First(value =>
+                    value.Race == "ForgeSoul" && !value.IsToken));
+            Assert.That(grant.Success, Is.True);
+            Assert.That(run.Shop.PlayMinion(grant.BenchIndex, 0).Success, Is.True);
+            while (run.State.PendingCardRewards.Count > 0)
+            {
+                Assert.That(run.SkipNextCardReward().Success, Is.True);
+            }
+            Assert.That(run.EndShopAndPrepareBattle("RunTest").Success, Is.True);
+            Assert.That(run.EnterNode("f1_opening_normal").Success, Is.True);
+
+            var expectedEffectIds = new[]
+            {
+                "relic_battle_start_shield",
+                "relic_manyfold_banner"
+            };
+            Assert.That(
+                run.PendingBattle.BoardState.BattleStartEffects
+                    .Select(value => value.Effect.Id),
+                Is.EqualTo(expectedEffectIds));
+
+            var mapper = new RunSnapshotMapper(configs);
+            var pendingPayload = mapper.Capture(run);
+            Assert.That(
+                pendingPayload.PendingBattle.Board.BattleStartEffects,
+                Is.Empty,
+                "derived relic effects must be represented by battle rules");
+            run = mapper.Restore(pendingPayload);
+            Assert.That(
+                run.PendingBattle.BoardState.BattleStartEffects
+                    .Select(value => value.Effect.Id),
+                Is.EqualTo(expectedEffectIds));
+
+            var finalBoard = run.PendingBattle.BoardState.Clone();
+            var result = new BattleSimulationResult(
+                finalBoard,
+                BattleSide.Player,
+                BattleOutcomeReason.Victory,
+                new List<string>(),
+                new List<BattleStep>());
+            Assert.That(run.TryCompleteBattle(result, out _), Is.True);
+
+            var committedPayload = mapper.Capture(run);
+            run = mapper.Restore(committedPayload);
+            Assert.That(
+                run.LastBattleContext.BoardState.BattleStartEffects
+                    .Select(value => value.Effect.Id),
+                Is.EqualTo(expectedEffectIds));
+            Assert.That(
+                run.LastBattleResult.FinalState.BattleStartEffects
+                    .Select(value => value.Effect.Id),
+                Is.EqualTo(expectedEffectIds));
         }
 
         [Test]
