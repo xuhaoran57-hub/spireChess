@@ -334,6 +334,20 @@ namespace SpireChess.Tests.EditMode
             Assert.That(summonEarly.Player[4].HasTaunt, Is.True);
             Assert.That(summonEarly.Player[4].HasShield, Is.True);
 
+            var shieldBreakMid = progressFixtures.CreateFixture(
+                2,
+                4,
+                "B02_BREAK");
+            Assert.That(
+                shieldBreakMid.Player.Where(value => value != null)
+                    .Sum(value => value.CurrentAttack),
+                Is.EqualTo(51));
+            Assert.That(
+                shieldBreakMid.Player.Where(value => value != null)
+                    .Sum(value => value.CurrentHealth),
+                Is.EqualTo(42));
+            Assert.That(shieldBreakMid.Player[0].CurrentHealth, Is.EqualTo(10));
+
             var deathMid = progressFixtures.CreateFixture(
                 2,
                 4,
@@ -361,6 +375,19 @@ namespace SpireChess.Tests.EditMode
                 "B03_SUMMON");
             Assert.That(summonLate.Player[4].HasTaunt, Is.True);
             Assert.That(summonLate.Player[4].HasShield, Is.False);
+
+            var shieldBreakLate = progressFixtures.CreateFixture(
+                2,
+                5,
+                "B02_BREAK");
+            Assert.That(
+                shieldBreakLate.Player.Where(value => value != null)
+                    .Sum(value => value.CurrentAttack),
+                Is.EqualTo(68));
+            Assert.That(
+                shieldBreakLate.Player.Where(value => value != null)
+                    .Sum(value => value.CurrentHealth),
+                Is.EqualTo(50));
 
             var deathLate = progressFixtures.CreateFixture(
                 2,
