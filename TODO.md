@@ -1,6 +1,6 @@
 # 项目待办
 
-> **v0.4.0 当前权威入口（2026-08-03）**：
+> **v0.4.0 当前权威入口（2026-08-04）**：
 > [v0.4.0-authoritative-backlog-and-acceptance-matrix.md](v0.4.0-authoritative-backlog-and-acceptance-matrix.md)。
 > 下文是历史实施记录；当前优先级和验收状态只以该矩阵为准。
 
@@ -10,8 +10,10 @@
 - [x] P0：候选 `d12e2ef` 已在干净工作树上完成 EditMode、PlayMode、Clean Player、
   双分辨率和重复输入/Exactly-once 门禁；见
   [不可变证据包](ui-concepts/unity-validation/v0.4.0-journal-ui/d12e2ef/manifest.json)。
-- [ ] P0：重新生成可追溯的 v0.4.0 章节进度 S0 平衡证据，固定提交、配置哈希和
-  fixture 身份。
+- [x] P0：候选 `0eaa2e3` 已在干净工作树上完成可追溯的 v0.4.0 章节进度
+  strict S0：198 场景/19,800 战斗，P0/P1 为 0；提交、配置哈希、fixture 身份、
+  逐文件哈希和完整测试结果见
+  [候选证据包](balance-results/v0.4.0/release-candidate-0eaa2e3/acceptance-summary.md)。
 - [ ] P1：建立并验证三角色真实单局的平衡候选，再决定正式 S1/S2 规模和人工批次。
 - [ ] P2：完成正式音频、背景生产签字、第二机性能、截图签字和外部试玩门禁。
 

@@ -1,0 +1,932 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Channel LicenseClient-eden.xu doesn't exist
+[Licensing::Module] Successfully launched the LicensingClient (PId: 7112)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-eden.xu" at "2026-08-04T13:13:51.0157174Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 7112, path: "C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.16.2+bdef8f5
+  Session Id:              cd46e6193956401bb9ec67dba66fc1a1
+  Correlation Id:          56dd8f2876ad500a90c99dc6be285541
+  External correlation Id: 6098569377349860367
+  Machine Id:              RJZOQ5aobMHmEo1bgCQTlJzA9G4=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-eden.xu" (connect: 0.56s, validation: 0.05s, handshake: 0.03s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-eden.xu-notifications" at "2026-08-04T13:13:51.0806287Z"
+[Licensing::Module] Connected to LicensingClient (PId: 7112, launch time: 0.00, total connection time: 0.64s)
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully updated license
+Built from '2022.3/china_unity/release' branch; Version is '2022.3.62f3c1 (1623fc0bbb97) revision 1451004'; Using compiler version '192829333'; Build Type 'Release'
+OS: 'Windows 11  (10.0.26200) 64bit Professional' Language: 'zh' Physical Memory: 16243 MB
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Serial number assigned to: "<redacted>"
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+[Licensing::Client] Successfully resolved entitlement details
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2022.3.62f3c1\Editor\Unity.exe
+-batchmode
+-nographics
+-quit
+-projectPath
+D:\code\spireChess\spireChess\sc
+-executeMethod
+SpireChess.Editor.ChapterEncounterSamplingCommand.RunFromCommandLine
+-chapterSampleFixtureMode
+progress
+-chapterSampleSeedSet
+S0_CHAPTER_PROGRESS_FIXED
+-chapterSampleFirstSeed
+1000
+-chapterSampleSeedCount
+100
+-chapterSampleRequireCleanSource
+true
+-chapterSampleStrictAcceptance
+true
+-chapterSampleOutput
+balance-results\v0.4.0\release-candidate-0eaa2e3\chapter-progress-s0
+-logFile
+D:\code\spireChess\spireChess\sc\Logs\chapter-progress-s0-0eaa2e3.log
+Successfully changed project path to: D:\code\spireChess\spireChess\sc
+D:/code/spireChess/spireChess/sc
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gfx=262144"
+Player connection [7388]  Target information:
+
+Player connection [7388]  * "[IP] 192.168.1.3 [Port] 55504 [Flags] 2 [Guid] 669154593 [EditorId] 669154593 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-453378L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [7388]  * "[IP] 198.18.0.1 [Port] 55504 [Flags] 2 [Guid] 669154593 [EditorId] 669154593 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-453378L) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [7388] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [7388] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+[Package Manager] UpmClient::Connect -- Connected to IPC stream "Upm-18060" after 0.3 seconds.
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 55 packages:
+  Packages from [https://packages.unity.cn]:
+    com.unity.collab-proxy@2.12.4 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.collab-proxy@2.12.4)
+    com.unity.ide.rider@3.0.36 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.ide.rider@3.0.36)
+    com.unity.ide.visualstudio@2.0.22 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.ide.visualstudio@2.0.22)
+    com.unity.nuget.newtonsoft-json@3.2.1 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1)
+    com.unity.test-framework@1.1.33 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.test-framework@1.1.33)
+    com.unity.textmeshpro@3.0.7 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.textmeshpro@3.0.7)
+    com.unity.timeline@1.7.7 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.timeline@1.7.7)
+    com.unity.visualscripting@1.9.4 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.visualscripting@1.9.4)
+    com.unity.ext.nunit@1.0.6 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.ext.nunit@1.0.6)
+    com.unity.2d.animation@9.2.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.animation@9.2.0)
+    com.unity.2d.pixel-perfect@5.1.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.pixel-perfect@5.1.0)
+    com.unity.2d.psdimporter@8.1.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.psdimporter@8.1.0)
+    com.unity.2d.spriteshape@9.1.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.spriteshape@9.1.0)
+    com.unity.2d.tilemap.extras@3.1.3 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.tilemap.extras@3.1.3)
+    com.unity.2d.aseprite@1.1.9 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.aseprite@1.1.9)
+    com.unity.2d.common@8.1.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.common@8.1.0)
+    com.unity.mathematics@1.2.6 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.mathematics@1.2.6)
+    com.unity.collections@1.2.4 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.collections@1.2.4)
+    com.unity.burst@1.8.21 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.burst@1.8.21)
+  Built-in packages:
+    com.unity.feature.2d@2.0.1 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.feature.2d@2.0.1)
+    com.unity.ugui@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.ugui@1.0.0)
+    com.unity.modules.ai@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.ai@1.0.0)
+    com.unity.modules.androidjni@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.androidjni@1.0.0)
+    com.unity.modules.animation@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.animation@1.0.0)
+    com.unity.modules.assetbundle@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.assetbundle@1.0.0)
+    com.unity.modules.audio@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.audio@1.0.0)
+    com.unity.modules.cloth@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.cloth@1.0.0)
+    com.unity.modules.director@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.director@1.0.0)
+    com.unity.modules.imageconversion@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.imageconversion@1.0.0)
+    com.unity.modules.imgui@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.imgui@1.0.0)
+    com.unity.modules.jsonserialize@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.jsonserialize@1.0.0)
+    com.unity.modules.particlesystem@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.particlesystem@1.0.0)
+    com.unity.modules.physics@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.physics@1.0.0)
+    com.unity.modules.physics2d@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.physics2d@1.0.0)
+    com.unity.modules.screencapture@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.screencapture@1.0.0)
+    com.unity.modules.terrain@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.terrain@1.0.0)
+    com.unity.modules.terrainphysics@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.terrainphysics@1.0.0)
+    com.unity.modules.tilemap@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.tilemap@1.0.0)
+    com.unity.modules.ui@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.ui@1.0.0)
+    com.unity.modules.uielements@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.uielements@1.0.0)
+    com.unity.modules.umbra@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.umbra@1.0.0)
+    com.unity.modules.unityanalytics@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.unityanalytics@1.0.0)
+    com.unity.modules.unitywebrequest@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.unitywebrequest@1.0.0)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle@1.0.0)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.unitywebrequestaudio@1.0.0)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.unitywebrequesttexture@1.0.0)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.unitywebrequestwww@1.0.0)
+    com.unity.modules.vehicles@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.vehicles@1.0.0)
+    com.unity.modules.video@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.video@1.0.0)
+    com.unity.modules.vr@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.vr@1.0.0)
+    com.unity.modules.wind@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.wind@1.0.0)
+    com.unity.modules.xr@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.xr@1.0.0)
+    com.unity.modules.subsystems@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.modules.subsystems@1.0.0)
+    com.unity.2d.sprite@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.sprite@1.0.0)
+    com.unity.2d.tilemap@1.0.0 (location: D:\code\spireChess\spireChess\sc\Library\PackageCache\com.unity.2d.tilemap@1.0.0)
+[Subsystems] No new subsystems found in resolved package list.
+Package Manager log level set to [2]
+[Package Manager] Done registering packages in 0.07 seconds
+Refreshing native plugins compatible for Editor in 5.73 ms, found 5 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2022.3.62f3c1 (1623fc0bbb97)
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path D:/code/spireChess/spireChess/sc/Assets
+Forcing GfxDevice: Null
+GfxDevice: creating device client; threaded=0; jobified=0
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+[Licensing::Client] Successfully resolved entitlement details
+Initialize mono
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56060
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+ImportWorker Server TCP listen port: 0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2022.3.62f3c1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.003927 seconds.
+- Loaded All Assemblies, in  0.248 seconds
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.174 seconds
+Domain Reload Profiling: 422ms
+	BeginReloadAssembly (73ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (0ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (1ms)
+	RebuildCommonClasses (23ms)
+	RebuildNativeTypeToScriptingClass (6ms)
+	initialDomainReloadingComplete (41ms)
+	LoadAllAssembliesAndSetupDomain (105ms)
+		LoadAssemblies (72ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (103ms)
+			TypeCache.Refresh (101ms)
+				TypeCache.ScanAssembly (92ms)
+			ScanForSourceGeneratedMonoScriptInfo (0ms)
+			ResolveRequiredComponents (0ms)
+	FinalizeReload (174ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (144ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (7ms)
+			SetLoadedEditorAssemblies (4ms)
+			RefreshPlugins (0ms)
+			BeforeProcessingInitializeOnLoad (1ms)
+			ProcessInitializeOnLoadAttributes (101ms)
+			ProcessInitializeOnLoadMethodAttributes (30ms)
+			AfterProcessingInitializeOnLoad (0ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (0ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+Starting: C:\Program Files\Unity\Hub\Editor\2022.3.62f3c1\Editor\Data\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: D:/code/spireChess/spireChess/sc
+DisplayProgressbar: Compiling Scripts
+ExitCode: 0 Duration: 0s171ms
+[515/663    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+*** Tundra build success (0.15 seconds), 1 items updated, 663 evaluated
+AssetDatabase: script compilation time: 0.587207s
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.455 seconds
+Refreshing native plugins compatible for Editor in 2.48 ms, found 5 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Refreshing native plugins compatible for Editor in 2.57 ms, found 5 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  2.009 seconds
+Domain Reload Profiling: 2463ms
+	BeginReloadAssembly (101ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (3ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (18ms)
+	RebuildCommonClasses (22ms)
+	RebuildNativeTypeToScriptingClass (6ms)
+	initialDomainReloadingComplete (20ms)
+	LoadAllAssembliesAndSetupDomain (304ms)
+		LoadAssemblies (216ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (145ms)
+			TypeCache.Refresh (122ms)
+				TypeCache.ScanAssembly (108ms)
+			ScanForSourceGeneratedMonoScriptInfo (16ms)
+			ResolveRequiredComponents (4ms)
+	FinalizeReload (2009ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1904ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (4ms)
+			SetLoadedEditorAssemblies (4ms)
+			RefreshPlugins (0ms)
+			BeforeProcessingInitializeOnLoad (48ms)
+			ProcessInitializeOnLoadAttributes (1783ms)
+			ProcessInitializeOnLoadMethodAttributes (60ms)
+			AfterProcessingInitializeOnLoad (4ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (6ms)
+Asset Pipeline Refresh (id=5c63252147d6b7d4b8709c16fe98ee8d): Total: 3.929 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=789 ms
+		Asset DB Callback time: managed=14 ms, native=0 ms
+		Scripting: domain reloads=1, domain reload time=2506 ms, compile time=590 ms, other=29 ms
+		Project Asset Count: scripts=5568, non-scripts=1798
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokeBeforeRefreshCallbacks: 0.269ms
+	ApplyChangesToAssetFolders: 0.191ms
+	Scan: 69.320ms
+	OnSourceAssetsModified: 0.001ms
+	GetAllGuidsForCategorization: 0.966ms
+	CategorizeAssets: 124.260ms
+	ImportOutOfDateAssets: 2041.413ms (1431.571ms without children)
+		CompileScripts: 589.778ms
+		ReloadNativeAssets: 0.000ms
+		UnloadImportedAssets: 16.765ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 2.159ms
+		InitializingProgressBar: 0.001ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.001ms
+		OnDemandSchedulerStart: 1.138ms
+	PostProcessAllAssets: 14.015ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.001ms
+	UnloadStreamsBegin: 0.370ms
+	PersistCurrentRevisions: 0.281ms
+	UnloadStreamsEnd: 0.085ms
+	GenerateScriptTypeHashes: 2.342ms
+	Untracked: 1678.101ms
+Application.AssetDatabase Initial Refresh End
+Scanning for USB devices : 1.677ms
+Initializing Unity extensions:
+[Licensing::Client] Successfully resolved entitlement details
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-旅团日记
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+ProgressiveSceneManager::Cancel()
+Unloading 9 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 96 unused Assets / (0.7 MB). Loaded Objects now: 5086.
+Memory consumption went from 131.0 MB to 130.3 MB.
+Total: 4.227500 ms (FindLiveObjects: 0.210100 ms CreateObjectMapping: 0.117700 ms MarkObjects: 3.226900 ms  DeleteObjects: 0.671700 ms)
+
+Chapter encounter sampling starting: encounters=33, builds=6, fixtureMode=progress, seeds=100, expectedBattles=19800.
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:131)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 131)
+
+Sampling encounter 1/33: F1 f1_opening_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 2/33: F1 f1_early_summon_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 3/33: F1 f1_safe_normal_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 4/33: F1 f1_mid_mechanic_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 5/33: F1 f1_route_normal_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 6/33: F1 f1_c4_elite_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 7/33: F1 f1_route_safe_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 8/33: F1 f1_c4_event_ambush_encounter (Event).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 9/33: F1 f1_c5_shield_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 10/33: F1 f1_c5_summon_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 11/33: F1 f1_c6_boss_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 12/33: F2 f2_opening_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 13/33: F2 f2_early_spell_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 14/33: F2 f2_normal_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 15/33: F2 f2_mid_mechanic_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 16/33: F2 f2_route_normal_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 17/33: F2 f2_c4_elite_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 18/33: F2 f2_route_safe_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 19/33: F2 f2_c4_event_ambush_encounter (Event).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 20/33: F2 f2_c5_break_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 21/33: F2 f2_c5_spell_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 22/33: F2 f2_c6_boss_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 23/33: F3 f3_opening_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 24/33: F3 f3_early_summon_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 25/33: F3 f3_normal_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 26/33: F3 f3_mid_mechanic_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 27/33: F3 f3_route_normal_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 28/33: F3 f3_c4_elite_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 29/33: F3 f3_route_safe_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 30/33: F3 f3_c4_event_ambush_encounter (Event).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 31/33: F3 f3_c5_forge_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 32/33: F3 f3_c5_wild_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Sampling encounter 33/33: F3 f3_c6_boss_encounter (Map).
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand/<>c__DisplayClass5_0:<Run>b__1 (SpireChess.Simulation.ChapterEncounterDefinition) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:141)
+SpireChess.Simulation.ChapterEncounterSamplingRunner:Run (System.Collections.Generic.IEnumerable`1<SpireChess.Simulation.ChapterEncounterDefinition>,SpireChess.Simulation.ChapterProgressFixtureCatalog,System.Collections.Generic.IEnumerable`1<int>,System.Action`1<SpireChess.Simulation.ChapterEncounterDefinition>) (at Assets/Scripts/Simulation/ChapterEncounterSampling.cs:349)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:147)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 141)
+
+Chapter encounter sampling complete: battles=19800, exceptions=0, effectLimits=0, roundLimits=0, anomalies=1, elapsed=5.8s, output=D:\code\spireChess\spireChess\balance-results\v0.4.0\release-candidate-0eaa2e3\chapter-progress-s0.
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+SpireChess.Editor.ChapterEncounterSamplingCommand:Run (SpireChess.Editor.ChapterEncounterSamplingCommand/ChapterEncounterSamplingOptions) (at Assets/Editor/ChapterEncounterSamplingCommand.cs:329)
+SpireChess.Editor.ChapterEncounterSamplingCommand:RunFromCommandLine () (at Assets/Editor/ChapterEncounterSamplingCommand.cs:43)
+
+(Filename: Assets/Editor/ChapterEncounterSamplingCommand.cs Line: 329)
+
+Batchmode quit successfully invoked - shutting down!
+[PhysX] Initialized MultithreadedTaskDispatcher with 16 workers.
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-eden.xu-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-eden.xu channel disconnected successfully.
+Cleanup mono
+[Performance] WinEditorMain                                                                                                  :        1 samples, Peak.  1.17 s (1.0x), Avg.  1.17 s, Total. 1.173 s (8.9%)
+[Performance] WinEditorMain.ConfigureCrashHandler                                                                            :        1 samples, Peak.  19.7 us (1.0x), Avg.  19.7 us, Total. 19.70 us (0.0%)
+[Performance] WinEditorMain.CurlRequestInitialize                                                                            :        1 samples, Peak.   225 us (1.0x), Avg.   225 us, Total. 225.1 us (0.0%)
+[Performance] WinEditorMain.SetupLogFile                                                                                     :        1 samples, Peak.   160 us (1.0x), Avg.   160 us, Total. 160.1 us (0.0%)
+[Performance] WinEditorMain.RunNativeTestsIfRequiredAndExit                                                                  :        1 samples, Peak.   200 ns (1.0x), Avg.   200 ns, Total. 200.0 ns (0.0%)
+[Performance] WinEditorMain.Licensing                                                                                        :        1 samples, Peak.  1.15 s (1.0x), Avg.  1.15 s, Total. 1.147 s (8.7%)
+[Performance] WinEditorMain.InitializeCrashHandler                                                                           :        1 samples, Peak.  23.4 ms (1.0x), Avg.  23.4 ms, Total. 23.44 ms (0.2%)
+[Performance] WinEditorMain.CreateApplication                                                                                :        1 samples, Peak.   116 us (1.0x), Avg.   116 us, Total. 115.8 us (0.0%)
+[Performance] Application.InitializeProject                                                                                  :        1 samples, Peak.  5.13 s (1.0x), Avg.  5.13 s, Total. 5.131 s (39.1%)
+[Performance] Application.PackageManager.StartServer                                                                         :        1 samples, Peak.  2.84 ms (1.0x), Avg.  2.84 ms, Total. 2.844 ms (0.0%)
+[Performance] Application.AcquireProjectLock                                                                                 :        1 samples, Peak.  2.12 ms (1.0x), Avg.  2.12 ms, Total. 2.118 ms (0.0%)
+[Performance] Application.InitializeEngineNoGraphics                                                                         :        1 samples, Peak.  53.5 ms (1.0x), Avg.  53.5 ms, Total. 53.46 ms (0.4%)
+[Performance] Application.PackageManager.Initialize                                                                          :        1 samples, Peak.   260 ms (1.0x), Avg.   260 ms, Total. 260.1 ms (2.0%)
+[Performance] Connecting to Package Manager                                                                                  :       27 samples, Peak.  57.2 us (16.6x), Avg.  3.45 us, Total. 93.10 us (0.0%)
+[Performance] Application.EngineGraphics.Initialize                                                                          :        1 samples, Peak.  18.1 ms (1.0x), Avg.  18.1 ms, Total. 18.05 ms (0.1%)
+[Performance] Application.GI.Initialize                                                                                      :        1 samples, Peak.  2.76 ms (1.0x), Avg.  2.76 ms, Total. 2.762 ms (0.0%)
+[Performance] Application.LoadAllDefaultResourcesFromEditor                                                                  :        1 samples, Peak.  1.48 ms (1.0x), Avg.  1.48 ms, Total. 1.480 ms (0.0%)
+[Performance] Application.LoadMonoAssemblies                                                                                 :        1 samples, Peak.   433 ms (1.0x), Avg.   433 ms, Total. 433.2 ms (3.3%)
+[Performance] RestoreManagedReferences                                                                                       :        2 samples, Peak.  30.8 ms (2.0x), Avg.  15.4 ms, Total. 30.80 ms (0.2%)
+[Performance] InitializeOnLoad DrivenRectTransformUndo                                                                       :        2 samples, Peak.   303 us (1.0x), Avg.   296 us, Total. 592.7 us (0.0%)
+[Performance] InitializeOnLoad SceneSearch                                                                                   :        2 samples, Peak.  97.2 us (1.1x), Avg.  87.8 us, Total. 175.5 us (0.0%)
+[Performance] InitializeOnLoad CloudBuild                                                                                    :        2 samples, Peak.  3.40 us (1.2x), Avg.  2.80 us, Total. 5.600 us (0.0%)
+[Performance] InitializeOnLoad NativeFormatImporterUtility                                                                   :        2 samples, Peak.  2.32 ms (1.3x), Avg.  1.83 ms, Total. 3.669 ms (0.0%)
+[Performance] InitializeOnLoad SearchService                                                                                 :        2 samples, Peak.   115 us (1.1x), Avg.   101 us, Total. 201.5 us (0.0%)
+[Performance] InitializeOnLoad SettingsService                                                                               :        2 samples, Peak.  7.90 us (1.2x), Avg.  6.40 us, Total. 12.80 us (0.0%)
+[Performance] InitializeOnLoad WindowLayout                                                                                  :        2 samples, Peak.   624 us (1.1x), Avg.   551 us, Total. 1.102 ms (0.0%)
+[Performance] InitializeOnLoad AssetStoreContext                                                                             :        2 samples, Peak.  19.0 ms (1.0x), Avg.  18.2 ms, Total. 36.46 ms (0.3%)
+[Performance] InitializeOnLoad PoolManager                                                                                   :        2 samples, Peak.   443 us (1.0x), Avg.   423 us, Total. 845.1 us (0.0%)
+[Performance] InitializeOnLoad MixerEffectDefinitionReloader                                                                 :        2 samples, Peak.  1.97 ms (1.3x), Avg.  1.57 ms, Total. 3.137 ms (0.0%)
+[Performance] InitializeOnLoad ProjectSearch                                                                                 :        2 samples, Peak.  56.3 us (1.0x), Avg.  53.9 us, Total. 107.8 us (0.0%)
+[Performance] InitializeOnLoad UISystemProfilerRenderService                                                                 :        2 samples, Peak.  6.50 us (1.0x), Avg.  6.20 us, Total. 12.40 us (0.0%)
+[Performance] InitializeOnLoad EditMode                                                                                      :        2 samples, Peak.   340 us (1.1x), Avg.   307 us, Total. 613.9 us (0.0%)
+[Performance] InitializeOnLoad UnityConnect                                                                                  :        2 samples, Peak.  36.7 us (1.1x), Avg.  33.9 us, Total. 67.80 us (0.0%)
+[Performance] InitializeOnLoad ManagedDebugger                                                                               :        2 samples, Peak.   448 us (1.1x), Avg.   407 us, Total. 813.3 us (0.0%)
+[Performance] InitializeOnLoad ShortcutIntegration                                                                           :        2 samples, Peak.  71.6 us (1.3x), Avg.  54.1 us, Total. 108.2 us (0.0%)
+[Performance] InitializeOnLoad AddComponentWindow                                                                            :        2 samples, Peak.  88.1 us (1.1x), Avg.  80.3 us, Total. 160.7 us (0.0%)
+[Performance] InitializeOnLoad ManagedDebuggerWindow                                                                         :        2 samples, Peak.  95.5 us (1.1x), Avg.  87.1 us, Total. 174.3 us (0.0%)
+[Performance] InitializeOnLoad CacheServerWindow                                                                             :        2 samples, Peak.  7.60 us (1.2x), Avg.  6.25 us, Total. 12.50 us (0.0%)
+[Performance] InitializeOnLoad PlayModeDownload                                                                              :        2 samples, Peak.  3.97 ms (1.9x), Avg.  2.04 ms, Total. 4.085 ms (0.0%)
+[Performance] InitializeOnLoad MenuItems                                                                                     :        2 samples, Peak.  72.7 us (1.0x), Avg.  70.3 us, Total. 140.7 us (0.0%)
+[Performance] InitializeOnLoad PrefabInstanceChangedListener                                                                 :        2 samples, Peak.  88.2 us (1.0x), Avg.  87.9 us, Total. 175.9 us (0.0%)
+[Performance] InitializeOnLoad ObjectSelectorSearch                                                                          :        2 samples, Peak.  66.4 us (1.2x), Avg.  53.5 us, Total. 107.1 us (0.0%)
+[Performance] InitializeOnLoad EditorMonitor                                                                                 :        2 samples, Peak.   765 us (1.4x), Avg.   534 us, Total. 1.067 ms (0.0%)
+[Performance] InitializeOnLoad RetainedMode                                                                                  :        2 samples, Peak.  1.85 ms (1.1x), Avg.  1.71 ms, Total. 3.428 ms (0.0%)
+[Performance] InitializeOnLoad EditorShaderLoader                                                                            :        2 samples, Peak.   454 us (1.0x), Avg.   450 us, Total. 900.7 us (0.0%)
+[Performance] InitializeOnLoad EditorDelegateRegistration                                                                    :        2 samples, Peak.   340 us (1.1x), Avg.   308 us, Total. 615.8 us (0.0%)
+[Performance] InitializeOnLoad UIDocumentHierarchyWatcher                                                                    :        2 samples, Peak.  67.4 us (1.2x), Avg.  57.0 us, Total. 114.0 us (0.0%)
+[Performance] InitializeOnLoad LiveReloadTrackerCreator                                                                      :        2 samples, Peak.   121 us (1.1x), Avg.   106 us, Total. 212.3 us (0.0%)
+[Performance] InitializeOnLoad UxmlObjectEditorFactories                                                                     :        2 samples, Peak.   367 us (1.1x), Avg.   329 us, Total. 658.3 us (0.0%)
+[Performance] InitializeOnLoad UXMLEditorFactories                                                                           :        2 samples, Peak.  46.1 ms (1.1x), Avg.  42.5 ms, Total. 85.07 ms (0.6%)
+[Performance] InitializeOnLoad PurchasingService                                                                             :        2 samples, Peak.  6.89 ms (1.1x), Avg.  6.14 ms, Total. 12.28 ms (0.1%)
+[Performance] InitializeOnLoad CloudBuildPoller                                                                              :        2 samples, Peak.   114 us (1.2x), Avg.  95.6 us, Total. 191.2 us (0.0%)
+[Performance] InitializeOnLoad EditorGameServicesAnalytics                                                                   :        2 samples, Peak.  2.02 ms (1.5x), Avg.  1.32 ms, Total. 2.646 ms (0.0%)
+[Performance] InitializeOnLoad AnalyticsService                                                                              :        2 samples, Peak.   133 us (1.0x), Avg.   130 us, Total. 259.0 us (0.0%)
+[Performance] InitializeOnLoad BuildService                                                                                  :        2 samples, Peak.   176 us (1.3x), Avg.   137 us, Total. 273.7 us (0.0%)
+[Performance] InitializeOnLoad AdsService                                                                                    :        2 samples, Peak.   303 us (1.1x), Avg.   286 us, Total. 572.1 us (0.0%)
+[Performance] InitializeOnLoad UDPService                                                                                    :        2 samples, Peak.   102 us (1.0x), Avg.   102 us, Total. 204.1 us (0.0%)
+[Performance] InitializeOnLoad CrashService                                                                                  :        2 samples, Peak.  93.8 us (1.0x), Avg.  92.1 us, Total. 184.2 us (0.0%)
+[Performance] InitializeOnLoad ServicesRepository                                                                            :        2 samples, Peak.   300 ns (1.0x), Avg.   300 ns, Total. 600.0 ns (0.0%)
+[Performance] InitializeOnLoad SearchWindow                                                                                  :        2 samples, Peak.   101 us (1.1x), Avg.  88.3 us, Total. 176.5 us (0.0%)
+[Performance] InitializeOnLoad CustomIndexers                                                                                :        2 samples, Peak.  15.0 ms (1.1x), Avg.  13.4 ms, Total. 26.79 ms (0.2%)
+[Performance] InitializeOnLoad SearchMonitor                                                                                 :        2 samples, Peak.  1.04 ms (1.2x), Avg.   896 us, Total. 1.791 ms (0.0%)
+[Performance] InitializeOnLoad ParameterControllerEditor                                                                     :        2 samples, Peak.  15.4 us (1.2x), Avg.  13.3 us, Total. 26.70 us (0.0%)
+[Performance] InitializeOnLoad LayerSettingsWindow                                                                           :        2 samples, Peak.  17.2 us (1.6x), Avg.  10.4 us, Total. 20.90 us (0.0%)
+[Performance] InitializeOnLoad PackageManagerHookGUIDConverter.RegisterPackagesEventHandler                                  :        2 samples, Peak.   570 us (1.5x), Avg.   371 us, Total. 742.9 us (0.0%)
+[Performance] InitializeOnLoad EditorDragAndDrop.RegisterEditorClient                                                        :        2 samples, Peak.   225 us (1.2x), Avg.   195 us, Total. 390.5 us (0.0%)
+[Performance] InitializeOnLoad EditorEventCallbacks.InitializeFontAssetResourceChangeCallBacks                               :        2 samples, Peak.  1.52 ms (1.3x), Avg.  1.18 ms, Total. 2.357 ms (0.0%)
+[Performance] InitializeOnLoad SceneTemplateService.Init                                                                     :        2 samples, Peak.  1.04 ms (1.1x), Avg.   911 us, Total. 1.822 ms (0.0%)
+[Performance] InitializeOnLoad DiagnosticSwitchesConsoleMessage.Init                                                         :        2 samples, Peak.  3.81 ms (1.7x), Avg.  2.27 ms, Total. 4.542 ms (0.0%)
+[Performance] InitializeOnLoad MemoryProfilerCompilationGuard.InjectCompileGuard                                             :        2 samples, Peak.   120 us (1.1x), Avg.   112 us, Total. 223.3 us (0.0%)
+[Performance] InitializeOnLoad EditorWindow.Initialize                                                                       :        2 samples, Peak.   395 us (1.5x), Avg.   272 us, Total. 543.4 us (0.0%)
+[Performance] InitializeOnLoad AssetPostprocessingInternal.RefreshCustomDependencies                                         :        2 samples, Peak.  2.71 ms (1.1x), Avg.  2.37 ms, Total. 4.745 ms (0.0%)
+[Performance] InitializeOnLoad SysrootManager.Initialize                                                                     :        2 samples, Peak.   130 us (1.9x), Avg.  68.9 us, Total. 137.9 us (0.0%)
+[Performance] InitializeOnLoad PackageManagerWindow.EditorInitializedInSafeMode                                              :        2 samples, Peak.  16.7 ms (2.0x), Avg.  8.46 ms, Total. 16.93 ms (0.1%)
+[Performance] InitializeOnLoad ToolShortcutContext.Init                                                                      :        2 samples, Peak.   115 us (1.1x), Avg.   103 us, Total. 206.0 us (0.0%)
+[Performance] InitializeOnLoad SceneVisibilityManager.Initialize                                                             :        2 samples, Peak.  3.75 ms (1.5x), Avg.  2.51 ms, Total. 5.019 ms (0.0%)
+[Performance] InitializeOnLoad ScopedRegistryAddedPopup.SubscribeToRegistriesAdded                                           :        2 samples, Peak.  8.04 ms (2.0x), Avg.  4.06 ms, Total. 8.118 ms (0.1%)
+[Performance] AssemblyReloadEvents.afterAssemblyReload: UnityEditor.SceneTemplate.SceneTemplateService.AfterAssemblyReload   :        2 samples, Peak.  3.80 ms (1.9x), Avg.  2.00 ms, Total. 4.006 ms (0.0%)
+[Performance] ProcessService.EditorAfterLoadAllAssemblies                                                                    :        2 samples, Peak.   359 us (1.4x), Avg.   263 us, Total. 526.3 us (0.0%)
+[Performance] Application.ReadLicenseInfo                                                                                    :        1 samples, Peak.  12.5 ms (1.0x), Avg.  12.5 ms, Total. 12.48 ms (0.1%)
+[Performance] Application.InitialRefresh                                                                                     :        1 samples, Peak.  3.93 s (1.0x), Avg.  3.93 s, Total. 3.932 s (29.9%)
+[Performance] Compiling Scripts                                                                                              :        1 samples, Peak.   587 ms (1.0x), Avg.   587 ms, Total. 587.3 ms (4.5%)
+[Performance] AssemblyReloadEvents.beforeAssemblyReload: UnityEditor.SceneTemplate.SceneTemplateService.BeforeAssemblyReload :        1 samples, Peak.   400 us (1.0x), Avg.   400 us, Total. 399.8 us (0.0%)
+[Performance] InitializeOnLoad BurstLoader                                                                                   :        1 samples, Peak.  1.46 s (1.0x), Avg.  1.46 s, Total. 1.464 s (11.1%)
+[Performance] InitializeOnLoad BackgroundWatcher                                                                             :        1 samples, Peak.   280 us (1.0x), Avg.   280 us, Total. 280.2 us (0.0%)
+[Performance] InitializeOnLoad UnityTestProtocolStarter                                                                      :        1 samples, Peak.   191 us (1.0x), Avg.   191 us, Total. 191.0 us (0.0%)
+[Performance] InitializeOnLoad TestStarter                                                                                   :        1 samples, Peak.   534 us (1.0x), Avg.   534 us, Total. 533.7 us (0.0%)
+[Performance] InitializeOnLoad RerunCallbackInitializer                                                                      :        1 samples, Peak.  2.32 ms (1.0x), Avg.  2.32 ms, Total. 2.317 ms (0.0%)
+[Performance] InitializeOnLoad EditorToolManager                                                                             :        1 samples, Peak.  2.04 ms (1.0x), Avg.  2.04 ms, Total. 2.043 ms (0.0%)
+[Performance] InitializeOnLoad VSUsageUtility                                                                                :        1 samples, Peak.  12.4 ms (1.0x), Avg.  12.4 ms, Total. 12.44 ms (0.1%)
+[Performance] InitializeOnLoad VisualStudioEditor                                                                            :        1 samples, Peak.  7.84 ms (1.0x), Avg.  7.84 ms, Total. 7.839 ms (0.1%)
+[Performance] InitializeOnLoad TestRunnerApiListener                                                                         :        1 samples, Peak.  46.4 ms (1.0x), Avg.  46.4 ms, Total. 46.37 ms (0.4%)
+[Performance] InitializeOnLoad VisualStudioIntegration                                                                       :        1 samples, Peak.   556 us (1.0x), Avg.   556 us, Total. 555.8 us (0.0%)
+[Performance] InitializeOnLoad PrefabLayoutRebuilder                                                                         :        1 samples, Peak.   283 us (1.0x), Avg.   283 us, Total. 283.4 us (0.0%)
+[Performance] InitializeOnLoad SpriteSkinCompositeStartup                                                                    :        1 samples, Peak.  12.5 ms (1.0x), Avg.  12.5 ms, Total. 12.46 ms (0.1%)
+[Performance] InitializeOnLoad RiderScriptEditor                                                                             :        1 samples, Peak.  2.76 ms (1.0x), Avg.  2.76 ms, Total. 2.763 ms (0.0%)
+[Performance] InitializeOnLoad CallbackInitializer                                                                           :        1 samples, Peak.  1.05 ms (1.0x), Avg.  1.05 ms, Total. 1.050 ms (0.0%)
+[Performance] InitializeOnLoad SpriteEditorWindow                                                                            :        1 samples, Peak.   322 us (1.0x), Avg.   322 us, Total. 321.5 us (0.0%)
+[Performance] InitializeOnLoad PackageEntryPoint                                                                             :        1 samples, Peak.  87.4 ms (1.0x), Avg.  87.4 ms, Total. 87.35 ms (0.7%)
+[Performance] InitializeOnLoad UnityInternalsInjector                                                                        :        1 samples, Peak.   813 us (1.0x), Avg.   813 us, Total. 812.6 us (0.0%)
+[Performance] InitializeOnLoad UVCSToolbarBoostrap                                                                           :        1 samples, Peak.  39.1 ms (1.0x), Avg.  39.1 ms, Total. 39.09 ms (0.3%)
+[Performance] InitializeOnLoad UnityAnalyticsStorage                                                                         :        1 samples, Peak.   298 us (1.0x), Avg.   298 us, Total. 297.9 us (0.0%)
+[Performance] InitializeOnLoad BoneGizmoInitializer                                                                          :        1 samples, Peak.  2.30 ms (1.0x), Avg.  2.30 ms, Total. 2.299 ms (0.0%)
+[Performance] InitializeOnLoad Analytics                                                                                     :        1 samples, Peak.   208 us (1.0x), Avg.   208 us, Total. 207.7 us (0.0%)
+[Performance] InitializeOnLoad BackgroundImport                                                                              :        1 samples, Peak.   114 us (1.0x), Avg.   114 us, Total. 113.6 us (0.0%)
+[Performance] InitializeOnLoad SceneDragAndDrop                                                                              :        1 samples, Peak.   126 us (1.0x), Avg.   126 us, Total. 126.1 us (0.0%)
+[Performance] InitializeOnLoad SpriteShapeUpdateCache                                                                        :        1 samples, Peak.   354 us (1.0x), Avg.   354 us, Total. 354.1 us (0.0%)
+[Performance] InitializeOnLoad SpriteShapeUnityAnalyticsStorage                                                              :        1 samples, Peak.  12.5 us (1.0x), Avg.  12.5 us, Total. 12.50 us (0.0%)
+[Performance] InitializeOnLoad IKEditorManager.CreateInstance                                                                :        1 samples, Peak.  1.50 ms (1.0x), Avg.  1.50 ms, Total. 1.501 ms (0.0%)
+[Performance] InitializeOnLoad $BurstDirectCallInitializer.Initialize                                                        :        7 samples, Peak.  15.0 ms (4.0x), Avg.  3.72 ms, Total. 26.04 ms (0.2%)
+[Performance] InitializeOnLoad SceneViewGridManager.Initialize                                                               :        1 samples, Peak.  4.01 ms (1.0x), Avg.  4.01 ms, Total. 4.006 ms (0.0%)
+[Performance] InitializeOnLoad TilemapPrefabStageHelper.Initialize                                                           :        1 samples, Peak.  1.37 ms (1.0x), Avg.  1.37 ms, Total. 1.365 ms (0.0%)
+[Performance] InitializeOnLoad SceneViewOpenTilePaletteHelper.Initialize                                                     :        1 samples, Peak.   935 us (1.0x), Avg.   935 us, Total. 935.0 us (0.0%)
+[Performance] InitializeOnLoad TileDragAndDropManager.Initialize                                                             :        1 samples, Peak.   614 us (1.0x), Avg.   614 us, Total. 613.8 us (0.0%)
+[Performance] InitializeOnLoad BackgroundImport.Setup                                                                        :        1 samples, Peak.  1.20 ms (1.0x), Avg.  1.20 ms, Total. 1.203 ms (0.0%)
+[Performance] InitializeOnLoad TestJobDataHolder.ResumeRunningJobs                                                           :        1 samples, Peak.   853 us (1.0x), Avg.   853 us, Total. 852.6 us (0.0%)
+[Performance] InitializeOnLoad AnalyticsReporter.RegisterCallbacks                                                           :        1 samples, Peak.   228 us (1.0x), Avg.   228 us, Total. 228.1 us (0.0%)
+[Performance] InitializeOnLoad VisualStudioEditor.LegacyVisualStudioCodePackageDisabler                                      :        1 samples, Peak.  5.44 ms (1.0x), Avg.  5.44 ms, Total. 5.442 ms (0.0%)
+[Performance] DidReloadScriptsTestRunnerWindow.CompilationCallback                                                           :        1 samples, Peak.   507 us (1.0x), Avg.   507 us, Total. 506.7 us (0.0%)
+[Performance] DidReloadScriptsTestListCache.ScriptReloaded                                                                   :        1 samples, Peak.  1.73 ms (1.0x), Avg.  1.73 ms, Total. 1.729 ms (0.0%)
+[Performance] DidReloadScriptsAdvancedDropdownWindow.OnScriptReload                                                          :        1 samples, Peak.   217 us (1.0x), Avg.   217 us, Total. 216.7 us (0.0%)
+[Performance] AssemblyReloadEvents.afterAssemblyReload: UnityEditor.U2D.Animation.BoneGizmo.OnAfterAssemblyReload            :        1 samples, Peak.  1.28 ms (1.0x), Avg.  1.28 ms, Total. 1.281 ms (0.0%)
+[Performance] SyncVS.PostprocessSyncProject                                                                                  :        1 samples, Peak.   135 us (1.0x), Avg.   135 us, Total. 134.7 us (0.0%)
+[Performance] Application.ImportPackagesAndSetTemplateWhenCreatingProject                                                    :        1 samples, Peak.  11.1 ms (1.0x), Avg.  11.1 ms, Total. 11.05 ms (0.1%)
+[Performance] Application.SyncCurrentColorSpace                                                                              :        1 samples, Peak.  8.42 ms (1.0x), Avg.  8.42 ms, Total. 8.424 ms (0.1%)
+[Performance] Application.OnUsbDevicesChanged                                                                                :        1 samples, Peak.  1.73 ms (1.0x), Avg.  1.73 ms, Total. 1.731 ms (0.0%)
+[Performance] Application.AssetInstanceCacheUpdate                                                                           :        1 samples, Peak.   300 ns (1.0x), Avg.   300 ns, Total. 300.0 ns (0.0%)
+[Performance] Application.UnityExtensions.Initialize                                                                         :        1 samples, Peak.  3.77 ms (1.0x), Avg.  3.77 ms, Total. 3.770 ms (0.0%)
+[Performance] CodeEditorProjectSync.SyncEditorProject                                                                        :        1 samples, Peak.   178 us (1.0x), Avg.   178 us, Total. 177.5 us (0.0%)
+[Performance] Application.ExecuteStartups                                                                                    :        1 samples, Peak.  39.4 ms (1.0x), Avg.  39.4 ms, Total. 39.41 ms (0.3%)
+[Performance] Menu.RegisterMenuInterface                                                                                     :       26 samples, Peak.   500 ns (5.0x), Avg. 100.0 ns, Total. 2.600 us (0.0%)
+[Performance] Gizmo.RebuildRenderers                                                                                         :        1 samples, Peak.  38.3 ms (1.0x), Avg.  38.3 ms, Total. 38.35 ms (0.3%)
+[Performance] Gizmo.AddGizmoRenderers                                                                                        :       93 samples, Peak.  1.81 ms (56.9x), Avg.  31.7 us, Total. 2.952 ms (0.0%)
+[Performance] Application.editorInitializingProject                                                                          :        1 samples, Peak.  91.5 ms (1.0x), Avg.  91.5 ms, Total. 91.54 ms (0.7%)
+[Performance] Application.InitializeMenu                                                                                     :        1 samples, Peak.  86.6 ms (1.0x), Avg.  86.6 ms, Total. 86.61 ms (0.7%)
+[Performance] Menu.RebuildAll                                                                                                :        1 samples, Peak.  86.6 ms (1.0x), Avg.  86.6 ms, Total. 86.60 ms (0.7%)
+[Performance] Menu.BuildRegisteredMenuInterfaces                                                                             :        1 samples, Peak.  85.0 ms (1.0x), Avg.  85.0 ms, Total. 84.99 ms (0.6%)
+[Performance] Menu.FilterMenuItem                                                                                            :      677 samples, Peak.  42.2 ms (657.4x), Avg.  64.2 us, Total. 43.48 ms (0.3%)
+[Performance] UpdateAllMenus                                                                                                 :        1 samples, Peak.   414 us (1.0x), Avg.   414 us, Total. 414.0 us (0.0%)
+[Performance] Menu.RebuildOSMainMenu                                                                                         :        1 samples, Peak.  1.01 ms (1.0x), Avg.  1.01 ms, Total. 1.009 ms (0.0%)
+[Performance] EditorSceneManager.sceneClosing: UnityEditor.SceneVisibilityManager.EditorSceneManagerOnSceneClosing           :        1 samples, Peak.   202 us (1.0x), Avg.   202 us, Total. 201.9 us (0.0%)
+[Performance] GUIView.RepaintAll.PlayerLoopController                                                                        :        1 samples, Peak.  1.10 us (1.0x), Avg.  1.10 us, Total. 1.100 us (0.0%)
+[Performance] EditorSceneManager.newSceneCreated: UnityEditor.SceneTemplate.SceneTemplateService.OnNewSceneCreated           :        1 samples, Peak.   364 us (1.0x), Avg.   364 us, Total. 363.5 us (0.0%)
+[Performance] EditorSceneManager.newSceneCreated: UnityEditor.SceneVisibilityManager.EditorSceneManagerOnNewSceneCreated     :        1 samples, Peak.   244 us (1.0x), Avg.   244 us, Total. 244.4 us (0.0%)
+[Performance] EditorSceneManager.newSceneCreated: UnityEditor.SceneManagement.StageNavigationManager.OnNewSceneCreated       :        1 samples, Peak.  59.2 us (1.0x), Avg.  59.2 us, Total. 59.20 us (0.0%)
+[Performance] Application.InvokeFinishedLoadingProject                                                                       :        1 samples, Peak.  10.1 ms (1.0x), Avg.  10.1 ms, Total. 10.13 ms (0.1%)
+[Performance] ProcessService.OnProjectLoaded                                                                                 :        1 samples, Peak.  77.3 us (1.0x), Avg.  77.3 us, Total. 77.30 us (0.0%)
+[Performance] VersionControl.Task.Wait                                                                                       :        1 samples, Peak.  8.80 us (1.0x), Avg.  8.80 us, Total. 8.800 us (0.0%)
+[Performance] EditorApplication.quitting: Unity.Burst.Editor.BurstLoader.OnEditorApplicationQuitting                         :        1 samples, Peak.  21.6 us (1.0x), Avg.  21.6 us, Total. 21.60 us (0.0%)
+[Performance] EditorApplication.quitting: UnityEditor.Tilemaps.SceneViewGridManager.EditorQuitting                           :        1 samples, Peak.  58.2 us (1.0x), Avg.  58.2 us, Total. 58.20 us (0.0%)
+[Performance] EditorApplication.quitting: callback in UnityEditor.TextCore.Text.EditorEventCallbacks                         :        1 samples, Peak.  8.79 ms (1.0x), Avg.  8.79 ms, Total. 8.788 ms (0.1%)
+[Performance] Application.Shutdown.PauseProfilerSession                                                                      :        1 samples, Peak.  28.6 us (1.0x), Avg.  28.6 us, Total. 28.60 us (0.0%)
+[Performance] Application.Shutdown.PauseAssetImportWorkers                                                                   :        1 samples, Peak.   183 us (1.0x), Avg.   183 us, Total. 182.8 us (0.0%)
+[Performance] Application.Shutdown.SaveAssets                                                                                :        1 samples, Peak.  9.86 ms (1.0x), Avg.  9.86 ms, Total. 9.857 ms (0.1%)
+[Performance] PaletteAssetModificationProcessor.OnWillSaveAssets                                                             :        1 samples, Peak.  1.31 ms (1.0x), Avg.  1.31 ms, Total. 1.312 ms (0.0%)
+[Performance] StateMacroSavedEvent.OnWillSaveAssets                                                                          :        1 samples, Peak.   130 us (1.0x), Avg.   130 us, Total. 130.2 us (0.0%)
+[Performance] UnityCloudProjectLinkMonitor.OnWillSaveAssets                                                                  :        1 samples, Peak.   270 us (1.0x), Avg.   270 us, Total. 270.4 us (0.0%)
+[Performance] UVCSAssetModificationProcessor.OnWillSaveAssets                                                                :        1 samples, Peak.   201 us (1.0x), Avg.   201 us, Total. 200.8 us (0.0%)
+[Performance] FlowMacroSavedEvent.OnWillSaveAssets                                                                           :        1 samples, Peak.   103 us (1.0x), Avg.   103 us, Total. 102.7 us (0.0%)
+[Performance] BuilderAssetModificationProcessor.OnWillSaveAssets                                                             :        1 samples, Peak.   323 us (1.0x), Avg.   323 us, Total. 323.4 us (0.0%)
+[Performance] TerrainModificationProcessor.OnWillSaveAssets                                                                  :        1 samples, Peak.   447 us (1.0x), Avg.   447 us, Total. 446.9 us (0.0%)
+[Performance] AssetDatabase.ImportAssets                                                                                     :        2 samples, Peak.   900 ns (2.0x), Avg.   450 ns, Total. 900.0 ns (0.0%)
+[Performance] Application.Shutdown.CleanupRenderPipeline                                                                     :        1 samples, Peak.  19.2 us (1.0x), Avg.  19.2 us, Total. 19.20 us (0.0%)
+[Performance] Application.Shutdown.StopPreloadManager                                                                        :        1 samples, Peak.  9.73 ms (1.0x), Avg.  9.73 ms, Total. 9.731 ms (0.1%)
+[Performance] Application.Shutdown.DestroyWorld                                                                              :        1 samples, Peak.   462 us (1.0x), Avg.   462 us, Total. 462.3 us (0.0%)
+[Performance] Application.Shutdown.CleanupAfterLoad                                                                          :        1 samples, Peak.   130 ms (1.0x), Avg.   130 ms, Total. 130.1 ms (1.0%)
+[Performance] Application.Shutdown.Progress                                                                                  :        1 samples, Peak.  6.20 us (1.0x), Avg.  6.20 us, Total. 6.200 us (0.0%)
+[Performance] Application.Shutdown.GICleanupManagers                                                                         :        1 samples, Peak.   487 us (1.0x), Avg.   487 us, Total. 487.2 us (0.0%)
+[Performance] Application.Shutdown.MenuCleanupClass                                                                          :        1 samples, Peak.   150 us (1.0x), Avg.   150 us, Total. 150.2 us (0.0%)
+[Performance] Application.Shutdown.ADBSaveStateBeforeShutdown                                                                :        1 samples, Peak.  9.20 us (1.0x), Avg.  9.20 us, Total. 9.200 us (0.0%)
+[Performance] Application.Shutdown.RemoteShutdown                                                                            :        1 samples, Peak.   700 ns (1.0x), Avg.   700 ns, Total. 700.0 ns (0.0%)
+[Performance] Application.Shutdown.CleanupVCProvider                                                                         :        1 samples, Peak.  6.30 us (1.0x), Avg.  6.30 us, Total. 6.300 us (0.0%)
+[Performance] Application.Shutdown.InputShutdown                                                                             :        1 samples, Peak.   500 ns (1.0x), Avg.   500 ns, Total. 500.0 ns (0.0%)
+[Performance] Application.Shutdown.GizmoManagerDestroy                                                                       :        1 samples, Peak.   731 us (1.0x), Avg.   731 us, Total. 731.4 us (0.0%)
+[Performance] Application.Shutdown.ProfilerSession                                                                           :        1 samples, Peak.   129 us (1.0x), Avg.   129 us, Total. 129.2 us (0.0%)
+[Performance] Application.Shutdown.ReleaseGfxWindowOnAllGUIViews                                                             :        1 samples, Peak.   200 ns (1.0x), Avg.   200 ns, Total. 200.0 ns (0.0%)
+[Performance] Application.Shutdown.CleanupEngine                                                                             :        1 samples, Peak.   143 ms (1.0x), Avg.   143 ms, Total. 142.6 ms (1.1%)
+[Performance] Application.Shutdown.CleanupAssetDatabase                                                                      :        1 samples, Peak.  11.2 ms (1.0x), Avg.  11.2 ms, Total. 11.22 ms (0.1%)
+[Performance] Application.Shutdown.ScriptCompilationCleanUp                                                                  :        1 samples, Peak.  10.5 ms (1.0x), Avg.  10.5 ms, Total. 10.54 ms (0.1%)
+[Performance] Application.Shutdown.DestroyJobSystem                                                                          :        1 samples, Peak.   103 us (1.0x), Avg.   103 us, Total. 102.8 us (0.0%)
+[Performance] Application.Shutdown.CleanupPersistentManager                                                                  :        1 samples, Peak.  2.33 ms (1.0x), Avg.  2.33 ms, Total. 2.330 ms (0.0%)
+[Performance] Application.Shutdown.CleanupAsyncReadManager                                                                   :        1 samples, Peak.   230 us (1.0x), Avg.   230 us, Total. 230.1 us (0.0%)
+[Performance] Application.Shutdown.CleanupProgressBar                                                                        :        1 samples, Peak.   200 ns (1.0x), Avg.   200 ns, Total. 200.0 ns (0.0%)
+[Performance] Application.Shutdown.CleanupMono                                                                               :        1 samples, Peak.  86.9 ms (1.0x), Avg.  86.9 ms, Total. 86.92 ms (0.7%)
+[Performance] Application.Shutdown.CleanupStdConverters                                                                      :        1 samples, Peak.  8.00 us (1.0x), Avg.  8.00 us, Total. 8.000 us (0.0%)
+[Performance] Application.Shutdown.UnloadAllPlatformSupportModuleNativeDlls                                                  :        1 samples, Peak.   600 ns (1.0x), Avg.   600 ns, Total. 600.0 ns (0.0%)
+[Performance] Application.Shutdown.UnloadAllPlatformSupportNativeLibraries                                                   :        1 samples, Peak. 100.0 ns (1.0x), Avg. 100.0 ns, Total. 100.00 ns (0.0%)
+[Performance] Application.Shutdown.CleanupAutoDocumentation                                                                  :        1 samples, Peak.   412 us (1.0x), Avg.   412 us, Total. 411.8 us (0.0%)
+[Performance] Application.Shutdown.ShaderNameManagerDestroy                                                                  :        1 samples, Peak.  42.9 us (1.0x), Avg.  42.9 us, Total. 42.90 us (0.0%)
+[Performance] Application.Shutdown.CleanupCacheServer                                                                        :        1 samples, Peak. 0.0 (-nan(ind)x), Avg. 0.0, Total. 0.0 (0.0%)
+[Performance] Application.Shutdown.Virtualization_Shutdown                                                                   :        1 samples, Peak.   400 ns (1.0x), Avg.   400 ns, Total. 400.0 ns (0.0%)
+[Performance] Application.Shutdown.DevConnections                                                                            :        1 samples, Peak.   211 us (1.0x), Avg.   211 us, Total. 210.9 us (0.0%)
+Exiting batchmode successfully now!
+Exiting without the bug reporter. Application will terminate with return code 0

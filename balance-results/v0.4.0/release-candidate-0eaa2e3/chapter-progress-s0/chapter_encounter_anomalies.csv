@@ -1,0 +1,2 @@
+severity,code,scope,floor,development_level,encounter_id,message,evidence,recommendation
+P2,SATURATED_RESULT,Normal,1,C2,f1_opening_encounter,该档固定构筑的聚合结果接近全胜或全败。,胜率 100.0 %,先结合 N/H 档定位是合理端点还是遭遇缺少区分度。

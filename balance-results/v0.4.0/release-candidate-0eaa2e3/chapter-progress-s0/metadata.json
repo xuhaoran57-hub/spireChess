@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "0.2.0",
+  "generatedAtUtc": "2026-08-04T13:14:03.1375659Z",
+  "runtime": "Unity Editor",
+  "unityVersion": "2022.3.62f3c1",
+  "contentVersion": "5.6.0",
+  "configHash": "9ed1dbb542cffb31dab62aa339767bc4497ec7c858028cf36e3802c283646c7f",
+  "gitCommit": "0eaa2e371694598c3ab20686aea497731d98ab89",
+  "sourceTreeDirty": false,
+  "requireCleanSource": true,
+  "strictAcceptance": true,
+  "fixtureVersion": "0.4.0",
+  "fixtureFile": "chapter-progress-fixtures.v0.4.json",
+  "fixtureSha256": "471bf06e2d98176911001cafc39c745acb2ce04687a5b6105074e7120338ac36",
+  "fixtureMode": "progress",
+  "sourceFixtureVersion": "0.3.0",
+  "sourceFixtureFile": "balance-fixtures.v0.3.json",
+  "sourceFixtureSha256": "3b94e5e9212ffe15aaad4faa8990b91a7bc7cf190acf345997c1830cd1fb6e73",
+  "coreClassifierVersion": "0.2.2",
+  "seedSet": "S0_CHAPTER_PROGRESS_FIXED",
+  "firstSeed": 1000,
+  "seedCount": 100,
+  "fixedBuildCount": 6,
+  "developmentLevels": [
+    "C2",
+    "C4",
+    "C5"
+  ],
+  "formalEncounterCount": 33,
+  "mapEncounterCount": 30,
+  "eventEncounterCount": 3,
+  "scenarioCount": 198,
+  "battleCount": 19800,
+  "exceptions": 0,
+  "effectLimitHits": 0,
+  "roundLimitCount": 0,
+  "anomalyCount": 1,
+  "p0AnomalyCount": 0,
+  "p1AnomalyCount": 0,
+  "p2AnomalyCount": 1,
+  "acceptancePassed": true,
+  "gateFailures": [],
+  "elapsedSeconds": 5.8186016999999994,
+  "scenarioFile": "chapter_encounter_scenarios.csv",
+  "aggregateFile": "chapter_encounter_aggregates.csv",
+  "scopeFile": "chapter_encounter_scopes.csv",
+  "anomalyFile": "chapter_encounter_anomalies.csv",
+  "reportFile": "chapter_encounter_report.md",
+  "progressFixtureFile": "chapter_progress_fixtures.csv",
+  "hashAlgorithm": "SHA-256",
+  "outputFiles": [
+    {
+      "fileName": "chapter_encounter_aggregates.csv",
+      "bytes": 10973,
+      "sha256": "c39b598ff7f83101a690650384c965ce6b801e38c506ba824c0bae33fa148a22"
+    },
+    {
+      "fileName": "chapter_encounter_anomalies.csv",
+      "bytes": 286,
+      "sha256": "783b3e3fdcbff51325ccb46f4c8bbdda959c6a3aaab820521cdc545c955dca82"
+    },
+    {
+      "fileName": "chapter_encounter_report.md",
+      "bytes": 6248,
+      "sha256": "5d94e36d9a1a3ba50d6fcd5968749bc6b771852cdf1c70f664e706de90422740"
+    },
+    {
+      "fileName": "chapter_encounter_scenarios.csv",
+      "bytes": 56200,
+      "sha256": "bbf8ebc6e71e4111f48be837491a431eebe29175ecaaef8c763b8bd61a6f1d6f"
+    },
+    {
+      "fileName": "chapter_encounter_scopes.csv",
+      "bytes": 3283,
+      "sha256": "6c8cb0f39397a54df64a6282e5ec5eccf0c8df58056b51525b5c226e348cf2c1"
+    },
+    {
+      "fileName": "chapter_progress_fixtures.csv",
+      "bytes": 10066,
+      "sha256": "77d36844cb89ca8e66f4e0166bb75c94755b8de21ad756a80ec2ceb51b8ba13a"
+    }
+  ],
+  "outputSetSha256": "a854578eeaca51acd9613dac2f4a1d390e6f89e4e2848ef854698eb48a50c795"
+}

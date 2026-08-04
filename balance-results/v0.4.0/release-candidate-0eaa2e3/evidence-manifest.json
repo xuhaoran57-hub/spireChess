@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "0.1.0",
+  "candidateCommit": "0eaa2e371694598c3ab20686aea497731d98ab89",
+  "branch": "codex/v040-clean-player",
+  "generatedAtUtc": "2026-08-04T13:14:03.1375659Z",
+  "hashAlgorithm": "SHA-256",
+  "canonicalization": "Files sorted by ordinal relative path; each row is path<TAB>bytes<TAB>sha256<LF>.",
+  "fileCount": 13,
+  "files": [
+    {
+      "file": "acceptance-summary.md",
+      "bytes": 5163,
+      "sha256": "4f5e755ae59b3d94c58fff7210f28bb0f731f051e3226c7e17fd7c3ad3061e3d"
+    },
+    {
+      "file": "chapter-progress-s0/chapter_encounter_aggregates.csv",
+      "bytes": 10973,
+      "sha256": "c39b598ff7f83101a690650384c965ce6b801e38c506ba824c0bae33fa148a22"
+    },
+    {
+      "file": "chapter-progress-s0/chapter_encounter_anomalies.csv",
+      "bytes": 286,
+      "sha256": "783b3e3fdcbff51325ccb46f4c8bbdda959c6a3aaab820521cdc545c955dca82"
+    },
+    {
+      "file": "chapter-progress-s0/chapter_encounter_report.md",
+      "bytes": 6248,
+      "sha256": "5d94e36d9a1a3ba50d6fcd5968749bc6b771852cdf1c70f664e706de90422740"
+    },
+    {
+      "file": "chapter-progress-s0/chapter_encounter_scenarios.csv",
+      "bytes": 56200,
+      "sha256": "bbf8ebc6e71e4111f48be837491a431eebe29175ecaaef8c763b8bd61a6f1d6f"
+    },
+    {
+      "file": "chapter-progress-s0/chapter_encounter_scopes.csv",
+      "bytes": 3283,
+      "sha256": "6c8cb0f39397a54df64a6282e5ec5eccf0c8df58056b51525b5c226e348cf2c1"
+    },
+    {
+      "file": "chapter-progress-s0/chapter_progress_fixtures.csv",
+      "bytes": 10066,
+      "sha256": "77d36844cb89ca8e66f4e0166bb75c94755b8de21ad756a80ec2ceb51b8ba13a"
+    },
+    {
+      "file": "chapter-progress-s0/metadata.json",
+      "bytes": 2919,
+      "sha256": "38564b3c121f5403d753b17f2f9e33137445798de1b5ce8d96826046bbf6f46a"
+    },
+    {
+      "file": "chapter-progress-s0/unity.log",
+      "bytes": 104619,
+      "sha256": "3292b9ea75fd1853e5a052cc598a3e2f9b448ae6ce75a93c42ca37fe41e2003b"
+    },
+    {
+      "file": "tests/EditMode.log",
+      "bytes": 146026,
+      "sha256": "9cad55c406ecc9fb965f13e564686cc6540644f13a4e6314171fdcd2967e4b38"
+    },
+    {
+      "file": "tests/EditMode-results.xml",
+      "bytes": 286561,
+      "sha256": "d15c59534cf9d8123768306f2bc772156e6a3d63d27a394ace6bd22319d3a629"
+    },
+    {
+      "file": "tests/PlayMode.log",
+      "bytes": 476555,
+      "sha256": "ad8c8e9ce32ba5a80242a8b9a2302ddfc2d3be1ab572568428ab501ef80534eb"
+    },
+    {
+      "file": "tests/PlayMode-results.xml",
+      "bytes": 217794,
+      "sha256": "4b5095dee896827f3c6651f4b082a042f446841c053518a4ee3389d37d1c8529"
+    }
+  ],
+  "evidenceSetSha256": "a73c800c41737e14466f617a9bc5bb11b48a30bfa931cee89acbbb4f03b51594"
+}
