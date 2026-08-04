@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using SpireChess.Battle;
 using SpireChess.Config;
+using SpireChess.Editor;
 using SpireChess.Simulation;
 using SpireChess.Utils;
 using UnityEngine;
@@ -416,6 +418,58 @@ namespace SpireChess.Tests.EditMode
             Assert.That(
                 ChapterEncounterStatistics.Wilson95(0, 0).Low,
                 Is.Zero);
+        }
+
+        [Test]
+        public void EvidenceHasher_RecordsStableSortedSha256Manifest()
+        {
+            var directory = Path.Combine(
+                Path.GetTempPath(),
+                "spirechess-evidence-hash-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(directory);
+            try
+            {
+                var emptyPath = Path.Combine(directory, "a-empty.txt");
+                var abcPath = Path.Combine(directory, "b-abc.txt");
+                File.WriteAllText(emptyPath, string.Empty, new UTF8Encoding(false));
+                File.WriteAllText(abcPath, "abc", new UTF8Encoding(false));
+
+                var first = ChapterEncounterEvidenceHasher.HashFiles(
+                    new[] { abcPath, emptyPath });
+                var second = ChapterEncounterEvidenceHasher.HashFiles(
+                    new[] { emptyPath, abcPath });
+
+                Assert.That(
+                    first.Select(value => value.FileName),
+                    Is.EqualTo(new[] { "a-empty.txt", "b-abc.txt" }));
+                Assert.That(
+                    first[0].Sha256,
+                    Is.EqualTo(
+                        "e3b0c44298fc1c149afbf4c8996fb924" +
+                        "27ae41e4649b934ca495991b7852b855"));
+                Assert.That(
+                    first[1].Sha256,
+                    Is.EqualTo(
+                        "ba7816bf8f01cfea414140de5dae2223" +
+                        "b00361a396177a9cb410ff61f20015ad"));
+                Assert.That(
+                    ChapterEncounterEvidenceHasher.ComputeOutputSetSha256(first),
+                    Is.EqualTo(
+                        ChapterEncounterEvidenceHasher.ComputeOutputSetSha256(
+                            second)));
+
+                var before =
+                    ChapterEncounterEvidenceHasher.ComputeOutputSetSha256(first);
+                File.WriteAllText(abcPath, "abcd", new UTF8Encoding(false));
+                var after = ChapterEncounterEvidenceHasher.ComputeOutputSetSha256(
+                    ChapterEncounterEvidenceHasher.HashFiles(
+                        new[] { abcPath, emptyPath }));
+                Assert.That(after, Is.Not.EqualTo(before));
+            }
+            finally
+            {
+                Directory.Delete(directory, true);
+            }
         }
 
         private ChapterEncounterAggregate Row(

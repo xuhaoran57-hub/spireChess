@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using SpireChess.Battle;
@@ -62,6 +63,14 @@ namespace SpireChess.Editor
             var repositoryRoot = Directory.GetParent(projectRoot)?.FullName ??
                                  projectRoot;
             var outputDirectory = options.ResolveOutputDirectory(repositoryRoot);
+            var gitState = ReadGitState(repositoryRoot);
+            if (options.RequireCleanSource &&
+                (!gitState.IsAvailable || gitState.SourceTreeDirty))
+            {
+                throw new InvalidOperationException(
+                    "Chapter encounter acceptance requires a clean, " +
+                    "identifiable Git source tree. " + gitState.Diagnostic);
+            }
 
             var configs = new ConfigService(new NewtonsoftJsonSerializer());
             var validation = configs.LoadFromResources();
@@ -83,18 +92,25 @@ namespace SpireChess.Editor
                 "Fixtures",
                 "Balance",
                 "balance-fixtures.v0.3.json");
+            var sourceFixtureSha256 =
+                ChapterEncounterEvidenceHasher.ComputeFileSha256(fixturePath);
             var sourceFixtures = BalanceFixtureCatalog.Load(
                 File.ReadAllText(fixturePath),
                 ResolveMinion);
             ChapterProgressFixtureCatalog progressFixtures = null;
+            string progressFixturePath = null;
+            string progressFixtureSha256 = null;
             if (options.UsesProgressFixtures)
             {
-                var progressFixturePath = Path.Combine(
+                progressFixturePath = Path.Combine(
                     Application.dataPath,
                     "Tests",
                     "Fixtures",
                     "Balance",
                     "chapter-progress-fixtures.v0.4.json");
+                progressFixtureSha256 =
+                    ChapterEncounterEvidenceHasher.ComputeFileSha256(
+                        progressFixturePath);
                 progressFixtures = ChapterProgressFixtureCatalog.Load(
                     File.ReadAllText(progressFixturePath),
                     sourceFixtures,
@@ -210,6 +226,36 @@ namespace SpireChess.Editor
                 value.EffectLimitHitCount);
             var roundLimitCount = scenarioResults.Sum(value =>
                 value.RoundLimitCount);
+            var p0AnomalyCount = anomalies.Count(value =>
+                value.Severity == "P0");
+            var p1AnomalyCount = anomalies.Count(value =>
+                value.Severity == "P1");
+            var p2AnomalyCount = anomalies.Count(value =>
+                value.Severity == "P2");
+            var gateFailures = BuildAcceptanceGateFailures(
+                expectedScenarioCount,
+                expectedBattleCount,
+                scenarioResults.Count,
+                scenarioResults.Sum(value => value.Batch.Battles),
+                safetyExceptions,
+                effectLimitHits,
+                roundLimitCount,
+                p0AnomalyCount,
+                p1AnomalyCount);
+            var outputFiles = new List<string>
+            {
+                scenarioFile,
+                aggregateFile,
+                scopeFile,
+                anomalyFile,
+                reportFile
+            };
+            if (progressFixtureFile != null)
+            {
+                outputFiles.Add(progressFixtureFile);
+            }
+            var outputEvidence =
+                ChapterEncounterEvidenceHasher.HashFiles(outputFiles);
             var metadata = new ChapterEncounterSamplingMetadata
             {
                 GeneratedAtUtc = DateTime.UtcNow.ToString(
@@ -219,14 +265,25 @@ namespace SpireChess.Editor
                 UnityVersion = Application.unityVersion,
                 ContentVersion = configs.ContentRelease.ContentVersion,
                 ConfigHash = configs.Identity.ConfigHash,
-                GitCommit = ReadGitState(repositoryRoot),
+                GitCommit = gitState.Commit,
+                SourceTreeDirty = gitState.SourceTreeDirty,
+                RequireCleanSource = options.RequireCleanSource,
+                StrictAcceptance = options.StrictAcceptance,
                 FixtureMode = options.FixtureMode,
                 FixtureVersion = options.UsesProgressFixtures
                     ? progressFixtures.FixtureVersion
                     : sourceFixtures.FixtureVersion,
+                FixtureFile = options.UsesProgressFixtures
+                    ? Path.GetFileName(progressFixturePath)
+                    : Path.GetFileName(fixturePath),
+                FixtureSha256 = options.UsesProgressFixtures
+                    ? progressFixtureSha256
+                    : sourceFixtureSha256,
                 SourceFixtureVersion = options.UsesProgressFixtures
                     ? progressFixtures.SourceFixtureVersion
                     : sourceFixtures.FixtureVersion,
+                SourceFixtureFile = Path.GetFileName(fixturePath),
+                SourceFixtureSha256 = sourceFixtureSha256,
                 CoreClassifierVersion = sourceFixtures.CoreClassifierVersion,
                 SeedSet = options.SeedSetName,
                 FirstSeed = options.FirstSeed,
@@ -244,9 +301,11 @@ namespace SpireChess.Editor
                 EffectLimitHits = effectLimitHits,
                 RoundLimitCount = roundLimitCount,
                 AnomalyCount = anomalies.Count,
-                P0AnomalyCount = anomalies.Count(value => value.Severity == "P0"),
-                P1AnomalyCount = anomalies.Count(value => value.Severity == "P1"),
-                P2AnomalyCount = anomalies.Count(value => value.Severity == "P2"),
+                P0AnomalyCount = p0AnomalyCount,
+                P1AnomalyCount = p1AnomalyCount,
+                P2AnomalyCount = p2AnomalyCount,
+                AcceptancePassed = gateFailures.Count == 0,
+                GateFailures = gateFailures.ToArray(),
                 ElapsedSeconds = stopwatch.Elapsed.TotalSeconds,
                 ScenarioFile = Path.GetFileName(scenarioFile),
                 AggregateFile = Path.GetFileName(aggregateFile),
@@ -255,7 +314,12 @@ namespace SpireChess.Editor
                 ReportFile = Path.GetFileName(reportFile),
                 ProgressFixtureFile = progressFixtureFile == null
                     ? null
-                    : Path.GetFileName(progressFixtureFile)
+                    : Path.GetFileName(progressFixtureFile),
+                HashAlgorithm = "SHA-256",
+                OutputFiles = outputEvidence.ToArray(),
+                OutputSetSha256 =
+                    ChapterEncounterEvidenceHasher.ComputeOutputSetSha256(
+                        outputEvidence)
             };
             File.WriteAllText(
                 metadataFile,
@@ -268,12 +332,58 @@ namespace SpireChess.Editor
                 $"roundLimits={metadata.RoundLimitCount}, anomalies={metadata.AnomalyCount}, " +
                 $"elapsed={metadata.ElapsedSeconds:0.0}s, output={outputDirectory}.");
 
-            if (metadata.Exceptions > 0 || metadata.EffectLimitHits > 0)
+            if (metadata.Exceptions > 0 || metadata.EffectLimitHits > 0 ||
+                (options.StrictAcceptance && gateFailures.Count > 0))
             {
                 throw new InvalidOperationException(
-                    "Chapter encounter sampling failed its simulation safety gate. " +
+                    "Chapter encounter sampling failed its acceptance gate: " +
+                    string.Join("; ", gateFailures) + ". " +
                     "See metadata.json and chapter_encounter_anomalies.csv.");
             }
+        }
+
+        private static IReadOnlyList<string> BuildAcceptanceGateFailures(
+            int expectedScenarioCount,
+            int expectedBattleCount,
+            int actualScenarioCount,
+            int actualBattleCount,
+            int exceptions,
+            int effectLimitHits,
+            int roundLimitCount,
+            int p0AnomalyCount,
+            int p1AnomalyCount)
+        {
+            var failures = new List<string>();
+            if (actualScenarioCount != expectedScenarioCount)
+            {
+                failures.Add(
+                    $"scenarioCount={actualScenarioCount}, " +
+                    $"expected={expectedScenarioCount}");
+            }
+            if (actualBattleCount != expectedBattleCount)
+            {
+                failures.Add(
+                    $"battleCount={actualBattleCount}, " +
+                    $"expected={expectedBattleCount}");
+            }
+            if (exceptions > 0) failures.Add($"exceptions={exceptions}");
+            if (effectLimitHits > 0)
+            {
+                failures.Add($"effectLimitHits={effectLimitHits}");
+            }
+            if (roundLimitCount > 0)
+            {
+                failures.Add($"roundLimitCount={roundLimitCount}");
+            }
+            if (p0AnomalyCount > 0)
+            {
+                failures.Add($"p0AnomalyCount={p0AnomalyCount}");
+            }
+            if (p1AnomalyCount > 0)
+            {
+                failures.Add($"p1AnomalyCount={p1AnomalyCount}");
+            }
+            return failures.AsReadOnly();
         }
 
         private static IReadOnlyList<ChapterEncounterScopeSummary> BuildScopeSummaries(
@@ -982,20 +1092,35 @@ namespace SpireChess.Editor
                 StringComparison.OrdinalIgnoreCase));
         }
 
-        private static string ReadGitState(string repositoryRoot)
+        private static GitState ReadGitState(string repositoryRoot)
         {
             try
             {
-                var commit = RunGit(repositoryRoot, "rev-parse --short=12 HEAD").Trim();
+                var commit = RunGit(repositoryRoot, "rev-parse HEAD").Trim();
                 var status = RunGit(
                     repositoryRoot,
-                    "status --porcelain --untracked-files=no");
-                return string.IsNullOrWhiteSpace(status) ? commit : commit + "+dirty";
+                    "status --porcelain");
+                var sourceTreeDirty = !string.IsNullOrWhiteSpace(status);
+                return new GitState
+                {
+                    IsAvailable = true,
+                    Commit = commit,
+                    SourceTreeDirty = sourceTreeDirty,
+                    Diagnostic = sourceTreeDirty
+                        ? "The source tree was dirty before sampling started."
+                        : "The source tree was clean before sampling started."
+                };
             }
             catch (Exception exception)
             {
                 Debug.LogWarning($"Unable to read Git state: {exception.Message}");
-                return "unknown";
+                return new GitState
+                {
+                    IsAvailable = false,
+                    Commit = "unknown",
+                    SourceTreeDirty = true,
+                    Diagnostic = "Git state was unavailable: " + exception.Message
+                };
             }
         }
 
@@ -1082,6 +1207,8 @@ namespace SpireChess.Editor
             public int SeedCount { get; private set; }
             public string OutputDirectory { get; private set; }
             public string FixtureMode { get; private set; }
+            public bool RequireCleanSource { get; private set; }
+            public bool StrictAcceptance { get; private set; }
             public bool UsesProgressFixtures => string.Equals(
                 FixtureMode,
                 ProgressFixtureMode,
@@ -1125,6 +1252,14 @@ namespace SpireChess.Editor
                     arguments,
                     "-chapterSampleSeedCount",
                     options.SeedCount);
+                options.RequireCleanSource = ReadBoolArgument(
+                    arguments,
+                    "-chapterSampleRequireCleanSource",
+                    options.RequireCleanSource);
+                options.StrictAcceptance = ReadBoolArgument(
+                    arguments,
+                    "-chapterSampleStrictAcceptance",
+                    options.StrictAcceptance);
                 if (options.SeedCount < 1)
                 {
                     throw new ArgumentOutOfRangeException(
@@ -1149,6 +1284,21 @@ namespace SpireChess.Editor
                     options.SeedSetName = "S0_CHAPTER_PROGRESS";
                 }
                 return options;
+            }
+
+            private static bool ReadBoolArgument(
+                IReadOnlyList<string> arguments,
+                string name,
+                bool fallback)
+            {
+                var text = ReadArgument(arguments, name);
+                if (string.IsNullOrWhiteSpace(text)) return fallback;
+                if (!bool.TryParse(text, out var value))
+                {
+                    throw new ArgumentException(
+                        $"{name} must be true or false, got {text}.");
+                }
+                return value;
             }
 
             public string ResolveOutputDirectory(string repositoryRoot)
@@ -1208,7 +1358,7 @@ namespace SpireChess.Editor
         private sealed class ChapterEncounterSamplingMetadata
         {
             [JsonProperty("schemaVersion")]
-            public string SchemaVersion { get; set; } = "0.1.0";
+            public string SchemaVersion { get; set; } = "0.2.0";
 
             [JsonProperty("generatedAtUtc")]
             public string GeneratedAtUtc { get; set; }
@@ -1228,14 +1378,35 @@ namespace SpireChess.Editor
             [JsonProperty("gitCommit")]
             public string GitCommit { get; set; }
 
+            [JsonProperty("sourceTreeDirty")]
+            public bool SourceTreeDirty { get; set; }
+
+            [JsonProperty("requireCleanSource")]
+            public bool RequireCleanSource { get; set; }
+
+            [JsonProperty("strictAcceptance")]
+            public bool StrictAcceptance { get; set; }
+
             [JsonProperty("fixtureVersion")]
             public string FixtureVersion { get; set; }
+
+            [JsonProperty("fixtureFile")]
+            public string FixtureFile { get; set; }
+
+            [JsonProperty("fixtureSha256")]
+            public string FixtureSha256 { get; set; }
 
             [JsonProperty("fixtureMode")]
             public string FixtureMode { get; set; }
 
             [JsonProperty("sourceFixtureVersion")]
             public string SourceFixtureVersion { get; set; }
+
+            [JsonProperty("sourceFixtureFile")]
+            public string SourceFixtureFile { get; set; }
+
+            [JsonProperty("sourceFixtureSha256")]
+            public string SourceFixtureSha256 { get; set; }
 
             [JsonProperty("coreClassifierVersion")]
             public string CoreClassifierVersion { get; set; }
@@ -1291,6 +1462,12 @@ namespace SpireChess.Editor
             [JsonProperty("p2AnomalyCount")]
             public int P2AnomalyCount { get; set; }
 
+            [JsonProperty("acceptancePassed")]
+            public bool AcceptancePassed { get; set; }
+
+            [JsonProperty("gateFailures")]
+            public string[] GateFailures { get; set; }
+
             [JsonProperty("elapsedSeconds")]
             public double ElapsedSeconds { get; set; }
 
@@ -1311,6 +1488,23 @@ namespace SpireChess.Editor
 
             [JsonProperty("progressFixtureFile")]
             public string ProgressFixtureFile { get; set; }
+
+            [JsonProperty("hashAlgorithm")]
+            public string HashAlgorithm { get; set; }
+
+            [JsonProperty("outputFiles")]
+            public ChapterEncounterEvidenceFile[] OutputFiles { get; set; }
+
+            [JsonProperty("outputSetSha256")]
+            public string OutputSetSha256 { get; set; }
+        }
+
+        private sealed class GitState
+        {
+            public bool IsAvailable { get; set; }
+            public string Commit { get; set; }
+            public bool SourceTreeDirty { get; set; }
+            public string Diagnostic { get; set; }
         }
 
         private sealed class ChapterEncounterScopeSummary
@@ -1368,6 +1562,92 @@ namespace SpireChess.Editor
                           successfulBattles
                 };
             }
+        }
+    }
+
+    public sealed class ChapterEncounterEvidenceFile
+    {
+        [JsonProperty("fileName")]
+        public string FileName { get; set; }
+
+        [JsonProperty("bytes")]
+        public long Bytes { get; set; }
+
+        [JsonProperty("sha256")]
+        public string Sha256 { get; set; }
+    }
+
+    public static class ChapterEncounterEvidenceHasher
+    {
+        public static IReadOnlyList<ChapterEncounterEvidenceFile> HashFiles(
+            IEnumerable<string> paths)
+        {
+            if (paths == null) throw new ArgumentNullException(nameof(paths));
+            var files = paths.Select(path =>
+                {
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        throw new ArgumentException(
+                            "Evidence file paths cannot be empty.",
+                            nameof(paths));
+                    }
+                    var file = new FileInfo(path);
+                    if (!file.Exists)
+                    {
+                        throw new FileNotFoundException(
+                            "Evidence file was not found.",
+                            file.FullName);
+                    }
+                    return new ChapterEncounterEvidenceFile
+                    {
+                        FileName = file.Name,
+                        Bytes = file.Length,
+                        Sha256 = ComputeFileSha256(file.FullName)
+                    };
+                })
+                .OrderBy(value => value.FileName, StringComparer.Ordinal)
+                .ToList();
+            if (files.Select(value => value.FileName)
+                .Distinct(StringComparer.Ordinal).Count() != files.Count)
+            {
+                throw new InvalidOperationException(
+                    "Evidence file names must be unique.");
+            }
+            return files.AsReadOnly();
+        }
+
+        public static string ComputeFileSha256(string path)
+        {
+            using (var stream = File.OpenRead(path))
+            using (var sha256 = SHA256.Create())
+            {
+                return ToLowerHex(sha256.ComputeHash(stream));
+            }
+        }
+
+        public static string ComputeOutputSetSha256(
+            IEnumerable<ChapterEncounterEvidenceFile> files)
+        {
+            if (files == null) throw new ArgumentNullException(nameof(files));
+            var canonical = string.Join(
+                "\n",
+                files.OrderBy(value => value.FileName, StringComparer.Ordinal)
+                    .Select(value =>
+                        value.FileName + "\t" +
+                        value.Bytes.ToString(CultureInfo.InvariantCulture) + "\t" +
+                        value.Sha256)) + "\n";
+            using (var sha256 = SHA256.Create())
+            {
+                return ToLowerHex(sha256.ComputeHash(
+                    new UTF8Encoding(false).GetBytes(canonical)));
+            }
+        }
+
+        private static string ToLowerHex(byte[] bytes)
+        {
+            return BitConverter.ToString(bytes)
+                .Replace("-", string.Empty)
+                .ToLowerInvariant();
         }
     }
 }
