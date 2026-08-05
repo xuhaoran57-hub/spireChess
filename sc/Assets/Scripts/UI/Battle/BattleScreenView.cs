@@ -127,7 +127,8 @@ namespace SpireChess.UI.Battle
             HasSlots(enemySlots) && HasSlots(playerSlots) &&
             logScrollRect != null && logText != null &&
             feedbackCanvasGroup != null && feedbackText != null &&
-            feedbackFxPool != null && boardPulseCanvasGroup != null &&
+            feedbackFxPool != null && impactFxLayer != null &&
+            boardMotionRoot != null && boardPulseCanvasGroup != null &&
             boardPulseImage != null && resultLayer != null &&
             resultCanvasGroup != null && resultTitleText != null &&
             resultBodyText != null &&
@@ -600,7 +601,8 @@ namespace SpireChess.UI.Battle
                     target,
                     playbackEvent.TargetSide,
                     playbackEvent.TargetIndex),
-                AttackerColor);
+                AttackerColor,
+                scale);
             SetSlotHighlight(
                 playbackEvent.SourceSide,
                 playbackEvent.SourceIndex,
@@ -686,15 +688,20 @@ namespace SpireChess.UI.Battle
                 playbackEvent.TargetIndex);
             var targetBaseHealth = target?.Model?.BaseHealth ??
                                    Mathf.Max(1, playbackEvent.Amount * 2);
+            var targetIsDefeated = target != null &&
+                                  target.Model != null &&
+                                  target.Model.Health <= 0;
             var impactEmphasis = ResolveImpactEmphasis(
                 playbackEvent.Amount,
-                targetBaseHealth);
+                targetBaseHealth,
+                targetIsDefeated);
             if (playbackEvent.WasBlocked)
             {
                 impactFxLayer?.PlayImpact(
                     impactPosition,
                     ShieldColor,
-                    PresentationFxEmphasis.Normal);
+                    PresentationFxEmphasis.Normal,
+                    scale);
                 ShowFeedback("格挡", ShieldColor);
                 PlayFx(
                     "格挡",
@@ -718,7 +725,8 @@ namespace SpireChess.UI.Battle
             impactFxLayer?.PlayImpact(
                 impactPosition,
                 TargetColor,
-                impactEmphasis);
+                impactEmphasis,
+                scale);
             ShowFeedback($"-{playbackEvent.Amount}", TargetColor);
             PlayFx(
                 $"-{playbackEvent.Amount}",
@@ -879,7 +887,8 @@ namespace SpireChess.UI.Battle
                     playbackEvent.TargetSide,
                     playbackEvent.TargetIndex),
                 DeathColor,
-                token);
+                token,
+                scale);
             var label = token ? "衍生消散" : "阵亡";
             ShowFeedback(label, DeathColor);
             PlayFx(
@@ -1368,8 +1377,14 @@ namespace SpireChess.UI.Battle
 
         public static PresentationFxEmphasis ResolveImpactEmphasis(
             int damage,
-            int targetBaseHealth)
+            int targetBaseHealth,
+            bool isLethal = false)
         {
+            if (isLethal)
+            {
+                return PresentationFxEmphasis.Critical;
+            }
+
             var safeHealth = Mathf.Max(1, targetBaseHealth);
             var strongThreshold = Mathf.Max(
                 2,

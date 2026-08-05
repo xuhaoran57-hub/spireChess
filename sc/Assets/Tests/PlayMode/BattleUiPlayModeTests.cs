@@ -108,6 +108,7 @@ namespace SpireChess.Tests
                 .GetComponent<Button>().onClick.Invoke();
             Assert.That(screen.IsAnimationPlaying, Is.False);
             Assert.That(screen.ActiveFeedbackFxCount, Is.Zero);
+            Assert.That(screen.ActiveImpactFxCount, Is.Zero);
 
             for (var step = 0; step < 10 && controller.LastResult == null; step++)
             {
@@ -167,6 +168,7 @@ namespace SpireChess.Tests
 
             Assert.That(screen.IsAnimationPlaying, Is.False);
             Assert.That(screen.ActiveFeedbackFxCount, Is.Zero);
+            Assert.That(screen.ActiveImpactFxCount, Is.Zero);
             Assert.That(standee.GetComponent<CanvasGroup>().alpha,
                 Is.EqualTo(1f).Within(0.001f));
             Assert.That(

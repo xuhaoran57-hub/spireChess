@@ -2524,6 +2524,7 @@ namespace SpireChess.Diagnostics
                 () => battleController.LastResult != null &&
                       !battleScreen.IsAnimationPlaying &&
                       battleScreen.ActiveFeedbackFxCount == 0 &&
+                      battleScreen.ActiveImpactFxCount == 0 &&
                       !HasActiveNonLoopingAudio() &&
                       !HasActiveNonLoopingAnimation() &&
                       battleScreen.IsResultVisible &&
@@ -2948,6 +2949,7 @@ namespace SpireChess.Diagnostics
                 () => battleController.LastResult != null &&
                       !battleScreen.IsAnimationPlaying &&
                       battleScreen.ActiveFeedbackFxCount == 0 &&
+                      battleScreen.ActiveImpactFxCount == 0 &&
                       !HasActiveNonLoopingAudio() &&
                       !HasActiveNonLoopingAnimation() &&
                       battleScreen.IsResultVisible &&
@@ -3398,6 +3400,7 @@ namespace SpireChess.Diagnostics
                     () => battleController.LastResult != null &&
                           !battleScreen.IsAnimationPlaying &&
                           battleScreen.ActiveFeedbackFxCount == 0 &&
+                          battleScreen.ActiveImpactFxCount == 0 &&
                           !HasActiveNonLoopingAudio() &&
                           !HasActiveNonLoopingAnimation() &&
                           battleScreen.IsResultVisible &&
@@ -3470,6 +3473,7 @@ namespace SpireChess.Diagnostics
                         StringComparison.Ordinal) ||
                     battleScreen.IsAnimationPlaying ||
                     battleScreen.ActiveFeedbackFxCount != 0 ||
+                    battleScreen.ActiveImpactFxCount != 0 ||
                     HasActiveNonLoopingAudio() ||
                     HasActiveNonLoopingAnimation())
                 {
@@ -3499,6 +3503,7 @@ namespace SpireChess.Diagnostics
             if (finalBattleScreen == null ||
                 finalBattleScreen.IsAnimationPlaying ||
                 finalBattleScreen.ActiveFeedbackFxCount != 0 ||
+                finalBattleScreen.ActiveImpactFxCount != 0 ||
                 HasActiveNonLoopingAudio() ||
                 HasActiveNonLoopingAnimation())
             {

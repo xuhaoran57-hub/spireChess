@@ -73,6 +73,21 @@ namespace SpireChess.Tests.EditMode
         [Test]
         public void Prefabs_HaveStableHierarchyAndCompleteBindings()
         {
+            var screenPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                ScreenPrefabPath);
+            Assert.That(screenPrefab, Is.Not.Null);
+            var serializedScreen = new SerializedObject(
+                screenPrefab.GetComponent<BattleScreenView>());
+            Assert.That(
+                serializedScreen.FindProperty("impactFxLayer")
+                    .objectReferenceValue,
+                Is.Not.Null,
+                "PF_BattleScreen must serialize its impact VFX layer.");
+            Assert.That(
+                serializedScreen.FindProperty("boardMotionRoot")
+                    .objectReferenceValue,
+                Is.Not.Null,
+                "PF_BattleScreen must serialize its board motion root.");
             var slotPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SlotPrefabPath);
             Assert.That(slotPrefab, Is.Not.Null);
             Assert.That(slotPrefab.GetComponent<BattleSlotView>(), Is.Not.Null);
@@ -98,6 +113,14 @@ namespace SpireChess.Tests.EditMode
             Assert.That(standeeRootImage.raycastTarget, Is.True);
             Assert.That(standeePrefab.transform.Find("PortraitMask/Portrait"),
                 Is.Not.Null);
+            Assert.That(standeePrefab.transform.Find("HitFlashOverlay"),
+                Is.Not.Null);
+            var serializedStandee = new SerializedObject(standee);
+            Assert.That(
+                serializedStandee.FindProperty("hitFlashOverlay")
+                    .objectReferenceValue,
+                Is.Not.Null,
+                "PF_BattleStandee must serialize its hit-flash overlay.");
             Assert.That(standeePrefab.transform.Find("ShieldOverlay"),
                 Is.Not.Null);
             Assert.That(standeePrefab.transform.Find("TauntBase"), Is.Not.Null);
@@ -322,7 +345,9 @@ namespace SpireChess.Tests.EditMode
             var impact = layer.GetComponent<BattleImpactFxLayer>();
             Assert.That(pool, Is.Not.Null);
             Assert.That(impact, Is.Not.Null);
-            Assert.That(impact.Capacity, Is.EqualTo(32));
+            Assert.That(
+                impact.Capacity,
+                Is.EqualTo(BattleImpactFxLayer.FixedPoolCapacity));
             pool.Configure(
                 Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"),
                 3);
@@ -382,6 +407,9 @@ namespace SpireChess.Tests.EditMode
                 BattleScreenView.ResolveImpactEmphasis(5, 10),
                 Is.EqualTo(PresentationFxEmphasis.Strong));
             Assert.That(
+                BattleScreenView.ResolveImpactEmphasis(2, 10, true),
+                Is.EqualTo(PresentationFxEmphasis.Critical));
+            Assert.That(
                 BattleScreenView.ResolveHitStopSeconds(
                     PresentationFxEmphasis.Normal),
                 Is.EqualTo(0.025f).Within(0.001f));
@@ -389,6 +417,55 @@ namespace SpireChess.Tests.EditMode
                 BattleScreenView.ResolveHitStopSeconds(
                     PresentationFxEmphasis.Strong),
                 Is.EqualTo(0.045f).Within(0.001f));
+            Assert.That(
+                BattleScreenView.ResolveHitStopSeconds(
+                    PresentationFxEmphasis.Critical),
+                Is.EqualTo(0.060f).Within(0.001f));
+        }
+
+        [Test]
+        public void ImpactFx_UsesPlaybackDurationScaleAndEventBudget()
+        {
+            view.Render(CreateState());
+            var impact = root.Find("SafeArea/VfxLayer")
+                .GetComponent<BattleImpactFxLayer>();
+
+            impact.PlayImpact(
+                Vector2.zero,
+                Color.red,
+                PresentationFxEmphasis.Critical,
+                0.5f);
+            Assert.That(
+                impact.ActiveCount,
+                Is.EqualTo(BattleImpactFxLayer.MaximumElementsPerEvent));
+            impact.Advance(0.13f);
+            Assert.That(impact.ActiveCount, Is.Zero,
+                "2x critical impacts must finish within their scaled window.");
+
+            impact.PlayImpact(
+                Vector2.zero,
+                Color.red,
+                PresentationFxEmphasis.Critical);
+            impact.Advance(0.13f);
+            Assert.That(impact.ActiveCount, Is.GreaterThan(0),
+                "1x critical impacts must remain longer than their 2x variant.");
+            impact.ClearImmediate();
+
+            impact.PlayAttackTrail(
+                new Vector2(-100f, 0f),
+                new Vector2(100f, 0f),
+                Color.yellow,
+                0.5f);
+            impact.Advance(0.10f);
+            Assert.That(impact.ActiveCount, Is.Zero);
+
+            impact.PlayDeath(
+                Vector2.zero,
+                Color.magenta,
+                true,
+                0.5f);
+            impact.Advance(0.13f);
+            Assert.That(impact.ActiveCount, Is.Zero);
         }
 
         [Test]

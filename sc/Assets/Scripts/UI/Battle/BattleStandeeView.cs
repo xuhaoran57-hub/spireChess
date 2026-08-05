@@ -70,7 +70,8 @@ namespace SpireChess.UI.Battle
             : hitFlashOverlay.color.a;
         public bool HasCompleteBindings =>
             spriteCatalog != null && theme != null && portrait != null &&
-            portraitFallback != null && frame != null && shieldOverlay != null &&
+            portraitFallback != null && frame != null &&
+            hitFlashOverlay != null && shieldOverlay != null &&
             tauntBase != null && deathrattleSeal != null && splashMark != null &&
             attackMedallion != null && healthMedallion != null &&
             attackText != null && healthText != null && targetHighlight != null;

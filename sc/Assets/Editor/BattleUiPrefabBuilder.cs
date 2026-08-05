@@ -36,28 +36,32 @@ namespace SpireChess.Editor
             Color.clear;
         private static readonly Color ButtonColor =
             new Color(0.16f, 0.19f, 0.25f, 1f);
-        private const string StandeeArtRoot =
-            "Assets/Art/Presentation/UI/Battle/Standee";
         private const string ShieldMaterialPath =
-            StandeeArtRoot + "/M_BattleShieldAdditive.mat";
-        private const string ShieldSquireArtPath =
-            "Assets/Art/Presentation/Cards/Minions/ForgeSoul/" +
-            "card_minion_forge_soul_shield_squire.png";
+            "Assets/Art/Presentation/UI/Battle/Standee/" +
+            "M_BattleShieldAdditive.mat";
 
         [MenuItem("Spire Chess/UI/Rebuild Battle UI")]
         public static void Build()
         {
-            CardUiPrefabBuilder.Build();
-            EnsureFolder("Assets/Prefabs/UI", "Battle");
             var font = AssetDatabase.LoadAssetAtPath<Font>(
                 CardUiPrefabBuilder.FontPath);
             var cardPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 CardUiPrefabBuilder.PrefabPath);
             if (font == null || cardPrefab == null)
             {
+                CardUiPrefabBuilder.Build();
+                font = AssetDatabase.LoadAssetAtPath<Font>(
+                    CardUiPrefabBuilder.FontPath);
+                cardPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                    CardUiPrefabBuilder.PrefabPath);
+            }
+            if (font == null || cardPrefab == null)
+            {
                 throw new InvalidOperationException(
                     "Battle UI requires the pinned font and PF_Card.");
             }
+
+            EnsureFolder("Assets/Prefabs/UI", "Battle");
 
             var catalog = AssetDatabase.LoadAssetAtPath<PresentationSpriteCatalog>(
                 CardUiPrefabBuilder.SpriteCatalogPath);
@@ -307,40 +311,11 @@ namespace SpireChess.Editor
         private static Material ConfigureStandeePresentation(
             PresentationSpriteCatalog catalog)
         {
-            if (catalog == null)
+            if (catalog == null || !catalog.HasCompleteBattleStandeeSet)
             {
                 throw new InvalidOperationException(
-                    "PresentationSpriteCatalog is required for battle standees.");
+                    "Battle standees require the frozen presentation catalog.");
             }
-
-            var serialized = new SerializedObject(catalog);
-            SetReference(serialized, "battleNormalStandeeFrame",
-                LoadSprite(StandeeArtRoot + "/standee_frame_silver_v1.png", true));
-            SetReference(serialized, "battleStandeeFrame",
-                LoadSprite(StandeeArtRoot + "/standee_frame.png", true));
-            SetReference(serialized, "battleAttackMedallion",
-                LoadSprite(StandeeArtRoot + "/attack_medallion.png", true));
-            SetReference(serialized, "battleHealthMedallion",
-                LoadSprite(StandeeArtRoot + "/health_medallion.png", true));
-            SetReference(serialized, "battleShieldOverlay",
-                LoadSprite(StandeeArtRoot + "/shield_overlay_screen.png", false));
-            SetReference(serialized, "battleStandeeShieldOverlay",
-                LoadSprite(
-                    StandeeArtRoot +
-                    "/shield_overlay_bright_storybook_v1.png",
-                    false));
-            SetReference(serialized, "battleTauntBase",
-                LoadSprite(StandeeArtRoot + "/taunt_base.png", true));
-            SetReference(serialized, "battleDeathrattleSeal",
-                LoadSprite(StandeeArtRoot + "/deathrattle_seal.png", true));
-            SetReference(serialized, "battleSplashMark",
-                LoadSprite(StandeeArtRoot + "/splash_mark.png", true));
-            AddOrReplaceArtwork(
-                serialized,
-                "placeholder_card_forge_soul_shield_squire",
-                LoadSprite(ShieldSquireArtPath, false));
-            serialized.ApplyModifiedPropertiesWithoutUndo();
-            EditorUtility.SetDirty(catalog);
 
             var material = AssetDatabase.LoadAssetAtPath<Material>(
                 ShieldMaterialPath);
@@ -361,74 +336,6 @@ namespace SpireChess.Editor
             };
             AssetDatabase.CreateAsset(material, ShieldMaterialPath);
             return material;
-        }
-
-        private static Sprite LoadSprite(string path, bool alphaTransparency)
-        {
-            AssetDatabase.ImportAsset(
-                path,
-                ImportAssetOptions.ForceSynchronousImport |
-                ImportAssetOptions.ForceUpdate);
-            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
-            if (importer == null)
-            {
-                throw new InvalidOperationException(
-                    "Unable to configure presentation sprite at " + path);
-            }
-
-            var changed = importer.textureType != TextureImporterType.Sprite ||
-                          importer.spriteImportMode != SpriteImportMode.Single ||
-                          importer.mipmapEnabled ||
-                          importer.alphaIsTransparency != alphaTransparency;
-            importer.textureType = TextureImporterType.Sprite;
-            importer.spriteImportMode = SpriteImportMode.Single;
-            importer.mipmapEnabled = false;
-            importer.alphaIsTransparency = alphaTransparency;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
-            if (changed)
-            {
-                importer.SaveAndReimport();
-            }
-
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-            if (sprite == null)
-            {
-                throw new InvalidOperationException(
-                    "Unable to load presentation sprite at " + path);
-            }
-            return sprite;
-        }
-
-        private static void AddOrReplaceArtwork(
-            SerializedObject catalog,
-            string id,
-            Sprite sprite)
-        {
-            var artworks = catalog.FindProperty("artworks");
-            if (artworks == null)
-            {
-                throw new InvalidOperationException(
-                    "PresentationSpriteCatalog.artworks is unavailable.");
-            }
-
-            SerializedProperty entry = null;
-            for (var index = 0; index < artworks.arraySize; index++)
-            {
-                var candidate = artworks.GetArrayElementAtIndex(index);
-                if (candidate.FindPropertyRelative("id").stringValue == id)
-                {
-                    entry = candidate;
-                    break;
-                }
-            }
-            if (entry == null)
-            {
-                artworks.arraySize++;
-                entry = artworks.GetArrayElementAtIndex(artworks.arraySize - 1);
-            }
-
-            entry.FindPropertyRelative("id").stringValue = id;
-            entry.FindPropertyRelative("sprite").objectReferenceValue = sprite;
         }
 
         private static void BuildStandee(
@@ -871,7 +778,7 @@ namespace SpireChess.Editor
                 impactFxLayer.Configure(
                     AssetDatabase.GetBuiltinExtraResource<Sprite>(
                         "UI/Skin/UISprite.psd"),
-                    32);
+                    BattleImpactFxLayer.FixedPoolCapacity);
 
                 var resultImage = CreateImage(
                     "ResultLayer",

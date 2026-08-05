@@ -8,7 +8,9 @@ namespace SpireChess.UI.Battle
     public sealed class BattleImpactFxLayer : MonoBehaviour
     {
         private const int MinimumCapacity = 8;
-        private const int MaximumCapacity = 48;
+        public const int FixedPoolCapacity = 32;
+        public const int MaximumElementsPerEvent = 12;
+        private const int MaximumCapacity = FixedPoolCapacity;
 
         [SerializeField] private Sprite sprite;
         [SerializeField, Range(MinimumCapacity, MaximumCapacity)]
@@ -54,9 +56,11 @@ namespace SpireChess.UI.Battle
         public void PlayAttackTrail(
             Vector2 source,
             Vector2 target,
-            Color color)
+            Color color,
+            float durationScale = 1f)
         {
             LastEffectId = "attack_trail";
+            var scaledDuration = ResolveDurationScale(durationScale);
             var delta = target - source;
             var distance = Mathf.Max(72f, delta.magnitude);
             var direction = delta.sqrMagnitude <= 0.001f
@@ -75,7 +79,7 @@ namespace SpireChess.UI.Battle
                     new Vector2(distance * (0.62f - index * 0.06f), 8f - index * 2f),
                     color,
                     alpha,
-                    0.14f + index * 0.02f,
+                    (0.14f + index * 0.02f) * scaledDuration,
                     angle,
                     angle,
                     new Vector2(0.38f, 0.72f),
@@ -86,11 +90,13 @@ namespace SpireChess.UI.Battle
         public void PlayImpact(
             Vector2 position,
             Color color,
-            PresentationFxEmphasis emphasis = PresentationFxEmphasis.Normal)
+            PresentationFxEmphasis emphasis = PresentationFxEmphasis.Normal,
+            float durationScale = 1f)
         {
             LastEffectId = "impact";
+            var scaledDuration = ResolveDurationScale(durationScale);
             var rayCount = emphasis == PresentationFxEmphasis.Critical
-                ? 12
+                ? MaximumElementsPerEvent - 1
                 : emphasis == PresentationFxEmphasis.Strong ? 8 : 6;
             var radius = emphasis == PresentationFxEmphasis.Critical
                 ? 82f
@@ -105,7 +111,7 @@ namespace SpireChess.UI.Battle
                 new Vector2(radius * 0.72f, radius * 0.72f),
                 Color.Lerp(color, Color.white, 0.62f),
                 0.86f,
-                duration * 0.72f,
+                duration * 0.72f * scaledDuration,
                 45f,
                 62f,
                 Vector2.one * 0.24f,
@@ -125,7 +131,7 @@ namespace SpireChess.UI.Battle
                         PresentationFxEmphasis.Normal ? 4f : 6f),
                     color,
                     0.96f,
-                    duration,
+                    duration * scaledDuration,
                     angle,
                     angle,
                     new Vector2(0.30f, 1f),
@@ -136,9 +142,11 @@ namespace SpireChess.UI.Battle
         public void PlayDeath(
             Vector2 position,
             Color color,
-            bool token)
+            bool token,
+            float durationScale = 1f)
         {
             LastEffectId = token ? "token_death" : "death";
+            var scaledDuration = ResolveDurationScale(durationScale);
             var count = token ? 5 : 8;
             var duration = token ? 0.20f : 0.30f;
             for (var index = 0; index < count; index++)
@@ -156,7 +164,7 @@ namespace SpireChess.UI.Battle
                     new Vector2(size, size * 0.72f),
                     color,
                     token ? 0.72f : 0.90f,
-                    duration + index * 0.012f,
+                    (duration + index * 0.012f) * scaledDuration,
                     angle,
                     angle + (index % 2 == 0 ? 105f : -105f),
                     Vector2.one,
@@ -375,6 +383,11 @@ namespace SpireChess.UI.Battle
         {
             value = Mathf.Clamp01(value);
             return value * value * (3f - 2f * value);
+        }
+
+        private static float ResolveDurationScale(float value)
+        {
+            return Mathf.Clamp(value, 0.1f, 1f);
         }
 
         private sealed class Entry
