@@ -316,9 +316,13 @@ namespace SpireChess.Tests.EditMode
         [Test]
         public void VfxLayer_UsesFinitePoolAndNeverBlocksInput()
         {
+            view.Render(CreateState());
             var layer = root.Find("SafeArea/VfxLayer");
             var pool = layer.GetComponent<PresentationFxPool>();
+            var impact = layer.GetComponent<BattleImpactFxLayer>();
             Assert.That(pool, Is.Not.Null);
+            Assert.That(impact, Is.Not.Null);
+            Assert.That(impact.Capacity, Is.EqualTo(32));
             pool.Configure(
                 Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"),
                 3);
@@ -332,6 +336,21 @@ namespace SpireChess.Tests.EditMode
 
             Assert.That(pool.Capacity, Is.EqualTo(3));
             Assert.That(pool.ActiveCount, Is.EqualTo(3));
+            impact.PlayAttackTrail(
+                new Vector2(-120f, -40f),
+                new Vector2(120f, 40f),
+                Color.yellow);
+            impact.PlayImpact(
+                Vector2.zero,
+                Color.red,
+                PresentationFxEmphasis.Strong);
+            impact.PlayDeath(
+                new Vector2(80f, 20f),
+                Color.magenta,
+                false);
+            Assert.That(impact.ActiveCount, Is.GreaterThan(0));
+            Assert.That(impact.ActiveCount, Is.LessThanOrEqualTo(impact.Capacity));
+            Assert.That(impact.LastEffectId, Is.EqualTo("death"));
             foreach (var group in layer.GetComponentsInChildren<CanvasGroup>(true))
             {
                 Assert.That(group.interactable, Is.False);
@@ -341,6 +360,35 @@ namespace SpireChess.Tests.EditMode
             {
                 Assert.That(graphic.raycastTarget, Is.False);
             }
+
+            impact.Advance(5f);
+            Assert.That(impact.ActiveCount, Is.Zero);
+            pool.Play(
+                "-9",
+                Color.red,
+                Vector2.zero,
+                PresentationFxEmphasis.Strong,
+                showBackdrop: false);
+            Assert.That(pool.LastPlayUsedBackdrop, Is.False);
+        }
+
+        [Test]
+        public void DamageFeedback_UsesStableImpactTiers()
+        {
+            Assert.That(
+                BattleScreenView.ResolveImpactEmphasis(2, 10),
+                Is.EqualTo(PresentationFxEmphasis.Normal));
+            Assert.That(
+                BattleScreenView.ResolveImpactEmphasis(5, 10),
+                Is.EqualTo(PresentationFxEmphasis.Strong));
+            Assert.That(
+                BattleScreenView.ResolveHitStopSeconds(
+                    PresentationFxEmphasis.Normal),
+                Is.EqualTo(0.025f).Within(0.001f));
+            Assert.That(
+                BattleScreenView.ResolveHitStopSeconds(
+                    PresentationFxEmphasis.Strong),
+                Is.EqualTo(0.045f).Within(0.001f));
         }
 
         [Test]
@@ -354,6 +402,13 @@ namespace SpireChess.Tests.EditMode
             group.alpha = 0.22f;
             standee.RectTransform.anchoredPosition = new Vector2(17f, -9f);
             standee.RectTransform.localScale = Vector3.one * 0.76f;
+            standee.SetHitFlash(Color.white, 0.85f);
+            var board = root.Find("SafeArea/Board") as RectTransform;
+            var boardOrigin = board.anchoredPosition;
+            board.anchoredPosition += new Vector2(11f, -7f);
+            var impact = root.Find("SafeArea/VfxLayer")
+                .GetComponent<BattleImpactFxLayer>();
+            impact.PlayImpact(Vector2.zero, Color.red);
             view.ShowCombatResult(BattleSide.Player, "测试结算");
 
             view.SnapAndClear();
@@ -365,7 +420,10 @@ namespace SpireChess.Tests.EditMode
             Assert.That(
                 standee.RectTransform.localScale,
                 Is.EqualTo(Vector3.one));
+            Assert.That(standee.HitFlashAlpha, Is.Zero.Within(0.001f));
+            Assert.That(board.anchoredPosition, Is.EqualTo(boardOrigin));
             Assert.That(view.ActiveFeedbackFxCount, Is.Zero);
+            Assert.That(view.ActiveImpactFxCount, Is.Zero);
             Assert.That(view.IsAnimationPlaying, Is.False);
             Assert.That(view.IsResultVisible, Is.False);
         }

@@ -1,11 +1,17 @@
 # 项目待办
 
-> **v0.4.0 当前权威入口（2026-08-04）**：
+> **v0.4.0 当前权威入口（2026-08-05）**：
 > [v0.4.0-authoritative-backlog-and-acceptance-matrix.md](v0.4.0-authoritative-backlog-and-acceptance-matrix.md)。
 > 下文是历史实施记录；当前优先级和验收状态只以该矩阵为准。
 
 ## v0.4.0 当前工作板
 
+- [ ] P0：暂停平衡调整，优先完成战斗表现 MVP；按
+  [动画与特效美术技术方案](v0.4.0-mvp-battle-presentation-technical-design-v0.1.md)
+  依次关闭打击感基础、法术/关键词语言、样板战斗和内部人工验收。
+  - [ ] FX-A 工程实现已落地：固定图形池、攻击前摇/拖尾、命中爆点、闪白、
+    轻重 hit-stop、棋盘震动、无矩形底伤害浮字及普通/Token 死亡差异；当前因
+    本机 Unity 未激活而保持“实现待复验”，待补 Prefab 重建、全量测试和对比视频。
 - [ ] P0（Clean Player 已关闭，外部签字待完成）：封面→目录→角色选择→地图、章节完成页、结局页与一次性解锁提示已接入 UI；十张 v0.4 日记正式候选资产（含锁定角色状态）已接入并通过离线哈希/导入合同核验，详见 [资产包](ui-concepts/phase-9c/light-storybook-production-v0.1/journal-ui-v0.4.0/README.md)；候选 `d12e2ef` 的 Prefab/Unity、Clean Player、双分辨率与工程审图证据已归档，资产来源/许可和外部视觉签字仍待完成，见 [验收摘要](ui-concepts/unity-validation/v0.4.0-journal-ui/d12e2ef/acceptance-summary.md)。
 - [x] P0：候选 `d12e2ef` 已在干净工作树上完成 EditMode、PlayMode、Clean Player、
   双分辨率和重复输入/Exactly-once 门禁；见
@@ -14,7 +20,7 @@
   strict S0：198 场景/19,800 战斗，P0/P1 为 0；提交、配置哈希、fixture 身份、
   逐文件哈希和完整测试结果见
   [候选证据包](balance-results/v0.4.0/release-candidate-0eaa2e3/acceptance-summary.md)。
-- [ ] P1：建立并验证三角色真实单局的平衡候选，再决定正式 S1/S2 规模和人工批次。
+- [ ] P1（暂停，等待战斗表现 MVP）：建立并验证三角色真实单局的平衡候选，再决定正式 S1/S2 规模和人工批次。
 - [ ] P2：完成正式音频、背景生产签字、第二机性能、截图签字和外部试玩门禁。
 
 ## 历史实施记录（非当前排期）

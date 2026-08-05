@@ -63,6 +63,8 @@ namespace SpireChess.UI.Battle
         [SerializeField] private CanvasGroup feedbackCanvasGroup;
         [SerializeField] private Text feedbackText;
         [SerializeField] private PresentationFxPool feedbackFxPool;
+        [SerializeField] private BattleImpactFxLayer impactFxLayer;
+        [SerializeField] private RectTransform boardMotionRoot;
         [SerializeField] private CanvasGroup boardPulseCanvasGroup;
         [SerializeField] private Image boardPulseImage;
 
@@ -86,11 +88,15 @@ namespace SpireChess.UI.Battle
         private bool isBound;
         private int presentationEpoch;
         private Image productionBackdrop;
+        private Vector2 boardMotionOrigin;
+        private bool hasBoardMotionOrigin;
 
         public int RenderedCardCount { get; private set; }
         public bool IsAnimationPlaying { get; private set; }
         public int ActiveFeedbackFxCount =>
             feedbackFxPool == null ? 0 : feedbackFxPool.ActiveCount;
+        public int ActiveImpactFxCount =>
+            impactFxLayer == null ? 0 : impactFxLayer.ActiveCount;
         public string LastFeedbackId { get; private set; } = string.Empty;
         public string LastAudioCueId { get; private set; } = string.Empty;
         public bool IsResultVisible => resultLayer != null &&
@@ -131,6 +137,8 @@ namespace SpireChess.UI.Battle
 
         private void Awake()
         {
+            EnsurePresentationFxBindings();
+            CacheBoardMotionOrigin();
             var board = safeArea == null
                 ? null
                 : safeArea.Find("Board");
@@ -203,11 +211,14 @@ namespace SpireChess.UI.Battle
             {
                 throw new ArgumentNullException(nameof(state));
             }
+            EnsurePresentationFxBindings();
             if (!HasCompleteBindings)
             {
                 throw new InvalidOperationException(
                     "BattleScreenView has missing serialized bindings.");
             }
+
+            CacheBoardMotionOrigin();
 
             titleText.text = state.Title ?? string.Empty;
             statusText.text = state.Status ?? string.Empty;
@@ -580,6 +591,16 @@ namespace SpireChess.UI.Battle
                 PresentationFxEmphasis.Subtle,
                 0.30f * scale,
                 24f);
+            impactFxLayer?.PlayAttackTrail(
+                ResolveImpactFxPosition(
+                    attacker,
+                    playbackEvent.SourceSide,
+                    playbackEvent.SourceIndex),
+                ResolveImpactFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                AttackerColor);
             SetSlotHighlight(
                 playbackEvent.SourceSide,
                 playbackEvent.SourceIndex,
@@ -607,21 +628,37 @@ namespace SpireChess.UI.Battle
             var direction = new Vector2(
                 localDirection.x,
                 localDirection.y).normalized;
-            var destination = start + direction * 46f;
-            yield return Animate(0.12f * scale, epoch, value =>
+            var startScale = rect.localScale;
+            var destination = start + direction * 54f;
+            yield return Animate(0.06f * scale, epoch, value =>
+            {
+                rect.localScale = Vector3.Lerp(
+                    startScale,
+                    startScale * 0.94f,
+                    Smooth(value));
+            });
+            yield return Animate(0.09f * scale, epoch, value =>
             {
                 rect.anchoredPosition = Vector2.Lerp(
                     start,
                     destination,
                     Smooth(value));
+                rect.localScale = Vector3.Lerp(
+                    startScale * 0.94f,
+                    startScale * 1.04f,
+                    Smooth(value));
                 boardPulseCanvasGroup.alpha =
                     Mathf.Sin(value * Mathf.PI) * 0.10f;
             });
-            yield return Animate(0.12f * scale, epoch, value =>
+            yield return Animate(0.11f * scale, epoch, value =>
             {
                 rect.anchoredPosition = Vector2.Lerp(
                     destination,
                     start,
+                    Smooth(value));
+                rect.localScale = Vector3.Lerp(
+                    startScale * 1.04f,
+                    startScale,
                     Smooth(value));
                 boardPulseCanvasGroup.alpha =
                     (1f - value) * 0.06f;
@@ -629,6 +666,7 @@ namespace SpireChess.UI.Battle
             if (epoch == presentationEpoch)
             {
                 rect.anchoredPosition = start;
+                rect.localScale = startScale;
             }
         }
 
@@ -642,8 +680,21 @@ namespace SpireChess.UI.Battle
                 target,
                 playbackEvent.TargetSide,
                 playbackEvent.TargetIndex);
+            var impactPosition = ResolveImpactFxPosition(
+                target,
+                playbackEvent.TargetSide,
+                playbackEvent.TargetIndex);
+            var targetBaseHealth = target?.Model?.BaseHealth ??
+                                   Mathf.Max(1, playbackEvent.Amount * 2);
+            var impactEmphasis = ResolveImpactEmphasis(
+                playbackEvent.Amount,
+                targetBaseHealth);
             if (playbackEvent.WasBlocked)
             {
+                impactFxLayer?.PlayImpact(
+                    impactPosition,
+                    ShieldColor,
+                    PresentationFxEmphasis.Normal);
                 ShowFeedback("格挡", ShieldColor);
                 PlayFx(
                     "格挡",
@@ -664,14 +715,19 @@ namespace SpireChess.UI.Battle
                 yield break;
             }
 
+            impactFxLayer?.PlayImpact(
+                impactPosition,
+                TargetColor,
+                impactEmphasis);
             ShowFeedback($"-{playbackEvent.Amount}", TargetColor);
             PlayFx(
                 $"-{playbackEvent.Amount}",
                 TargetColor,
                 position,
-                PresentationFxEmphasis.Strong,
+                impactEmphasis,
                 0.44f * scale,
-                58f);
+                58f,
+                false);
             SetSlotHighlight(
                 playbackEvent.TargetSide,
                 playbackEvent.TargetIndex,
@@ -690,17 +746,39 @@ namespace SpireChess.UI.Battle
             target.PlayStatChange(0, playbackEvent.HealthDelta);
             var rect = target.RectTransform;
             var start = rect.anchoredPosition;
-            yield return Animate(0.16f * scale, epoch, value =>
+            var shakeDistance = ResolveShakeDistance(impactEmphasis);
+            target.SetHitFlash(Color.white, 0f);
+            yield return Animate(
+                ResolveHitStopSeconds(impactEmphasis) * scale,
+                epoch,
+                value => target.SetHitFlash(
+                    Color.white,
+                    Mathf.Lerp(0.18f, 0.92f, Smooth(value))));
+            yield return Animate(0.15f * scale, epoch, value =>
             {
                 var shake = Mathf.Sin(value * Mathf.PI * 6f) *
-                            (1f - value) * 8f;
+                            (1f - value) * shakeDistance * 1.65f;
                 rect.anchoredPosition = start + Vector2.right * shake;
+                if (boardMotionRoot != null && hasBoardMotionOrigin)
+                {
+                    var boardShake = new Vector2(
+                        Mathf.Sin(value * Mathf.PI * 8f) * shakeDistance,
+                        Mathf.Sin(value * Mathf.PI * 5f) *
+                        shakeDistance * 0.42f) * (1f - value);
+                    boardMotionRoot.anchoredPosition =
+                        boardMotionOrigin + boardShake;
+                }
+                target.SetHitFlash(
+                    Color.white,
+                    (1f - value) * 0.78f);
                 boardPulseCanvasGroup.alpha =
                     Mathf.Sin(value * Mathf.PI) * 0.16f;
             });
             if (epoch == presentationEpoch)
             {
                 rect.anchoredPosition = start;
+                target.SetHitFlash(Color.white, 0f);
+                ResetBoardMotion();
             }
         }
 
@@ -795,6 +873,13 @@ namespace SpireChess.UI.Battle
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
             var token = target?.Model?.IsToken == true;
+            impactFxLayer?.PlayDeath(
+                ResolveImpactFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                DeathColor,
+                token);
             var label = token ? "衍生消散" : "阵亡";
             ShowFeedback(label, DeathColor);
             PlayFx(
@@ -808,7 +893,8 @@ namespace SpireChess.UI.Battle
                     ? PresentationFxEmphasis.Normal
                     : PresentationFxEmphasis.Strong,
                 0.42f * scale,
-                38f);
+                38f,
+                false);
             SetSlotHighlight(
                 playbackEvent.TargetSide,
                 playbackEvent.TargetIndex,
@@ -825,14 +911,27 @@ namespace SpireChess.UI.Battle
             }
 
             var canvasGroup = target.GetComponent<CanvasGroup>();
+            var rect = target.RectTransform;
             var startScale = target.transform.localScale;
-            yield return Animate(0.20f * scale, epoch, value =>
+            var startPosition = rect.anchoredPosition;
+            var startRotation = rect.localEulerAngles;
+            yield return Animate((token ? 0.14f : 0.24f) * scale, epoch, value =>
             {
                 canvasGroup.alpha = 1f - value;
                 target.transform.localScale = Vector3.Lerp(
                     startScale,
-                    startScale * 0.78f,
+                    startScale * (token ? 0.42f : 0.72f),
                     value);
+                rect.anchoredPosition = startPosition +
+                                        Vector2.up * value *
+                                        (token ? 10f : 20f);
+                rect.localEulerAngles = Vector3.Lerp(
+                    startRotation,
+                    startRotation + new Vector3(
+                        0f,
+                        0f,
+                        token ? 5f : 11f),
+                    Smooth(value));
                 boardPulseCanvasGroup.alpha =
                     Mathf.Sin(value * Mathf.PI) * 0.12f;
             });
@@ -840,6 +939,8 @@ namespace SpireChess.UI.Battle
             {
                 canvasGroup.alpha = 1f;
                 target.transform.localScale = startScale;
+                rect.anchoredPosition = startPosition;
+                rect.localEulerAngles = startRotation;
             }
         }
 
@@ -990,6 +1091,7 @@ namespace SpireChess.UI.Battle
             {
                 feedbackFxPool.ClearImmediate();
             }
+            impactFxLayer?.ClearImmediate();
             HideResult();
         }
 
@@ -1004,7 +1106,8 @@ namespace SpireChess.UI.Battle
             Vector2 position,
             PresentationFxEmphasis emphasis,
             float duration,
-            float verticalTravel)
+            float verticalTravel,
+            bool showBackdrop = true)
         {
             feedbackFxPool?.Play(
                 label,
@@ -1012,7 +1115,8 @@ namespace SpireChess.UI.Battle
                 position,
                 emphasis,
                 duration,
-                verticalTravel);
+                verticalTravel,
+                showBackdrop);
         }
 
         private Vector2 ResolveFxPosition(
@@ -1047,6 +1151,41 @@ namespace SpireChess.UI.Battle
 
             var world = source.TransformPoint(source.rect.center);
             var local = poolRect.InverseTransformPoint(world);
+            return new Vector2(local.x, local.y);
+        }
+
+        private Vector2 ResolveImpactFxPosition(
+            BattleStandeeView standee,
+            BattleSide? side,
+            int index)
+        {
+            RectTransform source = null;
+            if (standee != null)
+            {
+                source = standee.RectTransform;
+            }
+            else if (side.HasValue && index >= 0 &&
+                     index < BattleBoardState.SlotCount)
+            {
+                var slots = side.Value == BattleSide.Player
+                    ? playerSlots
+                    : enemySlots;
+                if (slots != null && index < slots.Length && slots[index] != null)
+                {
+                    source = slots[index].Content;
+                }
+            }
+
+            var layerRect = impactFxLayer == null
+                ? null
+                : impactFxLayer.transform as RectTransform;
+            if (source == null || layerRect == null)
+            {
+                return Vector2.zero;
+            }
+
+            var world = source.TransformPoint(source.rect.center);
+            var local = layerRect.InverseTransformPoint(world);
             return new Vector2(local.x, local.y);
         }
 
@@ -1101,12 +1240,66 @@ namespace SpireChess.UI.Battle
         {
             ClearHighlights();
             HideTransientBannerAndPulse();
+            ResetBoardMotion();
             foreach (var standee in standeesById.Values)
             {
                 if (standee != null)
                 {
                     standee.ResetPresentationState();
                 }
+            }
+        }
+
+        private void CacheBoardMotionOrigin()
+        {
+            if (boardMotionRoot == null || hasBoardMotionOrigin)
+            {
+                return;
+            }
+
+            boardMotionOrigin = boardMotionRoot.anchoredPosition;
+            hasBoardMotionOrigin = true;
+        }
+
+        private void EnsurePresentationFxBindings()
+        {
+            if (safeArea == null)
+            {
+                return;
+            }
+
+            if (boardMotionRoot == null)
+            {
+                boardMotionRoot = safeArea.Find("Board") as RectTransform;
+            }
+
+            if (impactFxLayer == null)
+            {
+                var vfxLayer = safeArea.Find("VfxLayer");
+                if (vfxLayer != null)
+                {
+                    impactFxLayer =
+                        vfxLayer.GetComponent<BattleImpactFxLayer>();
+                    if (impactFxLayer == null)
+                    {
+                        impactFxLayer = vfxLayer.gameObject
+                            .AddComponent<BattleImpactFxLayer>();
+                    }
+                    impactFxLayer.Configure(
+                        Resources.GetBuiltinResource<Sprite>(
+                            "UI/Skin/UISprite.psd"),
+                        32);
+                }
+            }
+
+            CacheBoardMotionOrigin();
+        }
+
+        private void ResetBoardMotion()
+        {
+            if (boardMotionRoot != null && hasBoardMotionOrigin)
+            {
+                boardMotionRoot.anchoredPosition = boardMotionOrigin;
             }
         }
 
@@ -1171,6 +1364,41 @@ namespace SpireChess.UI.Battle
                 return $"{FormatDelta(healthDelta)} 生命";
             }
             return "属性刷新";
+        }
+
+        public static PresentationFxEmphasis ResolveImpactEmphasis(
+            int damage,
+            int targetBaseHealth)
+        {
+            var safeHealth = Mathf.Max(1, targetBaseHealth);
+            var strongThreshold = Mathf.Max(
+                2,
+                Mathf.CeilToInt(safeHealth * 0.5f));
+            return Mathf.Abs(damage) >= strongThreshold
+                ? PresentationFxEmphasis.Strong
+                : PresentationFxEmphasis.Normal;
+        }
+
+        public static float ResolveHitStopSeconds(
+            PresentationFxEmphasis emphasis)
+        {
+            switch (emphasis)
+            {
+                case PresentationFxEmphasis.Critical: return 0.060f;
+                case PresentationFxEmphasis.Strong: return 0.045f;
+                default: return 0.025f;
+            }
+        }
+
+        private static float ResolveShakeDistance(
+            PresentationFxEmphasis emphasis)
+        {
+            switch (emphasis)
+            {
+                case PresentationFxEmphasis.Critical: return 8f;
+                case PresentationFxEmphasis.Strong: return 5f;
+                default: return 2.5f;
+            }
         }
 
         private static string FormatDelta(int value)

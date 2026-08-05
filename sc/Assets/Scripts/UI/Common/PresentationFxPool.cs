@@ -47,6 +47,7 @@ namespace SpireChess.UI
             }
         }
         public int TotalPlayCount { get; private set; }
+        public bool LastPlayUsedBackdrop { get; private set; } = true;
 
         public void Configure(Font value, int desiredCapacity = 12)
         {
@@ -67,7 +68,8 @@ namespace SpireChess.UI
             Vector2 anchoredPosition,
             PresentationFxEmphasis emphasis = PresentationFxEmphasis.Normal,
             float duration = 0.62f,
-            float verticalTravel = 74f)
+            float verticalTravel = 74f,
+            bool showBackdrop = true)
         {
             if (string.IsNullOrWhiteSpace(label))
             {
@@ -89,11 +91,12 @@ namespace SpireChess.UI
             entry.Text.text = label;
             entry.Text.color = Color.white;
             entry.Text.fontSize = GetFontSize(emphasis);
+            LastPlayUsedBackdrop = showBackdrop;
             entry.Backdrop.color = new Color(
                 color.r,
                 color.g,
                 color.b,
-                GetBackdropAlpha(emphasis));
+                showBackdrop ? GetBackdropAlpha(emphasis) : 0f);
             entry.Rect.anchoredPosition = anchoredPosition;
             entry.Rect.localScale = Vector3.one * entry.StartScale;
             entry.GameObject.SetActive(true);

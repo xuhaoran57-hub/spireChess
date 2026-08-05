@@ -24,6 +24,7 @@ namespace SpireChess.UI.Battle
         [SerializeField] private AspectRatioFitter portraitAspectFitter;
         [SerializeField] private Text portraitFallback;
         [SerializeField] private Image frame;
+        [SerializeField] private Image hitFlashOverlay;
         [SerializeField] private Image shieldContrastUnderlay;
         [SerializeField] private Image shieldOverlay;
         [SerializeField] private Image tauntBase;
@@ -64,6 +65,9 @@ namespace SpireChess.UI.Battle
                                        splashMark.gameObject.activeSelf;
         public bool IsTargetHighlighted => targetHighlight != null &&
                                            targetHighlight.gameObject.activeSelf;
+        public float HitFlashAlpha => hitFlashOverlay == null
+            ? 0f
+            : hitFlashOverlay.color.a;
         public bool HasCompleteBindings =>
             spriteCatalog != null && theme != null && portrait != null &&
             portraitFallback != null && frame != null && shieldOverlay != null &&
@@ -99,6 +103,7 @@ namespace SpireChess.UI.Battle
             {
                 throw new ArgumentNullException(nameof(value));
             }
+            EnsureHitFlashOverlay();
             if (!HasCompleteBindings)
             {
                 throw new InvalidOperationException(
@@ -158,6 +163,62 @@ namespace SpireChess.UI.Battle
             }
         }
 
+        public void SetHitFlash(Color color, float alpha)
+        {
+            if (hitFlashOverlay == null)
+            {
+                return;
+            }
+
+            var clamped = Mathf.Clamp01(alpha);
+            hitFlashOverlay.color = new Color(
+                color.r,
+                color.g,
+                color.b,
+                clamped);
+            hitFlashOverlay.gameObject.SetActive(clamped > 0.001f);
+        }
+
+        private void EnsureHitFlashOverlay()
+        {
+            if (hitFlashOverlay != null)
+            {
+                return;
+            }
+
+            var existing = transform.Find("HitFlashOverlay");
+            if (existing != null)
+            {
+                hitFlashOverlay = existing.GetComponent<Image>();
+            }
+            if (hitFlashOverlay != null)
+            {
+                return;
+            }
+
+            var root = new GameObject(
+                "HitFlashOverlay",
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image));
+            root.transform.SetParent(transform, false);
+            var rect = root.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(12f, 5f);
+            rect.offsetMax = new Vector2(-12f, -5f);
+            hitFlashOverlay = root.GetComponent<Image>();
+            hitFlashOverlay.sprite = Resources.GetBuiltinResource<Sprite>(
+                "UI/Skin/UISprite.psd");
+            hitFlashOverlay.type = Image.Type.Sliced;
+            hitFlashOverlay.raycastTarget = false;
+            var frameIndex = frame == null
+                ? transform.childCount - 1
+                : frame.transform.GetSiblingIndex() + 1;
+            rect.SetSiblingIndex(frameIndex);
+            SetHitFlash(Color.white, 0f);
+        }
+
         public void ResetPresentationState()
         {
             if (this == null)
@@ -178,6 +239,7 @@ namespace SpireChess.UI.Battle
             {
                 rectTransform.anchoredPosition = Vector2.zero;
                 rectTransform.localScale = Vector3.one;
+                rectTransform.localEulerAngles = Vector3.zero;
             }
             if (canvasGroup != null)
             {
@@ -191,6 +253,7 @@ namespace SpireChess.UI.Battle
             {
                 healthText.color = Color.white;
             }
+            SetHitFlash(Color.white, 0f);
         }
 
         public void OnPointerEnter(PointerEventData eventData)

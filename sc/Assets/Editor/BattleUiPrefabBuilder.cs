@@ -507,6 +507,20 @@ namespace SpireChess.Editor
                 var frame = CreateImage("Frame", root.transform, Color.white);
                 SetRect(frame.rectTransform, 14f, 7f, 132f, 228f);
 
+                var hitFlash = CreateImage(
+                    "HitFlashOverlay",
+                    root.transform,
+                    Color.clear);
+                Stretch(
+                    hitFlash.rectTransform,
+                    new Vector2(12f, 5f),
+                    new Vector2(-12f, -5f));
+                hitFlash.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>(
+                    "UI/Skin/UISprite.psd");
+                hitFlash.type = Image.Type.Sliced;
+                hitFlash.raycastTarget = false;
+                hitFlash.gameObject.SetActive(false);
+
                 var deathrattle = CreateImage(
                     "DeathrattleSeal",
                     root.transform,
@@ -564,6 +578,7 @@ namespace SpireChess.Editor
                     portraitAspectFitter);
                 SetReference(serialized, "portraitFallback", fallback);
                 SetReference(serialized, "frame", frame);
+                SetReference(serialized, "hitFlashOverlay", hitFlash);
                 SetReference(serialized, "shieldOverlay", shield);
                 SetReference(serialized, "tauntBase", taunt);
                 SetReference(serialized, "deathrattleSeal", deathrattle);
@@ -851,6 +866,12 @@ namespace SpireChess.Editor
                 var fxPool =
                     vfxLayer.gameObject.AddComponent<PresentationFxPool>();
                 fxPool.Configure(font, 12);
+                var impactFxLayer =
+                    vfxLayer.gameObject.AddComponent<BattleImpactFxLayer>();
+                impactFxLayer.Configure(
+                    AssetDatabase.GetBuiltinExtraResource<Sprite>(
+                        "UI/Skin/UISprite.psd"),
+                    32);
 
                 var resultImage = CreateImage(
                     "ResultLayer",
@@ -953,6 +974,8 @@ namespace SpireChess.Editor
                 SetReference(serialized, "feedbackCanvasGroup", feedbackCanvas);
                 SetReference(serialized, "feedbackText", feedbackText);
                 SetReference(serialized, "feedbackFxPool", fxPool);
+                SetReference(serialized, "impactFxLayer", impactFxLayer);
+                SetReference(serialized, "boardMotionRoot", board);
                 SetReference(
                     serialized,
                     "boardPulseCanvasGroup",
