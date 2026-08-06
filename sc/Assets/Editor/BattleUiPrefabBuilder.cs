@@ -43,6 +43,7 @@ namespace SpireChess.Editor
         [MenuItem("Spire Chess/UI/Rebuild Battle UI")]
         public static void Build()
         {
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             var font = AssetDatabase.LoadAssetAtPath<Font>(
                 CardUiPrefabBuilder.FontPath);
             var cardPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
@@ -336,6 +337,95 @@ namespace SpireChess.Editor
             };
             AssetDatabase.CreateAsset(material, ShieldMaterialPath);
             return material;
+        }
+
+        private static void ConfigureShowcaseVfx(
+            BattleImpactFxLayer layer)
+        {
+            var serialized = new SerializedObject(layer);
+            SetReference(
+                serialized,
+                "attackTrailSprite",
+                LoadShowcaseVfxSprite("FX_ATK_TRAIL_LIGHT.png"));
+            SetReference(
+                serialized,
+                "attackHeavyTrailSprite",
+                LoadShowcaseVfxSprite("FX_ATK_TRAIL_HEAVY.png"));
+            SetReference(
+                serialized,
+                "cleaveArcSprite",
+                LoadShowcaseVfxSprite("FX_CLEAVE_ARC.png"));
+            SetReference(
+                serialized,
+                "lightImpactSprite",
+                LoadShowcaseVfxSprite("FX_HIT_LIGHT.png"));
+            SetReference(
+                serialized,
+                "impactSprite",
+                LoadShowcaseVfxSprite("FX_HIT_HEAVY.png"));
+            SetReference(
+                serialized,
+                "shieldSprite",
+                AssetDatabase.LoadAssetAtPath<Sprite>(
+                    "Assets/Art/Presentation/UI/Battle/Standee/" +
+                    "shield_overlay_bright_storybook_v1.png"));
+            SetReference(
+                serialized,
+                "effectSealSprite",
+                LoadShowcaseVfxSprite("FX_WARCRY_SEAL.png"));
+            SetReference(
+                serialized,
+                "warcryLinkSprite",
+                LoadShowcaseVfxSprite("FX_WARCRY_LINK.png"));
+            SetReference(
+                serialized,
+                "effectBoltSprite",
+                LoadShowcaseVfxSprite("FX_EFFECT_BOLT.png"));
+            SetReference(
+                serialized,
+                "statGrowthSprite",
+                LoadShowcaseVfxSprite("FX_STAT_GROWTH.png"));
+            SetReference(
+                serialized,
+                "deathSprite",
+                LoadShowcaseVfxSprite("FX_DEATH_DISSOLVE.png"));
+            SetReference(
+                serialized,
+                "tokenDeathSprite",
+                LoadShowcaseVfxSprite("FX_TOKEN_POOF.png"));
+            SetReference(
+                serialized,
+                "summonSprite",
+                LoadShowcaseVfxSprite("FX_SUMMON_PORTAL.png"));
+            SetReference(
+                serialized,
+                "summonBeamSprite",
+                LoadShowcaseVfxSprite("FX_SUMMON_BEAM.png"));
+            SetReference(
+                serialized,
+                "summonDustSprite",
+                LoadShowcaseVfxSprite("FX_SUMMON_DUST.png"));
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static Sprite LoadShowcaseVfxSprite(string fileName)
+        {
+            var path = "Assets/Art/Presentation/UI/Battle/Vfx/" + fileName;
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer != null &&
+                (importer.textureType != TextureImporterType.Sprite ||
+                 importer.spriteImportMode != SpriteImportMode.Single ||
+                 !importer.alphaIsTransparency ||
+                 importer.mipmapEnabled))
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = false;
+                importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
         private static void BuildStandee(
@@ -779,6 +869,7 @@ namespace SpireChess.Editor
                     AssetDatabase.GetBuiltinExtraResource<Sprite>(
                         "UI/Skin/UISprite.psd"),
                     BattleImpactFxLayer.FixedPoolCapacity);
+                ConfigureShowcaseVfx(impactFxLayer);
 
                 var resultImage = CreateImage(
                     "ResultLayer",

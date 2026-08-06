@@ -292,6 +292,21 @@ namespace SpireChess.Audio
                 FadeOutMusic(outgoing, duration));
         }
 
+        /// <summary>
+        /// Stops every pooled non-music voice immediately.  Presentation
+        /// callers use this when a sequence is skipped so old impacts or
+        /// battle cues cannot continue after the visual state has snapped.
+        /// </summary>
+        public void StopAllTransientCues()
+        {
+            foreach (var voice in voices)
+            {
+                ReleaseVoice(voice, true);
+            }
+
+            playbackLimiter.Reset();
+        }
+
         public void SetMasterVolume(float value, bool save = true)
         {
             EnsureSettings();

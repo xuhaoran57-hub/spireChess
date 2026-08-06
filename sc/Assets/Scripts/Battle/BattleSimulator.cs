@@ -318,7 +318,8 @@ namespace SpireChess.Battle
                 BattlePlaybackEventKind.AttackStarted,
                 log[log.Count - 1],
                 attacker,
-                target);
+                target,
+                isImmediateAttack: isImmediateAttack);
             if (isImmediateAttack)
             {
                 diagnostics.For(attackerSide).ImmediateAttacks++;
@@ -353,7 +354,8 @@ namespace SpireChess.Battle
                 GetOpposingSide(attackerSide),
                 target,
                 attackerDamage,
-                log);
+                log,
+                source: attacker);
             splashTargetIndexes = ResolveCleave(
                 attackerSide,
                 attacker,
@@ -366,7 +368,8 @@ namespace SpireChess.Battle
                 attackerSide,
                 attacker,
                 counterDamage,
-                log);
+                log,
+                source: target);
 
             foreach (var pair in shieldState)
             {
@@ -525,7 +528,9 @@ namespace SpireChess.Battle
                 GetOpposingSide(attackerSide),
                 target,
                 damage,
-                log);
+                log,
+                source: attacker,
+                isSplashDamage: true);
         }
 
         private void ApplyDamage(
@@ -533,14 +538,16 @@ namespace SpireChess.Battle
             BattleSide targetSide,
             BattleMinionRuntime target,
             int amount,
-            IList<string> log)
+            IList<string> log,
+            BattleMinionRuntime source = null,
+            bool isSplashDamage = false)
         {
             if (target == null || amount <= 0 || !target.IsAlive)
             {
                 return;
             }
 
-            var source = diagnostics.For(sourceSide);
+            var sourceDiagnostics = diagnostics.For(sourceSide);
             var targetDiagnostics = diagnostics.For(targetSide);
             var hadShield = target.HasShield;
             var healthBefore = target.CurrentHealth;
@@ -553,32 +560,36 @@ namespace SpireChess.Battle
                 RecordPlaybackEvent(
                     BattlePlaybackEventKind.ShieldLost,
                     $"{target.Name} 的护盾破裂。",
+                    source,
                     target: target,
                     explicitTargetSide: targetSide,
-                    wasBlocked: true);
+                    wasBlocked: true,
+                    isSplashDamage: isSplashDamage);
             }
             RecordPlaybackEvent(
                 BattlePlaybackEventKind.DamageApplied,
                 hadShield
                     ? $"{target.Name} 的护盾抵挡了 {amount} 点伤害。"
                     : $"{target.Name} 受到 {amount} 点伤害。",
+                source,
                 target: target,
                 explicitTargetSide: targetSide,
                 amount: amount,
                 healthDelta: target.CurrentHealth - healthBefore,
-                wasBlocked: hadShield);
+                wasBlocked: hadShield,
+                isSplashDamage: isSplashDamage);
 
             if (currentRound == 0)
             {
-                source.OpeningRawDamage += amount;
-                source.OpeningEffectiveDamage += effectiveDamage;
-                source.RoundOneRawDamage += amount;
-                source.RoundOneEffectiveDamage += effectiveDamage;
+                sourceDiagnostics.OpeningRawDamage += amount;
+                sourceDiagnostics.OpeningEffectiveDamage += effectiveDamage;
+                sourceDiagnostics.RoundOneRawDamage += amount;
+                sourceDiagnostics.RoundOneEffectiveDamage += effectiveDamage;
             }
             else if (currentRound == 1)
             {
-                source.RoundOneRawDamage += amount;
-                source.RoundOneEffectiveDamage += effectiveDamage;
+                sourceDiagnostics.RoundOneRawDamage += amount;
+                sourceDiagnostics.RoundOneEffectiveDamage += effectiveDamage;
             }
 
             if (hadShield && !target.HasShield)
@@ -957,6 +968,19 @@ namespace SpireChess.Battle
             PendingBattleActions pendingActions)
         {
             var effect = pending.Effect;
+            var effectTarget = pending.Subject ?? pending.Related ?? pending.Source;
+            RecordPlaybackEvent(
+                BattlePlaybackEventKind.EffectTriggered,
+                BuildEffectPlaybackMessage(pending),
+                pending.Source,
+                effectTarget,
+                explicitTargetSide: pending.Side,
+                explicitTargetIndex: pending.SourceIndex,
+                effectId: effect.Id,
+                effectTrigger: effect.Trigger,
+                effectAction: effect.Action,
+                explicitSourceSide: pending.Side,
+                explicitSourceIndex: pending.SourceIndex);
             if (effect.Trigger == "OnShieldLost" && effect.Action != "AddShield")
             {
                 diagnostics.For(pending.Side).ShieldBenefitTriggers++;
@@ -1416,7 +1440,13 @@ namespace SpireChess.Battle
 
             var targetSide = GetRuntimeSide(state, target, GetOpposingSide(pending.Side));
             var hadShield = target.HasShield;
-            ApplyDamage(pending.Side, targetSide, target, amount, log);
+            ApplyDamage(
+                pending.Side,
+                targetSide,
+                target,
+                amount,
+                log,
+                source: pending.Source);
             if (hadShield && !target.HasShield)
             {
                 EnqueueObservedEffects(
@@ -1576,7 +1606,12 @@ namespace SpireChess.Battle
                     death.Minion,
                     token,
                     explicitTargetSide: death.Side,
-                    explicitTargetIndex: slotIndex);
+                    explicitTargetIndex: slotIndex,
+                    effectId: effect.Id,
+                    effectTrigger: effect.Trigger,
+                    effectAction: effect.Action,
+                    explicitSourceSide: death.Side,
+                    explicitSourceIndex: death.OriginalIndex);
                 AddTemporaryStats(
                     death.Side,
                     token,
@@ -1889,17 +1924,29 @@ namespace SpireChess.Battle
             int amount = 0,
             int attackDelta = 0,
             int healthDelta = 0,
-            bool wasBlocked = false)
+            bool wasBlocked = false,
+            string effectId = null,
+            string effectTrigger = null,
+            string effectAction = null,
+            bool isSplashDamage = false,
+            bool isImmediateAttack = false,
+            BattleSide? explicitSourceSide = null,
+            int explicitSourceIndex = -1)
         {
             if (playbackEvents == null || playbackState == null)
             {
                 return;
             }
 
-            var sourceSide = FindRuntimeLocation(
+            var locatedSourceSide = FindRuntimeLocation(
                 playbackState,
                 source,
                 out var sourceIndex);
+            var sourceSide = locatedSourceSide ?? explicitSourceSide;
+            if (sourceIndex < 0)
+            {
+                sourceIndex = explicitSourceIndex;
+            }
             var locatedTargetSide = FindRuntimeLocation(
                 playbackState,
                 target,
@@ -1923,7 +1970,46 @@ namespace SpireChess.Battle
                 amount,
                 attackDelta,
                 healthDelta,
-                wasBlocked));
+                wasBlocked,
+                effectId,
+                effectTrigger,
+                effectAction,
+                isSplashDamage,
+                isImmediateAttack));
+        }
+
+        private static string BuildEffectPlaybackMessage(
+            PendingBattleEffect pending)
+        {
+            var name = pending.Source?.Name ?? "效果";
+            return $"{name} 触发{DescribeEffectTrigger(pending.Effect.Trigger)}。";
+        }
+
+        private static string DescribeEffectTrigger(string trigger)
+        {
+            switch (trigger)
+            {
+                case "OnPlay":
+                    return "战吼";
+                case "OnDeath":
+                    return "亡语";
+                case "OnBattleStart":
+                    return "战斗开始效果";
+                case "OnSummon":
+                    return "召唤效果";
+                case "OnEnemySummon":
+                    return "敌方召唤响应";
+                case "OnShieldLost":
+                    return "护盾破裂响应";
+                case "OnShieldGained":
+                    return "护盾获得响应";
+                case "OnAttackBefore":
+                    return "攻击前效果";
+                case "OnKill":
+                    return "击杀效果";
+                default:
+                    return "效果";
+            }
         }
 
         private static BattleSide? FindRuntimeLocation(

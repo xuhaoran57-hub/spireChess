@@ -242,6 +242,7 @@ namespace SpireChess.Tests.EditMode
 
         [TestCase(BattlePlaybackEventKind.CombatStarted, "battle_start")]
         [TestCase(BattlePlaybackEventKind.RoundStarted, "battle_round")]
+        [TestCase(BattlePlaybackEventKind.EffectTriggered, "battle_effect")]
         [TestCase(BattlePlaybackEventKind.AttackStarted, "battle_attack")]
         [TestCase(BattlePlaybackEventKind.DamageApplied, "battle_damage")]
         [TestCase(BattlePlaybackEventKind.ShieldGained, "battle_shield_gain")]
@@ -276,6 +277,11 @@ namespace SpireChess.Tests.EditMode
                 BattleScreenView.ResolveAudioCueId(
                     BattlePlaybackEventKind.AttackStarted),
                 Is.EqualTo(PresentationAudioCueIds.BattleAttackLight));
+            Assert.That(
+                BattleScreenView.ResolveAudioCueId(
+                    BattlePlaybackEventKind.EffectTriggered,
+                    effectTrigger: "OnPlay"),
+                Is.EqualTo(PresentationAudioCueIds.ShopPlay));
             Assert.That(
                 BattleScreenView.ResolveAudioCueId(
                     BattlePlaybackEventKind.DamageApplied),
@@ -376,6 +382,17 @@ namespace SpireChess.Tests.EditMode
             Assert.That(impact.ActiveCount, Is.GreaterThan(0));
             Assert.That(impact.ActiveCount, Is.LessThanOrEqualTo(impact.Capacity));
             Assert.That(impact.LastEffectId, Is.EqualTo("death"));
+            impact.PlayEffectSeal(Vector2.zero, Color.yellow, false);
+            impact.PlayEffectLink(
+                new Vector2(-60f, 0f),
+                new Vector2(60f, 0f),
+                Color.yellow,
+                true);
+            impact.PlayStatGrowth(Vector2.zero, Color.green);
+            impact.PlayShield(Vector2.zero, Color.cyan, true);
+            impact.PlaySummonPortal(Vector2.zero, Color.magenta);
+            Assert.That(impact.ActiveCount, Is.LessThanOrEqualTo(impact.Capacity));
+            Assert.That(impact.LastEffectId, Is.EqualTo("summon_portal"));
             foreach (var group in layer.GetComponentsInChildren<CanvasGroup>(true))
             {
                 Assert.That(group.interactable, Is.False);

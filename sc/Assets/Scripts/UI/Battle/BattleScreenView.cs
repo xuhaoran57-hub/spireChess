@@ -279,7 +279,8 @@ namespace SpireChess.UI.Battle
                 playbackEvent.AttackDelta,
                 playbackEvent.HealthDelta,
                 targetIsToken,
-                winner) ?? string.Empty;
+                winner,
+                playbackEvent.EffectTrigger) ?? string.Empty;
             if (!string.IsNullOrEmpty(LastAudioCueId))
             {
                 AudioService.Instance?.PlayCue(LastAudioCueId);
@@ -296,6 +297,12 @@ namespace SpireChess.UI.Battle
                         break;
                     case BattlePlaybackEventKind.RoundStarted:
                         yield return PlayRoundStarted(
+                            playbackEvent,
+                            durationScale,
+                            epoch);
+                        break;
+                    case BattlePlaybackEventKind.EffectTriggered:
+                        yield return PlayEffectTriggered(
                             playbackEvent,
                             durationScale,
                             epoch);
@@ -383,6 +390,8 @@ namespace SpireChess.UI.Battle
                     return "battle_start";
                 case BattlePlaybackEventKind.RoundStarted:
                     return "battle_round";
+                case BattlePlaybackEventKind.EffectTriggered:
+                    return "battle_effect";
                 case BattlePlaybackEventKind.AttackStarted:
                     return "battle_attack";
                 case BattlePlaybackEventKind.DamageApplied:
@@ -412,10 +421,15 @@ namespace SpireChess.UI.Battle
             int attackDelta = 0,
             int healthDelta = 0,
             bool targetIsToken = false,
-            BattleSide? winner = null)
+            BattleSide? winner = null,
+            string effectTrigger = null)
         {
             switch (kind)
             {
+                case BattlePlaybackEventKind.EffectTriggered:
+                    return effectTrigger == "OnPlay"
+                        ? PresentationAudioCueIds.ShopPlay
+                        : null;
                 case BattlePlaybackEventKind.AttackStarted:
                     return PresentationAudioCueIds.BattleAttackLight;
                 case BattlePlaybackEventKind.DamageApplied:
@@ -574,6 +588,67 @@ namespace SpireChess.UI.Battle
                 epoch);
         }
 
+        private IEnumerator PlayEffectTriggered(
+            BattlePlaybackEvent playbackEvent,
+            float scale,
+            int epoch)
+        {
+            var source = FindCard(playbackEvent.SourceInstanceId);
+            var target = FindCard(playbackEvent.TargetInstanceId);
+            var label = FormatEffectLabel(
+                playbackEvent.EffectTrigger,
+                playbackEvent.EffectAction);
+            var color = ResolveEffectColor(playbackEvent.EffectTrigger);
+            var sourcePosition = ResolveFxPosition(
+                source,
+                playbackEvent.SourceSide,
+                playbackEvent.SourceIndex);
+            var sourceImpactPosition = ResolveImpactFxPosition(
+                source,
+                playbackEvent.SourceSide,
+                playbackEvent.SourceIndex);
+            ShowFeedback(label, color);
+            PlayFx(
+                label,
+                color,
+                sourcePosition + Vector2.up * 18f,
+                PresentationFxEmphasis.Strong,
+                0.36f * scale,
+                34f);
+            impactFxLayer?.PlayEffectSeal(
+                sourceImpactPosition,
+                color,
+                playbackEvent.EffectTrigger == "OnDeath",
+                scale);
+            SetSlotHighlight(
+                playbackEvent.SourceSide,
+                playbackEvent.SourceIndex,
+                color);
+            if (!string.IsNullOrWhiteSpace(playbackEvent.TargetInstanceId) &&
+                playbackEvent.TargetInstanceId != playbackEvent.SourceInstanceId)
+            {
+                impactFxLayer?.PlayEffectLink(
+                    sourceImpactPosition,
+                    ResolveImpactFxPosition(
+                        target,
+                        playbackEvent.TargetSide,
+                        playbackEvent.TargetIndex),
+                    color,
+                    playbackEvent.EffectTrigger == "OnPlay",
+                    scale);
+                SetSlotHighlight(
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex,
+                    color);
+            }
+
+            yield return AnimatePulse(
+                color,
+                0.14f,
+                0.22f * scale,
+                epoch);
+        }
+
         private IEnumerator PlayAttack(
             BattlePlaybackEvent playbackEvent,
             float scale,
@@ -581,9 +656,11 @@ namespace SpireChess.UI.Battle
         {
             var attacker = FindCard(playbackEvent.SourceInstanceId);
             var target = FindCard(playbackEvent.TargetInstanceId);
-            ShowFeedback("突进", AttackerColor);
+            ShowFeedback(
+                playbackEvent.IsImmediateAttack ? "迅捷突进" : "突进",
+                AttackerColor);
             PlayFx(
-                "攻击",
+                playbackEvent.IsImmediateAttack ? "立即攻击" : "攻击",
                 AttackerColor,
                 ResolveFxPosition(
                     attacker,
@@ -602,7 +679,9 @@ namespace SpireChess.UI.Battle
                     playbackEvent.TargetSide,
                     playbackEvent.TargetIndex),
                 AttackerColor,
-                scale);
+                scale,
+                playbackEvent.IsImmediateAttack ||
+                attacker?.Model?.Keywords.Contains("溅射") == true);
             SetSlotHighlight(
                 playbackEvent.SourceSide,
                 playbackEvent.SourceIndex,
@@ -695,6 +774,21 @@ namespace SpireChess.UI.Battle
                 playbackEvent.Amount,
                 targetBaseHealth,
                 targetIsDefeated);
+            if (playbackEvent.IsSplashDamage)
+            {
+                impactFxLayer?.PlayCleaveArc(
+                    ResolveImpactFxPosition(
+                        FindCard(playbackEvent.SourceInstanceId),
+                        playbackEvent.SourceSide,
+                        playbackEvent.SourceIndex),
+                    impactPosition,
+                    AttackerColor,
+                    scale);
+                yield return Animate(
+                    0.04f * scale,
+                    epoch,
+                    _ => { });
+            }
             if (playbackEvent.WasBlocked)
             {
                 impactFxLayer?.PlayImpact(
@@ -799,6 +893,14 @@ namespace SpireChess.UI.Battle
             var target = FindCard(playbackEvent.TargetInstanceId);
             var color = gained ? ShieldColor : TargetColor;
             var label = gained ? "护盾 +" : "护盾破裂";
+            impactFxLayer?.PlayShield(
+                ResolveImpactFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                color,
+                gained,
+                scale);
             ShowFeedback(label, color);
             PlayFx(
                 label,
@@ -852,6 +954,16 @@ namespace SpireChess.UI.Battle
             target?.PlayStatChange(
                 playbackEvent.AttackDelta,
                 playbackEvent.HealthDelta);
+            if (positive)
+            {
+                impactFxLayer?.PlayStatGrowth(
+                    ResolveImpactFxPosition(
+                        target,
+                        playbackEvent.TargetSide,
+                        playbackEvent.TargetIndex),
+                    color,
+                    scale);
+            }
             ShowFeedback("属性变化", color);
             PlayFx(
                 label,
@@ -959,6 +1071,13 @@ namespace SpireChess.UI.Battle
             int epoch)
         {
             var target = FindCard(playbackEvent.TargetInstanceId);
+            impactFxLayer?.PlaySummonPortal(
+                ResolveImpactFxPosition(
+                    target,
+                    playbackEvent.TargetSide,
+                    playbackEvent.TargetIndex),
+                GrowthColor,
+                scale);
             ShowFeedback("增援入场", GrowthColor);
             PlayFx(
                 "召唤",
@@ -1021,6 +1140,63 @@ namespace SpireChess.UI.Battle
                 0.20f,
                 0.30f * scale,
                 epoch);
+        }
+
+        private static string FormatEffectLabel(
+            string trigger,
+            string action)
+        {
+            var triggerLabel = ResolveEffectTriggerLabel(trigger);
+            var actionLabel = ResolveEffectActionLabel(action);
+            return string.IsNullOrWhiteSpace(actionLabel)
+                ? triggerLabel
+                : triggerLabel + " · " + actionLabel;
+        }
+
+        private static string ResolveEffectTriggerLabel(string trigger)
+        {
+            switch (trigger)
+            {
+                case "OnPlay": return "战吼";
+                case "OnDeath": return "亡语";
+                case "OnBattleStart": return "战斗开始";
+                case "OnSummon": return "召唤响应";
+                case "OnEnemySummon": return "敌方召唤响应";
+                case "OnShieldLost": return "护盾破裂响应";
+                case "OnShieldGained": return "护盾获得响应";
+                case "OnAttackBefore": return "攻击前效果";
+                case "OnKill": return "击杀效果";
+                default: return "效果触发";
+            }
+        }
+
+        private static string ResolveEffectActionLabel(string action)
+        {
+            switch (action)
+            {
+                case "AddShield": return "护盾";
+                case "RemoveShield": return "破盾";
+                case "ModifyStats": return "属性变化";
+                case "SummonToken": return "召唤";
+                case "ImmediateAttack": return "立即攻击";
+                case "AddKeyword": return "获得关键词";
+                case "DealDamage": return "伤害";
+                default: return string.Empty;
+            }
+        }
+
+        private static Color ResolveEffectColor(string trigger)
+        {
+            switch (trigger)
+            {
+                case "OnPlay": return FeedbackColor;
+                case "OnDeath": return DeathColor;
+                case "OnSummon":
+                case "OnEnemySummon": return GrowthColor;
+                case "OnShieldLost":
+                case "OnShieldGained": return ShieldColor;
+                default: return AttackerColor;
+            }
         }
 
         private BattleStandeeView FindCard(string instanceId)
@@ -1101,6 +1277,7 @@ namespace SpireChess.UI.Battle
                 feedbackFxPool.ClearImmediate();
             }
             impactFxLayer?.ClearImmediate();
+            AudioService.Instance?.StopAllTransientCues();
             HideResult();
         }
 

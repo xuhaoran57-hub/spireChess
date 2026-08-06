@@ -412,6 +412,47 @@ namespace SpireChess.Tests
         }
 
         [Test]
+        public void PlaybackEvents_ExposeEffectAndCleavePresentationMetadata()
+        {
+            var cleave = new BattleSimulator(new SequenceRandom())
+                .SimulatePlayback(CreateCleaveState(true));
+            var attack = cleave.PlaybackEvents.First(value =>
+                value.Kind == BattlePlaybackEventKind.AttackStarted);
+            var splashTargets = cleave.PlaybackEvents
+                .Where(value => value.Kind == BattlePlaybackEventKind.DamageApplied &&
+                                value.IsSplashDamage)
+                .Select(value => value.TargetIndex)
+                .ToArray();
+
+            Assert.That(attack.IsImmediateAttack, Is.False);
+            Assert.That(splashTargets, Is.EqualTo(new[] { 1, 3 }));
+
+            var tokenConfig = CreateConfig("token", 1, 1, true);
+            var summonerConfig = CreateConfig("summoner", 1, 1);
+            summonerConfig.Effects.Add(CreateSummonEffect("token", 1));
+            var state = CreateState();
+            state.Player[0] = new BattleMinionRuntime(summonerConfig);
+            state.Enemy[0] = CreateMinion("enemy", 2, 100);
+
+            var result = CreateSimulator(tokenConfig).SimulatePlayback(state);
+            var playbackEvents = result.PlaybackEvents.ToList();
+            var death = playbackEvents.FindIndex(value =>
+                value.Kind == BattlePlaybackEventKind.UnitDied);
+            var effect = playbackEvents.FindIndex(value =>
+                value.Kind == BattlePlaybackEventKind.EffectTriggered &&
+                value.EffectId == "summon");
+            var summon = playbackEvents.FindIndex(value =>
+                value.Kind == BattlePlaybackEventKind.UnitSummoned);
+
+            Assert.That(effect, Is.GreaterThan(death));
+            Assert.That(effect, Is.LessThan(summon));
+            Assert.That(playbackEvents[effect].EffectTrigger,
+                Is.EqualTo("OnDeath"));
+            Assert.That(playbackEvents[effect].EffectAction,
+                Is.EqualTo("SummonToken"));
+        }
+
+        [Test]
         public void RuntimeInstanceId_IsStableAcrossPlaybackSnapshotsAndClones()
         {
             var state = CreateState();

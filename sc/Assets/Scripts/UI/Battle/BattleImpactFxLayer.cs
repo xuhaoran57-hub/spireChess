@@ -13,6 +13,22 @@ namespace SpireChess.UI.Battle
         private const int MaximumCapacity = FixedPoolCapacity;
 
         [SerializeField] private Sprite sprite;
+        [Header("Showcase sprites")]
+        [SerializeField] private Sprite attackTrailSprite;
+        [SerializeField] private Sprite attackHeavyTrailSprite;
+        [SerializeField] private Sprite cleaveArcSprite;
+        [SerializeField] private Sprite lightImpactSprite;
+        [SerializeField] private Sprite impactSprite;
+        [SerializeField] private Sprite shieldSprite;
+        [SerializeField] private Sprite effectSealSprite;
+        [SerializeField] private Sprite warcryLinkSprite;
+        [SerializeField] private Sprite effectBoltSprite;
+        [SerializeField] private Sprite statGrowthSprite;
+        [SerializeField] private Sprite deathSprite;
+        [SerializeField] private Sprite tokenDeathSprite;
+        [SerializeField] private Sprite summonSprite;
+        [SerializeField] private Sprite summonBeamSprite;
+        [SerializeField] private Sprite summonDustSprite;
         [SerializeField, Range(MinimumCapacity, MaximumCapacity)]
         private int capacity = 32;
 
@@ -57,10 +73,14 @@ namespace SpireChess.UI.Battle
             Vector2 source,
             Vector2 target,
             Color color,
-            float durationScale = 1f)
+            float durationScale = 1f,
+            bool heavy = false)
         {
             LastEffectId = "attack_trail";
             var scaledDuration = ResolveDurationScale(durationScale);
+            var preferredSprite = heavy
+                ? (attackHeavyTrailSprite ?? attackTrailSprite)
+                : attackTrailSprite;
             var delta = target - source;
             var distance = Mathf.Max(72f, delta.magnitude);
             var direction = delta.sqrMagnitude <= 0.001f
@@ -83,7 +103,8 @@ namespace SpireChess.UI.Battle
                     angle,
                     angle,
                     new Vector2(0.38f, 0.72f),
-                    new Vector2(1.06f, 0.20f));
+                    new Vector2(1.06f, 0.20f),
+                    preferredSprite);
             }
         }
 
@@ -104,6 +125,9 @@ namespace SpireChess.UI.Battle
             var duration = emphasis == PresentationFxEmphasis.Critical
                 ? 0.24f
                 : emphasis == PresentationFxEmphasis.Strong ? 0.20f : 0.16f;
+            var coreSprite = emphasis == PresentationFxEmphasis.Normal
+                ? (lightImpactSprite ?? impactSprite)
+                : impactSprite;
 
             PlayElement(
                 position,
@@ -115,7 +139,8 @@ namespace SpireChess.UI.Battle
                 45f,
                 62f,
                 Vector2.one * 0.24f,
-                Vector2.one * 1.18f);
+                Vector2.one * 1.18f,
+                coreSprite);
 
             for (var index = 0; index < rayCount; index++)
             {
@@ -149,6 +174,20 @@ namespace SpireChess.UI.Battle
             var scaledDuration = ResolveDurationScale(durationScale);
             var count = token ? 5 : 8;
             var duration = token ? 0.20f : 0.30f;
+            PlayElement(
+                position,
+                position + Vector2.up * (token ? 16f : 24f),
+                Vector2.one * (token ? 66f : 94f),
+                Color.Lerp(color, Color.white, 0.28f),
+                token ? 0.74f : 0.90f,
+                duration * scaledDuration,
+                0f,
+                token ? 24f : -18f,
+                Vector2.one * 0.52f,
+                Vector2.one * (token ? 0.84f : 1.08f),
+                token
+                    ? (tokenDeathSprite ?? summonDustSprite)
+                    : deathSprite);
             for (var index = 0; index < count; index++)
             {
                 var angle = 360f * index / count + 18f;
@@ -169,6 +208,181 @@ namespace SpireChess.UI.Battle
                     angle + (index % 2 == 0 ? 105f : -105f),
                     Vector2.one,
                     Vector2.one * (token ? 0.18f : 0.42f));
+            }
+        }
+
+        public void PlayEffectSeal(
+            Vector2 position,
+            Color color,
+            bool isDeathrattle,
+            float durationScale = 1f)
+        {
+            LastEffectId = isDeathrattle ? "deathrattle_seal" : "effect_seal";
+            var scaledDuration = ResolveDurationScale(durationScale);
+            PlayElement(
+                position,
+                position + Vector2.up * 24f,
+                Vector2.one * 94f,
+                Color.Lerp(color, Color.white, 0.36f),
+                0.94f,
+                0.32f * scaledDuration,
+                0f,
+                isDeathrattle ? -38f : 38f,
+                Vector2.one * 0.44f,
+                Vector2.one * 1.05f,
+                effectSealSprite);
+        }
+
+        public void PlayCleaveArc(
+            Vector2 source,
+            Vector2 target,
+            Color color,
+            float durationScale = 1f)
+        {
+            LastEffectId = "cleave_arc";
+            var scaledDuration = ResolveDurationScale(durationScale);
+            var delta = target - source;
+            var angle = delta.sqrMagnitude <= 0.001f
+                ? 0f
+                : Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+            PlayElement(
+                Vector2.Lerp(source, target, 0.34f),
+                target,
+                new Vector2(Mathf.Max(92f, delta.magnitude * 0.72f), 64f),
+                Color.Lerp(color, Color.white, 0.24f),
+                0.88f,
+                0.24f * scaledDuration,
+                angle,
+                angle + 12f,
+                Vector2.one * 0.50f,
+                Vector2.one,
+                cleaveArcSprite);
+        }
+
+        public void PlayEffectLink(
+            Vector2 source,
+            Vector2 target,
+            Color color,
+            bool isWarcry,
+            float durationScale = 1f)
+        {
+            LastEffectId = isWarcry ? "warcry_link" : "effect_bolt";
+            var scaledDuration = ResolveDurationScale(durationScale);
+            var delta = target - source;
+            var angle = delta.sqrMagnitude <= 0.001f
+                ? 0f
+                : Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+            var preferredSprite = isWarcry
+                ? (warcryLinkSprite ?? effectBoltSprite)
+                : (effectBoltSprite ?? warcryLinkSprite);
+            PlayElement(
+                Vector2.Lerp(source, target, 0.24f),
+                target,
+                new Vector2(Mathf.Max(82f, delta.magnitude * 0.76f),
+                    isWarcry ? 34f : 26f),
+                Color.Lerp(color, Color.white, 0.28f),
+                0.86f,
+                (isWarcry ? 0.26f : 0.18f) * scaledDuration,
+                angle,
+                angle,
+                new Vector2(0.42f, 0.72f),
+                new Vector2(1.04f, 0.42f),
+                preferredSprite);
+        }
+
+        public void PlayStatGrowth(
+            Vector2 position,
+            Color color,
+            float durationScale = 1f)
+        {
+            LastEffectId = "stat_growth";
+            var scaledDuration = ResolveDurationScale(durationScale);
+            PlayElement(
+                position + Vector2.down * 12f,
+                position + Vector2.up * 34f,
+                new Vector2(86f, 108f),
+                Color.Lerp(color, Color.white, 0.30f),
+                0.84f,
+                0.30f * scaledDuration,
+                0f,
+                9f,
+                Vector2.one * 0.42f,
+                Vector2.one * 0.96f,
+                statGrowthSprite);
+        }
+
+        public void PlayShield(
+            Vector2 position,
+            Color color,
+            bool gained,
+            float durationScale = 1f)
+        {
+            LastEffectId = gained ? "shield_gain" : "shield_break";
+            var scaledDuration = ResolveDurationScale(durationScale);
+            PlayElement(
+                position,
+                position,
+                Vector2.one * 96f,
+                Color.Lerp(color, Color.white, 0.34f),
+                gained ? 0.76f : 0.94f,
+                (gained ? 0.22f : 0.28f) * scaledDuration,
+                0f,
+                gained ? 36f : -58f,
+                Vector2.one * (gained ? 0.44f : 0.92f),
+                Vector2.one * (gained ? 1.04f : 1.26f),
+                shieldSprite);
+        }
+
+        public void PlaySummonPortal(
+            Vector2 position,
+            Color color,
+            float durationScale = 1f)
+        {
+            LastEffectId = "summon_portal";
+            var scaledDuration = ResolveDurationScale(durationScale);
+            PlayElement(
+                position + Vector2.down * 42f,
+                position + Vector2.up * 56f,
+                new Vector2(42f, 156f),
+                Color.Lerp(color, Color.white, 0.38f),
+                0.72f,
+                0.30f * scaledDuration,
+                0f,
+                0f,
+                new Vector2(0.42f, 0.24f),
+                new Vector2(0.94f, 1.10f),
+                summonBeamSprite);
+            PlayElement(
+                position + Vector2.down * 24f,
+                position + Vector2.up * 8f,
+                new Vector2(122f, 92f),
+                Color.Lerp(color, Color.white, 0.26f),
+                0.92f,
+                0.34f * scaledDuration,
+                0f,
+                42f,
+                Vector2.one * 0.36f,
+                Vector2.one * 1.10f,
+                summonSprite);
+            for (var index = 0; index < 4; index++)
+            {
+                var angle = 42f + index * 78f;
+                var radians = angle * Mathf.Deg2Rad;
+                var direction = new Vector2(
+                    Mathf.Cos(radians),
+                    Mathf.Sin(radians));
+                PlayElement(
+                    position + direction * 8f,
+                    position + direction * 42f + Vector2.up * 18f,
+                    new Vector2(20f, 16f),
+                    Color.Lerp(color, Color.white, 0.20f),
+                    0.68f,
+                    (0.22f + index * 0.018f) * scaledDuration,
+                    angle,
+                    angle + 48f,
+                    Vector2.one * 0.36f,
+                    Vector2.one * 0.78f,
+                    summonDustSprite);
             }
         }
 
@@ -306,7 +520,8 @@ namespace SpireChess.UI.Battle
             float startRotation,
             float endRotation,
             Vector2 startScale,
-            Vector2 endScale)
+            Vector2 endScale,
+            Sprite preferredSprite = null)
         {
             EnsureEntries();
             var entry = FindAvailableEntry();
@@ -325,6 +540,7 @@ namespace SpireChess.UI.Battle
             entry.Rect.anchoredPosition = startPosition;
             entry.Rect.localScale = new Vector3(startScale.x, startScale.y, 1f);
             entry.Rect.localEulerAngles = new Vector3(0f, 0f, startRotation);
+            entry.Image.sprite = preferredSprite ?? sprite;
             var initialColor = entry.Color;
             initialColor.a = 0f;
             entry.Image.color = initialColor;

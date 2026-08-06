@@ -85,6 +85,58 @@ namespace SpireChess.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator StopAllTransientCues_ReleasesActiveCueCapacity()
+        {
+            var service = AudioService.EnsurePresent();
+            var originalCatalog = service.Catalog;
+            var catalog =
+                ScriptableObject.CreateInstance<PresentationAudioCatalog>();
+            var clip = CreateClip("showcase_impact");
+
+            try
+            {
+                SetPrivateField(
+                    catalog,
+                    "cues",
+                    new[]
+                    {
+                        new PresentationAudioCueDefinition(
+                            "showcase_impact",
+                            PresentationAudioBus.Sfx,
+                            new[] { clip },
+                            concurrencyLimit: 1,
+                            assetStatus:
+                                PresentationAudioCueAssetStatus.Placeholder)
+                    });
+                InvokePrivate(catalog, "RebuildLookup");
+                service.StopAllTransientCues();
+                service.Configure(catalog);
+
+                Assert.That(service.PlayCue("showcase_impact"), Is.True);
+                Assert.That(
+                    service.PlayCue("showcase_impact"),
+                    Is.False,
+                    "The test cue has a single active-voice slot.");
+
+                service.StopAllTransientCues();
+
+                Assert.That(
+                    service.PlayCue("showcase_impact"),
+                    Is.True,
+                    "Skipping must stop the voice and release its limiter slot.");
+            }
+            finally
+            {
+                service.StopAllTransientCues();
+                service.Configure(originalCatalog);
+                Object.Destroy(catalog);
+                Object.Destroy(clip);
+            }
+
+            yield return null;
+        }
+
         private static PresentationAudioCueDefinition CreateMusicCue(
             string id,
             AudioClip clip)

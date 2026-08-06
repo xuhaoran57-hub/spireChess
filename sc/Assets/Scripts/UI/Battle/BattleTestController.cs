@@ -6,6 +6,7 @@ using SpireChess.Battle;
 using SpireChess.Config;
 using SpireChess.Run;
 using SpireChess.Simulation;
+using SpireChess.Shop;
 using SpireChess.UI.Common;
 using UnityEngine;
 
@@ -35,6 +36,26 @@ namespace SpireChess.UI.Battle
                     "rending_cub",
                     "forge_soul_shield_squire"
                 }),
+            new BattlePreset(
+                "可审看战斗 Showcase",
+                new[]
+                {
+                    "mirrorsteel_duelist",
+                    "forge_soul_shield_squire",
+                    "mercenary_shieldbearer",
+                    "rending_cub",
+                    "traveling_physician"
+                },
+                new[]
+                {
+                    null,
+                    "wandering_swordsman",
+                    "mercenary_shieldbearer",
+                    "fox_den_matriarch",
+                    null
+                },
+                new[] { 0 },
+                isShowcase: true),
             new BattlePreset(
                 "随机目标",
                 new[] { "wandering_swordsman", null, null, null, null },
@@ -201,6 +222,9 @@ namespace SpireChess.UI.Battle
         public float PlaybackSpeed => playbackSpeed;
         public bool UsesFormalView => screenView != null;
         public bool IsUsingValidationPreset => HasValidationPreset;
+        public bool IsShowcasePreset => !runBattle &&
+                                         !HasValidationPreset &&
+                                         CurrentTestPreset.IsShowcase;
         public string ActivePresetName => CurrentTestPreset.Name;
 
         private bool HasValidationPreset =>
@@ -327,7 +351,7 @@ namespace SpireChess.UI.Battle
 
         public void MoveCard(BattleSide fromSide, int fromIndex, BattleSide toSide, int toIndex)
         {
-            if (IsBattleLocked || battleResolved || fromSide != toSide)
+            if (IsBattleLocked || battleResolved || IsShowcasePreset || fromSide != toSide)
             {
                 RenderFormalState();
                 return;
@@ -374,11 +398,36 @@ namespace SpireChess.UI.Battle
             battleResolved = false;
             skipPlaybackRequested = false;
             displayedLog.Clear();
-            displayedState = setupState.Clone();
+            var showcaseFixture = IsShowcasePreset
+                ? BuildShowcaseFixture(GameApp.Instance.Configs)
+                : null;
+            var battleState = showcaseFixture?.BattleState ?? setupState;
+            displayedState = showcaseFixture?.PresentationBeforeBattlecry ??
+                battleState.Clone();
             currentStatus = "战斗播放中";
             RenderFormalState();
 
-            var result = simulator.SimulatePlayback(setupState);
+            var activeSimulator = IsShowcasePreset
+                ? CreateShowcaseSimulator()
+                : simulator;
+            var result = activeSimulator.SimulatePlayback(battleState);
+            foreach (var playbackEvent in BuildShowcasePreludeEvents(
+                         showcaseFixture))
+            {
+                if (skipPlaybackRequested)
+                {
+                    break;
+                }
+
+                currentStatus = playbackEvent.Message;
+                displayedLog.Add(playbackEvent.Message);
+                displayedState = playbackEvent.BoardState;
+                RenderFormalState();
+                yield return screenView.PlayEvent(
+                    playbackEvent,
+                    playbackSpeed,
+                    result.Winner);
+            }
             foreach (var playbackEvent in result.PlaybackEvents)
             {
                 if (skipPlaybackRequested)
@@ -446,7 +495,14 @@ namespace SpireChess.UI.Battle
                 return lastResult;
             }
 
-            var result = simulator.Simulate(setupState);
+            var activeSimulator = IsShowcasePreset
+                ? CreateShowcaseSimulator()
+                : simulator;
+            var showcaseFixture = IsShowcasePreset
+                ? BuildShowcaseFixture(GameApp.Instance.Configs)
+                : null;
+            var result = activeSimulator.Simulate(
+                showcaseFixture?.BattleState ?? setupState);
             displayedLog.Clear();
             displayedLog.AddRange(result.Log);
             displayedState = result.FinalState;
@@ -537,10 +593,196 @@ namespace SpireChess.UI.Battle
 
         private static BattleBoardState BuildInitialState(ConfigService configs, BattlePreset preset)
         {
+            if (preset.IsShowcase)
+            {
+                return BuildShowcaseFixture(configs).BattleState;
+            }
+
             var state = new BattleBoardState();
             FillRow(state.Player, configs, preset.PlayerIds, preset.PlayerGoldenSlots);
             FillRow(state.Enemy, configs, preset.EnemyIds, preset.EnemyGoldenSlots);
             return state;
+        }
+
+        private static ShowcaseFixture BuildShowcaseFixture(
+            ConfigService configs)
+        {
+            if (!configs.TryGetMinion("rending_cub", out var cubConfig) ||
+                !configs.TryGetMinion(
+                    "traveling_physician",
+                    out var physicianConfig))
+            {
+                throw new System.InvalidOperationException(
+                    "Showcase shop minion config is missing.");
+            }
+
+            var shop = new ShopSession(
+                configs.Minions,
+                configs.Spells,
+                new System.Random(40606));
+            if (!shop.StartRound(1).Success)
+            {
+                throw new System.InvalidOperationException(
+                    "Showcase shop could not open.");
+            }
+
+            if (!shop.Collection.TryAddToBench(
+                    ShopCardInstance.CreateMinion(
+                        "showcase:cub",
+                        cubConfig),
+                    out var cubBenchIndex) ||
+                !shop.PlayMinion(cubBenchIndex, 3).Success)
+            {
+                throw new System.InvalidOperationException(
+                    "Showcase target could not enter the battle area.");
+            }
+
+            var targetBeforeBattlecry = shop.CreateBattleSnapshot();
+            ShopEventData battlecryEvent = null;
+            shop.EventRaised += value =>
+            {
+                if (value.Type == ShopEventType.OnPlay &&
+                    value.Card?.InstanceId == "showcase:physician")
+                {
+                    battlecryEvent = value;
+                }
+            };
+            if (!shop.Collection.TryAddToBench(
+                    ShopCardInstance.CreateMinion(
+                        "showcase:physician",
+                        physicianConfig),
+                    out var physicianBenchIndex) ||
+                !shop.PlayMinion(physicianBenchIndex, 4, 3).Success ||
+                battlecryEvent?.TargetCard?.InstanceId != "showcase:cub")
+            {
+                throw new System.InvalidOperationException(
+                    "Showcase battlecry fixture could not resolve its target.");
+            }
+
+            var battleState = shop.CreateBattleSnapshot();
+            var presentationBeforeBattlecry = battleState.Clone();
+            presentationBeforeBattlecry.Player[3] =
+                targetBeforeBattlecry.Player[3];
+            ConfigureShowcaseBattleState(
+                presentationBeforeBattlecry,
+                configs);
+            ConfigureShowcaseBattleState(battleState, configs);
+            return new ShowcaseFixture(
+                presentationBeforeBattlecry,
+                battleState,
+                battlecryEvent);
+        }
+
+        private static void ConfigureShowcaseBattleState(
+            BattleBoardState state,
+            ConfigService configs)
+        {
+            state.Player[0] = CreateShowcaseMinion(
+                configs,
+                "mirrorsteel_duelist",
+                true,
+                initialHealth: 40);
+            state.Player[1] = CreateShowcaseMinion(
+                configs,
+                "forge_soul_shield_squire",
+                false,
+                initialHealth: 10);
+            state.Player[2] = CreateShowcaseMinion(
+                configs,
+                "mercenary_shieldbearer",
+                false,
+                initialHealth: 70);
+
+            state.Enemy[1] = CreateShowcaseMinion(
+                configs,
+                "wandering_swordsman",
+                false,
+                initialHealth: 8);
+            state.Enemy[2] = CreateShowcaseMinion(
+                configs,
+                "mercenary_shieldbearer",
+                false,
+                initialAttack: 22,
+                initialHealth: 27);
+            state.Enemy[3] = CreateShowcaseMinion(
+                configs,
+                "fox_den_matriarch",
+                false,
+                initialAttack: 1,
+                initialHealth: 5);
+        }
+
+        private static BattleMinionRuntime CreateShowcaseMinion(
+            ConfigService configs,
+            string id,
+            bool golden,
+            int? initialAttack = null,
+            int? initialHealth = null)
+        {
+            if (!configs.TryGetMinion(id, out var config))
+            {
+                throw new System.InvalidOperationException(
+                    "Showcase minion config is missing: " + id);
+            }
+
+            return new BattleMinionRuntime(
+                config,
+                golden,
+                initialAttack,
+                initialHealth);
+        }
+
+        private static IEnumerable<BattlePlaybackEvent> BuildShowcasePreludeEvents(
+            ShowcaseFixture fixture)
+        {
+            if (fixture == null)
+            {
+                return Enumerable.Empty<BattlePlaybackEvent>();
+            }
+
+            var source = fixture.BattlecryEvent.Card;
+            var target = fixture.BattlecryEvent.TargetCard;
+            var effect = source.Minion.Effects.FirstOrDefault(value =>
+                value.Trigger == "OnPlay");
+            var healthDelta = fixture.BattleState.Player[3].CurrentHealth -
+                fixture.PresentationBeforeBattlecry.Player[3].CurrentHealth;
+            return new[]
+            {
+                new BattlePlaybackEvent(
+                    BattlePlaybackEventKind.EffectTriggered,
+                    fixture.PresentationBeforeBattlecry,
+                    source.Minion.Name + "触发战吼。",
+                    BattleSide.Player,
+                    4,
+                    source.InstanceId,
+                    BattleSide.Player,
+                    3,
+                    target.InstanceId,
+                    effectId: effect?.Id,
+                    effectTrigger: "OnPlay",
+                    effectAction: effect?.Action),
+                new BattlePlaybackEvent(
+                    BattlePlaybackEventKind.StatsChanged,
+                    fixture.BattleState,
+                    target.Minion.Name + "获得 +" + healthDelta + " 生命。",
+                    BattleSide.Player,
+                    4,
+                    source.InstanceId,
+                    BattleSide.Player,
+                    3,
+                    target.InstanceId,
+                    healthDelta: healthDelta)
+            };
+        }
+
+        private BattleSimulator CreateShowcaseSimulator()
+        {
+            var configs = GameApp.Instance.Configs;
+            return new BattleSimulator(
+                new System.Random(40606),
+                id => configs.TryGetMinion(id, out var config)
+                    ? config
+                    : null);
         }
 
         private static void FillRow(
@@ -699,6 +941,27 @@ namespace SpireChess.UI.Battle
             }
         }
 
+        private sealed class ShowcaseFixture
+        {
+            public ShowcaseFixture(
+                BattleBoardState presentationBeforeBattlecry,
+                BattleBoardState battleState,
+                ShopEventData battlecryEvent)
+            {
+                PresentationBeforeBattlecry = presentationBeforeBattlecry ??
+                    throw new System.ArgumentNullException(
+                        nameof(presentationBeforeBattlecry));
+                BattleState = battleState ?? throw new System.ArgumentNullException(
+                    nameof(battleState));
+                BattlecryEvent = battlecryEvent ??
+                    throw new System.ArgumentNullException(nameof(battlecryEvent));
+            }
+
+            public BattleBoardState PresentationBeforeBattlecry { get; }
+            public BattleBoardState BattleState { get; }
+            public ShopEventData BattlecryEvent { get; }
+        }
+
         private sealed class BattlePreset
         {
             public BattlePreset(
@@ -706,13 +969,15 @@ namespace SpireChess.UI.Battle
                 string[] playerIds,
                 string[] enemyIds,
                 IEnumerable<int> playerGoldenSlots = null,
-                IEnumerable<int> enemyGoldenSlots = null)
+                IEnumerable<int> enemyGoldenSlots = null,
+                bool isShowcase = false)
             {
                 Name = name;
                 PlayerIds = playerIds;
                 EnemyIds = enemyIds;
                 PlayerGoldenSlots = new HashSet<int>(playerGoldenSlots ?? new int[0]);
                 EnemyGoldenSlots = new HashSet<int>(enemyGoldenSlots ?? new int[0]);
+                IsShowcase = isShowcase;
             }
 
             public string Name { get; }
@@ -720,6 +985,7 @@ namespace SpireChess.UI.Battle
             public IReadOnlyList<string> EnemyIds { get; }
             public ISet<int> PlayerGoldenSlots { get; }
             public ISet<int> EnemyGoldenSlots { get; }
+            public bool IsShowcase { get; }
         }
     }
 

@@ -14,6 +14,7 @@ namespace SpireChess.Battle
     {
         CombatStarted,
         RoundStarted,
+        EffectTriggered,
         AttackStarted,
         DamageApplied,
         ShieldGained,
@@ -39,7 +40,12 @@ namespace SpireChess.Battle
             int amount = 0,
             int attackDelta = 0,
             int healthDelta = 0,
-            bool wasBlocked = false)
+            bool wasBlocked = false,
+            string effectId = null,
+            string effectTrigger = null,
+            string effectAction = null,
+            bool isSplashDamage = false,
+            bool isImmediateAttack = false)
         {
             Kind = kind;
             BoardState = (boardState ??
@@ -55,6 +61,11 @@ namespace SpireChess.Battle
             AttackDelta = attackDelta;
             HealthDelta = healthDelta;
             WasBlocked = wasBlocked;
+            EffectId = effectId;
+            EffectTrigger = effectTrigger;
+            EffectAction = effectAction;
+            IsSplashDamage = isSplashDamage;
+            IsImmediateAttack = isImmediateAttack;
         }
 
         public BattlePlaybackEventKind Kind { get; }
@@ -70,6 +81,11 @@ namespace SpireChess.Battle
         public int AttackDelta { get; }
         public int HealthDelta { get; }
         public bool WasBlocked { get; }
+        public string EffectId { get; }
+        public string EffectTrigger { get; }
+        public string EffectAction { get; }
+        public bool IsSplashDamage { get; }
+        public bool IsImmediateAttack { get; }
     }
 
     public sealed class BattleSideDiagnostics
